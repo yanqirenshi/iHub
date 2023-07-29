@@ -1,4 +1,3 @@
-'use client';
 import * as React from 'react';
 import Avatar from './Account/Avater.js';
 import Menu from './Account/Menu.js';
