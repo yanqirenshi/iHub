@@ -1,13 +1,8 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 
-import Provider from '../recoil/provider1.js';
-
-import Account from '@/assemblies/Account.js';
-import Operators from '@/assemblies/Operators.js';
-
-import ACCOUNT_MENU from '@/data/ACCOUNT_MENU.js';
-import OPERATORS from '@/data/OPERATORS.js';
+import Provider from '@/recoil/Provider.js';
+import GlobalUI from '@/assemblies/GlobalUI.js';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,17 +12,11 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-    const account_menu = ACCOUNT_MENU;
-    const operators = OPERATORS;
-
-    console.log('3--')
-
     return (
         <html lang="ja">
           <body className={inter.className}>
             <Provider>
-              <Account menu={account_menu}/>
-              <Operators operators={operators}/>
+              <GlobalUI/>
 
               {children}
             </Provider>

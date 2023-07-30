@@ -1,5 +1,8 @@
 'use client';
 import * as React from 'react';
+import { useRecoilValue } from "recoil";
+import { OPERATORS } from "../recoil/Provider.js";
+
 import Box from '@mui/material/Box';
 
 import Root from './Operators/Root.js';
@@ -11,11 +14,11 @@ export default function Operators (props) {
     // https://zenn.dev/developanda/articles/daf34873fe4ef4
     if (!window) return null;
 
-    calPositions(window.innerWidth, window.innerHeight, operators);
+    const calculated_operators = calPositions(window.innerWidth, window.innerHeight, operators);
 
     return (
         <>
-          {operators.map(operator=> {
+          {calculated_operators.map(operator=> {
               return (
                   <Root key={operator.code}
                         operator={operator}/>
@@ -41,7 +44,7 @@ export default function Operators (props) {
 function calPositions (w, h, operators=[]) {
     const size = operators.length;
 
-    if (size===0) return;
+    if (size===0) return [];
 
     // Root 間の Space は全部固定
     const s = 11;
@@ -55,12 +58,16 @@ function calPositions (w, h, operators=[]) {
     let start_x = (w / 2) - (operators_width / 2);
 
     // operator 毎 の position を計算する。
-    for (const operator of operators) {
+    return operators.map(operator=> {
+        const new_operator = JSON.parse(JSON.stringify(operator));
+
         // cal x
-        operator.position.x = start_x;
-        start_x += operator.size.w + s;
+        new_operator.position.x = start_x;
+        start_x += new_operator.size.w + s;
 
         // cal y
-        operator.position.y = h - operator.size.h - s;
-    }
+        new_operator.position.y = h - new_operator.size.h - s;
+
+        return new_operator;
+    });
 }
