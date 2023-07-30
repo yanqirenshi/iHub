@@ -1,5 +1,5 @@
 const PROJECTS = [
-    { id: 1, name: 'Party.Foodies' }
+    { id: 1, name: 'iHub' }
 ];
 
 export default PROJECTS;

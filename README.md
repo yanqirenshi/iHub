@@ -2,19 +2,34 @@
 
 ### React Components
 
-| Name     | Description                          |
-|----------|--------------------------------------|
-| app      | Page コンポーネント                  |
-| panels   | Page コンポーネント の具である Panel |
-| assembly | intermediate assembly (中間品)       |
-| parts    | 部品                                 |
+| Name     | Description                    |
+|----------+--------------------------------|
+| app      | Page コンポーネント            |
+| frames   | Page の枠、Panel を表示する。  |
+| panels   | Frame の Contents で表示する。 |
+| assembly | intermediate assembly (中間品) |
+| parts    | 部品                           |
 
 ### Javascript
 
-| Name   | Description |
-|--------|-------------|
-| models |             |
-| tools  |             |
+| Name     | Description              |
+|----------|--------------------------|
+| manegers | データモデルのマネージャ |
+| models   | データモデル             |
+| tools    |                          |
+
+## Page の構成
+
+Page の内容は以下の構成がある。
+
+- Tabs + Contents
+- Contents
+
+上記の種類のコンポーネントを Frame とする。
+
+Frameを基本とすることで、ユーザーが構成を自由に設定できるようにする。
+
+Content のコンポーネントを Panel とする。
 
 # Next.js
 
@@ -52,4 +67,3 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-
