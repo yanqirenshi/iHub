@@ -1,5 +1,4 @@
-'use client';
-import * as React from 'react';
+'use client'
 import { useRecoilValue } from "recoil";
 import { OPERATORS } from "../recoil/Provider.js";
 
@@ -9,12 +8,11 @@ import Root from './Operators/Root.js';
 
 export default function Operators (props) {
     const operators = props.operators;
+    const window_size = props.window_size;
 
-    // TODO: なんかエラーでるし、、、
-    // https://zenn.dev/developanda/articles/daf34873fe4ef4
-    if (!window) return null;
+    if (!window_size) return null;
 
-    const calculated_operators = calPositions(window.innerWidth, window.innerHeight, operators);
+    const calculated_operators = calPositions(window_size.w, window_size.h, operators);
 
     return (
         <>

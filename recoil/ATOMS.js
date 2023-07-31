@@ -11,3 +11,5 @@ function atom (key, val) {
 
 export const ACCOUNT_MENU = atom( "ACCOUNT_MENU", DATA_ACCOUNT_MENU);
 export const OPERATORS = atom("OPERATORS", DATA_OPERATORS);
+
+export const WINDOW = atom("WINDOW", null); // {w: num, h: num}

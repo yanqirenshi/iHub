@@ -2,9 +2,14 @@ import Box from '@mui/material/Box';
 
 // import styles from '@/app/page.module.css';
 
+const sx = {
+    width: '100vw',
+    height: '100vh',
+};
+
 export default function Frame (props) {
     return (
-        <Box>
+        <Box sx={sx}>
         </Box>
     );
 }
