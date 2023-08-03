@@ -8,8 +8,10 @@ const sx = {
 };
 
 export default function Frame (props) {
+    const children = props.children;
     return (
         <Box sx={sx}>
+          {children}
         </Box>
     );
 }

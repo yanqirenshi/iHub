@@ -12,6 +12,13 @@ const ACCOUNT_MENU = [
     { url: '/account',            label: 'アカウント' },
     { url: '/auth',               label: '認証' },
     { url: '/next.js',            label: 'Next.js' },
+    { url: '/bpmn',               label: 'BPMN' },
+    { url: '/ddd',                label: 'DDD' },
+    { url: '/tm',                 label: 'TM' },
+    { url: '/er',                 label: 'ER図' },
+    { url: '/uml',                label: 'UML' },
+    { url: '/systemic-design',    label: 'Systemic Design' },
+    { url: '/system-dynamics',    label: 'System Dynamics' },
 ];
 
 export default ACCOUNT_MENU;
