@@ -2,15 +2,14 @@ import Frame from '@/frames/Frame.js';
 
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+import S from '@mui/material/Typography';
 
-import WBSTable from '@/assemblies/WBSTable.js';
-
-export default function Wbs (props) {
+export default function ScreenTransitionDiagram () {
     return (
         <Frame>
-          <Container maxWidth="lg" sx={{pt:5}}>
+          <Container maxWidth="xl" sx={{pt: 3, pb:22}}>
             <Box>
-              <WBSTable/>
+              <S variant="h5">画面遷移</S>
             </Box>
           </Container>
         </Frame>

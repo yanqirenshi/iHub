@@ -3,8 +3,6 @@
 import * as React from 'react';
 import { RecoilRoot } from 'recoil';
 
-import wbs from '@/manegers/wbs.js';
-
 // ちょっと良くわかってない。
 // これがなせ必要なのか。
 // 以下を真似しているかんじ。
@@ -12,8 +10,6 @@ import wbs from '@/manegers/wbs.js';
 // 不要なら削除しても良さそう。
 export default function Provider(props) {
     const children = props.children;
-
-    console.log(wbs.data());
 
     return (
         <RecoilRoot>
