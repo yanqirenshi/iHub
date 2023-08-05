@@ -18,14 +18,12 @@ export const WINDOW = atom("WINDOW", null); // {w: num, h: num}
 
 // これつかってない。たぶん。
 export const PAGE_SCRUM = atom("PAGE_SCRUM", {
-    bounds: {
-        height: 0,
-    },
     tabs: {
-        selected: '1',
+        selected: 'projects',
         list: [
-            { code: '1', label: 'a' },
-            { code: '2', label: 'b' },
+            { code: 'projects', label: 'Projects' },
+            { code: 'account',  label: 'Account' },
+            { code: 'help',     label: 'Help' },
         ],
     },
 });
