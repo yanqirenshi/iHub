@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { useRecoilValue, useRecoilState } from "recoil";
 
-import * as atoms from '../recoil/ATOMS.js';
+import * as atoms from '@/recoil/ATOMS.js';
 
 import Account from '@/assemblies/Account.js';
 import Operators from '@/assemblies/Operators.js';

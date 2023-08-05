@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useRecoilValue } from "recoil";
 import { OPERATORS } from "../recoil/Provider.js";
 

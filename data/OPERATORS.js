@@ -16,7 +16,7 @@ const OPERATORS = [
     },
 ].map(d=> {
     // size use default
-    d.size = { w: 66, h: 66 };
+    d.size = { w: 55, h: 55 };
 
     return d;
 });
