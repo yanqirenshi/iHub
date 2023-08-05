@@ -5,6 +5,8 @@ import * as recoil from 'recoil';
 import DATA_ACCOUNT_MENU from '@/data/ACCOUNT_MENU.js';
 import DATA_OPERATORS from '@/data/OPERATORS.js';
 
+import sogh from '@/manegers/Sogh.js';
+
 function atom (key, val) {
     return recoil.atom({ key: key, default: val });
 }
@@ -14,9 +16,11 @@ export const OPERATORS = atom("OPERATORS", DATA_OPERATORS);
 
 export const WINDOW = atom("WINDOW", null); // {w: num, h: num}
 
-
+// これつかってない。たぶん。
 export const PAGE_SCRUM = atom("PAGE_SCRUM", {
-    bounds: {height:0},
+    bounds: {
+        height: 0,
+    },
     tabs: {
         selected: '1',
         list: [
