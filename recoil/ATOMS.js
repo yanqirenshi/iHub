@@ -16,7 +16,6 @@ export const OPERATORS = atom("OPERATORS", DATA_OPERATORS);
 
 export const WINDOW = atom("WINDOW", null); // {w: num, h: num}
 
-// これつかってない。たぶん。
 export const PAGE_SCRUM = atom("PAGE_SCRUM", {
     tabs: {
         selected: 'projects',
@@ -24,6 +23,17 @@ export const PAGE_SCRUM = atom("PAGE_SCRUM", {
             { code: 'projects', label: 'Projects' },
             { code: 'account',  label: 'Account' },
             { code: 'help',     label: 'Help' },
+        ],
+    },
+});
+
+export const PAGE_BPMN = atom("PAGE_BPMN", {
+    tabs: {
+        selected: 'palettes',
+        list: [
+            { code: 'palettes', label: 'Palettes' },
+            { code: 'styles',   label: 'Styles' },
+            { code: 'overview', label: 'Overview' },
         ],
     },
 });
