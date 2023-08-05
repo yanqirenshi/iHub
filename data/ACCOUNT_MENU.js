@@ -1,4 +1,5 @@
 const ACCOUNT_MENU = {
+    open: false,
     current_page: '1',
     pages: [
         {

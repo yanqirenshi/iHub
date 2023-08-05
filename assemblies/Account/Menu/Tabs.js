@@ -13,7 +13,7 @@ export default function Tabs (props) {
     const clickTab = (e,v)=> {
         const new_menu = {...menu};
         new_menu.current_page = v;
-        actions.menu.changeTab(new_menu);
+        actions.menu.change(new_menu);
     };
 
     return (

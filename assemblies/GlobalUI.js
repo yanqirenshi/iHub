@@ -28,8 +28,7 @@ export default function GlobalUI (props) {
 
     const actions = {
         menu: {
-            switchOpen: ()=> {},
-            changeTab: (new_menu)=> setAccountMenu(new_menu),
+            change: (new_menu)=> setAccountMenu(new_menu),
         },
     };
 
