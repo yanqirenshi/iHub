@@ -9,7 +9,7 @@ import CardContent from '@mui/material/CardContent';
 export default function SystemicDesign() {
     return (
         <Frame>
-          <Container maxWidth="xl" sx={{pt: 3, pb:22}}>
+          <Container maxWidth="lg" sx={{pt: 3, pb:22}}>
             <Box>
               <S variant="h5">(0) システミックデザイン</S>
 
