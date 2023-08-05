@@ -9,16 +9,13 @@ import Operators from '@/assemblies/Operators.js';
 
 export default function GlobalUI (props) {
     const [window_size, setWindowSize] = useRecoilState(atoms.WINDOW);
+    const [account_menu, setAccountMenu] = useRecoilState(atoms.ACCOUNT_MENU);
 
-    const account_menu = useRecoilValue(atoms.ACCOUNT_MENU);
     const operators = useRecoilValue(atoms.OPERATORS);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const handleResize = ()=> {
-                setWindowSize({w: window.innerWidth, h: window.innerHeight});
-            };
-
+            const handleResize = ()=> setWindowSize({w: window.innerWidth, h: window.innerHeight});
             window.addEventListener("resize", handleResize);
 
             handleResize();
@@ -29,9 +26,16 @@ export default function GlobalUI (props) {
         }
     }, []);
 
+    const actions = {
+        menu: {
+            switchOpen: ()=> {},
+            changeTab: (new_menu)=> setAccountMenu(new_menu),
+        },
+    };
+
     return (
         <>
-          <Account menu={account_menu}/>
+          <Account menu={account_menu} actions={actions}/>
           <Operators operators={operators} window_size={window_size}/>
         </>
     );

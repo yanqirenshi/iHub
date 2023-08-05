@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Link from 'next/link';
 import Box from '@mui/material/Box';
 
@@ -9,6 +8,7 @@ import Tabs from './Menu/Tabs.js';
 
 export default function Menu (props) {
     const menu = props.menu || [];
+    const actions = props.actions;
 
     const sx = {
         position: 'fixed',
@@ -27,17 +27,18 @@ export default function Menu (props) {
         }
     };
 
-    const tabs = menu.pages.map(d=>d.label);
+    const selected_page_num = menu.pages.findIndex(page=> page.label===menu.current_page);
+    const selected_page = menu.pages[selected_page_num];
 
     return (
         <Box sx={sx}>
 
           <Head/>
 
-          <Tabs menu={menu}/>
+          <Tabs menu={menu} actions={actions}/>
 
           <Box sx={sx.body}>
-            {menu.pages[0].items.map(item=> {
+            {selected_page.items.map(item=> {
                 return <Item data={item}/>;
             })}
           </Box>

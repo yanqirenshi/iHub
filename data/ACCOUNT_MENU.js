@@ -1,5 +1,5 @@
 const ACCOUNT_MENU = {
-    current_page: 0,
+    current_page: '1',
     pages: [
         {
             label: '1',
