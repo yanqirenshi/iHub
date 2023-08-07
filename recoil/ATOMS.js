@@ -37,3 +37,17 @@ export const PAGE_BPMN = atom("PAGE_BPMN", {
         ],
     },
 });
+
+export const PAGE_DDD = atom("PAGE_DDD", {
+    tabs: {
+        selected: 'layer-architecture',
+        list: [
+            { code: 'ubiquitous-language', label: 'ユビキタス言語' },
+            { code: 'model-driven-design', label: 'モデル駆動設計' },
+            { code: 'hands-on-modeler',    label: '実践的モデラー' },
+            { code: 'declarative-design',  label: '宣言的な設計' },
+            { code: 'layer-architecture',  label: 'レイヤーアーキテクチャ' },
+            { code: 'overview',            label: 'Overview' },
+        ],
+    },
+});

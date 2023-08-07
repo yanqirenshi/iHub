@@ -6,7 +6,7 @@ export default function Item (props) {
 
     return (
         <Box key={item.url} sx={{mt:2}}>
-          <Link href={item.url}>
+          <Link href={item.url} prefetch={true}>
             {item.label}
           </Link>
         </Box>
