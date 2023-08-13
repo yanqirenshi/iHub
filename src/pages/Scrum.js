@@ -3,11 +3,9 @@ import React from 'react';
 import { useRecoilState } from "recoil";
 import * as atoms from '../recoil/ATOMS.js';
 
-import Box from '@mui/material/Box';
+// import * as util from '../tools/utilities.js';
 
-import * as util from '../tools/utilities.js';
-
-import sogh from '../manegers/sogh.js';
+// import sogh from '../manegers/sogh.js';
 
 import Frame from '../frames/FrameTabs.js';
 import Account from '../panels/sogh/Account.js';
@@ -16,7 +14,7 @@ import Projects from '../panels/sogh/Projects.js';
 
 export default function Scrum () {
     const [page, setPageScrum] = useRecoilState(atoms.PAGE_SCRUM);
-    const [github, setGithub] = useRecoilState(atoms.GITHUB);
+    // const [github, setGithub] = useRecoilState(atoms.GITHUB);
 
     const changeTabs = (tabs)=> {
         const new_page = {...page};

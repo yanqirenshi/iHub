@@ -5,11 +5,6 @@ import Box from '@mui/material/Box';
 import Frame from './Frame.js';
 import Tabs from '../parts/Tabs.js';
 
-const sx = {
-    width: '100vw',
-    height: '100vh',
-};
-
 export default function FrameTabs (props) {
     const children = props.children;
     const tabs = props.tabs;

@@ -115,6 +115,7 @@ function Table (props) {
                         {row.image.map(file_name=> {
                             return (
                                 <img src={`/bpmn/${file_name}`}
+                                     alt={file_name}
                                      style={{width:44, height:44}}/>
                             );
                         })}

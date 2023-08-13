@@ -40,9 +40,3 @@ export default function SystemicDesignContents (props) {
 
    return null;
 }
-
-function toCamelCase(str) {
-  return str.split('_').map((word,index)=> {
-    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-  }).join('');
-}

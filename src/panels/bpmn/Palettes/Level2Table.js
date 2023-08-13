@@ -77,6 +77,7 @@ function TbodyCellValue (props) {
         <TableCell sx={sx} size="small">
           {val &&
            <img src={`/bpmn/level2/${val}`}
+                alt={val}
                 style={{width:22,height:22}}/>}
         </TableCell>
     );

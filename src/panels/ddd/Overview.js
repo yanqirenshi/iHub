@@ -9,13 +9,15 @@ export default function Overview () {
             <Box>
               <S variant="h5">???</S>
 
-              <img src="/ddd/overview_from_book_01.png"/>
+              <img src="/ddd/overview_from_book_01.png"
+                   alt="overview_from_book_01.png"/>
               {table(list1)}
             </Box>
 
             <Box sx={{mt: 5}}>
               <S variant="h5">???</S>
-              <img src="/ddd/overview_from_book_02.png"/>
+              <img src="/ddd/overview_from_book_02.png"
+                   alt="/overview_from_book_02.png"/>
               {table(list2)}
             </Box>
           </Box>
