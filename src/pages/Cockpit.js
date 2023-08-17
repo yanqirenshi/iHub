@@ -2,23 +2,12 @@ import React from 'react';
 
 import Frame from '../frames/Frame.js';
 
+import Panel from '../panels/cockpit/index.js';
+
 export default function Cockpit () {
   return (
       <Frame>
-        <div style={sx()}>Cockpit</div>
+        <Panel/>
       </Frame>
   );
-}
-
-function sx () {
-    return {
-        height: '100%',
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: '333px',
-        background: '#eee',
-        color: '#eaeaea',
-    };
 }
