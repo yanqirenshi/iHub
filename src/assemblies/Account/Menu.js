@@ -1,6 +1,8 @@
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 
+import * as u from '../../libs/yutils/index.js';
+
 import Head from './Menu/Head.js';
 import Foot from './Menu/Foot.js';
 import Item from './Menu/Item.js';
@@ -13,8 +15,19 @@ export default function Menu (props) {
     const selected_page_num = menu.pages.findIndex(page=> page.label===menu.current_page);
     const selected_page = menu.pages[selected_page_num];
 
+    const change = actions.menu.change;
+
+    const enterd = ()=> change(u.catom(menu, (new_menu)=> {
+        new_menu.menu.enterd = true;
+    }));
+
+    const leaved = ()=> change(u.catom(menu, (new_menu)=> {
+        new_menu.menu.enterd = false;
+    }));
+
     return (
-        <Box>
+        <Box onMouseEnter={enterd}
+             onMouseLeave={leaved}>
           <Paper sx={sx()}>
             <Head/>
 

@@ -3,7 +3,7 @@
 ### React Components
 
 | Name       | Description                    |
-|------------+--------------------------------|
+|------------|--------------------------------|
 | frames     | Page の枠、Panel を表示する。  |
 | panels     | Frame の Contents で表示する。 |
 | assemblies | intermediate assembly (中間品) |
@@ -11,11 +11,11 @@
 
 ### Javascript
 
-| Name     | Description              |
-|----------|--------------------------|
-| manegers | データモデルのマネージャ |
-| models   | データモデル             |
-| tools    |                          |
+| Name     | Description                      |
+|----------|----------------------------------|
+| manegers | データモデルのマネージャ         |
+| models   | データモデル                     |
+| libs     | 外部ライブラリに切り出したいもの |
 
 ## Page の構成
 

@@ -1,5 +1,11 @@
 const ACCOUNT_MENU = {
-    open: false,
+    avater: {
+        enterd: false,
+        clicked: false,
+    },
+    menu: {
+        enterd: false,
+    },
     current_page: 'iHub',
     pages: [
         {

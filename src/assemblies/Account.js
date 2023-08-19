@@ -9,7 +9,14 @@ export default function Account (props) {
     return (
         <>
           <Avatar menu={menu} actions={actions}/>
-          {menu.open && <Menu menu={menu} actions={actions}/>}
+          {isOpenMenu(menu) &&
+           <Menu menu={menu} actions={actions}/>}
         </>
     );
+}
+
+function isOpenMenu (menu) {
+    return menu.avater.clicked
+        || menu.avater.enterd
+        || menu.menu.enterd;
 }
