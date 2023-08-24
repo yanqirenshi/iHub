@@ -35,20 +35,3 @@ export const GITHUB = recoil.atom({
         },
     },
 });
-
-export const GITHUB_REPOSITORIES = recoil.atom({
-    key: "GITHUB_REPOSITORIES",
-    default: { start: null, end: null, error: null },
-});
-export const GITHUB_REPOSITORIES_START = recoil.atom({
-    key: "GITHUB_REPOSITORIES_START",
-    default: null,
-});
-export const GITHUB_REPOSITORIES_END = recoil.atom({
-    key: "GITHUB_REPOSITORIES_END",
-    default: null,
-});
-export const GITHUB_REPOSITORIES_ERROR = recoil.atom({
-    key: "GITHUB_REPOSITORIES_ERROR",
-    default: null,
-});

@@ -15,3 +15,57 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.theme-color1 {
+    background: rgba(234, 228, 208, 1.0);
+}
+
+.theme-color2 {
+    background: rgba(234, 228, 208, 0.8);
+}
+
+.theme-color3 {
+    background: rgba(234, 228, 208, 0.6);
+}
+
+.theme-color4 {
+    background: rgba(234, 228, 208, 0.4);
+}
+
+.theme-color5 {
+    background: rgba(234, 228, 208, 0.2);
+}
+
+
+.pair-color1 {
+    background: rgba(167, 193, 220, 1.0);
+}
+
+.pair-color2 {
+    background: rgba(167, 193, 220, 0.8);
+}
+
+.pair-color3 {
+    background: rgba(167, 193, 220, 0.6);
+}
+
+.pair-color4 {
+    background: rgba(167, 193, 220, 0.4);
+}
+
+.pair-color5 {
+    background: rgba(167, 193, 220, 0.2);
+}
+
+
+.text-color1 {
+    color: rgb(0, 0, 0);
+}
+
+.text-color2 {
+    color: rgb(137, 137 137);
+}
+
+.text-color3 {
+    color: rgb(86, 152, 123,);
+}

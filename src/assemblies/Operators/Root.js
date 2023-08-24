@@ -12,16 +12,16 @@ export default function Root (props) {
     const y = operator.position.y;
 
     return (
-        <Box sx={{
-            position: 'fixed',
-            left: x,
-            top:  y,
-            maxWidth: width + 'px',
-            maxHeight: height + 'px',
-            background: '#eee',
-            borderRadius: width + 'px',
-            padding: border_width + 'px',
-        }}>
+        <Box className="pair-color1"
+             sx={{
+                 position: 'fixed',
+                 left: x,
+                 top:  y,
+                 maxWidth: width + 'px',
+                 maxHeight: height + 'px',
+                 borderRadius: width + 'px',
+                 padding: border_width + 'px',
+             }}>
           <Box sx={{
               width: (width - border_width * 2) + 'px',
               height: (height - border_width * 2) + 'px',
