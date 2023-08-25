@@ -1,9 +1,8 @@
 import React from 'react';
 
 import { useRecoilState, useRecoilValue } from "recoil";
-import * as atoms from '../recoil/ATOMS.js';
-
-import {GITHUB_AUTH, GITHUB_REPOSITORIES} from '../recoil/GITHUB.js';
+import {GITHUB_AUTH} from '../recoil/GITHUB.js';
+import * as atoms from '../recoil/PAGE_SCRUM.js';
 
 import * as u from '../libs/yutils/index.js';
 
@@ -15,11 +14,35 @@ import Help from '../panels/sogh/Help.js';
 import Projects from '../panels/sogh/Projects.js';
 
 export default function Scrum () {
-    const [page, setPageScrum] = useRecoilState(atoms.PAGE_SCRUM);
     const authed = useRecoilValue(GITHUB_AUTH);
-    // const repositories = useRecoilValue(GITHUB_REPOSITORIES);
+    const [page, setPageScrum] = useRecoilState(atoms.PAGE_SCRUM);
+    const [fetch_repositories, setFetchRepositories] = useRecoilState(atoms.FETCH_REPOSITORIES);
+    // const [fetch_projectsV2, setFetchProjectsV2] = useRecoilState(atoms.FETCH_PROJECTSV2);
 
-    console.log(authed);
+    React.useEffect(()=> {
+        if (authed!==true || null!==fetch_repositories) return;
+
+        setFetchRepositories(new Date());
+
+        sogh.fetchRepositoriesByViewer(
+            ()=>      setFetchRepositories(true),
+            (error)=> setFetchRepositories(error));
+    }, [fetch_repositories]);
+
+    // React.useEffect(()=> {
+    //     if (null!==fetch_repositories) return;
+
+    //     setFetchRepositories(new Date());
+
+    //     sogh.fetchRepositoriesByViewer(
+    //         ()=>      setFetchRepositories(true),
+    //         (error)=> setFetchRepositories(error));
+    // }, [fetch_repositories]);
+
+    if (authed!==true)
+        return null;
+
+    // console.log(sogh.repositories().length);
 
     const tabs = page.tabs;
     const tab = tabs.selected;

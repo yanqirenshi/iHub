@@ -1,6 +1,5 @@
 import * as recoil from 'recoil';
 
-export {default as PAGE_SCRUM} from './PAGE_SCRUM.js';
 export {default as PAGE_BPMN} from './PAGE_BPMN.js';
 export {default as PAGE_DDD} from './PAGE_DDD.js';
 export {default as PAGE_SCREENS} from './PAGE_SCREENS.js';

@@ -1,6 +1,6 @@
 import * as recoil from 'recoil';
 
-const PAGE_SCRUM = recoil.atom({
+export const PAGE_SCRUM = recoil.atom({
     key: "PAGE_SCRUM",
     default: {
         tabs: {
@@ -14,4 +14,7 @@ const PAGE_SCRUM = recoil.atom({
     },
 });
 
-export default PAGE_SCRUM;
+export const FETCH_REPOSITORIES = recoil.atom({
+    key: "FETCH_REPOSITORIES",
+    default: null, // null, Date, true, error
+});
