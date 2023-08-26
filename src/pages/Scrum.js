@@ -1,11 +1,9 @@
 import React, {Suspense} from 'react';
 
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import * as atoms from '../recoil/PAGE_SCRUM.js';
 
-import * as u from '../libs/yutils/index.js';
-
-import sogh from '../manegers/sogh.js';
+// import * as u from '../libs/yutils/index.js';
 
 import Frame from '../frames/FrameTabs.js';
 import * as panel from '../panels/sogh/index.js';
