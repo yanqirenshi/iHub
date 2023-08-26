@@ -5,6 +5,8 @@ import * as atoms from '../recoil/PAGE_SCRUM.js';
 
 // import * as u from '../libs/yutils/index.js';
 
+import Loading from '../assemblies/Loading.js';
+
 import Frame from '../frames/FrameTabs.js';
 import * as panel from '../panels/sogh/index.js';
 
@@ -24,7 +26,7 @@ export default function Scrum () {
         <Frame tabs={page.tabs}
                onChangeTabs={changeTabs}>
 
-          <Suspense fallback={<div>サスペンドしたらこれが表示される</div>}>
+          <Suspense fallback={<Loading/>}>
             {'repositories'===tab && <panel.Repositories/>}
             {'projects'===tab && <panel.Projects/>}
             {'account'===tab && <panel.Account/>}
