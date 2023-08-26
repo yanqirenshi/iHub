@@ -6,12 +6,11 @@ import Box from '@mui/material/Box';
 
 import Account from './assemblies/Account.js';
 import Operators from './assemblies/Operators.js';
+import * as page from './pages/index.js';
+import * as atoms from './recoil/ATOMS.js';
+
 import Router from './Router.js';
 import Github from './Github.js';
-
-import * as page from './pages/index.js';
-
-import * as atoms from './recoil/ATOMS.js';
 
 export default function App () {
     const [window_size, setWindowSize] = useRecoilState(atoms.WINDOW);

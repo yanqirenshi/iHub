@@ -12,6 +12,12 @@ export default function Avater (props) {
 
     const click = ()=> change(u.catom(menu, (new_menu)=> {
         new_menu.avater.clicked = !new_menu.avater.clicked;
+
+        if (new_menu.avater.clicked)
+            return;
+
+        new_menu.avater.enterd = false;
+        new_menu.menu.enterd = false;
     }));
 
     const enterd = ()=> change(u.catom(menu, (new_menu)=> {
@@ -32,7 +38,6 @@ export default function Avater (props) {
                       onMouseEnter={enterd}
                       onMouseLeave={leaved}/>
         </Box>
-
     );
 }
 

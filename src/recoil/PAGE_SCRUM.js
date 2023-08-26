@@ -6,12 +6,16 @@ export const PAGE_SCRUM = recoil.atom({
     key: "PAGE_SCRUM",
     default: {
         tabs: {
-            selected: 'repositories',
+            selected: 'projects',
             list: [
-                { code: 'repositories', label: 'Repositories' },
-                { code: 'projects',     label: 'Projects' },
-                { code: 'account',      label: 'Account' },
-                { code: 'help',         label: 'Help' },
+                { code: 'timeline',      label: 'Timeline' },
+                { code: 'gantt-chart',   label: 'Gantt Chart' },
+                { code: 'issues',        label: 'Issues' },
+                { code: 'pull-requests', label: 'Pull Requests' },
+                { code: 'repositories',  label: 'Repositories' },
+                { code: 'projects',      label: 'Projects' },
+                { code: 'account',       label: 'Account' },
+                { code: 'help',          label: 'Help' },
             ],
         },
     },
@@ -23,21 +27,23 @@ export const FETCH_REPOSITORIES = recoil.atom({
 });
 
 export const REPOSITORIES = recoil.selectorFamily({
-  key: 'UserName',
+    key: 'REPOSITORIES',
     get: authed => async () => {
 
         if (authed!==true)
             return [];
 
         return await sogh.asyncFetchRepositoriesByViewer();
+    },
+});
 
-        // return [1,2];
+export const PROJECTSV2 = recoil.selectorFamily({
+    key: 'PROJECTSV2',
+    get: authed => async () => {
 
-        // const response = await myDBQuery({userID});
+        if (authed!==true)
+            return [];
 
-        // if (response.error) {
-        //   throw response.error;
-        // }
-        //   return response.name;
-  },
+        return await sogh.asyncFetchProjectsV2ByViewer();
+    },
 });
