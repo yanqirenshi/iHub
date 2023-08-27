@@ -4,7 +4,7 @@ const PAGE_BUSINESS = recoil.atom({
     key: "PAGE_BUSINESS",
     default: {
         tabs: {
-            selected: 'TM',
+            selected: 'tm',
             list: [
                 { code: 'systemic-design', label: 'Systemic Design' },
                 { code: 'tm',              label: 'TM' },

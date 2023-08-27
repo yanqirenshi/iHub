@@ -19,7 +19,7 @@ export default function Github (props) {
             (viewer)=> setAuthed(true),
             (error)=> setAuthed(false),
         );
-    }, [auth]);
+    }, [auth, setAuthed]); // TODO: setAuthed これ入れたないなぁ。。。
 
 
     return null;

@@ -9,7 +9,7 @@ export default function Cockpit (props) {
 
     const authed = useRecoilValue(GITHUB_AUTH);
     const issues = useRecoilValue(ISSUES(authed));
-
+    console.log(issues.length);
     return (
         <CompCockpit window_size={window_size}/>
     );

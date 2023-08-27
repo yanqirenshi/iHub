@@ -1,12 +1,10 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import Box from '@mui/material/Box';
 
 import Account from './assemblies/Account.js';
 import Operators from './assemblies/Operators.js';
-import * as page from './pages/index.js';
 import * as atoms from './recoil/ATOMS.js';
 
 import Router from './Router.js';

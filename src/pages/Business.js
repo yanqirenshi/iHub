@@ -5,6 +5,11 @@ import * as atoms from '../recoil/ATOMS.js';
 
 import Frame from '../frames/FrameTabs.js';
 
+import SystemDynamics from '../panels/SystemDynamics.js';
+import TM from '../panels/TM.js';
+import Procedures from '../panels/Procedures.js';
+import Wbs from '../panels/Wbs.js';
+
 export default function Business () {
     const [page_data, setPageData] = useRecoilState(atoms.PAGE_BUSINESS);
 
@@ -21,11 +26,11 @@ export default function Business () {
         <Frame tabs={tabs}
                onChangeTabs={changeTabs}>
 
-          {'systemic-design'===tab && <div/>}
-          {'tm'===tab && <div/>}
-          {'procedures'===tab && <div/>}
-          {'wbs'===tab && <div/>}
-          {'help'===tab && <div/>}
+          {'systemic-design'===tab && <SystemDynamics/>}
+          {'tm'===tab              && <TM/>}
+          {'procedures'===tab      && <Procedures/>}
+          {'wbs'===tab             && <Wbs/>}
+          {'help'===tab            && <div>Help...</div>}
         </Frame>
     );
 }
