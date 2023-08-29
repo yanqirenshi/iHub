@@ -9,6 +9,7 @@ import SystemDynamics from '../panels/SystemDynamics.js';
 import TM from '../panels/TM.js';
 import Procedures from '../panels/Procedures.js';
 import Wbs from '../panels/Wbs.js';
+import HelpEmpty from '../panels/HelpEmpty.js';
 
 export default function Business () {
     const [page_data, setPageData] = useRecoilState(atoms.PAGE_BUSINESS);
@@ -30,7 +31,7 @@ export default function Business () {
           {'tm'===tab              && <TM/>}
           {'procedures'===tab      && <Procedures/>}
           {'wbs'===tab             && <Wbs/>}
-          {'help'===tab            && <div>Help...</div>}
+          {'help'===tab            && <HelpEmpty/>}
         </Frame>
     );
 }
