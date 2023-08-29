@@ -1,11 +1,13 @@
 import React from 'react';
 
-import Frame from '../frames/Frame.js';
+import Frame from '../../frames/Frame.js';
 
-export default function UseCase () {
+export default function Classes () {
   return (
       <Frame>
-        <div style={sx()}>UseCase</div>
+        <div style={sx()}>
+          Classes
+        </div>
       </Frame>
   );
 }

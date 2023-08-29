@@ -1,8 +1,9 @@
 import React from 'react';
 
-import Frame from '../frames/Frame.js';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+
+import Frame from '../../frames/Frame.js';
 
 export default function ScreenTransitionDiagram () {
     return (

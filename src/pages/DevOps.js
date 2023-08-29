@@ -4,6 +4,8 @@ import { useRecoilState } from "recoil";
 import * as atoms from '../recoil/ATOMS.js';
 
 import Frame from '../frames/FrameTabs.js';
+import Wbs from '../panels/Wbs.js';
+import HelpEmpty from '../panels/HelpEmpty.js';
 
 export default function DevOps () {
     const [page_data, setPageData] = useRecoilState(atoms.PAGE_DEVOPS);
@@ -22,8 +24,8 @@ export default function DevOps () {
                onChangeTabs={changeTabs}>
 
           {'bpmn'===tab && <div/>}
-          {'wbs'===tab && <div/>}
-          {'help'===tab && <div/>}
+          {'wbs'===tab && <Wbs/>}
+          {'help'===tab && <HelpEmpty/>}
         </Frame>
     );
 }

@@ -1,13 +1,13 @@
 import React from 'react';
 
-import Frame from '../frames/Frame.js';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import S from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 
-import Link from '../parts/Link.js';
+import Frame from '../../frames/Frame.js';
+import Link from '../../parts/Link.js';
 
 export default function SystemicDesign () {
     return (

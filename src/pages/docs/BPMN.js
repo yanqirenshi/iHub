@@ -1,14 +1,14 @@
 import React from 'react';
 
 import { useRecoilState } from "recoil";
-import * as atoms from '../recoil/ATOMS.js';
+import * as atoms from '../../recoil/ATOMS.js';
 
-import Frame from '../frames/FrameTabs.js';
-import Overview from '../panels/bpmn/Overview.js';
-import PalettesLev1 from '../panels/bpmn/PalettesLev1.js';
-import PalettesLev2 from '../panels/bpmn/PalettesLev2.js';
-import MethodsAndStylesLev1 from '../panels/bpmn/MethodsAndStylesLev1.js';
-import MethodsAndStylesLev2 from '../panels/bpmn/MethodsAndStylesLev2.js';
+import Frame from '../../frames/FrameTabs.js';
+import Overview from '../../panels/bpmn/Overview.js';
+import PalettesLev1 from '../../panels/bpmn/PalettesLev1.js';
+import PalettesLev2 from '../../panels/bpmn/PalettesLev2.js';
+import MethodsAndStylesLev1 from '../../panels/bpmn/MethodsAndStylesLev1.js';
+import MethodsAndStylesLev2 from '../../panels/bpmn/MethodsAndStylesLev2.js';
 
 export default function BPMN () {
     const [page, setPageScrum] = useRecoilState(atoms.PAGE_BPMN);

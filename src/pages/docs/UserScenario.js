@@ -1,11 +1,11 @@
 import React from 'react';
 
-import Frame from '../frames/Frame.js';
+import Frame from '../../frames/Frame.js';
 
-export default function Procedures () {
+export default function UserScenario () {
   return (
       <Frame>
-        <div style={sx()}>Procedures</div>
+        <div style={sx()}>UserScenario</div>
       </Frame>
   );
 }

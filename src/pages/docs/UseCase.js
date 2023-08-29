@@ -1,11 +1,11 @@
 import React from 'react';
 
-import Frame from '../frames/Frame.js';
+import Frame from '../../frames/Frame.js';
 
-export default function ER () {
+export default function UseCase () {
   return (
       <Frame>
-        <div style={sx()}>ER</div>
+        <div style={sx()}>UseCase</div>
       </Frame>
   );
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import * as page from './pages/index.js';
+import * as page_docs from './pages/docs/index.js';
 
 export default function Router () {
     return (
@@ -21,31 +22,30 @@ export default function Router () {
           <Route path='/scrum'                     element={<page.Scrum/>} />
           {/* == Docs ================================================================ */}
           {/* ux */}
-          <Route path='/user-scenario'             element={<page.UserScenario/>} />
-          <Route path='/customer-journey-map'      element={<page.CustomerJourneyMap/>} />
-          <Route path='/use-case'                  element={<page.UseCase/>} />
-          <Route path='/systemic-design'           element={<page.SystemicDesign/>} />
           <Route path='/systemic-design/:name'     element={<page.SystemicDesignContents/>} />
-          <Route path='/bpmn'                      element={<page.BPMN/>} />
           {/* == ui ================================================================ */}
           {/* { path: '/screens'                   element={page }, */}
           {/* { path: '/assemblies'                element={page }, */}
           {/* { path: '/parts'                     element={page }, */}
           <Route path='/batchs'                    element={<page.Batchs/>} />
           <Route path='/actions'                   element={<page.Actions/>} />
-          <Route path='/screen-transition-diagram' element={<page.ScreenTransitionDiagram/>} />
-          {/* == Application ================================================================ */}
-          <Route path='/classes'                   element={<page.Classes/>} />
-          <Route path='/procedures'                element={<page.Procedures/>} />
-          {/* == Model ================================================================ */}
-          <Route path='/tm'                        element={<page.TM/>} />
-          <Route path='/er'                        element={<page.ER/>} />
-          <Route path='/uml'                       element={<page.UML/>} />
           {/* == Etc ================================================================ */}
           <Route path='/system-dynamics'           element={<page.SystemDynamics/>} />
           <Route path='/ddd'                       element={<page.DDD/>} />
           <Route path='/account'                   element={<page.Account/>} />
           <Route path='/auth'                      element={<page.Auth/>} />
+          {/* == Docs ================================================================ */}
+          <Route path='/bpmn'                      element={<page_docs.BPMN/>} />
+          <Route path='/classes'                   element={<page_docs.Classes/>} />
+          <Route path='/customer-journey-map'      element={<page_docs.CustomerJourneyMap/>} />
+          <Route path='/er'                        element={<page_docs.ER/>} />
+          <Route path='/procedures'                element={<page_docs.Procedures/>} />
+          <Route path='/screen-transition-diagram' element={<page_docs.ScreenTransitionDiagram/>} />
+          <Route path='/systemic-design'           element={<page_docs.SystemicDesign/>} />
+          <Route path='/tm'                        element={<page_docs.TM/>} />
+          <Route path='/uml'                       element={<page_docs.UML/>} />
+          <Route path='/use-case'                  element={<page_docs.UseCase/>} />
+          <Route path='/user-scenario'             element={<page_docs.UserScenario/>} />
         </Routes>
     );
 }

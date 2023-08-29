@@ -9,6 +9,7 @@ import Loading from '../assemblies/Loading.js';
 
 import Frame from '../frames/FrameTabs.js';
 import * as panel from '../panels/sogh/index.js';
+import HelpEmpty from '../panels/HelpEmpty.js';
 
 export default function Scrum () {
     const [page, setPageScrum] = useRecoilState(atoms.PAGE_SCRUM);
@@ -30,7 +31,7 @@ export default function Scrum () {
             {'repositories'===tab && <panel.Repositories/>}
             {'projects'===tab && <panel.Projects/>}
             {'account'===tab && <panel.Account/>}
-            {'help'===tab && <panel.Help/>}
+            {'help'===tab && <HelpEmpty/>}
           </Suspense>
         </Frame>
     );

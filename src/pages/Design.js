@@ -4,6 +4,8 @@ import { useRecoilState } from "recoil";
 import * as atoms from '../recoil/ATOMS.js';
 
 import Frame from '../frames/FrameTabs.js';
+import Wbs from '../panels/Wbs.js';
+import HelpEmpty from '../panels/HelpEmpty.js';
 
 export default function Design () {
     const [page_data, setPageData] = useRecoilState(atoms.PAGE_DESIGN);
@@ -25,8 +27,8 @@ export default function Design () {
           {'ui-assemblies'===tab && <div/>}
           {'ui-parts'===tab && <div/>}
           {'ui-actions'===tab && <div/>}
-          {'wbs'===tab && <div/>}
-          {'help'===tab && <div/>}
+          {'wbs'===tab && <Wbs/>}
+          {'help'===tab && <HelpEmpty/>}
         </Frame>
     );
 }

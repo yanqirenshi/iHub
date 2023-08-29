@@ -4,6 +4,8 @@ import { useRecoilState } from "recoil";
 import * as atoms from '../recoil/ATOMS.js';
 
 import Frame from '../frames/FrameTabs.js';
+import Wbs from '../panels/Wbs.js';
+import HelpEmpty from '../panels/HelpEmpty.js';
 
 export default function Markets () {
     const [page_data, setPageData] = useRecoilState(atoms.PAGE_MARKETS);
@@ -24,8 +26,8 @@ export default function Markets () {
           {'systemic-design'===tab && <div/>}
           {'tm'===tab && <div/>}
           {'procedures'===tab && <div/>}
-          {'wbs'===tab && <div/>}
-          {'help'===tab && <div/>}
+          {'wbs'===tab && <Wbs/>}
+          {'help'===tab && <HelpEmpty/>}
         </Frame>
     );
 }
