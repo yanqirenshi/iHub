@@ -30,26 +30,35 @@ export default function Avater (props) {
     }));
 
     return (
-        <Box sx={sx()}>
-          <AvatarIcon sx={{ width: 55, height: 55 }}
-                      alt="Yanqirenshi"
+        <Box className={menu.avater.clicked ? 'pair-color1' : 'theme-color3'}
+             sx={sx(menu)}>
+          <Box sx={{
+              display:'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              background: '#fff',
+              width: 44,
+              height: 44,
+              borderRadius: 44,
+          }}>
+            <AvatarIcon alt="Yanqirenshi"
                       src="https://avatars.githubusercontent.com/u/346975?s=400&u=9689e695c587cadccb01c45a8d5df58d4d61cf1e&v=4"
                       onClick={click}
                       onMouseEnter={enterd}
                       onMouseLeave={leaved}/>
+          </Box>
         </Box>
     );
 }
 
-function sx () {
+function sx (menu) {
     return {
         position: 'fixed',
         top: 18,
         left: 22,
         padding: 0.5,
-        background: '#fff',
-        borderRadius: 55,
+        borderRadius: 44,
         zIndex: 8888888,
-        border: '1px solid #bbb',
+        boxSizing: 'border-box',
     };
 }

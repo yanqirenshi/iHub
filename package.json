@@ -19,6 +19,7 @@
     "@yanqirenshi/d3.ter": "^0.1.0",
     "@yanqirenshi/wnqi.big.size": "^0.0.2",
     "react": "^18.2.0",
+    "react-bpmn": "^0.2.0",
     "react-dom": "^18.2.0",
     "react-measure": "^2.5.2",
     "react-router": "^6.14.2",
