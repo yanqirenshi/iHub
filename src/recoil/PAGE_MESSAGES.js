@@ -6,8 +6,9 @@ const PAGE_MESSAGES = recoil.atom({
         tabs: {
             selected: 'wbs',
             list: [
-                { code: 'wbs',           label: 'WBS' },
-                { code: 'help',          label: 'Help' },
+                { code: 'model', label: 'Model' },
+                { code: 'wbs',   label: 'WBS' },
+                { code: 'help',  label: 'Help' },
             ],
         },
     },

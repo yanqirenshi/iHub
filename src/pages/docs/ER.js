@@ -1,24 +1,21 @@
 import React from 'react';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 
 import Frame from '../../frames/Frame.js';
 
 export default function ER () {
   return (
       <Frame>
-        <div style={sx()}>ER</div>
+        <Container maxWidth="md">
+          <Box>
+            <pre>{note.join('\n')}</pre>
+          </Box>
+        </Container>
       </Frame>
   );
 }
 
-function sx () {
-    return {
-        height: '100%',
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: '333px',
-        background: '#eee',
-        color: '#eaeaea',
-    };
-}
+const note = [
+    'https://segakuin.com/diagram/entity-relationship-diagram.html',
+];

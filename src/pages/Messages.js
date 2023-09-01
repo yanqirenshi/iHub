@@ -6,6 +6,7 @@ import * as atoms from '../recoil/ATOMS.js';
 import Frame from '../frames/FrameTabs.js';
 import Wbs from '../panels/Wbs.js';
 import HelpEmpty from '../panels/HelpEmpty.js';
+import Model from '../panels/messages/Model.js';
 
 export default function Messages () {
     const [page_data, setPageData] = useRecoilState(atoms.PAGE_MESSAGES);
@@ -23,6 +24,7 @@ export default function Messages () {
         <Frame tabs={tabs}
                onChangeTabs={changeTabs}>
 
+          {'model'===tab && <Model/>}
           {'wbs'===tab && <Wbs/>}
           {'help'===tab && <HelpEmpty/>}
         </Frame>
