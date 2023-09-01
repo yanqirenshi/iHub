@@ -9,3 +9,4 @@ export { default as TM                      } from './TM.js';
 export { default as UML                     } from './UML.js';
 export { default as UseCase                 } from './UseCase.js';
 export { default as UserScenario            } from './UserScenario.js';
+export { default as PAD                     } from './PAD.js';

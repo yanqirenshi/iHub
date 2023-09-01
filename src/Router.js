@@ -46,6 +46,7 @@ export default function Router () {
           <Route path='/uml'                       element={<page_docs.UML/>} />
           <Route path='/use-case'                  element={<page_docs.UseCase/>} />
           <Route path='/user-scenario'             element={<page_docs.UserScenario/>} />
+          <Route path='/pad'                       element={<page_docs.PAD/>} />
         </Routes>
     );
 }

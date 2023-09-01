@@ -44,6 +44,7 @@ const ACCOUNT_MENU = {
                 { url: '/tm',                        label: 'TM' },
                 { url: '/er',                        label: 'ER図' },
                 { url: '/uml',                       label: 'UML' },
+                { url: '/pad',                       label: 'PAD' },
             ],
         },
         {
