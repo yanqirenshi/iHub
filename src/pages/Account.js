@@ -1,24 +1,23 @@
 import React from 'react';
 
-import Frame from '../frames/Frame.js';
+import { useRecoilState } from "recoil";
+import * as atoms from '../recoil/PAGE_ACCOUNT.js';
+
+import Frame from '../frames/FrameTabs.js';
 
 export default function Account () {
-  return (
-      <Frame>
-        <div style={sx()}>Account</div>
-      </Frame>
-  );
-}
+    const [tabs, setTabs] = useRecoilState(atoms.PAGE_ACCOUNT_TABS);
 
-function sx () {
-    return {
-        height: '100%',
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: '333px',
-        background: '#eee',
-        color: '#eaeaea',
-    };
+    const changeTabs = (new_tabs)=> setTabs(new_tabs);
+
+    const tab = tabs.selected;
+
+    return (
+        <Frame tabs={tabs}
+               onChangeTabs={changeTabs}>
+
+          {'menus'===tab && <div/>}
+          {'operators'===tab && <div/>}
+        </Frame>
+    );
 }
