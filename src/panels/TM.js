@@ -28,7 +28,6 @@ export default function TM () {
             callbacks: {
                 entity: {
                     click: (node)=> {
-                        console.log(node);
                     }
                 }
             }

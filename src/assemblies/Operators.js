@@ -1,65 +1,44 @@
 import Root from './Operators/Root.js';
+import Branch from './Operators/Branch.js';
+import Leaf from './Operators/Leaf.js';
+
+import operator from '../manegers/operator.js';
 
 export default function Operators (props) {
-    const operators = props.operators;
+    const actions     = props.actions;
+    const operators   = props.operators;
     const window_size = props.window_size;
+    const children    = props.children;
 
     if (!window_size) return null;
 
-    const calculated_operators = calPositions(window_size.w, window_size.h, operators);
+    if (!operators.initialized)
+        actions.operator.change(
+            operator.initialize(window_size, operators));
+
+    const clickRoot = (code)=>
+          actions.operator.change(operator.clickedRoot(code, operators));
+
+    const selected_operator = operator.selectedOperator(operators);
 
     return (
         <>
-          {calculated_operators.map(operator=> {
+          {selected_operator &&
+           <>
+             <Branch root={selected_operator}/>
+             <Leaf   root={selected_operator}
+                     contents={children}/>
+           </>}
+
+          {operators.list.map(operator=> {
               return (
                   <Root key={operator.code}
-                        operator={operator}/>
+                        operator={operator}
+                        active={operator.code===operators.active}
+                        actions={actions}
+                        onClick={clickRoot}/>
               );
           })}
         </>
     );
-}
-
-//
-//              window center
-//                    :                    window height
-//   |<------- operators width ------->|      |
-//                    :                       |
-//   +-----+       +-----+       +-----+      |
-//   | R1  |<--s-->| R2  |<--s-->| R3  |      |
-//   +-----+       +-----+       +-----+  -   |
-//                    :                   |   |
-//                    :                   s   |
-//   |<--->|       |<--->|       |<--->|  |   |
-//     w1            w2            w3     -   -
-//
-function calPositions (w, h, operators=[]) {
-    const size = operators.length;
-
-    if (size===0) return [];
-
-    // Root 間の Space は全部固定
-    const s = 11;
-
-    // operators width を計算する。
-    const operators_width = operators.reduce((w, operator, i)=> {
-        return w + operator.size.w;
-    }, (size - 1) * s);
-
-    // operators の 開始 x を計算する。
-    let start_x = (w / 2) - (operators_width / 2);
-
-    // operator 毎 の position を計算する。
-    return operators.map(operator=> {
-        const new_operator = JSON.parse(JSON.stringify(operator));
-
-        // cal x
-        new_operator.position.x = start_x;
-        start_x += new_operator.size.w + s;
-
-        // cal y
-        new_operator.position.y = h - new_operator.size.h - s;
-
-        return new_operator;
-    });
 }

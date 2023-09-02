@@ -3,16 +3,18 @@ import Box from '@mui/material/Box';
 
 export default function Root (props) {
     const operator = props.operator;
+    const onClick  = props.onClick;
+    const active   = props.active;
+    const border_width = operator.border.w;
+    const width        = operator.size.w;
+    const height       = operator.size.h;
+    const x            = operator.position.x;
+    const y            = operator.position.y;
 
-    const border_width = 6;
-
-    const width = operator.size.w;
-    const height = operator.size.h;
-    const x = operator.position.x;
-    const y = operator.position.y;
+    const click = ()=> onClick(operator.code);
 
     return (
-        <Box className="pair-color1"
+        <Box className={active ? "pair-color1" : "pair-color4"}
              sx={{
                  position: 'fixed',
                  left: x,
@@ -21,7 +23,9 @@ export default function Root (props) {
                  maxHeight: height + 'px',
                  borderRadius: width + 'px',
                  padding: border_width + 'px',
-             }}>
+             }}
+             onClick={click}>
+
           <Box sx={{
               width: (width - border_width * 2) + 'px',
               height: (height - border_width * 2) + 'px',
@@ -33,6 +37,7 @@ export default function Root (props) {
           }}>
             <p>{operator.label.val}</p>
           </Box>
+
         </Box>
     );
 }
