@@ -32,12 +32,13 @@ const ROOTS = [
     d.branch = {};
 
     return d;
-});
+}).reduce((ht, item)=> {
+    if (ht[item.code])
+        throw new Error('Dupulicate code. code='+item.code);
 
-const OPERATORS = {
-    initialized: false,
-    active: null,
-    list: ROOTS,
-};
+    ht[item.code] = item;
 
-export default OPERATORS;
+    return ht;
+}, {});
+
+export default ROOTS;
