@@ -5,6 +5,10 @@ import * as atoms from '../recoil/PAGE_ACCOUNT.js';
 
 import Frame from '../frames/FrameTabs.js';
 
+import Menus from '../panels/account/Menus.js';
+import Operators from '../panels/account/Operators.js';
+import Pages from '../panels/account/Pages.js';
+
 export default function Account () {
     const [tabs, setTabs] = useRecoilState(atoms.PAGE_ACCOUNT_TABS);
 
@@ -16,8 +20,9 @@ export default function Account () {
         <Frame tabs={tabs}
                onChangeTabs={changeTabs}>
 
-          {'menus'===tab && <div/>}
-          {'operators'===tab && <div/>}
+          {'menus'     === tab && <Menus/>}
+          {'operators' === tab && <Operators/>}
+          {'pages'     === tab && <Pages/>}
         </Frame>
     );
 }

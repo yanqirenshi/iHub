@@ -7,6 +7,7 @@ export const PAGE_ACCOUNT_TABS = recoil.atom({
         list: [
             { code: 'menus',     label: 'Menus' },
             { code: 'operators', label: 'Operators' },
+            { code: 'pages',     label: 'Pages' },
         ],
     },
 });
