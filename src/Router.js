@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import * as page from './pages/index.js';
 import * as page_docs from './pages/docs/index.js';
+import Loading from './assemblies/Loading.js';
 
 export default function Router () {
     return (
         <Routes>
           {/* == iHub ================================================================ */}
-          <Route path='/'                          element={<page.Cockpit/>} />
+          <Route path='/'
+                 element={<Suspense fallback={<Loading/>}>
+                            <page.Cockpit/>
+                          </Suspense>} />
           <Route path='/markets'                   element={<page.Markets/>} />
           <Route path='/business'                  element={<page.Business/>} />
           <Route path='/design'                    element={<page.Design/>} />

@@ -1,15 +1,7 @@
 import Box from '@mui/material/Box';
 
-function cards () {
-    const out = [];
-
-    for (let i=0 ; i< 33 ; i++)
-        out.push({ id: i });
-
-    return out;
-}
-
 export default function Cockpit (props) {
+    const children = props.children;
     const window_size = props.window_size;
 
     if (!window_size)
@@ -36,11 +28,7 @@ export default function Cockpit (props) {
               pt: 3,
               pb: 22,
           }}>
-            {cards().map(card=> (
-                <Box key={card.id}
-                     className="theme-color3"
-                     sx={{display: 'inline-block', width: '222px',height: '222px', margin: '11px'}}/>
-            ))}
+            {children}
           </Box>
 
         </Box>
