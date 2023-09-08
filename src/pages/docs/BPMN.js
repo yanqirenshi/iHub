@@ -5,10 +5,9 @@ import * as atoms from '../../recoil/ATOMS.js';
 
 import Frame from '../../frames/FrameTabs.js';
 import Overview from '../../panels/bpmn/Overview.js';
-import PalettesLev1 from '../../panels/bpmn/PalettesLev1.js';
-import PalettesLev2 from '../../panels/bpmn/PalettesLev2.js';
-import MethodsAndStylesLev1 from '../../panels/bpmn/MethodsAndStylesLev1.js';
-import MethodsAndStylesLev2 from '../../panels/bpmn/MethodsAndStylesLev2.js';
+import Palettes from '../../panels/bpmn/Palettes.js';
+import Methods from '../../panels/bpmn/Methods.js';
+import Styles from '../../panels/bpmn/Styles.js';
 
 export default function BPMN () {
     const [page, setPageScrum] = useRecoilState(atoms.PAGE_BPMN);
@@ -25,10 +24,9 @@ export default function BPMN () {
     return (
         <Frame tabs={page.tabs}
                onChangeTabs={changeTabs}>
-          {'palettes-lev1'===tab       && <PalettesLev1/>}
-          {'palettes-lev2'===tab       && <PalettesLev2/>}
-          {'methods-styles-lev1'===tab && <MethodsAndStylesLev1/>}
-          {'methods-styles-lev2'===tab && <MethodsAndStylesLev2/>}
+          {'palettes'===tab && <Palettes/>}
+          {'methods'===tab  && <Methods/>}
+          {'styles'===tab   && <Styles/>}
           {'overview'===tab            && <Overview/>}
         </Frame>
     );
