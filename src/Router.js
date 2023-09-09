@@ -23,6 +23,7 @@ export default function Router () {
           <Route path='/message'                   element={<page.Messages/>} />
           <Route path='/devops'                    element={<page.DevOps/>} />
           <Route path='/wbs'                       element={<page.Wbs/>} />
+          <Route path='/wbs/:wbs_id'               element={<page.WbsNode/>} />
           <Route path='/scrum'                     element={<page.Scrum/>} />
           {/* == Docs ================================================================ */}
           {/* ux */}

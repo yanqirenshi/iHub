@@ -21,3 +21,4 @@ export { default as SystemDynamics          } from './SystemDynamics.js';
 export { default as SystemEnvironment       } from './SystemEnvironment.js';
 export { default as SystemicDesignContents  } from './SystemicDesignContents.js';
 export { default as Wbs                     } from './Wbs.js';
+export { default as WbsNode                 } from './WbsNode.js';

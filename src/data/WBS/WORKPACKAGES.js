@@ -57,10 +57,11 @@ const WORKPACKAGES = [
     { id: 1000055, parent: 1022, name: 'PAD', description: '' },
     { id: 1000056, parent: 1023, name: 'System Dynamics', description: '' },
     { id: 1000057, parent: 1023, name: 'DDD', description: '' },
-    { id: 1000058, parent: 1023, name: 'WBS', description: '' },
+    { id: 1000058, parent: 1023, name: 'WBS', description: '全WBSツリーの表示。Wp は表示しない。' },
     { id: 1000059, parent: 1023, name: 'アカウント', description: '' },
     { id: 1000060, parent: 1023, name: '認証', description: '' },
     { id: 1000061, parent: 1023, name: 'Next.js', description: '' },
+    { id: 1000062, parent: 1023, name: 'WBS Node', description: '/wbs/:id の画面' },
 ].map(d=> {
     d._class = 'WORKPACKAGE';
     return d;
