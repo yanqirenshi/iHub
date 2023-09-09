@@ -2,23 +2,24 @@ import PROJECTS from './WBS/PROJECTS.js';
 import WBS from './WBS/WBS.js';
 import WORKPACKAGES from './WBS/WORKPACKAGES.js';
 
-function p () {
-    const parent = {};
+const INDEX_ID  = {};
+const INDEX_PARENT = {};
+const INDEX_WP_ID  = {};
 
-    const x = (d)=> {
-        if (!parent[d.from])
-            parent[d.from] = [];
+const all = [
+    ...PROJECTS,
+    ...WBS,
+    ...WORKPACKAGES,
+];
 
-        parent[d.from].push(d);
+for (const wbs_node of all) {
+    if (INDEX_ID[wbs_node.id])
+        throw new Error('Duplication WBS Node. id='+wbs_node.id);
 
-        return parent;
-    };
+    INDEX_ID[wbs_node.id] = wbs_node;
 
-    for (const d of PROJECTS) x(d);
-    for (const d of WBS) x(d);
-    for (const d of WORKPACKAGES) x(d);
-
-    return parent;
+    if (wbs_node._class==="WORKPACKAGE")
+        INDEX_WP_ID[wbs_node.id] = wbs_node;
 }
 
 const WBS_DATA = {
@@ -26,12 +27,7 @@ const WBS_DATA = {
     wbs:          WBS,
     workpackages: WORKPACKAGES,
     edges:        null,
-    index: {
-        parent: p(),
-    },
 };
-
-const INDEX_WP  = WORKPACKAGES.ht;
 
 export {
     PROJECTS,
@@ -39,5 +35,6 @@ export {
     WORKPACKAGES,
     //
     WBS_DATA,
-    INDEX_WP,
+    INDEX_WP_ID,
+    INDEX_ID,
 }
