@@ -4,7 +4,7 @@ const PAGE_DESIGN = recoil.atom({
     key: "PAGE_DESIGN",
     default: {
         tabs: {
-            selected: 'TM',
+            selected: 'ui-parts',
             list: [
                 { code: 'ui-panels',     label: 'パネル' },
                 { code: 'ui-assemblies', label: '中間組立品' },

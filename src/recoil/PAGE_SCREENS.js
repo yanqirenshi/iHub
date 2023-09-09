@@ -7,6 +7,7 @@ const PAGE_SCREENS = recoil.atom({
             selected: 'screen-transition-diagram',
             list: [
                 { code: 'screen-transition-diagram', label: '画面遷移図' },
+                { code: 'screens',                   label: '画面' },
                 { code: 'wbs',                       label: 'WBS' },
                 { code: 'help',                      label: 'Help' },
             ],

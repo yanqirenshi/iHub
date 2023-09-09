@@ -7,6 +7,11 @@ import Frame from '../frames/FrameTabs.js';
 import Wbs from '../panels/Wbs.js';
 import HelpEmpty from '../panels/HelpEmpty.js';
 
+import Panels from '../panels/design/Panels.js';
+import Assemblies from '../panels/design/Assemblies.js';
+import Parts from '../panels/design/Parts.js';
+import Events from '../panels/design/Events.js';
+
 export default function Design () {
     const [page_data, setPageData] = useRecoilState(atoms.PAGE_DESIGN);
 
@@ -23,11 +28,11 @@ export default function Design () {
         <Frame tabs={tabs}
                onChangeTabs={changeTabs}>
 
-          {'ui-panels'===tab && <div/>}
-          {'ui-assemblies'===tab && <div/>}
-          {'ui-parts'===tab && <div/>}
-          {'ui-actions'===tab && <div/>}
-          {'wbs'===tab && <Wbs/>}
+          {'ui-panels'===tab && <Panels/>}
+          {'ui-assemblies'===tab && <Assemblies/>}
+          {'ui-parts'===tab && <Parts/>}
+          {'ui-actions'===tab && <Events/>}
+          {'wbs'===tab && <Wbs start_id="1001"/>}
           {'help'===tab && <HelpEmpty/>}
         </Frame>
     );

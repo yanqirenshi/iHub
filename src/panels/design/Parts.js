@@ -1,17 +1,14 @@
 import Box from '@mui/material/Box';
-
 import Container from '@mui/material/Container';
 
-import WBSTable from '../assemblies/WBSTable.js';
+import WBSTable from '../../assemblies/WBSTable.js';
 
-export default function Wbs (props) {
-    const start_id = props.start_id;
-
+export default function Parts () {
     return (
         <Box>
           <Container maxWidth="lg" sx={{pt:5}}>
             <Box>
-              <WBSTable start_id={start_id}/>
+              <WBSTable start_id="1009"/>
             </Box>
           </Container>
         </Box>

@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 
 import * as page from './pages/index.js';
 import * as page_docs from './pages/docs/index.js';
-import Loading from './assemblies/Loading.js';
+import Loading from './panels/Loading.js';
 
 export default function Router () {
     return (
