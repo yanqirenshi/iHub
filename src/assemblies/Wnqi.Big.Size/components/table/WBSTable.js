@@ -94,7 +94,9 @@ function WBSTable (props) {
 
           {!bilding &&
            <TableContainer component={Paper}>
-             <Table sx={{ minWidth: 650 }} aria-label="simple table">
+             <Table sx={{ minWidth: 650 }}
+                    size="small"
+                    aria-label="simple table">
 
                <Comps.THead columns={columns_filterd}
                             max_level={max_lev}

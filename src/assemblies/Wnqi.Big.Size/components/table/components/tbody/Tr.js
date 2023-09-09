@@ -20,8 +20,8 @@ export default function Tr (props) {
 
         const element = span(e.target);
 
-        const action =element.getAttribute('action');
-        const data_id =element.getAttribute('data_id') * 1;
+        const action = element.getAttribute('action');
+        const data_id = element.getAttribute('data_id') * 1;
 
         props.callbacks.body.wbs.switch(action, data_id);
     };

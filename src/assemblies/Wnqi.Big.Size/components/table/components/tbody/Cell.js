@@ -48,8 +48,8 @@ export default function Cell (props) {
 function cellStyle (row, level, style) {
     const out = {};
 
-    if (row._class==="WORKPACKAGE")
-        out.fontWeight = 'bold';
+    // if (row._class==="WORKPACKAGE")
+    //     out.fontWeight = 'bold';
 
     if (level===0)
         return out;
