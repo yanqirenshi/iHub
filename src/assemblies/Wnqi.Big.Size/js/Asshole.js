@@ -437,7 +437,9 @@ export default class Asshole {
     flatten (tree, level) {
         let out = [];
 
-        for (let node of tree) {
+        const sorted_tree = tree.sort((a,b)=> a._id<b._id ? -1 : 1);
+
+        for (let node of sorted_tree) {
             node._level = level;
 
             out.push(node);
