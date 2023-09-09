@@ -10,7 +10,6 @@ const WBS = [
     { id: 1008, parent: 1001, name: '中間組立品', },
     { id: 1009, parent: 1001, name: '部品', },
     { id: 1010, parent: 1001, name: 'UIイベント', },
-
     { id: 1011, parent: 1007, name: 'account', },
     { id: 1012, parent: 1007, name: 'bpmn', },
     { id: 1013, parent: 1007, name: 'cockpit', },
@@ -21,6 +20,9 @@ const WBS = [
     { id: 1018, parent: 1007, name: 'sogh', },
     { id: 1019, parent: 1007, name: 'std', },
     { id: 1020, parent: 1007, name: 'systemic_design', },
+    { id: 1021, parent: 1002, name: 'iHub', },
+    { id: 1022, parent: 1002, name: 'Docs', },
+    { id: 1023, parent: 1002, name: 'Etc', },
 ];
 
 export default WBS;

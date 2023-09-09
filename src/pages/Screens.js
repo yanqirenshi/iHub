@@ -25,7 +25,7 @@ export default function Screens () {
                onChangeTabs={changeTabs}>
 
           {'screen-transition-diagram'===tab && <ScreenTransitionDiagram/>}
-          {'wbs'===tab && <Wbs/>}
+          {'wbs'===tab && <Wbs start_id="1002"/>}
           {'help'===tab && <HelpEmpty/>}
         </Frame>
     );

@@ -32,9 +32,16 @@ export default function Cockpit () {
 }
 
 function issues2cards (issues) {
-    return issues.map(issue_id=> ({
-        type: 'GITHUB ISSUE',
-        id: issue_id,
-        data: sogh.issue(issue_id),
-    }));
+    return issues.reduce((list,issue_id)=> {
+        const issue = sogh.issue(issue_id);
+
+        if (issue.assignees().find(ass=>ass.login==="yanqirenshi"))
+            list.push({
+                type: 'GITHUB ISSUE',
+                id: issue_id,
+                data: issue,
+            });
+
+        return list;
+    }, []);
 }

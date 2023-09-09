@@ -8,8 +8,8 @@ export default function Wbs (props) {
     const start_id = props.start_id;
 
     return (
-        <Box>
-          <Container maxWidth="lg" sx={{pt:5}}>
+        <Box sx={{height:'100%', overflow: 'auto'}}>
+          <Container maxWidth="lg" sx={{pt:5, pb: 22}}>
             <Box>
               <WBSTable start_id={start_id}/>
             </Box>
