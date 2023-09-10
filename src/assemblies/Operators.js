@@ -1,3 +1,5 @@
+import React from 'react';
+
 import Root from './Operators/Root.js';
 import Branch from './Operators/Branch.js';
 import Leaf from './Operators/Leaf.js';
@@ -10,11 +12,16 @@ export default function Operators (props) {
     const window_size = props.window_size;
     const children    = props.children;
 
-    if (!window_size) return null;
+    React.useEffect(()=> {
+        if (!window_size)
+            return;
 
-    if (!operators.initialized)
-        actions.operator.change(
-            operator.initialize(window_size, operators));
+        if (!operators.initialized)
+            actions.operator.change(
+                operator.initialize(window_size, operators));
+    }, [window_size]);
+
+    if (!window_size) return null;
 
     const clickRoot = (code)=>
           actions.operator.change(operator.clickedRoot(code, operators));
