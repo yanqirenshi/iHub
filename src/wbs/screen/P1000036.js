@@ -6,6 +6,14 @@ import S from '@mui/material/Typography';
 import Frame from '../../frames/Frame.js';
 
 export default function P1000036 (props) {
+    console.log(props.wbs_node);
+// description
+// id
+// name
+// parent
+// type
+// _class
+
     return (
         <Frame>
           <Container maxWidth="lg" sx={{pt:5}}>

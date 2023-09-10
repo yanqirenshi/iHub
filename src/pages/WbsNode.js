@@ -1,13 +1,8 @@
 import React, { lazy, Suspense } from 'react';
-
 import { useParams } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import S from '@mui/material/Typography';
-import Container from '@mui/material/Container';
 
-import Frame from '../frames/Frame.js';
 import Loading from '../panels/Loading.js';
-import NotFoundWbsNode from './wbs/NotFoundWbsNode.js';
+import NotFoundWbsNode from '../wbs/NotFoundWbsNode.js';
 
 import {INDEX_ID} from '../data/WBS.js';
 

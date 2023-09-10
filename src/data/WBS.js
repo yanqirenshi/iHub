@@ -3,7 +3,6 @@ import WBS from './WBS/WBS.js';
 import WORKPACKAGES from './WBS/WORKPACKAGES.js';
 
 const INDEX_ID  = {};
-const INDEX_PARENT = {};
 const INDEX_WP_ID  = {};
 const INDEX_WP_TYPE  = {};
 

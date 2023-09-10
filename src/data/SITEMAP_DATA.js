@@ -1,7 +1,25 @@
 import {INDEX_WP_TYPE} from './WBS.js';
 
-console.log(INDEX_WP_TYPE);
+import SITEMAP_DATA_NODES from './SITEMAP_DATA_NODES.js';
+import SITEMAP_DATA_EDGES from './SITEMAP_DATA_EDGES.js';
 
-const DATA = {};
+const screens = INDEX_WP_TYPE['screen'].reduce((list, wbs_node)=> {
+    const node = SITEMAP_DATA_NODES[wbs_node.id];
+
+    if (!node)
+        return list;
+
+    node.label.contents = wbs_node.name;
+
+    list.push(node);
+
+    return list;
+}, []);
+
+
+const DATA = {
+    nodes: screens,
+    edges: SITEMAP_DATA_EDGES,
+};
 
 export default DATA;
