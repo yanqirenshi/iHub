@@ -5,6 +5,7 @@ import WORKPACKAGES from './WBS/WORKPACKAGES.js';
 const INDEX_ID  = {};
 const INDEX_PARENT = {};
 const INDEX_WP_ID  = {};
+const INDEX_WP_TYPE  = {};
 
 const all = [
     ...PROJECTS,
@@ -18,8 +19,17 @@ for (const wbs_node of all) {
 
     INDEX_ID[wbs_node.id] = wbs_node;
 
-    if (wbs_node._class==="WORKPACKAGE")
+    if (wbs_node._class==="WORKPACKAGE") {
+        // INDEX_WP_ID
         INDEX_WP_ID[wbs_node.id] = wbs_node;
+
+        // INDEX_WP_TYPE
+        const type = wbs_node.type || null;
+        if (!INDEX_WP_TYPE[type])
+            INDEX_WP_TYPE[type] = [];
+
+        INDEX_WP_TYPE[type].push(wbs_node);
+    }
 }
 
 const WBS_DATA = {
@@ -35,6 +45,7 @@ export {
     WORKPACKAGES,
     //
     WBS_DATA,
-    INDEX_WP_ID,
     INDEX_ID,
+    INDEX_WP_ID,
+    INDEX_WP_TYPE,
 }

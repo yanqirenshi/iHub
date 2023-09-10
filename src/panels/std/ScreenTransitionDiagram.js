@@ -6,6 +6,8 @@ import D3Sitemap, { Rectum } from '@yanqirenshi/d3.sitemap';
 
 import SITEMAP_DATA from '../../data/samples/SITEMAP_DATA.js';
 
+import SITEMAP_DATA_test from '../../data/SITEMAP_DATA.js';
+
 const style = {
     background: '#f3f3f3',
     width: '100%',
