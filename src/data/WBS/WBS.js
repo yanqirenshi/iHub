@@ -125,6 +125,12 @@ const WBS = [
         name: 'WBS Nodes',
         description: '/wbs/:id の画面',
     },
+    {
+        id: 1025,
+        parent: 1008,
+        name: 'Frames',
+        description: 'Panel() のルートコンポーネント',
+    },
 ];
 
 export default WBS;

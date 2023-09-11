@@ -16,7 +16,7 @@ export default function WbsNode () {
     if (!wbs_node)
         return <NotFoundWbsNode/>;
 
-    const Page = lazy(() => import(`../wbs/${wbs_node.type || 'unknown'}/P${wbs_id}.js`));
+    const Page = lazy(() => import(`../wbs/${wbs_node.type ? wbs_node.type + '/' : ''}P${wbs_id}.js`));
 
     return (
         <Suspense fallback={<Loading/>}>
