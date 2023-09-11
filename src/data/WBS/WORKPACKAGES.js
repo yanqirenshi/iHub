@@ -489,7 +489,13 @@ const WORKPACKAGES = [
         name: 'LinkWBS',
         description: '',
     },
-
+    {
+        id: 1000070,
+        type: 'screen',
+        parent: 1021,
+        name: '外部リソース',
+        description: '',
+    },
 ].map(d=> {
     d._class = 'WORKPACKAGE';
     return d;

@@ -19,6 +19,7 @@ export default function Router () {
           <Route path='/screens'                   element={<page.Screens/>} />
           <Route path='/data'                      element={<page.Data/>} />
           <Route path='/classes'                   element={<page.Classes/>} />
+          <Route path='/external-resources'        element={<page.ExternalResources/>} />
           <Route path='/system-environment'        element={<page.SystemEnvironment/>} />
           <Route path='/message'                   element={<page.Messages/>} />
           <Route path='/devops'                    element={<page.DevOps/>} />

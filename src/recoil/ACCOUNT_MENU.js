@@ -31,6 +31,7 @@ const ACCOUNT_MENU = recoil.atom({
                     'batchs',
                     'data',
                     'classes',
+                    'external-resources',
                     'system-environment',
                     'message',
                     'devops',

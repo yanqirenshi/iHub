@@ -11,6 +11,7 @@ export { default as DDD                     } from './DDD.js';
 export { default as Data                    } from './Data.js';
 export { default as Design                  } from './Design.js';
 export { default as DevOps                  } from './DevOps.js';
+export { default as ExternalResources       } from './ExternalResources.js';
 export { default as Markets                 } from './Markets.js';
 export { default as Messages                } from './Messages.js';
 export { default as Parts                   } from './Parts.js';
