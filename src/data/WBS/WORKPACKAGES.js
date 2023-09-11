@@ -496,6 +496,62 @@ const WORKPACKAGES = [
         name: '外部リソース',
         description: '',
     },
+    {
+        id: 1000071,
+        type: 'external-resources',
+        parent: 1028,
+        name: '@yanqirenshi/d3.deployment',
+        description: '',
+    },
+    {
+        id: 1000072,
+        type: 'external-resources',
+        parent: 1028,
+        name: '@yanqirenshi/d3.er',
+        description: '',
+    },
+    {
+        id: 1000073,
+        type: 'external-resources',
+        parent: 1028,
+        name: '@yanqirenshi/d3.gantt',
+        description: '',
+    },
+    {
+        id: 1000074,
+        type: 'external-resources',
+        parent: 1028,
+        name: '@yanqirenshi/d3.network',
+        description: '',
+    },
+    {
+        id: 1000075,
+        type: 'external-resources',
+        parent: 1028,
+        name: '@yanqirenshi/d3.sitemap',
+        description: '',
+    },
+    {
+        id: 1000076,
+        type: 'external-resources',
+        parent: 1028,
+        name: '@yanqirenshi/d3.ter',
+        description: '',
+    },
+    {
+        id: 1000077,
+        type: 'external-resources',
+        parent: 1028,
+        name: '@yanqirenshi/wnqi.big.size',
+        description: '',
+    },
+    {
+        id: 1000078,
+        type: 'external-resources',
+        parent: 1028,
+        name: 'react-bpmn',
+        description: '',
+    },
 ].map(d=> {
     d._class = 'WORKPACKAGE';
     return d;

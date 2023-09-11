@@ -25,7 +25,24 @@ export default function Router () {
           <Route path='/devops'                    element={<page.DevOps/>} />
           <Route path='/wbs'                       element={<page.Wbs/>} />
           <Route path='/wbs/:wbs_id'               element={<page.WbsNode/>} />
-          <Route path='/scrum'                     element={<page.Scrum/>} />
+          {/* /scrum root. viewer の画面 */}
+          <Route path='/scrum'       element={<page.Scrum/>} />
+          {/* ProjectV2 */}
+          <Route path='/scrum/users/:user/projects'          element={<page.Scrum/>} />
+          <Route path='/scrum/users/:user/projects/:project' element={<page.Scrum/>} />
+          {/* Issue */}
+          <Route path='/scrum/:user/:repository'             element={<page.Scrum/>} />
+          <Route path='/scrum/:user/:repository/issues'      element={<page.Scrum/>} />
+          <Route path='/scrum/:user/:repository/issues/:num' element={<page.Scrum/>} />
+          {/* Pull requests */}
+          <Route path='/scrum/:user/:repository/pull'      element={<page.Scrum/>} />
+          <Route path='/scrum/:user/:repository/pull/:num' element={<page.Scrum/>} />
+          {/* Actions */}
+          <Route path='/scrum/:user/:repository/actions/runs'      element={<page.Scrum/>} />
+          <Route path='/scrum/:user/:repository/actions/runs/:num' element={<page.Scrum/>} />
+          {/* Discussions */}
+          <Route path='/scrum/:user/:repository/discussions/'     element={<page.Scrum/>} />
+          <Route path='/scrum/:user/:repository/discussions/:num' element={<page.Scrum/>} />
           {/* == Docs ================================================================ */}
           {/* ux */}
           <Route path='/systemic-design/:name'     element={<page.SystemicDesignContents/>} />

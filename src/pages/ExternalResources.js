@@ -1,16 +1,14 @@
 import React from 'react';
 
 import { useRecoilState } from "recoil";
-import * as atoms from '../recoil/PAGE_ACCOUNT.js';
+import * as atoms from '../recoil/PAGE_EXTERNAL_RESOURCES.js';
 
 import Frame from '../assemblies/frames/FrameTabs.js';
 
-import Menus from '../panels/account/Menus.js';
-import Operators from '../panels/account/Operators.js';
-import Pages from '../panels/account/Pages.js';
+import Wbs from '../panels/Wbs.js';
 
 export default function ExternalResources () {
-    const [tabs, setTabs] = useRecoilState(atoms.PAGE_ACCOUNT_TABS);
+    const [tabs, setTabs] = useRecoilState(atoms.PAGE_EXTERNAL_RESOURCES_TABS);
 
     const changeTabs = (new_tabs)=> setTabs(new_tabs);
 
@@ -19,10 +17,7 @@ export default function ExternalResources () {
     return (
         <Frame tabs={tabs}
                onChangeTabs={changeTabs}>
-
-          {'menus'     === tab && <Menus/>}
-          {'operators' === tab && <Operators/>}
-          {'pages'     === tab && <Pages/>}
+          {'wbs' === tab && <Wbs start_id={1027}/>}
         </Frame>
     );
 }

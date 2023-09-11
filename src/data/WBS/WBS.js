@@ -131,6 +131,16 @@ const WBS = [
         name: 'Frames',
         description: 'Panel() のルートコンポーネント',
     },
+    {
+        id: 1027,
+        parent:    1,
+        name: '外部リソース',
+    },
+    {
+        id: 1028,
+        parent: 1027,
+        name: 'npm',
+    },
 ];
 
 export default WBS;
