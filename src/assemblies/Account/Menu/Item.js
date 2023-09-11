@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 
-import Link from '../../../parts/Link.js';
+import Link from '../../../assemblies/Link.js';
 
 export default function Item (props) {
     const item = props.data;

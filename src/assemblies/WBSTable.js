@@ -1,6 +1,6 @@
 "use client";
 
-import Link from '../parts/Link.js';
+import Link from '../assemblies/Link.js';
 
 import Table from './Wnqi.Big.Size/index.js';
 import wbs from '../manegers/wbs.js';

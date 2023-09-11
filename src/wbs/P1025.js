@@ -6,7 +6,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 
 import Frame from '../assemblies/frames/Frame.js';
-import Link from '../parts/Link.js';
+import Link from '../assemblies/Link.js';
 
 export default function P1025 (props) {
     return (

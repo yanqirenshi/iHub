@@ -7,7 +7,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 
 import Frame from '../../assemblies/frames/Frame.js';
-import Link from '../../parts/Link.js';
+import Link from '../../assemblies/Link.js';
 
 import DATA from '../../data/systemic_design/DATA.js';
 
