@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Frame from '../frames/Frame.js';
+import Frame from '../assemblies/frames/Frame.js';
 import { Monitor, Card } from '../panels/cockpit/index.js';
 
 import { useRecoilValue } from "recoil";

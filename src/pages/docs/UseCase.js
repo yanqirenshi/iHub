@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Frame from '../../frames/Frame.js';
+import Frame from '../../assemblies/frames/Frame.js';
 
 export default function UseCase () {
   return (

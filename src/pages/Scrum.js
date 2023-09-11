@@ -3,7 +3,7 @@ import React, {Suspense} from 'react';
 import { useRecoilState } from "recoil";
 import * as atoms from '../recoil/PAGE_SCRUM.js';
 
-import Frame from '../frames/FrameTabs.js';
+import Frame from '../assemblies/frames/FrameTabs.js';
 import * as panel from '../panels/sogh/index.js';
 import HelpEmpty from '../panels/HelpEmpty.js';
 import Loading from '../panels/Loading.js';

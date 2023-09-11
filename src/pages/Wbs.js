@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Frame from '../frames/Frame.js';
+import Frame from '../assemblies/frames/Frame.js';
 
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';

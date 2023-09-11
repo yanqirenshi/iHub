@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import S from '@mui/material/Typography';
 
-import Frame from '../../frames/Frame.js';
+import Frame from '../../assemblies/frames/Frame.js';
 import Link from '../../parts/Link.js';
 
 export default function CustomerJourneyMap () {

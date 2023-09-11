@@ -6,7 +6,7 @@ import S from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 
-import Frame from '../../frames/Frame.js';
+import Frame from '../../assemblies/frames/Frame.js';
 import Link from '../../parts/Link.js';
 
 import DATA from '../../data/systemic_design/DATA.js';

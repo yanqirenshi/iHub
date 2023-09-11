@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import S from '@mui/material/Typography';
 
-import Frame from '../../frames/Frame.js';
+import Frame from '../../assemblies/frames/Frame.js';
 
 export default function P1000052 (props) {
     return (

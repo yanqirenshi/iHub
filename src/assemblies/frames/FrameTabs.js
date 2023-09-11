@@ -3,7 +3,7 @@ import Measure from 'react-measure';
 import Box from '@mui/material/Box';
 
 import Frame from './Frame.js';
-import Tabs from '../parts/Tabs.js';
+import Tabs from '../../parts/Tabs.js';
 
 export default function FrameTabs (props) {
     const children = props.children;

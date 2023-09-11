@@ -3,7 +3,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 
-import Frame from '../../frames/Frame.js';
+import Frame from '../../assemblies/frames/Frame.js';
 
 export default function ScreenTransitionDiagram () {
     return (

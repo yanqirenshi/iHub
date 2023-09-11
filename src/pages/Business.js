@@ -3,7 +3,7 @@ import React from 'react';
 import { useRecoilState } from "recoil";
 import * as atoms from '../recoil/ATOMS.js';
 
-import Frame from '../frames/FrameTabs.js';
+import Frame from '../assemblies/frames/FrameTabs.js';
 
 import SystemDynamics from '../panels/SystemDynamics.js';
 import TM from '../panels/TM.js';
