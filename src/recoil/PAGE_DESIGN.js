@@ -9,7 +9,7 @@ const PAGE_DESIGN = recoil.atom({
                 { code: 'ui-panels',     label: 'パネル' },
                 { code: 'ui-assemblies', label: '中間組立品' },
                 { code: 'ui-parts',      label: '部品' },
-                { code: 'ui-actions',    label: 'UI アクション' },
+                { code: 'ui-events',     label: 'UI イベント' },
                 { code: 'wbs',           label: 'WBS' },
                 { code: 'help',          label: 'Help' },
             ],

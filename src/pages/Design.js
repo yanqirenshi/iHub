@@ -31,7 +31,7 @@ export default function Design () {
           {'ui-panels'===tab && <Panels/>}
           {'ui-assemblies'===tab && <Assemblies/>}
           {'ui-parts'===tab && <Parts/>}
-          {'ui-actions'===tab && <Events/>}
+          {'ui-events'===tab && <Events/>}
           {'wbs'===tab && <Wbs start_id="1001"/>}
           {'help'===tab && <HelpEmpty/>}
         </Frame>

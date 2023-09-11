@@ -1,14 +1,14 @@
 const WORKPACKAGES = [
     {
         id: 1000000,
-        type: null,
-        parent: 1009,
+        type: 'assembliy',
+        parent: 1008,
         name: 'Link',
         description: '',
     },
     {
         id: 1000001,
-        type: null,
+        type: 'parts',
         parent: 1009,
         name: 'Tabs',
         description: '',
@@ -468,6 +468,28 @@ const WORKPACKAGES = [
         name: 'FrameHeaderTabs',
         description: '',
     },
+    {
+        id: 1000067,
+        type: 'parts',
+        parent: 1009,
+        name: 'LinkInSite',
+        description: '',
+    },
+    {
+        id: 1000068,
+        type: 'parts',
+        parent: 1009,
+        name: 'LinkOutSite',
+        description: '',
+    },
+    {
+        id: 1000069,
+        type: 'parts',
+        parent: 1009,
+        name: 'LinkWBS',
+        description: '',
+    },
+
 ].map(d=> {
     d._class = 'WORKPACKAGE';
     return d;
