@@ -55,6 +55,7 @@ function Cards (props) {
                      return (
                          <Box key={img}>
                            <img src={`/systemic_design/${img}`}
+                                alt={img}
                                 style={{width: w - 33}}/>
                          </Box>
                      );
