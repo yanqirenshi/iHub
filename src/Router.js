@@ -13,6 +13,7 @@ export default function Router () {
                  element={<Suspense fallback={<Loading/>}>
                             <page.Cockpit/>
                           </Suspense>} />
+          <Route path='/help'                      element={<page.Help/>} />
           <Route path='/markets'                   element={<page.Markets/>} />
           <Route path='/business'                  element={<page.Business/>} />
           <Route path='/design'                    element={<page.Design/>} />

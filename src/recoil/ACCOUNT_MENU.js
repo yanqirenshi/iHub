@@ -36,6 +36,7 @@ const ACCOUNT_MENU = recoil.atom({
                     'message',
                     'devops',
                     'scrum',
+                    'help',
                 ]),
             },
             {

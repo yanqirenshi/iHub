@@ -12,6 +12,7 @@ const MAIN = [
     { code: 'message',               url: '/message',               label: 'メッセージ' },
     { code: 'devops',                url: '/devops',                label: 'DevOps' },
     { code: 'scrum',                 url: '/scrum',                 label: 'Scrum' },
+    { code: 'help',                  url: '/help',                  label: 'Help' },
 ];
 
 const UX = [

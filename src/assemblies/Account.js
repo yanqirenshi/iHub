@@ -5,6 +5,7 @@ import Menu from './Account/Menu.js';
 export default function Account (props) {
     const menu = props.menu;
     const actions = props.actions;
+
     return (
         <>
           <div style={{position: 'fixed', right: 22, top: 22}}>

@@ -6,7 +6,7 @@ export default function Item (props) {
     const item = props.data;
 
     return (
-        <Box key={item.url} sx={{mt:1, mb: 1}}>
+        <Box key={item.url} sx={{mt:0.8, mb: 0.8}}>
           <Link href={item.url}>
             {item.label}
           </Link>
