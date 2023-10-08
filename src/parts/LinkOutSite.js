@@ -7,7 +7,6 @@ export default function LinkOutSite (props) {
     return (
         <MaterialLink href={href}
                       target="_blank"
-                      rel="noopener"
                       rel="noreferrer"
                       style={{
                           color: 'rgba(0, 0, 0, 0.87)',

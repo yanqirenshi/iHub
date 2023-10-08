@@ -12,12 +12,12 @@ const style = {
     height: '100%',
 };
 
-export default function SystemConfigurationDiagram (props) {
-    const graph_data = {
-        nodes: DEPLOYMENT_MANAGE_OVERVIEW_NODE_DATA,
-        edges: DEPLOYMENT_MANAGE_OVERVIEW_EDGE_DATA,
-    };
+const graph_data = {
+    nodes: DEPLOYMENT_MANAGE_OVERVIEW_NODE_DATA,
+    edges: DEPLOYMENT_MANAGE_OVERVIEW_EDGE_DATA,
+};
 
+export default function SystemConfigurationDiagram (props) {
     const [rectum] = React.useState(new Rectum({
         transform: {
             k: 0.3,

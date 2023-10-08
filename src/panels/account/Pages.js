@@ -6,8 +6,6 @@ import S from '@mui/material/Typography';
 
 import Models from './Models.js';
 
-import ROOTS from '../../data/OPERATOR_ITEMS.js';
-
 export default function Pages (props) {
     return (
         <Box sx={{
