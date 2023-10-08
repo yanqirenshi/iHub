@@ -4,8 +4,8 @@ import Box from '@mui/material/Box';
 
 import D3Deployment, { Rectum } from '@yanqirenshi/d3.deployment';
 
-import DEPLOYMENT_MANAGE_OVERVIEW_EDGE_DATA from '../../data/samples/scd/DEPLOYMENT_MANAGE_OVERVIEW_EDGE_DATA.js';
-import DEPLOYMENT_MANAGE_OVERVIEW_NODE_DATA from '../../data/samples/scd/DEPLOYMENT_MANAGE_OVERVIEW_NODE_DATA.js';
+import DEPLOYMENT_MANAGE_OVERVIEW_EDGE_DATA from '../../data/DEPLOYMENT_MANAGE_OVERVIEW_EDGE_DATA.js';
+import DEPLOYMENT_MANAGE_OVERVIEW_NODE_DATA from '../../data/DEPLOYMENT_MANAGE_OVERVIEW_NODE_DATA.js';
 
 const style = {
     width: '100%',

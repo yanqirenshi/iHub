@@ -4,7 +4,7 @@ import D3Er, { Rectum } from '@yanqirenshi/d3.er';
 
 import Box from '@mui/material/Box';
 
-import ER_DATA from '../data/ER_DATA.js';
+import ER_DATA from '../data/ER.js';
 
 export default function ER (props) {
     const source = ER_DATA;

@@ -46,7 +46,8 @@ export default function Router () {
           <Route path='/scrum/:user/:repository/discussions/:num' element={<page.Scrum/>} />
           {/* == Docs ================================================================ */}
           {/* ux */}
-          <Route path='/systemic-design/:name'     element={<page.SystemicDesignContents/>} />
+          <Route path='/systemic-design'       element={<page.SystemicDesign/>} />
+          <Route path='/systemic-design/:name' element={<page.SystemicDesignContents/>} />
           {/* == ui ================================================================ */}
           {/* { path: '/screens'                   element={page }, */}
           {/* { path: '/assemblies'                element={page }, */}
@@ -65,7 +66,6 @@ export default function Router () {
           <Route path='/er'                        element={<page_docs.ER/>} />
           <Route path='/procedures'                element={<page_docs.Procedures/>} />
           <Route path='/screen-transition-diagram' element={<page_docs.ScreenTransitionDiagram/>} />
-          <Route path='/systemic-design'           element={<page_docs.SystemicDesign/>} />
           <Route path='/tm'                        element={<page_docs.TM/>} />
           <Route path='/uml'                       element={<page_docs.UML/>} />
           <Route path='/use-case'                  element={<page_docs.UseCase/>} />

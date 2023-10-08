@@ -6,10 +6,10 @@ import S from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 
-import Frame from '../../assemblies/frames/Frame.js';
-import Link from '../../assemblies/Link.js';
+import Frame from '../assemblies/frames/Frame.js';
+import Link from '../assemblies/Link.js';
 
-import DATA from '../../data/systemic_design/DATA.js';
+import DATA from '../data/systemic_design/DATA.js';
 
 export default function SystemicDesign () {
     return (
@@ -19,7 +19,9 @@ export default function SystemicDesign () {
               {DATA.map(row=> {
                   return (
                       <Box sx={{mt: 3}}>
-                        <S variant="h5">{row.label}</S>
+                        <S variant="h5">
+                          {row.label}
+                        </S>
 
                         <Box sx={{display:'flex', mt: 1, flexWrap:'wrap'}}>
                           <Cards list={row.cards}/>

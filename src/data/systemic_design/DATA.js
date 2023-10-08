@@ -13,6 +13,15 @@ const DATA = [
         ],
     },
     {
+        label: '共創ワークショップ',
+        cards: [
+            {
+                code: null,
+                label: '?'
+            },
+        ],
+    },
+    {
         label: 'システムのフレーミングを行う',
         cards: [
             {

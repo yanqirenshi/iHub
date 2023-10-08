@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 
 import D3Ter, {Rectum}  from '@yanqirenshi/d3.ter';
 
-import TM_DATA from '../data/samples/TM_DATA.js';
+import TM_DATA from '../data/TM.js';
 
 export default function TM () {
     const [rectum, setRectum] = useState(null);
