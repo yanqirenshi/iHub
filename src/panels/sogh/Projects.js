@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 
 import {ProjectsV2} from 'sogh';
 
@@ -15,9 +16,9 @@ export default function Projects () {
 
     return (
         <Box sx={{ p:2, overflow: 'auto', height: '100%' }}>
-          <Box sx={{ width: 666, ml:'auto', mr: 'auto', pb: 22 }}>
+          <Container maxWidth="lg">
             <ProjectsV2 data={projects} sogh={sogh}/>
-          </Box>
+          </Container>
         </Box>
     );
 }

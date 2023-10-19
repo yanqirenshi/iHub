@@ -26,24 +26,40 @@ export default function Router () {
           <Route path='/devops'                    element={<page.DevOps/>} />
           <Route path='/wbs'                       element={<page.Wbs/>} />
           <Route path='/wbs/:wbs_id'               element={<page.WbsNode/>} />
+
+          {/* == Scrum ================================================================ */}
           {/* /scrum root. viewer の画面 */}
           <Route path='/scrum'       element={<page.Scrum/>} />
-          {/* ProjectV2 */}
-          <Route path='/scrum/users/:user/projects'          element={<page.Scrum/>} />
-          <Route path='/scrum/users/:user/projects/:project' element={<page.Scrum/>} />
+          {/* /scrum/users/:user-login/projects */}
+          {/* /scrum/users/:user-login/projects/:project-num */}
+          <Route path='/scrum/users/:login/projects'         element={<page.Scrum/>} />
+          <Route path='/scrum/users/:login/projects/:number' element={<page.ScrumProject/>} />
+
+          {/* ProjectV2 Item */}
+          {/* /scrum/users/:user-login/projects/:project-num/items/:item-id */}
+          <Route path='/scrum/users/:login/projects/:number/items/:id' element={<page.ScrumProjectItem/>} />
+
+          {/* Repository */}
+          {/* /scrum/users/:user-login/repositories */}
+          {/* /scrum/users/:user-login/repositories/:repository-name */}
+          <Route path='/scrum/users/:login/repositories/:repository' element={<page.Scrum/>} />
+
           {/* Issue */}
-          <Route path='/scrum/:user/:repository'             element={<page.Scrum/>} />
-          <Route path='/scrum/:user/:repository/issues'      element={<page.Scrum/>} />
-          <Route path='/scrum/:user/:repository/issues/:num' element={<page.Scrum/>} />
+          {/* /scrum/users/:user-login/repositories/:repository-name/issues/:num */}
+          <Route path='/scrum/users/:login/repositories/:repository/issues/:number' element={<page.Scrum/>} />
+
           {/* Pull requests */}
-          <Route path='/scrum/:user/:repository/pull'      element={<page.Scrum/>} />
-          <Route path='/scrum/:user/:repository/pull/:num' element={<page.Scrum/>} />
+          {/* /scrum/users/:user-login/repositories/:repository-name/pull/:num */}
+          <Route path='/scrum/users/:login/repositories/:repository/pull/:num' element={<page.Scrum/>} />
+
           {/* Actions */}
-          <Route path='/scrum/:user/:repository/actions/runs'      element={<page.Scrum/>} />
-          <Route path='/scrum/:user/:repository/actions/runs/:num' element={<page.Scrum/>} />
+          {/* /scrum/users/:user-login/repositories/:repository-name/actions/:num */}
+          <Route path='/scrum/users/:login/repositories/:repository/actions/:num' element={<page.Scrum/>} />
+
           {/* Discussions */}
-          <Route path='/scrum/:user/:repository/discussions/'     element={<page.Scrum/>} />
-          <Route path='/scrum/:user/:repository/discussions/:num' element={<page.Scrum/>} />
+          {/* /scrum/users/:user-login/repositories/:repository-name/discussions/:num */}
+          <Route path='/scrum/users/:login/repositories/:repository/discussions/:num' element={<page.Scrum/>} />
+
           {/* == Docs ================================================================ */}
           {/* ux */}
           <Route path='/systemic-design'       element={<page.SystemicDesign/>} />
