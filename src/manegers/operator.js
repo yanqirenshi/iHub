@@ -1,14 +1,30 @@
 import * as util from '../libs/yutils/index.js';
 
 class Operators {
+    constructor () {
+        this._window_size = null;;
+    }
     initialize (window_size, operators) {
+        this._window_size = window_size;
+
         const new_operators = util.cp(operators);
 
         new_operators.initialized = util.ts();
 
-        new_operators.list = operator.calRootPos(window_size.w, window_size.h, operators.list);
+        new_operators.list
+            = operator.calRootPos(
+                window_size.w,
+                window_size.h,
+                operators.list);
 
         return new_operators;
+    }
+    isNeedCal (window_size) {
+        if (window_size.w === this._window_size.w
+            && window_size.h === this._window_size.h)
+            return false;
+
+        return true;
     }
     //
     //              window center

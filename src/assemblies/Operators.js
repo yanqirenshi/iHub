@@ -16,9 +16,10 @@ export default function Operators (props) {
         if (!window_size)
             return;
 
-        if (!operators.initialized)
+        if (!operators.initialized || operator.isNeedCal(window_size))
             actions.operator.change(
                 operator.initialize(window_size, operators));
+
     }, [window_size]);
 
     if (!window_size) return null;

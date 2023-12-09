@@ -3,6 +3,10 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import S from '@mui/material/Typography';
 
+// import Link from '../.././../../parts/LinkInSite.js';
+import LinkOutSite from '../.././../../parts/LinkOutSite.js';
+
+
 export default function GithubIssue (props) {
     const data = props.data;
 
@@ -24,9 +28,9 @@ export default function GithubIssue (props) {
               {issue.title()}
               <span>
                 (
-                <a href={issue.url()}>
+                <LinkOutSite href={issue.url()}>
                   {issue.number()}
-                </a>
+                </LinkOutSite>
                 )
               </span>
             </S>

@@ -1,21 +1,27 @@
 ## Directories
 
-### React Components
 
-| Name       | Description                    |
-|------------|--------------------------------|
-| frames     | Page の枠、Panel を表示する。  |
-| panels     | Frame の Contents で表示する。 |
-| assemblies | intermediate assembly (中間品) |
-| parts      | 部品                           |
+### Structures
 
-### Javascript
-
-| Name     | Description                      |
-|----------|----------------------------------|
-| manegers | データモデルのマネージャ         |
-| models   | データモデル                     |
-| libs     | 外部ライブラリに切り出したいもの |
+|   |             |               |                                  |
+|---|-------------|---------------|----------------------------------|
+| d | assemblies  | Components    | intermediate assembly (中間品)   |
+| d | pages       | Components    |                                  |
+| d | panels      | Components    | Frame の Contents で表示する。   |
+| d | parts       | Components    | 部品                             |
+| d | wbs         | Components    |                                  |
+| d | recoil      | State         |                                  |
+| d | data        | Data (Static) |                                  |
+| d | manegers    | js            | データモデルのマネージャ         |
+| d | models      | js            | データモデル                     |
+| d | js          | js            |                                  |
+| d | libs        | js Libraries  | 外部ライブラリに切り出したいもの |
+| - | index.css   |               |                                  |
+| - | index.js    |               |                                  |
+| - | App.js      |               |                                  |
+| - | App.test.js |               |                                  |
+| - | Router.js   |               |                                  |
+| - | Github.js   |               |                                  |
 
 ## Page の構成
 

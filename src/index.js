@@ -5,8 +5,8 @@ import { BrowserRouter } from "react-router-dom";
 
 import './index.css';
 import App from './App';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-import reportWebVitals from './reportWebVitals';
+import * as serviceWorkerRegistration from './js/serviceWorkerRegistration';
+import reportWebVitals from './js/reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
