@@ -2,7 +2,10 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import AvatarIcon from '@mui/material/Avatar';
 
-import * as u from '../../libs/yutils/index.js';
+import Beach from '@yanqirenshi/beach';
+// import * as u from '../../libs/yutils/index.js';
+
+const u = new Beach();
 
 export default function Avater (props) {
     const menu = props.menu;

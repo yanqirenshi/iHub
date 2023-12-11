@@ -1,4 +1,7 @@
-import * as util from '../libs/yutils/index.js';
+import Beach from '@yanqirenshi/beach';
+// import * as util from '../libs/yutils/index.js';
+
+const util = new Beach();
 
 class Operators {
     constructor () {
