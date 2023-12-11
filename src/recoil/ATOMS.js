@@ -12,14 +12,8 @@ export {default as PAGE_SYSTEMS} from './PAGE_SYSTEMS.js';
 export {default as PAGE_MESSAGES} from './PAGE_MESSAGES.js';
 export {default as PAGE_DEVOPS} from './PAGE_DEVOPS.js';
 
-export {default as ACCOUNT_MENU} from './ACCOUNT_MENU.js';
 export {default as OPERATORS} from './OPERATORS.js';
 export {default as PAGE_MARKETS} from './PAGE_MARKETS.js';
-
-export const WINDOW = recoil.atom({
-    key: "WINDOW",
-    default: null,  // {w: num, h: num}
-});
 
 export const GITHUB = recoil.atom({
     key: "GITHUB",
