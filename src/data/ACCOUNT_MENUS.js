@@ -4,15 +4,17 @@ const MAIN = [
     { code: 'business',              url: '/business',              label: 'ビジネス' },
     { code: 'design',                url: '/design',                label: 'デザイン' },
     { code: 'screens',               url: '/screens',               label: '画面' },
+    { code: 'api',                   url: '/api',                   label: 'API' },
     { code: 'batchs',                url: '/batchs',                label: 'バッチ' },
     { code: 'data',                  url: '/data',                  label: 'データ' },
     { code: 'classes',               url: '/classes',               label: 'クラス' },
     { code: 'external-resources',    url: '/external-resources',    label: '外部リソース' },
     { code: 'system-environment',    url: '/system-environment',    label: 'システム構成' },
     { code: 'message',               url: '/message',               label: 'メッセージ' },
-    { code: 'devops',                url: '/devops',                label: 'DevOps' },
+    { code: 'devops',                url: '/devops',                label: '*Ops' },
     { code: 'scrum',                 url: '/scrum',                 label: 'Scrum' },
     { code: 'help',                  url: '/help',                  label: 'Help' },
+    { code: 'organizations',         url: '/organizations',         label: '組織' },
 ];
 
 const UX = [
