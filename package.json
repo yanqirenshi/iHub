@@ -19,7 +19,7 @@
     "@yanqirenshi/d3.sitemap": "^0.2.0",
     "@yanqirenshi/d3.ter": "^0.1.0",
     "@yanqirenshi/manipulater": "^0.0.3",
-    "@yanqirenshi/menubook": "^0.0.5",
+    "@yanqirenshi/menubook": "^0.0.6",
     "@yanqirenshi/wnqi.big.size": "^0.0.2",
     "react": "^18.2.0",
     "react-bpmn": "^0.2.0",

@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 
 import { useRecoilState } from "recoil";
 import { useNavigate } from "react-router-dom";
-import * as menu from '../../recoil/ACCOUNT_MENU.js';
+import * as MENU from '../../recoil/ACCOUNT_MENU.js';
 import OPERATORS from '../../recoil/OPERATORS.js';
 import {WINDOW} from '../../recoil/WINDOW.js';
 
@@ -20,22 +20,25 @@ export default function Frame (props) {
     const children = props.children;
 
     const [window_size, setWindowSize] = useRecoilState(WINDOW);
-    const [account_menu, setAccountMenu] = useRecoilState(menu.ACCOUNT_MENU);
-    const [account_menu_selected_item, setAccountMenuSelectedItem] = useRecoilState(menu.ACCOUNT_MENU_SELECTED_ITEM);
+    const [menu, setMenu] = useRecoilState(MENU.MENU);
+    const [menu_is_opend, setMenuIsOpend] = useRecoilState(MENU.MENU_IS_OPEND);
+    const [menu_selected_item, setMenuSelectedItem] = useRecoilState(MENU.MENU_SELECTED_ITEM);
     const [operators, setOperators] = useRecoilState(OPERATORS);
 
     const nav = useNavigate();
 
     const actions = {
         menu: {
-            change: (new_menu)=> setAccountMenu(new_menu),
+            change: (new_menu)=> setMenu(new_menu),
             item: {
                 click: (item)=> {
                     nav(item.url);
 
-                    setAccountMenuSelectedItem(item.code);
+                    setMenuSelectedItem(item.code);
                 },
-            }
+            },
+            open: ()=> setMenuIsOpend(true),
+            close: ()=> setMenuIsOpend(false),
         },
         operator: {
             change: (new_operators)=> setOperators(new_operators),
@@ -44,8 +47,9 @@ export default function Frame (props) {
 
     return (
         <Box sx={sx}>
-          <MenuBook menu={account_menu}
-                    selected_item={account_menu_selected_item}
+          <MenuBook menu={menu}
+                    is_opend={menu_is_opend}
+                    selected_item={menu_selected_item}
                     actions={actions}/>
 
           <Manipulater operators={operators}

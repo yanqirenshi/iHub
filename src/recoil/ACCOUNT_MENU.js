@@ -67,7 +67,7 @@ const PAGES = [
 ];
 
 
-export const ACCOUNT_MENU = recoil.atom({
+export const MENU = recoil.atom({
     key: "ACCOUNT_MENU",
     default: {
         avater: {
@@ -102,7 +102,12 @@ function pagePath () {
     return root_path ? '/'+root_path : '/';
 }
 
-export const ACCOUNT_MENU_SELECTED_ITEM = recoil.atom({
+export const MENU_SELECTED_ITEM = recoil.atom({
     key: "ACCOUNT_MENU_SELECTED_ITEM",
     default: selectedItem(PAGES),
+});
+
+export const MENU_IS_OPEND = recoil.atom({
+    key: "ACCOUNT_MENU_IS_OPEND",
+    default: false,
 });
