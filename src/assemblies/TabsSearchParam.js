@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router";
+import { useSearchParams } from "react-router-dom";
 
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
