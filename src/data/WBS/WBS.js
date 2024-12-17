@@ -183,7 +183,6 @@ const WBS = [
         name: 'システミックデザイン・ツールキット',
         description: ''
     },
-
 ];
 
 export default WBS;
