@@ -1,11 +1,11 @@
 import React from 'react';
-import { useParams } from "react-router";
+import { useSearchParams } from "react-router";
 
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import {Section, S, P, LinkOS} from 'tion';
 
-import Frame from '../assemblies/frames/FrameWbsNode.js';
+import Frame from '../assemblies/frames/FrameWbsNodeTabs.js';
 import HeadWbsPage from '../parts/HeadWbsPage.js';
 import WBSTable from '../assemblies/WBSTable.js';
 import TableTMRelationships from '../assemblies/TableTMRelationships.js';
@@ -13,8 +13,20 @@ import TableTMRelationships from '../assemblies/TableTMRelationships.js';
 import wbs from '../manegers/wbs.js';
 
 export default function P1033 (props) {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [tab, setTab] = React.useState(searchParams.get('tab') || null);
+    const [tabs] = React.useState([
+        { code: 'identifier',   label: 'Identifier' },
+        { code: 'entity',       label: 'Entity' },
+        { code: 'relationship', label: 'Relationship'},
+        { code: 'attribute',    label: 'Attribute' },
+        { code: 'description',  label: '概要' },
+    ]);
+    const [wbs_node, setWbsNode] = React.useState(null);
+
     return (
-        <Frame>
+        <Frame tabs={tabs} tab={tab} onChangeTab={(v)=>setTab(v)}
+               wbs_node={wbs_node} onChangeWbsNode={(v)=>setWbsNode(v)}>
 
           <Container maxWidth="lg" sx={{pt:5}}>
 

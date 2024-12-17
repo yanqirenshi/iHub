@@ -22,19 +22,22 @@ export default function TableTMRelationships () {
               </TableRow>
             </TableHead>
             <TableBody>
-              {relationships.map((row) => (
-                  <TableRow key={row.name}
-                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                    <TableCell component="th" scope="row">
-                      {row.code}
-                    </TableCell>
-                    <TableCell>
-                      {row.patterns.map(p=> {
-                          return <S>{p}</S>;
-                      })}
-                    </TableCell>
-                  </TableRow>
-              ))}
+              {relationships.map((row) => {
+                  console.log(row.code);
+                  return (
+                      <TableRow key={row.code}
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                        <TableCell component="th" scope="row">
+                          {row.code}
+                        </TableCell>
+                        <TableCell>
+                          {row.patterns.map((p,i)=> {
+                              return <S key={i}>{p}</S>;
+                          })}
+                        </TableCell>
+                      </TableRow>
+                  );
+              })}
             </TableBody>
           </Table>
         </TableContainer>
