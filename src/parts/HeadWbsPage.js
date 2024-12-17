@@ -8,9 +8,9 @@ export default function HeadWbsPage (props) {
     return (
         <Box>
           <Container maxWidth="lg" sx={{pt:5}}>
+            <S>{wbs_node._class}</S>
             <H>{wbs_node.name}</H>
             <S>{wbs_node.description}</S>
-            <S>{wbs_node._class}</S>
           </Container>
         </Box>
     );

@@ -3,29 +3,23 @@ import { useParams } from "react-router";
 
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-// import S from '@mui/material/Typography';
+// import {H, S} from 'tion';
 
-import Frame from '../assemblies/frames/Frame.js';
+import Frame from '../assemblies/frames/FrameWbsNode.js';
 import HeadWbsPage from '../parts/HeadWbsPage.js';
+import WBSTable from '../assemblies/WBSTable.js';
 
 import wbs from '../manegers/wbs.js';
 
-export default function P1030 (props) {
-    const params = useParams();
-
-    const wbs_node = wbs.get(params.wbs_id);
-
-    if (!wbs_node)
-        return null;
-
+export default function P1031 (props) {
     return (
         <Frame>
-          <HeadWbsPage value={wbs_node}/>
 
           <Container maxWidth="lg" sx={{pt:5}}>
             <Box>
             </Box>
           </Container>
+
         </Frame>
     );
 }

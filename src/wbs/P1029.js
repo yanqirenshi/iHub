@@ -11,7 +11,7 @@ import WBSTable from '../assemblies/WBSTable.js';
 
 import wbs from '../manegers/wbs.js';
 
-export default function P1033 (props) {
+export default function P1029 (props) {
     return (
         <Frame>
 

@@ -3,36 +3,45 @@ import { useParams } from "react-router";
 
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-// import {H, S} from 'tion';
+import {Section, P, S} from 'tion';
 
-import Frame from '../assemblies/frames/Frame.js';
+import Frame from '../assemblies/frames/FrameWbsNode.js';
 import HeadWbsPage from '../parts/HeadWbsPage.js';
 import WBSTable from '../assemblies/WBSTable.js';
 
 import wbs from '../manegers/wbs.js';
 
 export default function P1030 (props) {
-    const params = useParams();
-
-    const wbs_node = wbs.get(params.wbs_id);
-
-    if (!wbs_node)
-        return null;
-
     return (
         <Frame>
-          <HeadWbsPage value={wbs_node}/>
 
           <Container maxWidth="lg" sx={{pt:5}}>
-            <Box>
-            </Box>
+
+            <Section title="基本的前提(FP) × 10">
+              <P>S-Dロジックの「10」の基本的前提(FP)</P>
+
+              <Section lev="5" num="(1)" title="公理 × 4">
+                <P>公理1(FP01): サービスが交換の基本的基盤である</P>
+                <P>公理2(FP06): 顧客は常に価値の共創者である</P>
+                <P>公理3(FP09): すべての経済的および社会的アクターが資源統合者である</P>
+                <P>公理4(FP10): 価値は常に受益者によって独自にかつ現象学的に判断される</P>
+              </Section>
+
+              <Section lev="5" num="(2)"  title="基本的前提 × 6">
+                <Section lev="6" title="公理1(FP01): サービスが交換の基本的基盤である">
+                  <P>FP2: 間接的交換は交換の基本的基盤を見えなくしてしまう</P>
+                  <P>FP3: グッズはサービス提供のための伝達手段である</P>
+                  <P>FP4: オペラント資源が競争優位の基本的源泉である</P>
+                  <P>FP5: すべての経済がサービス経済である</P>
+                </Section>
+                <Section lev="6" title="公理2(FP06): 顧客は常に価値の共創者である">
+                  <P>FP7: 事業体は価値を提供することはできず、価値提案しかできない</P>
+                  <P>FP8: サービス中心の考え方は、元来 顧客志向的 であり関係的である</P>
+                </Section>
+              </Section>
+            </Section>
           </Container>
 
-          <Container maxWidth="lg" sx={{pt:11}}>
-            <Box>
-              <WBSTable start_id={wbs_node._id}/>
-            </Box>
-          </Container>
         </Frame>
     );
 }
