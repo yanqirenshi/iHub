@@ -171,6 +171,19 @@ const WBS = [
         name: 'TM',
         description: ''
     },
+    {
+        id: 1034,
+        parent: 1031,
+        name: 'デザインジャーニー',
+        description: '目的地までの7ステージ'
+    },
+    {
+        id: 1035,
+        parent: 1031,
+        name: 'システミックデザイン・ツールキット',
+        description: ''
+    },
+
 ];
 
 export default WBS;
