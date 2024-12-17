@@ -19,7 +19,7 @@ const sx = {
 export default function Frame (props) {
     const children = props.children;
 
-    const [window_size, setWindowSize] = useRecoilState(WINDOW);
+    const [window_size] = useRecoilState(WINDOW); // , setWindowSize
     const [menu, setMenu] = useRecoilState(MENU.MENU);
     const [menu_is_opend, setMenuIsOpend] = useRecoilState(MENU.MENU_IS_OPEND);
     const [menu_selected_item, setMenuSelectedItem] = useRecoilState(MENU.MENU_SELECTED_ITEM);

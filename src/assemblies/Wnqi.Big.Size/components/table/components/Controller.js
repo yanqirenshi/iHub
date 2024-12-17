@@ -36,7 +36,6 @@ function Controller (props) {
               <TextField hiddenLabel
                          style={{width:'100%'}}
                          id="filled-hidden-label-small"
-                         defaultValue="Small"
                          variant="filled"
                          size="small"
                          placeholder="Filter Workpackage"

@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 
 import { useRecoilValue } from "recoil";
-import { GITHUB_AUTH } from '../recoil/GITHUB.js';
+// import { GITHUB_AUTH } from '../recoil/GITHUB.js';
 import * as atoms from '../recoil/PAGE_SCRUM_PROJECT_ITEM.js';
 
 import Tabs from './ScrumProjectItem/Tabs.js';
@@ -47,11 +47,11 @@ function Item (props) {
         ],
     });
 
-    const authed = useRecoilValue(GITHUB_AUTH);
-    const project_item = useRecoilValue(atoms.PROJECTV2_ITEM({
-        authed: authed,
-        id: item_id,
-    }));
+    // const authed = useRecoilValue(GITHUB_AUTH);
+    // const project_item = useRecoilValue(atoms.PROJECTV2_ITEM({
+    //     authed: authed,
+    //     id: item_id,
+    // }));
 
     const item = sogh.projectV2Item(item_id);
 

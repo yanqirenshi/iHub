@@ -23,7 +23,6 @@ export default function TableTMRelationships () {
             </TableHead>
             <TableBody>
               {relationships.map((row) => {
-                  console.log(row.code);
                   return (
                       <TableRow key={row.code}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>

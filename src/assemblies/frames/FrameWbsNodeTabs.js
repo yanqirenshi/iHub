@@ -1,6 +1,4 @@
 import React from 'react';
-import { useSearchParams, useLocation, useNavigate } from "react-router";
-import { useParams } from "react-router";
 
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -10,22 +8,15 @@ import HeadWbsPage from '../../parts/HeadWbsPage.js';
 import WBSTable from '../../assemblies/WBSTable.js';
 import TabsSearchParam from '../../assemblies/TabsSearchParam.js';
 
-import wbs from '../../manegers/wbs.js';
-
 export default function FrameWbsNodeTabs (props) {
     const tabs = props.tabs;
     const tab  = props.tab;
     const onChangeTab = props.onChangeTab;
 
     const wbs_node = props.wbs_node;
-    const onChangeWbsNode = props.onChangeWbsNode;
 
     const children = props.children;
     const maxWidth = props.maxWidth || "lg";
-
-    const params = useParams();
-
-    if (wbs_node===null) onChangeWbsNode(wbs.get(params.wbs_id) || undefined);
 
     if (!wbs_node) return null;
 

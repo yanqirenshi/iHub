@@ -1,4 +1,4 @@
-import { useSearchParams, useLocation, useNavigate } from "react-router";
+import { useSearchParams } from "react-router";
 
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -9,9 +9,6 @@ export default function TabsSearchParam (props) {
     const onChange = props.onChange;
 
     const [searchParams, setSearchParams] = useSearchParams();
-
-    const location = useLocation();
-    const navigate = useNavigate();
 
     if (tabs.length===0) return null;
 
