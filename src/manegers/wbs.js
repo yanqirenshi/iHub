@@ -24,6 +24,14 @@ class Wbs {
 
         return this._data;
     }
+    get (id) {
+        const data = this.data();
+
+        return data.projects.ht[id]
+            || data.wbs.ht[id]
+            || data.wp.ht[id]
+            || null;
+    }
     ///// ////////////////////////////////////////////////////////////////
     ///// Node
     ///// ////////////////////////////////////////////////////////////////

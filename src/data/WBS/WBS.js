@@ -141,6 +141,36 @@ const WBS = [
         parent: 1027,
         name: 'npm',
     },
+    {
+        id: 1029,
+        parent: 1,
+        name: '思考/指向',
+        description: 'business model navigator'
+    },
+    {
+        id: 1030,
+        parent: 1029,
+        name: 'サービス・ドミナント・ロジック',
+        description: 'Service-Dominant Logic, SDL'
+    },
+    {
+        id: 1031,
+        parent: 1029,
+        name: 'システミック・デザイン',
+        description: 'Systemic Design'
+    },
+    {
+        id: 1032,
+        parent: 1029,
+        name: 'ビジネスモデル・ナビゲーター',
+        description: 'business model navigator'
+    },
+    {
+        id: 1033,
+        parent: 1029,
+        name: 'TM',
+        description: ''
+    },
 ];
 
 export default WBS;
