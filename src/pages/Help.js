@@ -1,75 +1,66 @@
-import React from 'react';
+import { Splide, SplideSlide } from '@splidejs/react-splide';
+import '@splidejs/react-splide/css';
 
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import S from '@mui/material/Typography';
-
-import Frame from '../assemblies/frames/Frame.js';
+import Section01 from './Help/Section01.js';
+import Section02 from './Help/Section02.js';
+import Section03 from './Help/Section03.js';
 
 export default function Help () {
+    const size = calSize(window.innerWidth, window.innerHeight);
+
+    const options = {
+        direction: 'ttb',
+        height: '100vh',
+        wheel: true,
+    };
+
     return (
-        <Frame>
-          <Container maxWidth="lg">
-            <Box>
-              <S variant="h5">???</S>
-              <pre>{graph1.join('\n')}</pre>
-            </Box>
+        <Splide options={options}
+                aria-label="React Splide Example">
 
-            <Box sx={{mt:6}}>
-              <S variant="h5">???</S>
-              <pre>{text1.join('\n')}</pre>
-            </Box>
+          <SplideSlide>
+            <Section01 size={size}/>
+          </SplideSlide>
 
-            <Box sx={{mt:6}}>
-              <S variant="h5">???</S>
-              <pre>{graph2.join('\n')}</pre>
-            </Box>
-          </Container>
-        </Frame>
+          <SplideSlide>
+            <Section02 size={size}/>
+          </SplideSlide>
+
+          <SplideSlide>
+            <Section03 size={size}/>
+          </SplideSlide>
+
+        </Splide>
     );
 }
 
-const graph1 = [
-    '   document ≒ wbs',
-    '',
-    '    - 100% roule',
-    '    - MECE',
-    '',
-    '   document',
-    '      |',
-    '   +---------+---------+',
-    '   |         |         |',
-    ' request  requirement  |',
-    '                       |',
-    '                   +---+---+-----+',
-    '                   |       |     |',
-    '                 model    spec   |',
-    '                                 |',
-    '                             +---+---+--------+',
-    '                             |       |        |',
-    '                           code     test   release',
-];
+function calSize (w, h) {
+    // 19.5:9
+    if (w < h) {
+        const tmp_h = (9/19.5) * h;
 
-const text1 = [
-    'メニューのパーソナライズ',
-    'オペレータのパーソナライズ',
-    '',
-    'iHub は箱である。',
-    '汎用的な箱である。',
-];
+        if (tmp_h < h)
+            return {
+                w: tmp_h,
+                h: h,
+            };
 
-const graph2 = [
-    '    +--------+    +----------------+    +----------+',
-    '    | iHub   |<---| Plug in        |<-->| External |',
-    '    |        |    |                |    |          |',
-    '    |        |    | +------------+ |    | API      |',
-    '    |        |    | | components | |    |          |',
-    '    |        |    | +------------+ |    |          |',
-    '    |        |    | +------------+ |    |          |',
-    '    |        |    | | procedures | |    |          |',
-    '    |        |    | +------------+ |    |          |',
-    '    +--------+    +----------------+    +----------+',
-    '',
-    '                    iHub の Frame を利用する必要がある。',
-    '                    Plug IN のリンク先をコントロール出来るようにする必要がある。',
-];
+        return {
+            w: (19.5/9) * h,
+            h: h,
+        };
+    } else {
+        const tmp_w = (19.5/9) * h;
+
+        if (tmp_w < w)
+            return {
+                w: tmp_w,
+                h: h,
+            };
+
+        return {
+            w: w,
+            h: (9/19.5) * w,
+        };
+    }
+};
