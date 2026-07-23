@@ -56,8 +56,8 @@ const TM = {
         },
     ],
     relationships: [
-        { id: 1, from: { id: 100, position: 270 }, to: { id: 101, position: 90 } },
-        { id: 2, from: { id: 103, position: 270 }, to: { id: 102, position: 90 } },
+        { id: 1, from: { id: 100, entity: 30000, position: 270 }, to: { id: 101, entity: 30002, position: 90 } },
+        { id: 2, from: { id: 103, entity: 30001, position: 270 }, to: { id: 102, entity: 30002, position: 90 } },
     ],
 };
 
