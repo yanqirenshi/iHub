@@ -7,6 +7,7 @@ import { GITHUB_AUTH } from '../../recoil/GITHUB.js';
 import * as atoms from '../../recoil/PAGE_SCRUM.js';
 
 import sogh from '../../manegers/sogh.js';
+import ErrorBoundary from '../../parts/ErrorBoundary.js';
 
 export default function Repositories () {
     const authed = useRecoilValue(GITHUB_AUTH);
@@ -16,7 +17,9 @@ export default function Repositories () {
     return (
         <Box sx={{ p:2, overflow: 'auto', height: '100%' }}>
           <Box sx={{ width: 666, ml:'auto', mr: 'auto', pb: 22 }}>
-            <SoghRepositories data={repositories} sogh={sogh}/>
+            <ErrorBoundary fallback="Repositories の取得・表示でエラーが発生しました。">
+              <SoghRepositories data={Array.isArray(repositories) ? repositories : []} sogh={sogh}/>
+            </ErrorBoundary>
           </Box>
         </Box>
     );

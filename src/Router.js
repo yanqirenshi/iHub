@@ -16,6 +16,7 @@ export default function Router () {
           <Route path='/help'                      element={<page.Help/>} />
           <Route path='/markets'                   element={<page.Markets/>} />
           <Route path='/business'                  element={<page.Business/>} />
+          <Route path='/api'                       element={<page.Api/>} />
           <Route path='/design'                    element={<page.Design/>} />
           <Route path='/screens'                   element={<page.Screens/>} />
           <Route path='/data'                      element={<page.Data/>} />
@@ -24,6 +25,7 @@ export default function Router () {
           <Route path='/system-environment'        element={<page.SystemEnvironment/>} />
           <Route path='/message'                   element={<page.Messages/>} />
           <Route path='/devops'                    element={<page.DevOps/>} />
+          <Route path='/organizations'             element={<page.Organizations/>} />
           <Route path='/wbs'                       element={<page.Wbs/>} />
           <Route path='/wbs/:wbs_id'               element={<page.WbsNode/>} />
 

@@ -8,6 +8,7 @@ import { GITHUB_AUTH } from '../../recoil/GITHUB.js';
 import * as atoms from '../../recoil/PAGE_SCRUM.js';
 
 import sogh from '../../manegers/sogh.js';
+import ErrorBoundary from '../../parts/ErrorBoundary.js';
 
 export default function Projects () {
     const authed = useRecoilValue(GITHUB_AUTH);
@@ -17,7 +18,9 @@ export default function Projects () {
     return (
         <Box sx={{ p:2, overflow: 'auto', height: '100%' }}>
           <Container maxWidth="lg">
-            <ProjectsV2 data={projects} sogh={sogh}/>
+            <ErrorBoundary fallback="Projects の取得・表示でエラーが発生しました。">
+              <ProjectsV2 data={Array.isArray(projects) ? projects : []} sogh={sogh}/>
+            </ErrorBoundary>
           </Container>
         </Box>
     );

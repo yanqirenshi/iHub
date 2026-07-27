@@ -32,6 +32,9 @@ export default function Cockpit () {
 }
 
 function issues2cards (issues) {
+    if (!Array.isArray(issues))
+        return [];
+
     return issues.reduce((list,issue_id)=> {
         const issue = sogh.issue(issue_id);
 

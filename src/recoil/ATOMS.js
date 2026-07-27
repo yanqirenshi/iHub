@@ -11,6 +11,8 @@ export {default as PAGE_BATCHS} from './PAGE_BATCHS.js';
 export {default as PAGE_SYSTEMS} from './PAGE_SYSTEMS.js';
 export {default as PAGE_MESSAGES} from './PAGE_MESSAGES.js';
 export {default as PAGE_DEVOPS} from './PAGE_DEVOPS.js';
+export {default as PAGE_API} from './PAGE_API.js';
+export {default as PAGE_ORGANIZATIONS} from './PAGE_ORGANIZATIONS.js';
 
 export {default as OPERATORS} from './OPERATORS.js';
 export {default as PAGE_MARKETS} from './PAGE_MARKETS.js';

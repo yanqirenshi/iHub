@@ -1,5 +1,6 @@
 export { default as Account                 } from './Account.js';
 export { default as Actions                 } from './Actions.js';
+export { default as Api                     } from './Api.js';
 export { default as Assemblies              } from './Assemblies.js';
 export { default as Auth                    } from './Auth.js';
 export { default as Batchs                  } from './Batchs.js';
@@ -15,6 +16,7 @@ export { default as ExternalResources       } from './ExternalResources.js';
 export { default as Help                    } from './Help.js';
 export { default as Markets                 } from './Markets.js';
 export { default as Messages                } from './Messages.js';
+export { default as Organizations           } from './Organizations.js';
 export { default as Parts                   } from './Parts.js';
 export { default as README                  } from './README.md';
 export { default as Screens                 } from './Screens.js';
