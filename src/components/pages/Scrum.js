@@ -1,7 +1,6 @@
 import React, {Suspense} from 'react';
 
-import { useRecoilState } from "recoil";
-import * as atoms from '../../recoil/PAGE_SCRUM.js';
+import { usePageTabs } from '../../redux/slices/tabsSlice.js';
 
 import Frame from '../assemblies/frames/FrameTabs.js';
 import * as panel from '../panels/sogh/index.js';
@@ -9,19 +8,12 @@ import HelpEmpty from '../panels/HelpEmpty.js';
 import Loading from '../panels/Loading.js';
 
 export default function Scrum () {
-    const [page, setPageScrum] = useRecoilState(atoms.PAGE_SCRUM_TABS);
+    const [tabs, changeTabs] = usePageTabs('PAGE_SCRUM');
 
-    const tabs = page.tabs;
     const tab = tabs.selected;
 
-    const changeTabs = (tabs)=> {
-        const new_page = {...page};
-        new_page.tabs = tabs;
-        setPageScrum(new_page);
-    };
-
     return (
-        <Frame tabs={page.tabs}
+        <Frame tabs={tabs}
                onChangeTabs={changeTabs}>
 
           <Suspense fallback={<Loading/>}>

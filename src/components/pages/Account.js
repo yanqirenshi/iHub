@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { useRecoilState } from "recoil";
-import * as atoms from '../../recoil/PAGE_ACCOUNT.js';
+import { usePageTabs } from '../../redux/slices/tabsSlice.js';
 
 import Frame from '../assemblies/frames/FrameTabs.js';
 
@@ -10,9 +9,7 @@ import Operators from '../panels/account/Operators.js';
 import Pages from '../panels/account/Pages.js';
 
 export default function Account () {
-    const [tabs, setTabs] = useRecoilState(atoms.PAGE_ACCOUNT_TABS);
-
-    const changeTabs = (new_tabs)=> setTabs(new_tabs);
+    const [tabs, changeTabs] = usePageTabs('PAGE_ACCOUNT');
 
     const tab = tabs.selected;
 

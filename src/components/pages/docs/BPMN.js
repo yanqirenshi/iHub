@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { useRecoilState } from "recoil";
-import * as atoms from '../../../recoil/ATOMS.js';
+import { usePageTabs } from '../../../redux/slices/tabsSlice.js';
 
 import Frame from '../../assemblies/frames/FrameTabs.js';
 import Overview from '../../panels/bpmn/Overview.js';
@@ -10,19 +9,12 @@ import Methods from '../../panels/bpmn/Methods.js';
 import Styles from '../../panels/bpmn/Styles.js';
 
 export default function BPMN () {
-    const [page, setPageScrum] = useRecoilState(atoms.PAGE_BPMN);
+    const [tabs, changeTabs] = usePageTabs('PAGE_BPMN');
 
-    const changeTabs = (tabs)=> {
-        const new_page = {...page};
-        new_page.tabs = tabs;
-        setPageScrum(new_page);
-    };
-
-    const tabs = page.tabs;
     const tab = tabs.selected;
 
     return (
-        <Frame tabs={page.tabs}
+        <Frame tabs={tabs}
                onChangeTabs={changeTabs}>
           {'palettes'===tab && <Palettes/>}
           {'methods'===tab  && <Methods/>}

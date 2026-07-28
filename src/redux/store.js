@@ -4,6 +4,7 @@ import windowReducer from './slices/windowSlice.js';
 import operatorsReducer from './slices/operatorsSlice.js';
 import githubAuthReducer from './slices/githubAuthSlice.js';
 import accountMenuReducer from './slices/accountMenuSlice.js';
+import tabsReducer from './slices/tabsSlice.js';
 
 export const store = configureStore({
     reducer: {
@@ -11,5 +12,6 @@ export const store = configureStore({
         operators: operatorsReducer,
         githubAuth: githubAuthReducer,
         accountMenu: accountMenuReducer,
+        tabs: tabsReducer,
     },
 });

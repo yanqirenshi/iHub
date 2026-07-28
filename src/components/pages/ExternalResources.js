@@ -1,16 +1,13 @@
 import React from 'react';
 
-import { useRecoilState } from "recoil";
-import * as atoms from '../../recoil/PAGE_EXTERNAL_RESOURCES.js';
+import { usePageTabs } from '../../redux/slices/tabsSlice.js';
 
 import Frame from '../assemblies/frames/FrameTabs.js';
 
 import Wbs from '../panels/Wbs.js';
 
 export default function ExternalResources () {
-    const [tabs, setTabs] = useRecoilState(atoms.PAGE_EXTERNAL_RESOURCES_TABS);
-
-    const changeTabs = (new_tabs)=> setTabs(new_tabs);
+    const [tabs, changeTabs] = usePageTabs('PAGE_EXTERNAL_RESOURCES');
 
     const tab = tabs.selected;
 
