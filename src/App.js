@@ -1,26 +1,26 @@
 import React from 'react';
-import { useRecoilState } from "recoil";
+import { useDispatch } from 'react-redux';
 
 import Box from '@mui/material/Box';
 
-import {WINDOW} from './recoil/WINDOW.js';
+import { windowResized } from './redux/slices/windowSlice.js';
 
 import Router from './Router.js';
 import Github from './Github.js';
 
 export default function App () {
-    const setWindowSize = useRecoilState(WINDOW)[1];
+    const dispatch = useDispatch();
 
     React.useEffect(()=> {
-        const handleResize= ()=> setWindowSize({
+        const handleResize= ()=> dispatch(windowResized({
             w: window.innerWidth,
             h: window.innerHeight
-        });
+        }));
 
         handleResize();
 
         window.addEventListener("resize", handleResize);
-    }, [setWindowSize]);
+    }, [dispatch]);
 
     return (
         <Box className="theme-color5">

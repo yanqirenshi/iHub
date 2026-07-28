@@ -1,8 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RecoilRoot } from 'recoil';
+import { Provider } from 'react-redux';
 import { BrowserRouter } from "react-router-dom";
 
+import { store } from './redux/store.js';
 import './index.css';
 import App from './App';
 import * as serviceWorkerRegistration from './js/serviceWorkerRegistration';
@@ -11,11 +13,13 @@ import reportWebVitals from './js/reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
-      <RecoilRoot>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </RecoilRoot>
+      <Provider store={store}>
+        <RecoilRoot>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </RecoilRoot>
+      </Provider>
     </React.StrictMode>
 );
 

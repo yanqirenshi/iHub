@@ -1,10 +1,10 @@
 import Box from '@mui/material/Box';
 
 import { useRecoilState } from "recoil";
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import * as MENU from '../../../recoil/ACCOUNT_MENU.js';
-import OPERATORS from '../../../recoil/OPERATORS.js';
-import {WINDOW} from '../../../recoil/WINDOW.js';
+import { operatorsChanged } from '../../../redux/slices/operatorsSlice.js';
 
 import MenuBook from '@yanqirenshi/menubook';
 import Manipulater from '@yanqirenshi/manipulater';
@@ -19,11 +19,12 @@ const sx = {
 export default function Frame (props) {
     const children = props.children;
 
-    const [window_size] = useRecoilState(WINDOW); // , setWindowSize
+    const dispatch = useDispatch();
+    const window_size = useSelector(s=> s.window.value);
+    const operators = useSelector(s=> s.operators);
     const [menu, setMenu] = useRecoilState(MENU.MENU);
     const [menu_is_opend, setMenuIsOpend] = useRecoilState(MENU.MENU_IS_OPEND);
     const [menu_selected_item, setMenuSelectedItem] = useRecoilState(MENU.MENU_SELECTED_ITEM);
-    const [operators, setOperators] = useRecoilState(OPERATORS);
 
     const nav = useNavigate();
 
@@ -41,7 +42,7 @@ export default function Frame (props) {
             close: ()=> setMenuIsOpend(false),
         },
         operator: {
-            change: (new_operators)=> setOperators(new_operators),
+            change: (new_operators)=> dispatch(operatorsChanged(new_operators)),
         },
     };
 
