@@ -5,6 +5,10 @@ import operatorsReducer from './slices/operatorsSlice.js';
 import githubAuthReducer from './slices/githubAuthSlice.js';
 import accountMenuReducer from './slices/accountMenuSlice.js';
 import tabsReducer from './slices/tabsSlice.js';
+import cockpitReducer from './slices/cockpitSlice.js';
+import scrumReducer from './slices/scrumSlice.js';
+import scrumProjectReducer from './slices/scrumProjectSlice.js';
+import scrumProjectItemReducer from './slices/scrumProjectItemSlice.js';
 
 export const store = configureStore({
     reducer: {
@@ -13,5 +17,9 @@ export const store = configureStore({
         githubAuth: githubAuthReducer,
         accountMenu: accountMenuReducer,
         tabs: tabsReducer,
+        cockpit: cockpitReducer,
+        scrum: scrumReducer,
+        scrumProject: scrumProjectReducer,
+        scrumProjectItem: scrumProjectItemReducer,
     },
 });

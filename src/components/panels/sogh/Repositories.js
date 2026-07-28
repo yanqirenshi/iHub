@@ -1,21 +1,30 @@
+import React, { useEffect } from 'react';
 import Box from '@mui/material/Box';
 
 import { Repositories as SoghRepositories } from 'sogh';
 
-import { useSelector } from 'react-redux';
-import { useRecoilValue } from "recoil";
-import * as atoms from '../../../recoil/PAGE_SCRUM.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchRepositories } from '../../../redux/slices/scrumSlice.js';
 
 import sogh from '../../../manegers/sogh.js';
 import ErrorBoundary from '../../parts/ErrorBoundary.js';
+import Loading from '../Loading.js';
 
 export default function Repositories () {
+    const dispatch = useDispatch();
     const authed = useSelector(s=> s.githubAuth.value);
+    const { status, ids } = useSelector(s=> s.scrum.repositories);
 
-    const repository_ids = useRecoilValue(atoms.REPOSITORIES(authed));
+    useEffect(()=> {
+        if (authed===true && status==='idle')
+            dispatch(fetchRepositories());
+    }, [authed, status, dispatch]);
 
-    const repositories = Array.isArray(repository_ids)
-          ? repository_ids.map(id=> sogh.repository(id)).filter(Boolean)
+    if (authed===true && (status==='idle' || status==='loading'))
+        return <Loading/>;
+
+    const repositories = Array.isArray(ids)
+          ? ids.map(id=> sogh.repository(id)).filter(Boolean)
           : [];
 
     return (

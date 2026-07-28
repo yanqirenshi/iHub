@@ -1,12 +1,11 @@
-import React, { Suspense } from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 
-import { useRecoilValue } from "recoil";
-// import { GITHUB_AUTH } from '../recoil/GITHUB.js';
-import * as atoms from '../../recoil/PAGE_SCRUM_PROJECT_ITEM.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchIssue, fetchIssueComments } from '../../redux/slices/scrumProjectItemSlice.js';
 
 import Tabs from './ScrumProjectItem/Tabs.js';
 
@@ -20,16 +19,13 @@ import {
 } from 'sogh';
 
 export default function ScrumProjectItem (props) {
-    // let {login, number, id} = useParams();
     let {id} = useParams();
 
     return (
         <Frame>
           <Box sx={{height:'100%', overflow:'auto'}}>
             <Container sx={{mb:22}}>
-              <Suspense fallback={<Loading/>}>
-                <Item item_id={id}/>
-              </Suspense>
+              <Item item_id={id}/>
             </Container>
           </Box>
         </Frame>
@@ -46,12 +42,6 @@ function Item (props) {
             { code: 'points',    label: 'Points' },
         ],
     });
-
-    // const authed = useRecoilValue(GITHUB_AUTH);
-    // const project_item = useRecoilValue(atoms.PROJECTV2_ITEM({
-    //     authed: authed,
-    //     id: item_id,
-    // }));
 
     const item = sogh.projectV2Item(item_id);
 
@@ -73,9 +63,7 @@ function Item (props) {
           {'content'===tabs.selected &&
            <Box>
              {'Issue'===typename &&
-              <Suspense fallback={<Loading/>}>
-                <IssueContent issue_id={item.content().id}/>
-              </Suspense>}
+              <IssueContent issue_id={item.content().id}/>}
 
              {'DraftIssue'===typename &&
               <div>DraftIssue</div>}
@@ -90,13 +78,21 @@ function Item (props) {
 function IssueContent (props) {
     const id = props.issue_id;
 
-    const issue_id = useRecoilValue(atoms.ISSUE({id: id}));
+    const dispatch = useDispatch();
+    const entry = useSelector(s=> s.scrumProjectItem.byId[id]);
 
-    const issue = sogh.issue(issue_id);
+    useEffect(()=> {
+        if (!entry) {
+            dispatch(fetchIssue(id));
+            dispatch(fetchIssueComments(id));
+        }
+    }, [entry, id, dispatch]);
 
-    const list = useRecoilValue(atoms.ISSUE_COMMENTS({id: id}));
+    if (!entry || entry.issue.status==='loading' || entry.comments.status==='loading')
+        return <Loading/>;
 
-    const comments = list.map(id=> sogh.issueComment(id));
+    const issue = sogh.issue(entry.issue.id);
+    const comments = entry.comments.ids.map(id=> sogh.issueComment(id));
 
     return (
         <>

@@ -1,22 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import Frame from '../assemblies/frames/Frame.js';
 import { Monitor, Card } from '../panels/cockpit/index.js';
+import Loading from '../panels/Loading.js';
 
-import { useSelector } from 'react-redux';
-import { useRecoilValue } from "recoil";
-import { ISSUES } from '../../recoil/PAGE_COCKPIT.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchIssues } from '../../redux/slices/cockpitSlice.js';
 
 import sogh from '../../manegers/sogh.js';
 
 export default function Cockpit () {
+    const dispatch = useDispatch();
     const window_size = useSelector(s=> s.window.value);
 
     const authed = useSelector(s=> s.githubAuth.value);
-    const issues = useRecoilValue(ISSUES(authed));
+    const { status, issueIds } = useSelector(s=> s.cockpit);
+
+    useEffect(()=> {
+        if (authed===true && status==='idle')
+            dispatch(fetchIssues());
+    }, [authed, status, dispatch]);
+
+    if (authed===true && (status==='idle' || status==='loading'))
+        return <Loading/>;
 
     const cards = [
-        ...issues2cards(issues)
+        ...issues2cards(issueIds)
     ];
 
     return (

@@ -1,22 +1,31 @@
+import React, { useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 
 import {ProjectsV2} from 'sogh';
 
-import { useSelector } from 'react-redux';
-import { useRecoilValue } from "recoil";
-import * as atoms from '../../../recoil/PAGE_SCRUM.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProjectsV2 } from '../../../redux/slices/scrumSlice.js';
 
 import sogh from '../../../manegers/sogh.js';
 import ErrorBoundary from '../../parts/ErrorBoundary.js';
+import Loading from '../Loading.js';
 
 export default function Projects () {
+    const dispatch = useDispatch();
     const authed = useSelector(s=> s.githubAuth.value);
+    const { status, ids } = useSelector(s=> s.scrum.projectsV2);
 
-    const project_ids = useRecoilValue(atoms.PROJECTSV2(authed));
+    useEffect(()=> {
+        if (authed===true && status==='idle')
+            dispatch(fetchProjectsV2());
+    }, [authed, status, dispatch]);
 
-    const projects = Array.isArray(project_ids)
-          ? project_ids.map(id=> sogh.projectV2(id)).filter(Boolean)
+    if (authed===true && (status==='idle' || status==='loading'))
+        return <Loading/>;
+
+    const projects = Array.isArray(ids)
+          ? ids.map(id=> sogh.projectV2(id)).filter(Boolean)
           : [];
 
     return (
