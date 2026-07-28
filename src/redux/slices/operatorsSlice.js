@@ -8,10 +8,8 @@ function buildInitial () {
     return {
         initialized: false,
         active: null,
-        // ROOTS['a'|'b'|'c'] is shared singleton data (also still read directly by the
-        // not-yet-migrated src/recoil/OPERATORS.js during the transition) — clone rather
-        // than mutate in place, otherwise Immer's freeze of this slice's state collides
-        // with the other consumer's own in-place mutation of the same objects.
+        // ROOTS['a'|'b'|'c'] is shared singleton data — clone rather than mutate in
+        // place, since Immer freezes this slice's initial state.
         list: [
             ROOTS['a'],
             ROOTS['b'],
