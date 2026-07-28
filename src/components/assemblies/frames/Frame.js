@@ -1,10 +1,9 @@
 import Box from '@mui/material/Box';
 
-import { useRecoilState } from "recoil";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
-import * as MENU from '../../../recoil/ACCOUNT_MENU.js';
 import { operatorsChanged } from '../../../redux/slices/operatorsSlice.js';
+import { menuChanged, menuOpened, menuClosed, menuItemSelected } from '../../../redux/slices/accountMenuSlice.js';
 
 import MenuBook from '@yanqirenshi/menubook';
 import Manipulater from '@yanqirenshi/manipulater';
@@ -22,24 +21,24 @@ export default function Frame (props) {
     const dispatch = useDispatch();
     const window_size = useSelector(s=> s.window.value);
     const operators = useSelector(s=> s.operators);
-    const [menu, setMenu] = useRecoilState(MENU.MENU);
-    const [menu_is_opend, setMenuIsOpend] = useRecoilState(MENU.MENU_IS_OPEND);
-    const [menu_selected_item, setMenuSelectedItem] = useRecoilState(MENU.MENU_SELECTED_ITEM);
+    const menu = useSelector(s=> s.accountMenu.menu);
+    const menu_is_opend = useSelector(s=> s.accountMenu.isOpend);
+    const menu_selected_item = useSelector(s=> s.accountMenu.selectedItem);
 
     const nav = useNavigate();
 
     const actions = {
         menu: {
-            change: (new_menu)=> setMenu(new_menu),
+            change: (new_menu)=> dispatch(menuChanged(new_menu)),
             item: {
                 click: (item)=> {
                     nav(item.url);
 
-                    setMenuSelectedItem(item.code);
+                    dispatch(menuItemSelected(item.code));
                 },
             },
-            open: ()=> setMenuIsOpend(true),
-            close: ()=> setMenuIsOpend(false),
+            open: ()=> dispatch(menuOpened()),
+            close: ()=> dispatch(menuClosed()),
         },
         operator: {
             change: (new_operators)=> dispatch(operatorsChanged(new_operators)),
