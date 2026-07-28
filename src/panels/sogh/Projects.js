@@ -13,13 +13,17 @@ import ErrorBoundary from '../../parts/ErrorBoundary.js';
 export default function Projects () {
     const authed = useRecoilValue(GITHUB_AUTH);
 
-    const projects = useRecoilValue(atoms.PROJECTSV2(authed));
+    const project_ids = useRecoilValue(atoms.PROJECTSV2(authed));
+
+    const projects = Array.isArray(project_ids)
+          ? project_ids.map(id=> sogh.projectV2(id)).filter(Boolean)
+          : [];
 
     return (
         <Box sx={{ p:2, overflow: 'auto', height: '100%' }}>
           <Container maxWidth="lg">
             <ErrorBoundary fallback="Projects の取得・表示でエラーが発生しました。">
-              <ProjectsV2 data={Array.isArray(projects) ? projects : []} sogh={sogh}/>
+              <ProjectsV2 data={projects} sogh={sogh}/>
             </ErrorBoundary>
           </Container>
         </Box>

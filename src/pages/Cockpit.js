@@ -35,10 +35,13 @@ function issues2cards (issues) {
     if (!Array.isArray(issues))
         return [];
 
+    const viewer = sogh.viewer();
+    const viewer_login = viewer ? viewer.login() : null;
+
     return issues.reduce((list,issue_id)=> {
         const issue = sogh.issue(issue_id);
 
-        if (issue.assignees().find(ass=>ass.login==="yanqirenshi"))
+        if (viewer_login && issue.assignees().find(ass=>ass.login===viewer_login))
             list.push({
                 type: 'GITHUB ISSUE',
                 id: issue_id,
