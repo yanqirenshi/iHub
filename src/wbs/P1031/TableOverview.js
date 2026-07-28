@@ -9,8 +9,8 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 import {S} from 'tion';
-import Link from '../../assemblies/Link.js';
-import ItemWbsNode from '../../parts/ItemWbsNode.js';
+import Link from '../../components/assemblies/Link.js';
+import ItemWbsNode from '../../components/parts/ItemWbsNode.js';
 
 import wbs from '../../manegers/wbs.js';
 

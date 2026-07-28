@@ -4,7 +4,7 @@ import { useParams } from "react-router";
 import Container from '@mui/material/Container';
 import {Section, P, LinkOS} from 'tion'; // , S
 
-import Frame from '../assemblies/frames/FrameWbsNodeTabs.js';
+import Frame from '../components/assemblies/frames/FrameWbsNodeTabs.js';
 
 import Attribute from './P1033/Attribute.js';
 import Description from './P1033/Description.js';

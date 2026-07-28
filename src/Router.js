@@ -1,9 +1,9 @@
 import React, { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import * as page from './pages/index.js';
-import * as page_docs from './pages/docs/index.js';
-import Loading from './panels/Loading.js';
+import * as page from './components/pages/index.js';
+import * as page_docs from './components/pages/docs/index.js';
+import Loading from './components/panels/Loading.js';
 
 export default function Router () {
     return (
