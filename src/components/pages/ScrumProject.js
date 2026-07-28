@@ -3,8 +3,8 @@ import { useParams } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 
+import { useSelector } from 'react-redux';
 import { useRecoilValue } from "recoil";
-import { GITHUB_AUTH } from '../../recoil/GITHUB.js';
 import * as atoms from '../../recoil/PAGE_SCRUM_PROJECT.js';
 
 import Loading from '../panels/Loading.js';
@@ -25,7 +25,7 @@ export default function ScrumProject (props) {
 function Project () {
     let {login, number} = useParams();
 
-    const authed = useRecoilValue(GITHUB_AUTH);
+    const authed = useSelector(s=> s.githubAuth.value);
     const project = useRecoilValue(atoms.PROJECTV2({
         authed: authed ,
         login: login,

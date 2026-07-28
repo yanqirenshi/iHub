@@ -1,25 +1,26 @@
 import React from 'react';
 
-import { useRecoilState } from 'recoil';
+import { useDispatch, useSelector } from 'react-redux';
 
-import * as atom from './recoil/GITHUB.js';
+import { authStarted, authSucceeded, authFailed } from './redux/slices/githubAuthSlice.js';
 
 import sogh from './manegers/sogh.js';
 
 export default function Github (props) {
-    const [auth, setAuthed] = useRecoilState(atom.GITHUB_AUTH);
+    const dispatch = useDispatch();
+    const auth = useSelector(s=> s.githubAuth.value);
 
     React.useEffect(()=> {
         if (null!==auth) return;
 
-        setAuthed('STARTED');
+        dispatch(authStarted());
 
         sogh.connect(
             process.env.REACT_APP_GITHU_PARSONAL_TOKEN,
-            (viewer)=> setAuthed(true),
-            (error)=> setAuthed(false),
+            (viewer)=> dispatch(authSucceeded()),
+            (error)=> dispatch(authFailed()),
         );
-    }, [auth, setAuthed]); // TODO: setAuthed これ入れたないなぁ。。。
+    }, [auth, dispatch]); // TODO: setAuthed これ入れたないなぁ。。。
 
 
     return null;

@@ -2,15 +2,15 @@ import Box from '@mui/material/Box';
 
 import { Repositories as SoghRepositories } from 'sogh';
 
+import { useSelector } from 'react-redux';
 import { useRecoilValue } from "recoil";
-import { GITHUB_AUTH } from '../../../recoil/GITHUB.js';
 import * as atoms from '../../../recoil/PAGE_SCRUM.js';
 
 import sogh from '../../../manegers/sogh.js';
 import ErrorBoundary from '../../parts/ErrorBoundary.js';
 
 export default function Repositories () {
-    const authed = useRecoilValue(GITHUB_AUTH);
+    const authed = useSelector(s=> s.githubAuth.value);
 
     const repository_ids = useRecoilValue(atoms.REPOSITORIES(authed));
 

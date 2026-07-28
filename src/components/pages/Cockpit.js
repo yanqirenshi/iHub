@@ -5,7 +5,6 @@ import { Monitor, Card } from '../panels/cockpit/index.js';
 
 import { useSelector } from 'react-redux';
 import { useRecoilValue } from "recoil";
-import { GITHUB_AUTH } from '../../recoil/GITHUB.js';
 import { ISSUES } from '../../recoil/PAGE_COCKPIT.js';
 
 import sogh from '../../manegers/sogh.js';
@@ -13,7 +12,7 @@ import sogh from '../../manegers/sogh.js';
 export default function Cockpit () {
     const window_size = useSelector(s=> s.window.value);
 
-    const authed = useRecoilValue(GITHUB_AUTH);
+    const authed = useSelector(s=> s.githubAuth.value);
     const issues = useRecoilValue(ISSUES(authed));
 
     const cards = [

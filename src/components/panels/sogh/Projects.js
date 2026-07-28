@@ -3,15 +3,15 @@ import Container from '@mui/material/Container';
 
 import {ProjectsV2} from 'sogh';
 
+import { useSelector } from 'react-redux';
 import { useRecoilValue } from "recoil";
-import { GITHUB_AUTH } from '../../../recoil/GITHUB.js';
 import * as atoms from '../../../recoil/PAGE_SCRUM.js';
 
 import sogh from '../../../manegers/sogh.js';
 import ErrorBoundary from '../../parts/ErrorBoundary.js';
 
 export default function Projects () {
-    const authed = useRecoilValue(GITHUB_AUTH);
+    const authed = useSelector(s=> s.githubAuth.value);
 
     const project_ids = useRecoilValue(atoms.PROJECTSV2(authed));
 
