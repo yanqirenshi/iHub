@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import ROOTS from '../../data/OPERATOR_ITEMS.js';
+import ROOTS from '../../../data/OPERATOR_ITEMS.js';
 
 const border_width = 3;
 

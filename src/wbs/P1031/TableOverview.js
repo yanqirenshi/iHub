@@ -9,10 +9,10 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 import {S} from 'tion';
-import Link from '../../components/assemblies/Link.js';
-import ItemWbsNode from '../../components/parts/ItemWbsNode.js';
+import Link from '../../_app/components/assemblies/Link.js';
+import ItemWbsNode from '../../_app/components/parts/ItemWbsNode.js';
 
-import wbs from '../../manegers/wbs.js';
+import wbs from '../../_app/manegers/wbs.js';
 
 export default function TableOverview (props) {
     return (

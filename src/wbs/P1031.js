@@ -3,7 +3,7 @@ import React from 'react';
 import Container from '@mui/material/Container';
 import {Section, P} from 'tion';
 
-import Frame from '../components/assemblies/frames/FrameWbsNode.js';
+import Frame from '../_app/components/assemblies/frames/FrameWbsNode.js';
 
 import TableOverview from './P1031/TableOverview.js';
 

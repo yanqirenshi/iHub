@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import DATA_ACCOUNT_MENUS from '../../data/ACCOUNT_MENUS.js';
+import DATA_ACCOUNT_MENUS from '../../../data/ACCOUNT_MENUS.js';
 
 function makeItems (list) {
     return list.map(code=> {

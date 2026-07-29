@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 // import {H, S} from 'tion';
 
-import Frame from '../components/assemblies/frames/FrameWbsNode.js';
+import Frame from '../_app/components/assemblies/frames/FrameWbsNode.js';
 
 // import wbs from '../manegers/wbs.js';
 

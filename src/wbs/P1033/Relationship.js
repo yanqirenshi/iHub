@@ -1,7 +1,7 @@
 import Container from '@mui/material/Container';
 import {Section, P, LinkOS} from 'tion'; // , S
 
-import TableTMRelationships from '../../components/assemblies/TableTMRelationships.js';
+import TableTMRelationships from '../../_app/components/assemblies/TableTMRelationships.js';
 
 export default function Relationship (props) {
     return (

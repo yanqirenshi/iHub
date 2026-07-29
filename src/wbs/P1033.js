@@ -4,7 +4,7 @@ import { useParams } from "react-router";
 import Container from '@mui/material/Container';
 import {Section, P, LinkOS} from 'tion'; // , S
 
-import Frame from '../components/assemblies/frames/FrameWbsNodeTabs.js';
+import Frame from '../_app/components/assemblies/frames/FrameWbsNodeTabs.js';
 
 import Attribute from './P1033/Attribute.js';
 import Description from './P1033/Description.js';
@@ -12,7 +12,7 @@ import Entity from './P1033/Entity.js';
 import Identifier from './P1033/Identifier.js';
 import Relationship from './P1033/Relationship.js';
 
-import wbs from '../manegers/wbs.js';
+import wbs from '../_app/manegers/wbs.js';
 
 export default function P1033 (props) {
     const [tab, setTab] = React.useState('entity' || null);

@@ -1,4 +1,4 @@
-import { PROJECTS, WBS, WORKPACKAGES } from '../data/WBS.js';
+import { PROJECTS, WBS, WORKPACKAGES } from '../../data/WBS.js';
 
 let i = 1000000000;
 

@@ -9,7 +9,7 @@ import CardContent from '@mui/material/CardContent';
 import Frame from '../assemblies/frames/Frame.js';
 import Link from '../assemblies/Link.js';
 
-import DATA from '../../data/systemic_design/DATA.js';
+import DATA from '../../../data/systemic_design/DATA.js';
 
 export default function SystemicDesign () {
     return (
