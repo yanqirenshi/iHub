@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Other from './operators/Other.js';
+import Other from './Other.js';
 
 export default function Operators (props) {
     const root = props.root;

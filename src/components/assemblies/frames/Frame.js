@@ -8,7 +8,7 @@ import { menuChanged, menuOpened, menuClosed, menuItemSelected } from '../../../
 import MenuBook from '@yanqirenshi/menubook';
 import Manipulater from '@yanqirenshi/manipulater';
 
-import OperatorsLeafs from '../../../Operators.js';
+import OperatorsLeafs from '../../../operators/Operators.js';
 
 const sx = {
     maxWidth: '100vw',
