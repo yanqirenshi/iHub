@@ -18,9 +18,6 @@
 | d | libs        | js Libraries  | 外部ライブラリに切り出したいもの |
 | - | index.css   |               |                                  |
 | - | index.js    |               |                                  |
-| - | App.js      |               |                                  |
-| - | App.test.js |               |                                  |
-| - | Router.js   |               |                                  |
 | - | Github.js   |               |                                  |
 
 ## Page の構成

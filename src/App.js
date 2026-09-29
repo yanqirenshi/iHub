@@ -3,10 +3,10 @@ import { useDispatch } from 'react-redux';
 
 import Box from '@mui/material/Box';
 
-import { windowResized } from './redux/slices/windowSlice.js';
+import { windowResized } from './ihub/redux/slices/windowSlice.js';
 
-import Router from '../Router.js';
-import Github from './Github.js';
+import Router from './Router.js';
+import Github from './ihub/Github.js';
 
 export default function App () {
     const dispatch = useDispatch();
