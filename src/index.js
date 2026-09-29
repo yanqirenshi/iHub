@@ -1,1 +1,1 @@
-import './_app/index.js';
+import './ihub/index.js';

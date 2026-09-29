@@ -5,8 +5,8 @@ import S from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 
-import Frame from '../_app/components/assemblies/frames/Frame.js';
-import Link from '../_app/components/assemblies/Link.js';
+import Frame from '../ihub/components/assemblies/frames/Frame.js';
+import Link from '../ihub/components/assemblies/Link.js';
 
 export default function P1025 (props) {
     return (
