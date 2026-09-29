@@ -1,8 +1,8 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import * as page from './components/pages/index.js';
-import * as page_docs from './components/pages/docs/index.js';
+import * as page from './ihub/components/pages/index.js';
+import * as page_docs from './ihub/components/pages/docs/index.js';
 
 export default function Router () {
     return (

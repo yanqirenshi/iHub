@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 
 import { windowResized } from './redux/slices/windowSlice.js';
 
-import Router from './Router.js';
+import Router from '../Router.js';
 import Github from './Github.js';
 
 export default function App () {
