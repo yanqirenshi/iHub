@@ -5,7 +5,7 @@ import S from '@mui/material/Typography';
 
 import Frame from '../ihub/components/assemblies/frames/Frame.js';
 
-export default function NotFoundWbsNode (props) {
+export default function NotFoundWbsNodeData (props) {
     return (
         <Frame>
           <Container maxWidth="lg" sx={{pt:5}}>
