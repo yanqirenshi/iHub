@@ -69,66 +69,67 @@ const ACCOUNT_MENU_ITEMS = [
     return ht;
 }, {});
 
+// active が true の項目だけをサイドメニューに表示する。
 function makeItems (list) {
-    return list.map(code=> {
-        return ACCOUNT_MENU_ITEMS[code];
-    });
+    return list
+        .filter(d=> d.active === true)
+        .map(d=> ACCOUNT_MENU_ITEMS[d.code]);
 }
 
 export const PAGES = [
     {
         label: 'iHub',
         items: makeItems([
-            'cockpit',
-            'markets',
-            'business',
-            'design',
-            'screens',
-            'api',
-            'batchs',
-            'data',
-            'classes',
-            'external-resources',
-            'system-environment',
-            'message',
-            'devops',
-            'scrum',
-            'organizations',
-            'wbs',
-            'help',
+            { code: 'cockpit',                        active: true },
+            { code: 'markets',                        active: true },
+            { code: 'business',                       active: true },
+            { code: 'design',                         active: true },
+            { code: 'screens',                        active: true },
+            { code: 'api',                            active: true },
+            { code: 'batchs',                         active: true },
+            { code: 'data',                           active: true },
+            { code: 'classes',                        active: true },
+            { code: 'external-resources',             active: true },
+            { code: 'system-environment',             active: true },
+            { code: 'message',                        active: true },
+            { code: 'devops',                         active: true },
+            { code: 'scrum',                          active: true },
+            { code: 'organizations',                  active: true },
+            { code: 'wbs',                            active: true },
+            { code: 'help',                           active: true },
         ]),
     },
     {
         label: 'Docs',
         items: makeItems([
             // ux
-            'docs.user-scenario',
-            'docs.customer-journey-map',
-            'docs.use-case',
-            'docs.systemic-design',
-            'docs.bpmn',
+            { code: 'docs.user-scenario',             active: true },
+            { code: 'docs.customer-journey-map',      active: true },
+            { code: 'docs.use-case',                  active: true },
+            { code: 'docs.systemic-design',           active: true },
+            { code: 'docs.bpmn',                      active: true },
             // ui
-            'docs.ui-design',
-            'docs.screen-transition-diagram',
+            { code: 'docs.ui-design',                 active: true },
+            { code: 'docs.screen-transition-diagram', active: true },
             // Application
-            'docs.classes',
-            'docs.procedures',
+            { code: 'docs.classes',                   active: true },
+            { code: 'docs.procedures',                active: true },
             // Model
-            'docs.tm',
-            'docs.er',
-            'docs.uml',
-            'docs.pad',
+            { code: 'docs.tm',                        active: true },
+            { code: 'docs.er',                        active: true },
+            { code: 'docs.uml',                       active: true },
+            { code: 'docs.pad',                       active: true },
         ]),
     },
     {
         label: 'Etc',
         items: makeItems([
-            'system-dynamics',
-            'ddd',
-            'wbs',
-            'account',
-            'auth',
-            'next.js',
+            { code: 'system-dynamics',                active: true },
+            { code: 'ddd',                            active: true },
+            { code: 'wbs',                            active: true },
+            { code: 'account',                        active: true },
+            { code: 'auth',                           active: true },
+            { code: 'next.js',                        active: true },
         ]),
     },
 ];
