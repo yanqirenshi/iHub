@@ -21,8 +21,9 @@ const ROOTS = [
     {
         code: 'c',
         label: {
-            type: 'text',
-            val: 'Z',
+            type: 'icon',
+            code: 'menu',
+            val: 'サイドメニューの項目',
         },
         reaf: {},
     },
