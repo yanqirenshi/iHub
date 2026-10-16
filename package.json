@@ -23,6 +23,7 @@
     "@yanqirenshi/d3.sitemap": "^0.6.1",
     "@yanqirenshi/d3.ter": "^0.2.1",
     "@yanqirenshi/manipulater": "^0.0.20",
+    "@yanqirenshi/markdown.sitter": "^0.1.5",
     "@yanqirenshi/menubook": "^0.0.11",
     "@yanqirenshi/wnqi.big.size": "^0.0.2",
     "react": "^18.3.1",

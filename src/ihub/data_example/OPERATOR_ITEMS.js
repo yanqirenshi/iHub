@@ -12,8 +12,9 @@ const ROOTS = [
     {
         code: 'b',
         label: {
-            type: 'text',
-            val: 'Y',
+            type: 'icon',
+            code: 'github',
+            val: 'Github',
         },
         reaf: {},
     },
