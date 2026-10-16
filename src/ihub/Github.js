@@ -17,7 +17,7 @@ export default function Github (props) {
 
         sogh.connect(
             process.env.REACT_APP_GITHU_PARSONAL_TOKEN,
-            (viewer)=> dispatch(authSucceeded()),
+            (viewer)=> dispatch(authSucceeded({ avatarUrl: viewer.avatarUrl() })),
             (error)=> dispatch(authFailed()),
         );
     }, [auth, dispatch]); // TODO: setAuthed これ入れたないなぁ。。。

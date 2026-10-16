@@ -24,6 +24,7 @@ export default function Frame (props) {
     const menu = useSelector(s=> s.accountMenu.menu);
     const menu_is_opend = useSelector(s=> s.accountMenu.isOpend);
     const menu_selected_item = useSelector(s=> s.accountMenu.selectedItem);
+    const github_avatar_url = useSelector(s=> s.githubAuth.avatarUrl);
 
     const nav = useNavigate();
 
@@ -50,6 +51,7 @@ export default function Frame (props) {
           <MenuBook menu={menu}
                     is_opend={menu_is_opend}
                     selected_item={menu_selected_item}
+                    icon={github_avatar_url}
                     actions={actions}/>
 
           <Manipulater operators={operators}
