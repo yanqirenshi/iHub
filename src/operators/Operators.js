@@ -2,6 +2,7 @@ import React from 'react';
 
 import Other from './Other.js';
 import ProjectItemForm from './ProjectItemForm.js';
+import AccountMenuSettings from './AccountMenuSettings.js';
 
 export default function Operators (props) {
     const root = props.root;
@@ -13,7 +14,7 @@ export default function Operators (props) {
         return <ProjectItemForm root={root}/>;
 
     if ('c'===root.code)
-        return <Other root={root}/>;
+        return <AccountMenuSettings root={root}/>;
 
     return <Other root={root}/>;
 }

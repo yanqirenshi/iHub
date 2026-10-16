@@ -69,19 +69,21 @@ const ACCOUNT_MENU_ITEMS = [
     return ht;
 }, {});
 
-// active が true の項目だけをサイドメニューに表示する。
 function makeItems (list) {
     return list
         .filter(d=> d.active === true)
         .map(d=> ACCOUNT_MENU_ITEMS[d.code]);
 }
 
-export const PAGES = [
+// サイドメニューのページと、表示する項目。
+// active が true の項目だけをサイドメニューに表示する。
+// active は、ドックの Z から on/off を切り替えられる。(src/setupProxy.js がこのファイルを書き換える)
+export const ACCOUNT_MENU_PAGES = [
     {
         label: 'iHub',
-        items: makeItems([
+        items: [
             { code: 'cockpit',                        active: true },
-            { code: 'markets',                        active: true },
+            { code: 'markets',                        active: false },
             { code: 'business',                       active: true },
             { code: 'design',                         active: true },
             { code: 'screens',                        active: true },
@@ -97,11 +99,11 @@ export const PAGES = [
             { code: 'organizations',                  active: true },
             { code: 'wbs',                            active: true },
             { code: 'help',                           active: true },
-        ]),
+        ],
     },
     {
         label: 'Docs',
-        items: makeItems([
+        items: [
             // ux
             { code: 'docs.user-scenario',             active: true },
             { code: 'docs.customer-journey-map',      active: true },
@@ -119,19 +121,25 @@ export const PAGES = [
             { code: 'docs.er',                        active: true },
             { code: 'docs.uml',                       active: true },
             { code: 'docs.pad',                       active: true },
-        ]),
+        ],
     },
     {
         label: 'Etc',
-        items: makeItems([
+        items: [
             { code: 'system-dynamics',                active: true },
             { code: 'ddd',                            active: true },
             { code: 'wbs',                            active: true },
             { code: 'account',                        active: true },
             { code: 'auth',                           active: true },
             { code: 'next.js',                        active: true },
-        ]),
+        ],
     },
 ];
+
+// ACCOUNT_MENU_PAGES から、active が true の項目だけを取り出したもの。
+export const PAGES = ACCOUNT_MENU_PAGES.map(page=> ({
+    label: page.label,
+    items: makeItems(page.items),
+}));
 
 export default ACCOUNT_MENU_ITEMS;

@@ -9,6 +9,7 @@ import MenuBook from '@yanqirenshi/menubook';
 import Manipulater from '@yanqirenshi/manipulater';
 
 import OperatorsLeafs from '../../../../operators/Operators.js';
+import { withIcons, withoutIcons } from '../../../../operators/labels.js';
 
 const sx = {
     maxWidth: '100vw',
@@ -42,7 +43,7 @@ export default function Frame (props) {
             close: ()=> dispatch(menuClosed()),
         },
         operator: {
-            change: (new_operators)=> dispatch(operatorsChanged(new_operators)),
+            change: (new_operators)=> dispatch(operatorsChanged(withoutIcons(new_operators))),
         },
     };
 
@@ -54,7 +55,7 @@ export default function Frame (props) {
                     icon={github_avatar_url}
                     actions={actions}/>
 
-          <Manipulater operators={operators}
+          <Manipulater operators={withIcons(operators)}
                        window_size={window_size}
                        actions={actions}
                        leafs={root=> <OperatorsLeafs root={root}/>}/>
