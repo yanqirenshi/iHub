@@ -11,7 +11,6 @@ import sogh from '../../manegers/sogh.js';
 
 export default function Cockpit () {
     const dispatch = useDispatch();
-    const window_size = useSelector(s=> s.window.value);
 
     const authed = useSelector(s=> s.githubAuth.value);
     const { status, issueIds } = useSelector(s=> s.cockpit);
@@ -30,7 +29,7 @@ export default function Cockpit () {
 
     return (
         <Frame>
-          <Monitor window_size={window_size}>
+          <Monitor>
             {cards.map(card=> {
                 return <Card key={card.id} data={card}/>;
             })}

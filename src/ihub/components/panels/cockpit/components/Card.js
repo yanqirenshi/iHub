@@ -11,9 +11,7 @@ export default function Card (props) {
     return (
         <Box className="theme-color3"
              sx={{
-                 display: 'inline-block',
                  width: '222px',
-                 height: '222px',
                  margin: '11px',
                  borderRadius: '5px',
              }}>
@@ -22,7 +20,7 @@ export default function Card (props) {
               justifyContent: 'center',
               alignItems: 'center',
               width: '100%',
-              height: '100%',
+              minHeight: '222px', // 中身が無いカードが潰れないようにする
               color: '#ccc',
           }}>
             {data.type || '?'}

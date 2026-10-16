@@ -15,9 +15,7 @@ export default function GithubIssue (props) {
 
     return (
         <Card sx={{
-            display: 'inline-block',
             width: '222px',
-            height: '222px',
             margin: '11px',
             background: '#fff',
             borderRadius: '5px',

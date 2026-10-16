@@ -1,36 +1,32 @@
 import Box from '@mui/material/Box';
 
+import Masonry from '@yanqirenshi/react-masonry-component';
+
+const MASONRY_OPTIONS = {
+    transitionDuration: 0, // 並べ替えのアニメーションは付けない
+    fitWidth: true, // カードの列を中央に寄せる
+};
+
+// カードを masonry (石積み) レイアウトで並べる。
+// 列数は Masonry が親の幅から決める。
 export default function Cockpit (props) {
     const children = props.children;
-    const window_size = props.window_size;
-
-    if (!window_size)
-        return null;
-
-    const contents_width = 222;
-    const margin = 11;
-    const card_width = contents_width + (margin * 2);
-
-    const column_num = Math.ceil(window_size.w / card_width) - 2;
 
     return (
         <Box sx={{
-            width: `${window_size.w}px`,
-            height: `${window_size.h}px`,
+            height: '100%',
             overflow: 'auto',
-            display: 'block',
+            pt: 3,
+            pb: 22, // 最後のカードがドックに隠れないようにする
+            px: '111px', // サイドメニューとドックにカードが隠れないようにする
+            boxSizing: 'border-box',
         }}>
-
-          <Box sx={{
-              width: `${column_num * card_width}px`,
-              ml: 'auto',
-              mr: 'auto',
-              pt: 3,
-              pb: 22,
-          }}>
+          {/* enableResizableChildren: 表示後にカードの高さが変わっても (フォントの読み込みなど) 並び直す */}
+          <Masonry options={MASONRY_OPTIONS}
+                   enableResizableChildren
+                   style={{margin: '0 auto'}}>
             {children}
-          </Box>
-
+          </Masonry>
         </Box>
     );
 }

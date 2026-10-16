@@ -25,6 +25,7 @@
     "@yanqirenshi/manipulater": "^0.0.20",
     "@yanqirenshi/markdown.sitter": "^0.1.5",
     "@yanqirenshi/menubook": "^0.0.11",
+    "@yanqirenshi/react-masonry-component": "^7.0.0",
     "@yanqirenshi/wnqi.big.size": "^0.0.2",
     "react": "^18.3.1",
     "react-bpmn": "^0.2.0",
