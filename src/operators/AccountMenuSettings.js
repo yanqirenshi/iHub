@@ -145,6 +145,12 @@ export default function AccountMenuSettings (props) {
 
                   return (
                       <Box key={key} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Switch size="small"
+                                checked={!!actives[key]}
+                                disabled={saving!==null}
+                                onChange={()=> toggle(page.label, item.code)}
+                                slotProps={{ input: { 'aria-label': `${page.label} ${item.code}` } }}/>
+
                         {menu && <img src={menu.icon} alt="" width={22} height={22}/>}
 
                         <Typography sx={{ flex: 1 }}>
@@ -154,12 +160,6 @@ export default function AccountMenuSettings (props) {
                         <Typography sx={{ color: '#888', fontSize: 12 }}>
                           {item.code}
                         </Typography>
-
-                        <Switch size="small"
-                                checked={!!actives[key]}
-                                disabled={saving!==null}
-                                onChange={()=> toggle(page.label, item.code)}
-                                slotProps={{ input: { 'aria-label': `${page.label} ${item.code}` } }}/>
                       </Box>
                   );
               })}
