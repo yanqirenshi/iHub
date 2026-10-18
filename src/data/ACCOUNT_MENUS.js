@@ -83,7 +83,7 @@ export const ACCOUNT_MENU_PAGES = [
         label: 'iHub',
         items: [
             { code: 'cockpit',                        active: true },
-            { code: 'markets',                        active: false },
+            { code: 'markets',                        active: true },
             { code: 'business',                       active: true },
             { code: 'design',                         active: true },
             { code: 'screens',                        active: true },
