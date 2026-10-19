@@ -1,4 +1,4 @@
-import ICONS from './ICONS.js';
+import ICONS from '../config/ICONS.js';
 
 const MAIN = [
     { code: 'cockpit',               url: '/',                      label: 'コックピット', icon: ICONS.cockpit },
