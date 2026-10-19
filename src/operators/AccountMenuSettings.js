@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import {Leaf} from '@yanqirenshi/manipulater';
 
 import ACCOUNT_MENU_ITEMS, { ACCOUNT_MENU_PAGES, isActive } from '../config/ACCOUNT_MENUS.js';
-import { useCollections, usePatchCollectionMutation } from '../ihub/redux/api/dataApi.js';
+import { errorMessage, useCollections, usePatchCollectionMutation } from '../ihub/redux/api/dataApi.js';
 
 // 吹き出しの大きさ
 const LEAF_W = 444;
@@ -56,13 +56,6 @@ function itemKey (page, code) {
     return `${page}/${code}`;
 }
 
-function errorMessage (error) {
-    if (error?.data?.message)
-        return [error.data.message, ...(error.data.errors || [])].join('\n');
-
-    return `保存できません。API サーバーが起動しているか、確かめてください。(${error?.status ?? ''})`;
-}
-
 // サイドメニューの項目の active (表示/非表示) を切り替える。
 // 切り替えた結果は、個人の設定として API サーバーへ保存し、サイドメニューにすぐ反映する。
 export default function AccountMenuSettings (props) {
@@ -93,7 +86,7 @@ export default function AccountMenuSettings (props) {
         try {
             await patchCollection({ name: ACTIVES, patch: { [page.label]: { [item.code]: value } } }).unwrap();
         } catch (e) {
-            setError(errorMessage(e));
+            setError(errorMessage(e, '保存できません。'));
         } finally {
             setSaving(null);
         }

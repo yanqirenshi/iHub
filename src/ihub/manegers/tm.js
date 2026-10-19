@@ -1,21 +1,18 @@
-import { useMemo } from 'react';
-
-import { useCollections } from '../redux/api/dataApi.js';
+// TM (d3.ter) に使うコレクション。
+export const TM_COLLECTIONS = [
+    'tm/identifiers',
+    'tm/attributes',
+    'tm/entities',
+    'tm/relationships',
+];
 
 // d3.ter に渡すデータ一式を作る。
-// d3.ter はデータを書き換える (ドラッグで position を変える) ので、複製して渡す。
-export function buildTmData ({ identifiers, attributes, entities, relationships }) {
-    return structuredClone({ identifiers, attributes, entities, relationships });
-}
-
-export function useTmData () {
-    const collections = useCollections();
-
-    const identifiers   = collections['tm/identifiers'];
-    const attributes    = collections['tm/attributes'];
-    const entities      = collections['tm/entities'];
-    const relationships = collections['tm/relationships'];
-
-    return useMemo(()=> buildTmData({ identifiers, attributes, entities, relationships }),
-                   [identifiers, attributes, entities, relationships]);
+// d3.ter はデータを書き換えるので、複製して渡す。
+export function buildTmData (collections) {
+    return structuredClone({
+        identifiers:   collections['tm/identifiers'],
+        attributes:    collections['tm/attributes'],
+        entities:      collections['tm/entities'],
+        relationships: collections['tm/relationships'],
+    });
 }

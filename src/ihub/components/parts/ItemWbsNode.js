@@ -1,12 +1,12 @@
 import {Link as RrLink} from "react-router-dom";
 
-import wbs from '../../manegers/wbs.js';
+import { useWbs } from '../../manegers/wbs.js';
 
 export default function ItemWbsNode (props) {
     const children = props.children;
     const wbs_id = props.wbs_id;
 
-    const wbs_node = wbs.get(wbs_id);
+    const wbs_node = useWbs().get(wbs_id);
 
     if (!wbs_node) return <>{children || wbs_id}</>;
 

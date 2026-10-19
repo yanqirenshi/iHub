@@ -3,11 +3,13 @@
 import Link from '../assemblies/Link.js';
 
 import Table from './Wnqi.Big.Size/index.js';
-import wbs from '../../manegers/wbs.js';
+import { useWbs } from '../../manegers/wbs.js';
 
 export default function WBSTable (props) {
     const start_id = props.start_id || null;
     const columns = props.columns || defaultColumns();
+
+    const wbs = useWbs();
 
     if (!wbs)
         return null;
@@ -22,8 +24,10 @@ export default function WBSTable (props) {
     const options = {}; // or null
     const style_table = { fontSize: '16px' }; // or null
 
+    // 表はデータが変わっても作り直さないので、WBS が変わったら表ごと作り直す。
     return (
-        <Table source={wbs_source}
+        <Table key={wbs.version}
+               source={wbs_source}
                columns={columns}
                options={options}
                style={style_table}

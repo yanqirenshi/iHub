@@ -4,7 +4,8 @@ import Box from '@mui/material/Box';
 
 import D3Sitemap, { Rectum } from '@yanqirenshi/d3.sitemap';
 
-import { useSitemapData } from '../../../manegers/sitemap.js';
+import DiagramBox from '../../assemblies/DiagramBox.js';
+import { SITEMAP_COLLECTIONS, buildSitemapData } from '../../../manegers/sitemap.js';
 
 const style = {
     background: '#f3f3f3',
@@ -13,8 +14,20 @@ const style = {
     overflow: 'hidden',
 };
 
+// ドラッグで動かした画面のノードの位置は、sitemap/nodes に保存する。
+const POSITIONS = { selector: 'g.node', collection: 'sitemap/nodes' };
+
 export default function ScreenTransitionDiagram (props) {
-    const source = useSitemapData();
+    return (
+        <DiagramBox names={SITEMAP_COLLECTIONS}
+                    build={buildSitemapData}
+                    positions={POSITIONS}
+                    render={source=> <Diagram {...props} source={source}/>}/>
+    );
+}
+
+function Diagram (props) {
+    const source = props.source;
 
     const [rectum] = useState(new Rectum({
         transform:  {
