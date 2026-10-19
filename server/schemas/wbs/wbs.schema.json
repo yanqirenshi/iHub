@@ -2,6 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "WBS のノード",
     "description": "プロジェクトの下の WBS。parent はプロジェクトか WBS の id。id は projects・workpackages とまたいで一意にする。",
+    "x-id-start": 1000,
     "type": "array",
     "items": {
         "type": "object",

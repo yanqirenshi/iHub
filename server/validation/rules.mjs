@@ -17,7 +17,7 @@ function checkUnique (errors, label, list, key = 'id') {
 }
 
 // 入れ子のノード (children) を平らにする。
-function flatten (nodes) {
+export function flatten (nodes) {
     return nodes.flatMap(node=> [node, ...flatten(node.children || [])]);
 }
 

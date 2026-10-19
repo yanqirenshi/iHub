@@ -2,6 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "ER 図の結び付き",
     "description": "テーブル・カラム・ポートの間の結び付き。from_id/to_id は、from_class/to_class の種類のデータの _id を指す。",
+    "x-id-start": 10000000,
     "type": "array",
     "items": {
         "type": "object",
