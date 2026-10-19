@@ -27,6 +27,8 @@
     "@yanqirenshi/menubook": "^0.0.11",
     "@yanqirenshi/react-masonry-component": "^7.0.0",
     "@yanqirenshi/wnqi.big.size": "^0.0.2",
+    "ajv": "^8.20.0",
+    "ajv-i18n": "^4.2.0",
     "react": "^18.3.1",
     "react-bpmn": "^0.2.0",
     "react-dom": "^18.3.1",
@@ -56,6 +58,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:data": "node --test \"server/test/**/*.test.mjs\"",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
