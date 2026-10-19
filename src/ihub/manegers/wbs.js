@@ -1,4 +1,9 @@
-import { PROJECTS, WBS, WORKPACKAGES } from '../../data/WBS.js';
+import PROJECTS          from '../../data/wbs/projects.json';
+import WBS               from '../../data/wbs/wbs.json';
+import WORKPACKAGES_DATA from '../../data/wbs/workpackages.json';
+
+// ワークパッケージには、読み込み時に _class を付ける。
+const WORKPACKAGES = WORKPACKAGES_DATA.map(d=> ({ ...d, _class: 'WORKPACKAGE' }));
 
 let i = 1000000000;
 
@@ -179,6 +184,21 @@ class Wbs {
     }
 }
 
+// プロジェクト・WBS・ワークパッケージを、id で引けるようにする。
+// id は、ノードの種類をまたいで一意にする。
+const INDEX_ID = {};
+
+for (const wbs_node of [...PROJECTS, ...WBS, ...WORKPACKAGES]) {
+    if (INDEX_ID[wbs_node.id])
+        throw new Error('Duplication WBS Node. id='+wbs_node.id);
+
+    INDEX_ID[wbs_node.id] = wbs_node;
+}
+
 const wbs = new Wbs(PROJECTS, WBS, WORKPACKAGES);
 
 export default wbs;
+
+export {
+    INDEX_ID,
+};

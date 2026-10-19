@@ -4,8 +4,8 @@ import Box from '@mui/material/Box';
 
 import D3Deployment, { Rectum } from '@yanqirenshi/d3.deployment';
 
-import DEPLOYMENT_MANAGE_OVERVIEW_EDGE_DATA from '../../../../data/DEPLOYMENT_MANAGE_OVERVIEW_EDGE_DATA.js';
-import DEPLOYMENT_MANAGE_OVERVIEW_NODE_DATA from '../../../../data/DEPLOYMENT_MANAGE_OVERVIEW_NODE_DATA.js';
+import DEPLOYMENT_NODES from '../../../../data/deployment/nodes.json';
+import DEPLOYMENT_EDGES from '../../../../data/deployment/edges.json';
 
 const style = {
     width: '100%',
@@ -13,8 +13,8 @@ const style = {
 };
 
 const graph_data = {
-    nodes: DEPLOYMENT_MANAGE_OVERVIEW_NODE_DATA,
-    edges: DEPLOYMENT_MANAGE_OVERVIEW_EDGE_DATA,
+    nodes: DEPLOYMENT_NODES,
+    edges: DEPLOYMENT_EDGES,
 };
 
 export default function SystemConfigurationDiagram (props) {
