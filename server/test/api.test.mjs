@@ -1,6 +1,6 @@
-import { test, beforeEach } from 'node:test';
+import { test, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,6 +18,66 @@ beforeEach(()=> {
     cpSync(EXAMPLE, dir, { recursive: true });
     app = createApp({ data_dir: dir });
 });
+
+afterEach(()=> {
+    app.stopWatching?.();
+});
+
+// SSE (GET /api/events) の応答から、通知を 1 つずつ取り出す。
+function eventReader (res) {
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let pending = null;
+
+    // 待ち切れなかった読み込みは、次に使う。(届いた内容をなくさないため)
+    const read = ()=> pending ??= reader.read().then(result=> {
+        pending = null;
+        return result;
+    });
+
+    return {
+        async next (ms = 3000) {
+            const deadline = Date.now() + ms;
+
+            for (;;) {
+                const index = buffer.indexOf('\n\n');
+
+                if (index >= 0) {
+                    const chunk = buffer.slice(0, index);
+
+                    buffer = buffer.slice(index + 2);
+
+                    // ping などのコメントは飛ばす。
+                    if (!/^event: /m.test(chunk))
+                        continue;
+
+                    return JSON.parse(chunk.split('\n')
+                                      .filter(line=> line.startsWith('data: '))
+                                      .map(line=> line.slice('data: '.length))
+                                      .join('\n'));
+                }
+
+                const rest = deadline - Date.now();
+
+                if (rest <= 0)
+                    throw new Error('通知が届きませんでした。');
+
+                let timer;
+                const result = await Promise.race([read(), new Promise(resolve=> { timer = setTimeout(()=> resolve(null), rest); })]);
+
+                clearTimeout(timer);
+
+                if (result && result.done)
+                    throw new Error('通知の接続が切れました。');
+
+                if (result)
+                    buffer += decoder.decode(result.value, { stream: true });
+            }
+        },
+        close: ()=> reader.cancel(),
+    };
+}
 
 function request (path, { method = 'GET', body, headers = {} } = {}) {
     return app.request(path, {
@@ -181,4 +241,70 @@ test('ほかのサイトからの要求と、JSON でない本文は受け付け
 
 test('無い API は 404 にする', async ()=> {
     assert.equal((await request('/api/a/b/c/d')).status, 404);
+});
+
+test('GET /api/events は、接続したときに ETag を、書き込んだときに変更を知らせる', async ()=> {
+    const res = await request('/api/events');
+
+    assert.equal(res.headers.get('content-type'), 'text/event-stream');
+    assert.equal(res.headers.get('cache-control'), 'no-cache, no-transform');
+
+    const events = eventReader(res);
+
+    try {
+        const ready = await events.next();
+
+        assert.equal(ready.type, 'ready');
+        assert.match(ready.etags['er/entities'], /^"[0-9a-f]{40}"$/);
+
+        // 書き込んだ画面 (タブ) の id も知らせる。
+        const patched = await request('/api/local/account_menus', {
+            method: 'PATCH',
+            body: { iHub: { markets: false } },
+            headers: { 'x-ihub-client': 'tab-1' },
+        });
+
+        assert.deepEqual(await events.next(), {
+            type: 'changed',
+            name: 'local/account_menus',
+            etag: (await patched.json()).etag,
+            client: 'tab-1',
+        });
+    } finally {
+        await events.close();
+    }
+});
+
+test('ファイルを直接変えたときも、検証してから知らせる', async ()=> {
+    app = createApp({ data_dir: dir, watch: true });
+
+    const events = eventReader(await request('/api/events'));
+    const file = join(dir, 'wbs', 'wbs.json');
+    const wbs = readData('wbs/wbs');
+
+    try {
+        await events.next();
+
+        // エディタで書き換えたのと同じように、ファイルを直接書き換える。
+        wbs.push({ id: 5000, parent: 1, name: '外で追加' });
+        writeFileSync(file, JSON.stringify(wbs, null, 4) + '\n');
+
+        const changed = await events.next(5000);
+
+        assert.equal(changed.type, 'changed');
+        assert.equal(changed.name, 'wbs/wbs');
+        assert.equal(changed.client, null);
+
+        // ルールに合わない内容は、invalid として知らせる。
+        wbs.push({ id: 5001, parent: 99999, name: '親が無い' });
+        writeFileSync(file, JSON.stringify(wbs, null, 4) + '\n');
+
+        assert.deepEqual(await events.next(5000), {
+            type: 'invalid',
+            name: 'wbs/wbs',
+            errors: ['wbs/wbs: parent のプロジェクトか WBS が見つかりません。(id=5001, parent=99999)'],
+        });
+    } finally {
+        await events.close();
+    }
 });
