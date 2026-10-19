@@ -4,20 +4,16 @@ import Box from '@mui/material/Box';
 
 import D3Deployment, { Rectum } from '@yanqirenshi/d3.deployment';
 
-import DEPLOYMENT_NODES from '../../../../data/deployment/nodes.json';
-import DEPLOYMENT_EDGES from '../../../../data/deployment/edges.json';
+import { useDeploymentData } from '../../../manegers/deployment.js';
 
 const style = {
     width: '100%',
     height: '100%',
 };
 
-const graph_data = {
-    nodes: DEPLOYMENT_NODES,
-    edges: DEPLOYMENT_EDGES,
-};
-
 export default function SystemConfigurationDiagram (props) {
+    const graph_data = useDeploymentData();
+
     const [rectum] = React.useState(new Rectum({
         transform: {
             k: 0.3,

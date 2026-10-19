@@ -2,6 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "画面遷移図のノード",
     "description": "d3.sitemap に渡す画面のノード。children に子のノードを入れ子で持つ。id は子のノードも含めて一意にする。",
+    "x-id-start": 1000000,
     "type": "array",
     "items": { "$ref": "#/$defs/node" },
     "$defs": {

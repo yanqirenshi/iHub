@@ -8,8 +8,8 @@ import { RULES } from '../validation/rules.mjs';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 
-// src/data/ と、その雛形の src/ihub/data_example/ は、同じフォーマット (スキーマ) にそろえる。
-for (const dir of ['src/data', 'src/ihub/data_example']) {
+// data/ と、その雛形の src/ihub/data_example/ は、同じフォーマット (スキーマ) にそろえる。
+for (const dir of ['data', 'src/ihub/data_example']) {
     test(`${dir} がスキーマとルールに合っている`, ()=> {
         assert.deepEqual(validateDataDir(join(ROOT, dir)), []);
     });
@@ -35,6 +35,16 @@ test('スキーマに無い項目を見つける', ()=> {
     const errors = validateData(data);
 
     assert.ok(errors.some(e=> e.startsWith('wbs/projects/') && e.endsWith('(parnet)')), errors.join('\n'));
+});
+
+test('個人の設定 (local) は、無くてもよいが、あればスキーマで検証する', ()=> {
+    const data = loadDataDir(join(ROOT, 'src/ihub/data_example'));
+
+    assert.deepEqual(validateData(data), []);
+
+    data['local/account_menus'] = { iHub: { markets: 'off' } };
+
+    assert.deepEqual(validateData(data), ['local/account_menus/iHub/markets: booleanでなければいけない']);
 });
 
 test('WBS の id の重複と、parent の無いノードを見つける', ()=> {

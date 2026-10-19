@@ -2,6 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "TM のエンティティ",
     "description": "d3.ter のエンティティ。id は 30000 番台、identifiers[].id は 40000 番台、attributes[].id は 50000 番台を使う。(今のデータには、この範囲に入っていない id もある)",
+    "x-id-start": 30000,
     "type": "array",
     "items": {
         "type": "object",

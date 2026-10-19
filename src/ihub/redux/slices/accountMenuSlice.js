@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { PAGES } from '../../../data/ACCOUNT_MENUS.js';
+import { PAGES } from '../../../config/ACCOUNT_MENUS.js';
 
 function pagePath () {
     const root_path = window.location.pathname.split('/')[1] || null;
@@ -50,8 +50,12 @@ const accountMenuSlice = createSlice({
         menuItemSelected (state, action) {
             state.selectedItem = action.payload;
         },
+        // 個人の設定 (on/off) を反映したページに差し替える。
+        menuPagesChanged (state, action) {
+            state.menu.pages = action.payload;
+        },
     },
 });
 
-export const { menuChanged, menuOpened, menuClosed, menuItemSelected } = accountMenuSlice.actions;
+export const { menuChanged, menuOpened, menuClosed, menuItemSelected, menuPagesChanged } = accountMenuSlice.actions;
 export default accountMenuSlice.reducer;

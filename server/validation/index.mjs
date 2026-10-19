@@ -1,6 +1,7 @@
-// data フォルダ (src/data/ など) を、JSON Schema とドメインごとのルールで検証する。
+// data フォルダ (data/ など) を、JSON Schema とドメインごとのルールで検証する。
 // コレクションは server/schemas/{domain}/{collection}.schema.json と
 // data フォルダの {domain}/{collection}.json の組で、スキーマのファイルから一覧を作る。
+// domain が local のコレクションは個人の設定なので、ファイルが無くてもよい。(無いときはスキーマの default を使う)
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,19 +21,48 @@ function listFiles (dir, suffix) {
         .sort();
 }
 
+// 配列のコレクションの、レコードのプロパティ。
+function itemProperties (schema) {
+    let items = schema.items;
+
+    if (items && items.$ref && items.$ref.startsWith('#/$defs/'))
+        items = schema.$defs[items.$ref.slice('#/$defs/'.length)];
+
+    return (items && items.properties) || {};
+}
+
 export const COLLECTIONS = listFiles(SCHEMAS_DIR, '.schema.json').map(file=> {
     const name = file.slice(0, -'.schema.json'.length);
     const [domain, collection] = name.split('/');
+    const schema = JSON.parse(readFileSync(join(SCHEMAS_DIR, file), 'utf8'));
+    const properties = schema.type==='array' ? itemProperties(schema) : {};
 
     return {
         name,
         domain,
         collection,
-        schema: JSON.parse(readFileSync(join(SCHEMAS_DIR, file), 'utf8')),
+        schema,
+        optional: domain==='local',
+        // レコードの id のプロパティ。(id の無いコレクションは null)
+        idKey: '_id' in properties ? '_id' : ('id' in properties ? 'id' : null),
+        // コレクションが空のときに、最初に振る id。
+        idStart: schema['x-id-start'] || 1,
     };
 });
 
+export function findCollection (name) {
+    return COLLECTIONS.find(c=> c.name===name) || null;
+}
+
+// ファイルが無いときに使うデータ。
+export function defaultData (collection) {
+    return structuredClone(collection.schema.default);
+}
+
 const ajv = new Ajv2020({ allErrors: true, allowUnionTypes: true });
+
+// 採番に使う注釈。(検証には使わない)
+ajv.addKeyword({ keyword: 'x-id-start', schemaType: 'number' });
 
 const VALIDATORS = Object.fromEntries(COLLECTIONS.map(c=> [c.name, ajv.compile(c.schema)]));
 
@@ -59,15 +89,17 @@ export function loadDataDir (dir) {
     }));
 }
 
-// 読み込んだデータを検証する。戻り値はエラーのメッセージの配列。(空ならエラーなし)
-export function validateData (data) {
+// collections をスキーマで検証し、そろっていてスキーマに合っているドメインはルールでも検査する。
+function validateCollections (collections, data) {
     const errors = [];
     const invalid = new Set();
 
-    for (const c of COLLECTIONS) {
+    for (const c of collections) {
         if (!(c.name in data)) {
-            errors.push(`${c.name}: ファイルがありません。`);
-            invalid.add(c.name);
+            if (!c.optional) {
+                errors.push(`${c.name}: ファイルがありません。`);
+                invalid.add(c.name);
+            }
             continue;
         }
 
@@ -80,21 +112,37 @@ export function validateData (data) {
         }
     }
 
-    for (const name of Object.keys(data))
-        if (!COLLECTIONS.some(c=> c.name===name))
-            errors.push(`${name}: スキーマがありません。(server/schemas/${name}.schema.json を作ってください)`);
+    const domains = new Set(collections.map(c=> c.domain));
 
-    // ルールは、コレクションがそろっていてスキーマに合っているドメインだけを検査する。
     for (const [domain, check] of Object.entries(RULES)) {
-        const collections = COLLECTIONS.filter(c=> c.domain===domain);
-
-        if (collections.some(c=> invalid.has(c.name)))
+        if (!domains.has(domain))
             continue;
 
-        errors.push(...check(Object.fromEntries(collections.map(c=> [c.collection, data[c.name]]))));
+        const members = COLLECTIONS.filter(c=> c.domain===domain);
+
+        if (members.some(c=> invalid.has(c.name)))
+            continue;
+
+        errors.push(...check(Object.fromEntries(members.map(c=> [c.collection, data[c.name]]))));
     }
 
     return errors;
+}
+
+// 読み込んだデータ全体を検証する。戻り値はエラーのメッセージの配列。(空ならエラーなし)
+export function validateData (data) {
+    const errors = validateCollections(COLLECTIONS, data);
+
+    for (const name of Object.keys(data))
+        if (!findCollection(name))
+            errors.push(`${name}: スキーマがありません。(server/schemas/${name}.schema.json を作ってください)`);
+
+    return errors;
+}
+
+// 1 つのドメインのデータだけを検証する。(API サーバーが、書き込む前に使う)
+export function validateDomain (domain, data) {
+    return validateCollections(COLLECTIONS.filter(c=> c.domain===domain), data);
 }
 
 export function validateDataDir (dir) {

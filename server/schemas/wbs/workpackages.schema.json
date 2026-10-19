@@ -2,6 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "WBS のワークパッケージ",
     "description": "WBS の下のワークパッケージ。parent は WBS の id。id は projects・wbs とまたいで一意にする。_class は読み込み時に付けるので、データには書かない。",
+    "x-id-start": 1000000,
     "type": "array",
     "items": {
         "type": "object",

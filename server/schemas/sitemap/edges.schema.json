@@ -2,6 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "画面遷移図の遷移",
     "description": "画面のノードの間の遷移。from.id/to.id はノードの id を指す。position はポートを取り付ける角度。",
+    "x-id-start": 2000001,
     "type": "array",
     "items": {
         "type": "object",
