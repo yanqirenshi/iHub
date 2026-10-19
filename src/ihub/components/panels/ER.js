@@ -4,10 +4,10 @@ import D3Er, { Rectum } from '@yanqirenshi/d3.er';
 
 import Box from '@mui/material/Box';
 
-import ER_DATA from '../../../data/ER.js';
+import { useErData } from '../../manegers/er.js';
 
 export default function ER (props) {
-    const source = ER_DATA;
+    const source = useErData();
 
     const [rectum] = useState(new Rectum({
         callbacks: props.callbacks,

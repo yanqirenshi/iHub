@@ -9,6 +9,7 @@ import cockpitReducer from './slices/cockpitSlice.js';
 import scrumReducer from './slices/scrumSlice.js';
 import scrumProjectReducer from './slices/scrumProjectSlice.js';
 import scrumProjectItemReducer from './slices/scrumProjectItemSlice.js';
+import { dataApi } from './api/dataApi.js';
 
 export const store = configureStore({
     reducer: {
@@ -21,5 +22,7 @@ export const store = configureStore({
         scrum: scrumReducer,
         scrumProject: scrumProjectReducer,
         scrumProjectItem: scrumProjectItemReducer,
+        [dataApi.reducerPath]: dataApi.reducer,
     },
+    middleware: (getDefaultMiddleware)=> getDefaultMiddleware().concat(dataApi.middleware),
 });

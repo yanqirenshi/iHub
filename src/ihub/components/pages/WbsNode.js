@@ -5,7 +5,7 @@ import Loading from '../panels/Loading.js';
 import NotFoundWbsNodeData from '../../../wbs/NotFoundWbsNodeData.js';
 import NotFoundWbsNodeComponent from '../../../wbs/NotFoundWbsNodeComponent.js';
 
-import {INDEX_ID} from '../../../data/WBS.js';
+import {INDEX_ID} from '../../manegers/wbs.js';
 
 // TODO: あと、ページ無いときの処理とかを入れる。
 // https://qiita.com/kakken1988/items/9f14480c8a9f0abf7b3b#chunkloaderror-%E3%81%AE%E5%9B%9E%E9%81%BF%E7%AD%96

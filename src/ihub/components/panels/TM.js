@@ -4,11 +4,11 @@ import Box from '@mui/material/Box';
 
 import D3Ter, {Rectum}  from '@yanqirenshi/d3.ter';
 
-import TM_DATA from '../../../data/TM.js';
+import { useTmData } from '../../manegers/tm.js';
 
 export default function TM () {
     const [rectum, setRectum] = useState(null);
-    const [graph_data] = useState(TM_DATA);
+    const graph_data = useTmData();
 
     useEffect(()=> {
         if (rectum!==null) return;
