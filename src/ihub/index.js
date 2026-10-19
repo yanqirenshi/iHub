@@ -6,6 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import { store } from './redux/store.js';
 import './index.css';
 import App from '../App';
+import DataGate from './DataGate.js';
 import * as serviceWorkerRegistration from './js/serviceWorkerRegistration';
 import reportWebVitals from './js/reportWebVitals';
 
@@ -14,7 +15,9 @@ root.render(
     <React.StrictMode>
       <Provider store={store}>
         <BrowserRouter>
-          <App />
+          <DataGate>
+            <App />
+          </DataGate>
         </BrowserRouter>
       </Provider>
     </React.StrictMode>

@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 
 import D3Sitemap, { Rectum } from '@yanqirenshi/d3.sitemap';
 
-import SITEMAP_DATA from '../../../manegers/sitemap.js';
+import { useSitemapData } from '../../../manegers/sitemap.js';
 
 const style = {
     background: '#f3f3f3',
@@ -14,7 +14,7 @@ const style = {
 };
 
 export default function ScreenTransitionDiagram (props) {
-    const source= SITEMAP_DATA;
+    const source = useSitemapData();
 
     const [rectum] = useState(new Rectum({
         transform:  {

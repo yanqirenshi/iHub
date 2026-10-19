@@ -1,10 +1,3 @@
-import PROJECTS          from '../../data/wbs/projects.json';
-import WBS               from '../../data/wbs/wbs.json';
-import WORKPACKAGES_DATA from '../../data/wbs/workpackages.json';
-
-// ワークパッケージには、読み込み時に _class を付ける。
-const WORKPACKAGES = WORKPACKAGES_DATA.map(d=> ({ ...d, _class: 'WORKPACKAGE' }));
-
 let i = 1000000000;
 
 class Wbs {
@@ -184,18 +177,46 @@ class Wbs {
     }
 }
 
-// プロジェクト・WBS・ワークパッケージを、id で引けるようにする。
+// プロジェクト・WBS・ワークパッケージを、id で引けるようにしたもの。
 // id は、ノードの種類をまたいで一意にする。
 const INDEX_ID = {};
 
-for (const wbs_node of [...PROJECTS, ...WBS, ...WORKPACKAGES]) {
-    if (INDEX_ID[wbs_node.id])
-        throw new Error('Duplication WBS Node. id='+wbs_node.id);
+const wbs = new Wbs([], [], []);
 
-    INDEX_ID[wbs_node.id] = wbs_node;
+// setWbsData に渡された、元のデータ。(同じデータなら作り直さないために使う)
+let source = null;
+
+// API サーバーから読み込んだデータで、wbs と INDEX_ID を作り直す。
+export function setWbsData (collections) {
+    const projects     = collections['wbs/projects'];
+    const wbs_list     = collections['wbs/wbs'];
+    const workpackages = collections['wbs/workpackages'];
+
+    if (source && source[0]===projects && source[1]===wbs_list && source[2]===workpackages)
+        return;
+
+    source = [projects, wbs_list, workpackages];
+
+    // 読み込んだデータは書き換えられないので、複製して使う。ワークパッケージには _class を付ける。
+    const nodes = {
+        projects:     structuredClone(projects),
+        wbs:          structuredClone(wbs_list),
+        workpackages: structuredClone(workpackages).map(d=> ({ ...d, _class: 'WORKPACKAGE' })),
+    };
+
+    // import した側が同じオブジェクトを使い続けられるように、INDEX_ID は中身を入れ替える。
+    for (const id of Object.keys(INDEX_ID))
+        delete INDEX_ID[id];
+
+    for (const wbs_node of [...nodes.projects, ...nodes.wbs, ...nodes.workpackages]) {
+        if (INDEX_ID[wbs_node.id])
+            throw new Error('Duplication WBS Node. id='+wbs_node.id);
+
+        INDEX_ID[wbs_node.id] = wbs_node;
+    }
+
+    wbs.build(nodes.projects, nodes.wbs, nodes.workpackages);
 }
-
-const wbs = new Wbs(PROJECTS, WBS, WORKPACKAGES);
 
 export default wbs;
 

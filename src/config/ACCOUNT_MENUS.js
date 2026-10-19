@@ -1,4 +1,4 @@
-import ICONS from '../config/ICONS.js';
+import ICONS from './ICONS.js';
 
 const MAIN = [
     { code: 'cockpit',               url: '/',                      label: 'コックピット', icon: ICONS.cockpit },
@@ -69,15 +69,9 @@ const ACCOUNT_MENU_ITEMS = [
     return ht;
 }, {});
 
-function makeItems (list) {
-    return list
-        .filter(d=> d.active === true)
-        .map(d=> ACCOUNT_MENU_ITEMS[d.code]);
-}
-
 // サイドメニューのページと、表示する項目。
-// active が true の項目だけをサイドメニューに表示する。
-// active は、ドックの Z から on/off を切り替えられる。(src/setupProxy.js がこのファイルを書き換える)
+// active は表示するかどうかの既定値。
+// ドックの Z から切り替えた on/off は、個人の設定として data/local/account_menus.json に保存し、既定値より優先する。
 export const ACCOUNT_MENU_PAGES = [
     {
         label: 'iHub',
@@ -136,10 +130,25 @@ export const ACCOUNT_MENU_PAGES = [
     },
 ];
 
-// ACCOUNT_MENU_PAGES から、active が true の項目だけを取り出したもの。
-export const PAGES = ACCOUNT_MENU_PAGES.map(page=> ({
-    label: page.label,
-    items: makeItems(page.items),
-}));
+// 項目を表示するかどうか。
+// actives は個人の設定 ({ ページの label: { 項目の code: true/false } }) で、無い項目は既定値 (active) を使う。
+export function isActive (page, item, actives) {
+    const value = actives?.[page.label]?.[item.code];
+
+    return typeof value === 'boolean' ? value : item.active === true;
+}
+
+// 表示する項目だけを並べた、サイドメニューのページを作る。
+export function makePages (actives = {}) {
+    return ACCOUNT_MENU_PAGES.map(page=> ({
+        label: page.label,
+        items: page.items
+            .filter(item=> isActive(page, item, actives))
+            .map(item=> ACCOUNT_MENU_ITEMS[item.code]),
+    }));
+}
+
+// 既定値だけで作ったページ。(個人の設定を読み込む前に使う)
+export const PAGES = makePages();
 
 export default ACCOUNT_MENU_ITEMS;

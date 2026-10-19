@@ -9,9 +9,11 @@ import CardContent from '@mui/material/CardContent';
 import Frame from '../assemblies/frames/Frame.js';
 import Link from '../assemblies/Link.js';
 
-import DATA from '../../../data/systemic_design/sections.json';
+import { useCollections } from '../../redux/api/dataApi.js';
 
 export default function SystemicDesign () {
+    const DATA = useCollections()['systemic_design/sections'];
+
     return (
         <Frame>
           <Box sx={{overflow: 'auto', height:'100%'}}>

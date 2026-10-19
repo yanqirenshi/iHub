@@ -8,8 +8,8 @@ import Typography from '@mui/material/Typography';
 
 import {Leaf} from '@yanqirenshi/manipulater';
 
-import ACCOUNT_MENU_ITEMS, { ACCOUNT_MENU_PAGES } from '../data/ACCOUNT_MENUS.js';
-import { requestReopen } from '../ihub/redux/slices/operatorsSlice.js';
+import ACCOUNT_MENU_ITEMS, { ACCOUNT_MENU_PAGES, isActive } from '../config/ACCOUNT_MENUS.js';
+import { useCollections, usePatchCollectionMutation } from '../ihub/redux/api/dataApi.js';
 
 // 吹き出しの大きさ
 const LEAF_W = 444;
@@ -19,8 +19,8 @@ const BRANCH_H = 33;
 // 画面の端からの余白
 const MARGIN = 8;
 
-// src/setupProxy.js (開発サーバー) が ACCOUNT_MENUS.js を書き換える。
-const API_ACCOUNT_MENU_ACTIVE = '/__ihub/account-menu-pages/active';
+// on/off を保存する、個人の設定のコレクション。(data/local/account_menus.json)
+const ACTIVES = 'local/account_menus';
 
 function leafPosition (root) {
     const w_center = root.position.x + (root.size.w / 2);
@@ -33,7 +33,7 @@ function leafPosition (root) {
 }
 
 // 選んでいるタブ (ページの label) を sessionStorage に記録するキー。
-// 保存すると画面が再読み込みされるので、再読み込みの後も同じタブを開くために使う。
+// 吹き出しを開き直したときも、同じタブを開くために使う。
 const TAB_KEY = 'ihub.account-menu-settings.tab';
 
 function loadTab () {
@@ -56,37 +56,21 @@ function itemKey (page, code) {
     return `${page}/${code}`;
 }
 
-function initialActives () {
-    return ACCOUNT_MENU_PAGES.reduce((ht, page)=> {
-        page.items.forEach(item=> ht[itemKey(page.label, item.code)] = item.active===true);
-        return ht;
-    }, {});
-}
+function errorMessage (error) {
+    if (error?.data?.message)
+        return [error.data.message, ...(error.data.errors || [])].join('\n');
 
-async function saveActive (page, code, active) {
-    const response = await fetch(API_ACCOUNT_MENU_ACTIVE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ page, code, active }),
-    });
-
-    if (response.status===404 || response.status===405)
-        throw new Error('保存できません。(on/off の保存は、開発サーバー (npm start) でのみ使えます)');
-
-    const json = await response.json().catch(()=> null);
-
-    if (!response.ok)
-        throw new Error(json?.message || `HTTP ${response.status}`);
-
-    return json;
+    return `保存できません。API サーバーが起動しているか、確かめてください。(${error?.status ?? ''})`;
 }
 
 // サイドメニューの項目の active (表示/非表示) を切り替える。
-// 切り替えた結果は ACCOUNT_MENUS.js に保存され、ファイルが変わると画面が再読み込みされる。
+// 切り替えた結果は、個人の設定として API サーバーへ保存し、サイドメニューにすぐ反映する。
 export default function AccountMenuSettings (props) {
     const root = props.root;
 
-    const [actives, setActives] = useState(initialActives);
+    const actives = useCollections()[ACTIVES];
+    const [patchCollection] = usePatchCollectionMutation();
+
     const [saving, setSaving] = useState(null);
     const [error, setError] = useState(null);
     const [tab, setTab] = useState(loadTab);
@@ -98,23 +82,18 @@ export default function AccountMenuSettings (props) {
         saveTab(label);
     };
 
-    const toggle = async (page, code)=> {
-        const key = itemKey(page, code);
-        const active = !actives[key];
+    const toggle = async (page, item)=> {
+        const active = !isActive(page, item, actives);
+        // 既定値に戻すときは、個人の設定から消す。
+        const value = active===(item.active===true) ? null : active;
 
-        setSaving(key);
+        setSaving(itemKey(page.label, item.code));
         setError(null);
-        setActives({ ...actives, [key]: active });
-
-        // 保存すると画面が再読み込みされるので、再読み込みの後もこの吹き出しを開いておく。
-        requestReopen(root.code);
 
         try {
-            await saveActive(page, code, active);
+            await patchCollection({ name: ACTIVES, patch: { [page.label]: { [item.code]: value } } }).unwrap();
         } catch (e) {
-            requestReopen(null);
-            setActives(prev=> ({ ...prev, [key]: !active }));
-            setError(e.message);
+            setError(errorMessage(e));
         } finally {
             setSaving(null);
         }
@@ -146,9 +125,9 @@ export default function AccountMenuSettings (props) {
                   return (
                       <Box key={key} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Switch size="small"
-                                checked={!!actives[key]}
+                                checked={isActive(page, item, actives)}
                                 disabled={saving!==null}
-                                onChange={()=> toggle(page.label, item.code)}
+                                onChange={()=> toggle(page, item)}
                                 slotProps={{ input: { 'aria-label': `${page.label} ${item.code}` } }}/>
 
                         {menu && <img src={menu.icon} alt="" width={22} height={22}/>}
