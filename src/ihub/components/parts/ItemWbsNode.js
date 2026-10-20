@@ -15,7 +15,7 @@ export default function ItemWbsNode (props) {
           {wbs_node.name}
 
           &nbsp;(
-          <RrLink to={`/wbs/P${wbs_id}`}
+          <RrLink to={`/wbs/${wbs_id}`}
                   style={{
                       color: 'rgba(0, 0, 0, 0.87)',
                       textDecorationStyle: 'dotted',

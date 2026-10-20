@@ -21,7 +21,7 @@
 | `tm/relationships.json` | リレーションシップ | TM |
 | `sitemap/nodes.json` | 画面のノード | 画面遷移図 |
 | `sitemap/edges.json` | 画面の遷移 | 画面遷移図 |
-| `deployment/nodes.json` | ノード (入れ子にできる) | システム構成図 |
+| `deployment/nodes.json` | ノード (入れ子にでき、リンクを付けられる) | システム構成図 |
 | `deployment/edges.json` | ノードの間の線 | システム構成図 |
 | `systemic_design/sections.json` | 章とカード | Systemic Design |
 | `local/account_menus.json` | サイドメニューの on/off (個人の設定) | サイドメニュー |

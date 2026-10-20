@@ -13,6 +13,7 @@ data/ を管理する API サーバーを置く場所です。
 | d | stores     | data/ の JSON ファイルの読み書き                                     |
 | d | schemas    | コレクションごとの JSON Schema ({domain}/{collection}.schema.json)  |
 | d | validation | スキーマと、コレクションをまたぐルール (id の重複・参照の整合性) による検証 |
+| d | tools      | 古い形式のデータ (src/data/*.js) を、data/ の JSON に変換するスクリプト |
 | d | test       | テスト                                                              |
 
 ### 起動
@@ -87,3 +88,15 @@ API サーバーのテストも、このコマンドで動きます。
 1. server/schemas/{domain}/{collection}.schema.json を作ります。
 2. data/{domain}/{collection}.json と src/ihub/data_example/{domain}/{collection}.json を作ります。
 3. コレクションをまたぐ検査が必要なときは、server/validation/rules.mjs に書きます。
+
+### 古い形式のデータを変換するとき
+
+データが src/data/*.js だったころの iHub をコピーしたアプリは、次のコマンドで data/ の JSON に変換できます。
+
+```
+node server/tools/convert-legacy-data.mjs src/data data
+```
+
+- 書き出し先に同じ名前のファイルがあるときは、何も書かずに止まります。(上書きするときは --force を付けます)
+- src/data/ の ACCOUNT_MENUS.js・ICONS.js・OPERATOR_ITEMS.js は変換しません。src/config/ に移します。
+- MODULE_TYPELESS_PACKAGE_JSON という警告が出ますが、問題はありません。

@@ -37,6 +37,22 @@ test('スキーマに無い項目を見つける', ()=> {
     assert.ok(errors.some(e=> e.startsWith('wbs/projects/') && e.endsWith('(parnet)')), errors.join('\n'));
 });
 
+test('システム構成図のノードの link は、url だけを持つ', ()=> {
+    const data = loadDataDir(join(ROOT, 'src/ihub/data_example'));
+
+    data['deployment/nodes'][0].link = { url: 'https://example.com/' };
+
+    assert.deepEqual(validateData(data), []);
+
+    data['deployment/nodes'][0].link = {};
+    data['deployment/nodes'][1].link = { url: 'https://example.com/', target: '_blank' };
+
+    assert.deepEqual(validateData(data), [
+        'deployment/nodes/0/link: 必要なプロパティurlがなければいけない',
+        'deployment/nodes/1/link: 追加してはいけない (target)',
+    ]);
+});
+
 test('個人の設定 (local) は、無くてもよいが、あればスキーマで検証する', ()=> {
     const data = loadDataDir(join(ROOT, 'src/ihub/data_example'));
 

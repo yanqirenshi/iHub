@@ -31,7 +31,9 @@ const accountMenuSlice = createSlice({
         menu: {
             avater: { enterd: false, clicked: true },
             menu: { enterd: false },
-            current_page: 'iHub',
+            // 初めに開くページは、src/config/ACCOUNT_MENUS.js の先頭のページにする。
+            // (アプリに合わせて、ページの名前 (label) を設定だけで変えられるようにするため)
+            current_page: PAGES[0]?.label,
             pages: PAGES,
         },
         selectedItem: selectedItem(PAGES),
