@@ -16,6 +16,8 @@ const STATIC = process.argv.includes('--static');
 const app = createApp({
     data_dir:   join(ROOT, 'data'),
     static_dir: STATIC ? join(ROOT, 'build') : null,
+    // エディタや git で data/ を変えたときも、画面へ知らせる。
+    watch:      true,
 });
 
 // このパソコンの中からだけ使えるように、127.0.0.1 で待ち受ける。

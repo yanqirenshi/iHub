@@ -1,3 +1,5 @@
+import { useCollections } from '../redux/api/dataApi.js';
+
 let i = 1000000000;
 
 class Wbs {
@@ -216,6 +218,16 @@ export function setWbsData (collections) {
     }
 
     wbs.build(nodes.projects, nodes.wbs, nodes.workpackages);
+
+    // 作り直した回数。(データが変わったときに、表などを作り直すために使う)
+    wbs.version = (wbs.version || 0) + 1;
+}
+
+// WBS のデータが変わったら描画し直す部品で使う。(作り直した wbs を返す)
+export function useWbs () {
+    setWbsData(useCollections());
+
+    return wbs;
 }
 
 export default wbs;

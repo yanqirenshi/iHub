@@ -4,11 +4,24 @@ import Box from '@mui/material/Box';
 
 import D3Ter, {Rectum}  from '@yanqirenshi/d3.ter';
 
-import { useTmData } from '../../manegers/tm.js';
+import DiagramBox from '../assemblies/DiagramBox.js';
+import { TM_COLLECTIONS, buildTmData } from '../../manegers/tm.js';
+
+// ドラッグで動かしたエンティティの位置は、tm/entities に保存する。
+const POSITIONS = { selector: 'g.entity', collection: 'tm/entities' };
 
 export default function TM () {
+    return (
+        <DiagramBox names={TM_COLLECTIONS}
+                    build={buildTmData}
+                    positions={POSITIONS}
+                    render={source=> <Diagram source={source}/>}/>
+    );
+}
+
+function Diagram (props) {
     const [rectum, setRectum] = useState(null);
-    const graph_data = useTmData();
+    const graph_data = props.source;
 
     useEffect(()=> {
         if (rectum!==null) return;

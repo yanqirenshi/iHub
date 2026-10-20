@@ -7,8 +7,9 @@ import Container from '@mui/material/Container';
 import Frame from '../../assemblies/frames/Frame.js';
 import HeadWbsPage from '../../parts/HeadWbsPage.js';
 import WBSTable from '../../assemblies/WBSTable.js';
+import AddWbsNode from '../../assemblies/AddWbsNode.js';
 
-import wbs from '../../../manegers/wbs.js';
+import { useWbs } from '../../../manegers/wbs.js';
 
 export default function FrameWbsNode (props) {
     const children = props.children;
@@ -16,7 +17,7 @@ export default function FrameWbsNode (props) {
 
     const params = useParams();
 
-    const wbs_node = wbs.get(params.wbs_id);
+    const wbs_node = useWbs().get(params.wbs_id);
 
     if (!wbs_node)
         return null;
@@ -29,6 +30,8 @@ export default function FrameWbsNode (props) {
             {children}
 
             <Container maxWidth={maxWidth} sx={{pt:11, mb:33}}>
+              <AddWbsNode parent={wbs_node}/>
+
               <Box>
                 <WBSTable start_id={wbs_node._id}/>
               </Box>

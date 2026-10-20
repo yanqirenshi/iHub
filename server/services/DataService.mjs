@@ -85,6 +85,55 @@ export default class DataService {
     constructor (store) {
         this.store = store;
         this.queue = Promise.resolve();
+        // 変更を知らせる先 (画面への通知)
+        this.listeners = new Set();
+        // コレクションごとに、最後に知らせた ETag (同じ内容を何度も知らせないため)
+        this.etags = new Map();
+    }
+
+    // 変更の通知を受け取る。戻り値は、受け取りをやめる関数。
+    subscribe (listener) {
+        this.listeners.add(listener);
+
+        return ()=> this.listeners.delete(listener);
+    }
+
+    notify (event) {
+        for (const listener of this.listeners)
+            listener(event);
+    }
+
+    // ファイルが API の外 (エディタや git) で変わったときに呼ぶ。
+    // 検証して、合っていれば changed、合っていなければ invalid を知らせる。
+    changed (name) {
+        const collection = findCollection(name);
+
+        if (!collection)
+            return Promise.resolve();
+
+        return this.exclusive(async ()=> {
+            let domain;
+
+            try {
+                domain = await this.loadDomain(collection.domain);
+            } catch (e) {
+                return this.notify({ type: 'invalid', name, errors: [e.message] });
+            }
+
+            const etag = etagOf(domain[name]);
+
+            if (this.etags.get(name)===etag)
+                return;
+
+            this.etags.set(name, etag);
+
+            const errors = validateDomain(collection.domain, domain);
+
+            if (errors.length > 0)
+                return this.notify({ type: 'invalid', name, errors });
+
+            this.notify({ type: 'changed', name, etag, client: null });
+        });
     }
 
     collection (name) {
@@ -145,9 +194,11 @@ export default class DataService {
     }
 
     // コレクションを書き換える共通の手順。
+    // options は { if_match: 読み込んだときの ETag, client: 書き込んだ画面 (タブ) の id }。
     // change は (コレクション, 今のデータの複製, ドメインのデータ) を受け取り、{ data, record, conflict } を返す。
-    update (name, if_match, required, change) {
+    update (name, options, required, change) {
         const collection = this.collection(name);
+        const { if_match = null, client = null } = options;
 
         return this.exclusive(async ()=> {
             const domain = await this.loadDomain(collection.domain);
@@ -175,18 +226,24 @@ export default class DataService {
 
             await this.store.write(collection.name, data);
 
-            return { name: collection.name, data, etag: etagOf(data), ...(record ? { record } : {}) };
+            const etag = etagOf(data);
+
+            // ファイルの見張りからの知らせと重ならないように、知らせた ETag を覚えておく。
+            this.etags.set(collection.name, etag);
+            this.notify({ type: 'changed', name: collection.name, etag, client });
+
+            return { name: collection.name, data, etag, ...(record ? { record } : {}) };
         });
     }
 
     // コレクション全体を書き換える。(上書きを防ぐため、If-Match を必ず指定する)
-    replace (name, body, if_match) {
-        return this.update(name, if_match, true, ()=> ({ data: body }));
+    replace (name, body, options = {}) {
+        return this.update(name, options, true, ()=> ({ data: body }));
     }
 
     // オブジェクトのコレクションを、JSON Merge Patch で部分的に書き換える。
-    patchDocument (name, patch, if_match) {
-        return this.update(name, if_match, false, (collection, current)=> {
+    patchDocument (name, patch, options = {}) {
+        return this.update(name, options, false, (collection, current)=> {
             if (!isObject(current))
                 throw new HttpError(400, `${collection.name} は配列なので、レコードごとに PATCH してください。`);
 
@@ -197,8 +254,8 @@ export default class DataService {
     }
 
     // レコードを追加する。id が無ければ振る。
-    addRecord (name, body, if_match) {
-        return this.update(name, if_match, false, (collection, current, domain)=> {
+    addRecord (name, body, options = {}) {
+        return this.update(name, options, false, (collection, current, domain)=> {
             const key = recordKey(collection);
 
             assertObject(body, '追加するレコード');
@@ -212,8 +269,8 @@ export default class DataService {
     }
 
     // レコードを、JSON Merge Patch で部分的に書き換える。
-    patchRecord (name, id, patch, if_match) {
-        return this.update(name, if_match, false, (collection, current)=> {
+    patchRecord (name, id, patch, options = {}) {
+        return this.update(name, options, false, (collection, current)=> {
             const key = recordKey(collection);
 
             assertObject(patch, '変更する内容');
@@ -235,8 +292,8 @@ export default class DataService {
     }
 
     // レコードを削除する。ほかのデータから参照されていれば、409 にする。
-    deleteRecord (name, id, if_match) {
-        return this.update(name, if_match, false, (collection, current)=> {
+    deleteRecord (name, id, options = {}) {
+        return this.update(name, options, false, (collection, current)=> {
             const key = recordKey(collection);
             const found = findRecord(current, key, id);
 
