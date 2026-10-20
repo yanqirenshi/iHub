@@ -93,6 +93,9 @@
                     "x": 50,
                     "y": 50
                 },
+                "link": {
+                    "url": "https://example.com/"
+                },
                 "children": []
             }
         ]

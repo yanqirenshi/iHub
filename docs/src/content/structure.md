@@ -28,6 +28,7 @@ iHub 本体を書き換えずにおくと、iHub が新しくなったときに�
 | `src/setupProxy.js` | 開発サーバーから API サーバーへの中継 |
 | `server/` | API サーバー (データの読み書き・検証・変更の通知) |
 | `server/schemas/` | データのフォーマット (JSON Schema) |
+| `server/tools/` | 古い形式のデータ (`src/data/*.js`) を、`data/` の JSON に変換するスクリプト |
 
 iHub 本体に直したいところが見つかったときは、iHub のリポジトリで直してから、アプリへ取り込んでください。
 アプリの側で直したときは、iHub のリポジトリにも反映してください。

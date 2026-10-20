@@ -70,6 +70,7 @@ const ACCOUNT_MENU_ITEMS = [
 }, {});
 
 // サイドメニューのページと、表示する項目。
+// 先頭のページを、初めに開く。ページの名前 (label) は、アプリに合わせて変えてよい。
 // active は表示するかどうかの既定値。
 // ドックの Z から切り替えた on/off は、個人の設定として data/local/account_menus.json に保存し、既定値より優先する。
 export const ACCOUNT_MENU_PAGES = [

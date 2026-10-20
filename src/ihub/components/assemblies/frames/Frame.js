@@ -1,3 +1,4 @@
+import React from 'react';
 import Box from '@mui/material/Box';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -29,6 +30,9 @@ export default function Frame (props) {
 
     const nav = useNavigate();
 
+    // Manipulater の useEffect が operators の変化で再実行されるため、参照を固定する。
+    const operators_with_icons = React.useMemo(()=> withIcons(operators), [operators]);
+
     const actions = {
         menu: {
             change: (new_menu)=> dispatch(menuChanged(new_menu)),
@@ -55,7 +59,7 @@ export default function Frame (props) {
                     icon={github_avatar_url}
                     actions={actions}/>
 
-          <Manipulater operators={withIcons(operators)}
+          <Manipulater operators={operators_with_icons}
                        window_size={window_size}
                        actions={actions}
                        leafs={root=> <OperatorsLeafs root={root}/>}/>
