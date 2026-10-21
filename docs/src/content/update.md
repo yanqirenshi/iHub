@@ -9,7 +9,7 @@ iHub のリポジトリで直したところを、iHub をコピーしたアプ�
 | `src/ihub/` | 新しいものに置き換えます。 |
 | `server/` | 新しいものに置き換えます。 |
 | `src/setupProxy.js` | 新しいものに置き換えます。アプリで処理を足していたときは、その処理を移します。`/api` の下は API サーバーへ中継されるので、足す処理のパスは `/api` の外にします。 |
-| `package.json` | 依存するパッケージ (`dependencies`) と `scripts` の差分を見て、合わせます。 |
+| `package.json` | 依存するパッケージ (`dependencies`)・`overrides`・`scripts` の差分を見て、合わせます。`overrides` を合わせないと、`npm install` が `ERESOLVE` で失敗することがあります。 |
 
 ## 置き換えないもの (アプリのもの)
 
