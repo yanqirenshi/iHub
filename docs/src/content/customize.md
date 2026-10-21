@@ -93,5 +93,69 @@ const ICONS = {
 
 ## 見た目を変える
 
+### サイドメニューの色
+
+`src/config/ACCOUNT_MENU_COLORS.js` で、サイドメニューの背景の色と、文字の色を決めます。
+iHub 本体の `Frame.js` を直す必要はありません。
+
+| 項目 | 書き方 | 内容 |
+|---|---|---|
+| `background` | `{ r, g, b }` (0〜255) | 背景の色です。選択中の項目は白い背景になり、この色が文字の色になります。 |
+| `text` | CSS の色 (`'#2b2b2b'` など) | 文字とアイコンの色です。背景が明るくて、白い文字が読みにくいときにだけ決めます。 |
+
+どちらも `null` のときは、iHub の既定の色 (紫の背景に、白い文字) になります。
+
+背景を暗い色にするときは、`background` だけを決めます。
+文字とアイコンは、白のままです。
+
+```js
+const ACCOUNT_MENU_COLORS = {
+    background: { r: 3, g: 57, b: 115 },
+    text: null,
+};
+```
+
+背景を明るい色にするときは、`text` に暗い色を決めます。
+
+```js
+const ACCOUNT_MENU_COLORS = {
+    background: { r: 255, g: 217, b: 0 },
+    text: '#2b2b2b',
+};
+```
+
+- `text` は、選択中の項目とページの一覧 (どちらも白い背景) の文字にも使います。
+白い背景でも読める、暗い色にしてください。
+- `text` を決めると、アイコンは白く反転せずに、SVG の色のまま表示されます。
+SVG に色を付けていないときは、黒になります。
+
+`text` を決めたときに、アイコンを文字と同じ暗い色にするには、`src/config/ICONS.js` の `<svg>` に `fill` を付けます。
+
+```js
+function icon (d, fillRule) {
+    // (省略)
+    return 'data:image/svg+xml,' + encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#2b2b2b">${path}</svg>`
+    );
+}
+```
+
+### そのほかの見た目
+
 `src/index.css` に、CSS を書きます。
 `src/index.css` は `src/ihub/index.css` のあとに読み込むので、iHub の見た目を上書きできます。
+
+## アプリの名前を出す
+
+画面などに出る名前は、次のところで変えます。
+
+| ファイル | 変えるところ | 出るところ |
+|---|---|---|
+| `src/config/ACCOUNT_MENUS.js` | 先頭のページの `label` | サイドメニューのページの名前 |
+| `data/wbs/projects.json` | プロジェクトの `name` | WBS の最上位のノード |
+| `public/index.html` | `<title>` | ブラウザのタブ |
+| `package.json` | `name` | パッケージの名前 (`npm start` のログなど) |
+
+iHub 本体のフォルダ (`src/ihub/`) の名前は、アプリの名前に変えないでください。
+アプリのファイル (`src/Router.js`・`src/wbs/` など) は、`src/ihub/` の部品を読み込んでいます。
+名前を変えると、iHub を取り込むたびに、フォルダの名前と読み込むパスを置き換え直すことになります。
