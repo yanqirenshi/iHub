@@ -11,11 +11,23 @@ import Manipulater from '@yanqirenshi/manipulater';
 
 import OperatorsLeafs from '../../../../operators/Operators.js';
 import { withIcons, withoutIcons } from '../../../../operators/labels.js';
+import ACCOUNT_MENU_COLORS from '../../../../config/ACCOUNT_MENU_COLORS.js';
 
 const sx = {
     maxWidth: '100vw',
     height: '100vh',
 };
+
+// サイドメニューの背景の色。(src/config/ACCOUNT_MENU_COLORS.js の background)
+// null のときは、menubook の既定の色になる。
+const menu_theme_color = ACCOUNT_MENU_COLORS.background;
+
+// サイドメニューの文字の色。(src/config/ACCOUNT_MENU_COLORS.js の text)
+// menubook は文字の色を #ffffff に固定し、アイコンを反転して白くしているため、決めてあるときは上書きする。
+const menu_sx = ACCOUNT_MENU_COLORS.text ? {
+    '& *': { color: `${ACCOUNT_MENU_COLORS.text} !important` },
+    '& img': { filter: 'none !important' },
+} : {};
 
 export default function Frame (props) {
     const children = props.children;
@@ -53,11 +65,14 @@ export default function Frame (props) {
 
     return (
         <Box sx={sx}>
-          <MenuBook menu={menu}
-                    is_opend={menu_is_opend}
-                    selected_item={menu_selected_item}
-                    icon={github_avatar_url}
-                    actions={actions}/>
+          <Box sx={menu_sx}>
+            <MenuBook menu={menu}
+                      is_opend={menu_is_opend}
+                      selected_item={menu_selected_item}
+                      icon={github_avatar_url}
+                      theme_color={menu_theme_color}
+                      actions={actions}/>
+          </Box>
 
           <Manipulater operators={operators_with_icons}
                        window_size={window_size}

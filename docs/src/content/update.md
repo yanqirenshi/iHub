@@ -22,6 +22,8 @@ iHub の PR や Issue には、「別プロジェクトへの反映手順」を�
 (例: [サイドメニューの on/off を加えたとき](https://github.com/yanqirenshi/iHub/issues/17))
 2. iHub 本体のフォルダとファイルを、新しいものに置き換えます。
 3. アプリのファイル (`src/config/` など) の書き方が変わったときは、反映手順のとおりに直します。
+iHub の `src/config/` にファイルが増えたときは、そのファイルをアプリの `src/config/` にコピーします。
+(コピーしないと、起動やビルドで `Module not found` のエラーになります)
 4. データのフォーマットが変わったときは、`server/schemas/` と `src/ihub/data_example/` を見て、自分の `data/` を直します。
 直したら、`npm run test:data` で確かめます。
 5. `npm install` を実行してから、`npm start` で動きを確かめます。
