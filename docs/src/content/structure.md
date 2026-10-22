@@ -9,7 +9,7 @@ iHub 本体を書き換えずにおくと、iHub が新しくなったときに�
 |---|---|
 | `data/` | 設計のデータ (JSON)。git で共有します。 |
 | `data/local/` | 個人の設定。画面から変わります。git では共有しません。 |
-| `src/config/` | サイドメニューの項目 (`ACCOUNT_MENUS.js`)・サイドメニューの色 (`ACCOUNT_MENU_COLORS.js`)・アイコン (`ICONS.js`)・ドックのボタン (`OPERATOR_ITEMS.js`) |
+| `src/config/` | サイドメニューの項目 (`ACCOUNT_MENUS.js`)・サイドメニューの色 (`ACCOUNT_MENU_COLORS.js`)・アプリの配色 (`COLORS.js`)・アイコン (`ICONS.js`)・ドックのボタン (`OPERATOR_ITEMS.js`) |
 | `src/components/` | 自分で作る部品 (`assemblies`・`pages`・`panels`・`parts`) |
 | `src/wbs/` | WBS のノードのページ (`P{id}.js`) |
 | `src/operators/` | ドックの吹き出しの中身 |

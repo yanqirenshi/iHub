@@ -2,6 +2,9 @@ import React from 'react';
 
 import {Leaf} from '@yanqirenshi/manipulater';
 
+// 吹き出しの枠の色。(src/config/COLORS.js の main。null のときは manipulater の既定の色)
+import { DOCK_COLOR } from '../ihub/manegers/colors.js';
+
 export default function Other (props) {
     const root = props.root;
 
@@ -15,7 +18,7 @@ export default function Other (props) {
     const y = root.position.y - sample_branch_h - sample_height;
 
     return (
-        <Leaf x={x} y={y} w={sample_width} h={sample_height}>
+        <Leaf x={x} y={y} w={sample_width} h={sample_height} theme_color={DOCK_COLOR || undefined}>
         </Leaf>
     );
 }

@@ -14,6 +14,9 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import {Leaf} from '@yanqirenshi/manipulater';
 
+// 吹き出しの枠の色。(src/config/COLORS.js の main。null のときは manipulater の既定の色)
+import { DOCK_COLOR } from '../ihub/manegers/colors.js';
+
 // <markdown-workspace> などのカスタム要素を登録する。
 import '@yanqirenshi/markdown.sitter';
 
@@ -178,7 +181,7 @@ export default function ProjectItemForm (props) {
     const { x, y } = leafPosition(root);
 
     return (
-        <Leaf x={x} y={y} w={LEAF_W} h={LEAF_H}>
+        <Leaf x={x} y={y} w={LEAF_W} h={LEAF_H} theme_color={DOCK_COLOR || undefined}>
           <Box sx={{ height: '100%', boxSizing: 'border-box', p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Typography variant="h6">Project にイシューを追加</Typography>
 
