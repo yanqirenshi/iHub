@@ -16,56 +16,69 @@ code {
     monospace;
 }
 
+/*
+ * 配色の変数。
+ * ここは既定の色で、src/config/COLORS.js で決めた色が上書きする。(src/ihub/manegers/colors.js)
+ */
+:root {
+    --ihub-color-base:   rgb(234, 228, 208);
+    --ihub-color-main:   rgb(0, 0, 0);
+    --ihub-color-sub:    rgb(137, 137, 137);
+    --ihub-color-accent: rgb(167, 193, 220);
+}
+
+/* 地の色 (base) を、濃さを変えて使う。 */
 .theme-color1 {
-    background: rgba(234, 228, 208, 1.0);
+    background: var(--ihub-color-base);
 }
 
 .theme-color2 {
-    background: rgba(234, 228, 208, 0.8);
+    background: color-mix(in srgb, var(--ihub-color-base) 80%, transparent);
 }
 
 .theme-color3 {
-    background: rgba(234, 228, 208, 0.6);
+    background: color-mix(in srgb, var(--ihub-color-base) 60%, transparent);
 }
 
 .theme-color4 {
-    background: rgba(234, 228, 208, 0.4);
+    background: color-mix(in srgb, var(--ihub-color-base) 40%, transparent);
 }
 
 .theme-color5 {
-    background: rgba(234, 228, 208, 0.2);
+    background: color-mix(in srgb, var(--ihub-color-base) 20%, transparent);
 }
 
 
+/* 差し色 (accent) を、濃さを変えて使う。 */
 .pair-color1 {
-    background: rgba(167, 193, 220, 1.0);
+    background: var(--ihub-color-accent);
 }
 
 .pair-color2 {
-    background: rgba(167, 193, 220, 0.8);
+    background: color-mix(in srgb, var(--ihub-color-accent) 80%, transparent);
 }
 
 .pair-color3 {
-    background: rgba(167, 193, 220, 0.6);
+    background: color-mix(in srgb, var(--ihub-color-accent) 60%, transparent);
 }
 
 .pair-color4 {
-    background: rgba(167, 193, 220, 0.4);
+    background: color-mix(in srgb, var(--ihub-color-accent) 40%, transparent);
 }
 
 .pair-color5 {
-    background: rgba(167, 193, 220, 0.2);
+    background: color-mix(in srgb, var(--ihub-color-accent) 20%, transparent);
 }
 
 
 .text-color1 {
-    color: rgb(0, 0, 0);
+    color: var(--ihub-color-main);
 }
 
 .text-color2 {
-    color: rgb(137, 137 137);
+    color: var(--ihub-color-sub);
 }
 
 .text-color3 {
-    color: rgb(86, 152, 123,);
+    color: rgb(86, 152, 123);
 }

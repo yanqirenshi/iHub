@@ -2,24 +2,37 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from "react-router-dom";
+import GlobalStyles from '@mui/material/GlobalStyles';
+import { ThemeProvider } from '@mui/material/styles';
 
 import { store } from './redux/store.js';
+import { BASE, CSS_VARIABLES, THEME } from './manegers/colors.js';
 import './index.css';
 import App from '../App';
 import DataGate from './DataGate.js';
 import * as serviceWorkerRegistration from './js/serviceWorkerRegistration';
 import reportWebVitals from './js/reportWebVitals';
 
+// src/config/COLORS.js の配色。
+// CSS の変数を :root に置き、地の色を決めてあるときは画面の背景にする。
+const global_styles = {
+    ':root': CSS_VARIABLES,
+    ...(BASE && { body: { backgroundColor: BASE } }),
+};
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
-      <Provider store={store}>
-        <BrowserRouter>
-          <DataGate>
-            <App />
-          </DataGate>
-        </BrowserRouter>
-      </Provider>
+      <ThemeProvider theme={THEME}>
+        <GlobalStyles styles={global_styles}/>
+        <Provider store={store}>
+          <BrowserRouter>
+            <DataGate>
+              <App />
+            </DataGate>
+          </BrowserRouter>
+        </Provider>
+      </ThemeProvider>
     </React.StrictMode>
 );
 

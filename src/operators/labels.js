@@ -3,6 +3,8 @@ import React from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import MenuIcon from '@mui/icons-material/Menu';
 
+import { DOCK_COLOR } from '../ihub/manegers/colors.js';
+
 // ドックのボタンのアイコン。
 // Manipulater の Root は label.type が 'icon' のとき、決まった code のアイコンしか描かない。
 // それ以外のアイコンは、ここで描画の直前に差し込む。
@@ -10,8 +12,11 @@ const ICONS = {
     menu: MenuIcon,
 };
 
-// Manipulater の既定の色
-const THEME_COLOR = 'rgba(8, 156, 163, 1.0)';
+// 選んでいるボタンのアイコンの色。
+// 配色の主の色 (src/config/COLORS.js の main)。null のときは Manipulater の既定の色。
+const THEME_COLOR = DOCK_COLOR
+      ? `rgba(${DOCK_COLOR.r}, ${DOCK_COLOR.g}, ${DOCK_COLOR.b}, 1.0)`
+      : 'rgba(8, 156, 163, 1.0)';
 
 // Redux の state には React の部品 (関数) を入れられないので、state には label.code だけを持たせる。
 // 描画の直前に、type: 'function' のラベルへ置き換える。

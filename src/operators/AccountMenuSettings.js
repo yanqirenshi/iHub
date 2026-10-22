@@ -8,6 +8,9 @@ import Typography from '@mui/material/Typography';
 
 import {Leaf} from '@yanqirenshi/manipulater';
 
+// 吹き出しの枠の色。(src/config/COLORS.js の main。null のときは manipulater の既定の色)
+import { DOCK_COLOR } from '../ihub/manegers/colors.js';
+
 import ACCOUNT_MENU_ITEMS, { ACCOUNT_MENU_PAGES, isActive } from '../config/ACCOUNT_MENUS.js';
 import { errorMessage, useCollections, usePatchCollectionMutation } from '../ihub/redux/api/dataApi.js';
 
@@ -95,7 +98,7 @@ export default function AccountMenuSettings (props) {
     const { x, y } = leafPosition(root);
 
     return (
-        <Leaf x={x} y={y} w={LEAF_W} h={LEAF_H}>
+        <Leaf x={x} y={y} w={LEAF_W} h={LEAF_H} theme_color={DOCK_COLOR || undefined}>
           <Box sx={{ height: '100%', boxSizing: 'border-box', p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
             <Typography variant="h6">サイドメニューの項目</Typography>
 
