@@ -183,14 +183,17 @@ export function useSavePositions (ref, { selector, collection, key = 'id' }) {
 
         container.addEventListener('mousedown', down, true);
         container.addEventListener('touchstart', down, true);
-        window.addEventListener('mouseup', up);
-        window.addEventListener('touchend', up);
+        // ドラッグの終わりは、キャプチャ段階で受ける。
+        // d3 のドラッグは、ドラッグの終わりに window のキャプチャ段階で mouseup の伝わりを止めるため、
+        // バブリング段階で受けると呼ばれない。(ここで付けるほうが d3 より先に登録されるので、先に呼ばれる)
+        window.addEventListener('mouseup', up, true);
+        window.addEventListener('touchend', up, true);
 
         return ()=> {
             container.removeEventListener('mousedown', down, true);
             container.removeEventListener('touchstart', down, true);
-            window.removeEventListener('mouseup', up);
-            window.removeEventListener('touchend', up);
+            window.removeEventListener('mouseup', up, true);
+            window.removeEventListener('touchend', up, true);
         };
     }, [ref, selector, collection, key, patchRecord]);
 
