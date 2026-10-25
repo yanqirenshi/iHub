@@ -1,10 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { useSearchParams } from 'react-router-dom';
 
-import { useDispatch, useSelector } from 'react-redux';
-
-// Every entry here is normalized to the flat {selected, list} shape (the 15
-// original recoil atoms that wrapped this in an extra `.tabs` level, plus the
-// 2 that were already flat, all collapse to this one representation).
+// Every entry here is normalized to the flat {selected, list} shape.
+// `selected` here is only the DEFAULT tab; the current selection lives in
+// the URL query parameter `?tab=` (same convention as TabsSearchParam.js).
 const TAB_DEFS = {
     PAGE_API: {
         selected: 'wbs',
@@ -156,24 +154,20 @@ const TAB_DEFS = {
     },
 };
 
-const tabsSlice = createSlice({
-    name: 'tabs',
-    initialState: { byPage: TAB_DEFS },
-    reducers: {
-        tabsChanged (state, action) {
-            const { pageId, tabs } = action.payload;
-            state.byPage[pageId] = tabs;
-        },
-    },
-});
-
-export const { tabsChanged } = tabsSlice.actions;
-export default tabsSlice.reducer;
-
 export function usePageTabs (pageId) {
-    const dispatch = useDispatch();
-    const tabs = useSelector(s=> s.tabs.byPage[pageId]);
-    const changeTabs = (newTabs)=> dispatch(tabsChanged({ pageId, tabs: newTabs }));
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const def = TAB_DEFS[pageId];
+
+    const param = searchParams.get('tab');
+    const selected = def.list.some(t=> t.code===param) ? param : def.selected;
+
+    const tabs = { ...def, selected };
+
+    const changeTabs = (newTabs)=> {
+        searchParams.set('tab', newTabs.selected);
+        setSearchParams(searchParams);
+    };
 
     return [tabs, changeTabs];
 }
