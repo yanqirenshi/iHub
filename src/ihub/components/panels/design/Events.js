@@ -8,7 +8,7 @@ export default function Events () {
         <Box>
           <Container maxWidth="lg" sx={{pt:5}}>
             <Box>
-              <WBSTable start_id="1010"/>
+              <WBSTable start_id="1"/>
             </Box>
           </Container>
         </Box>

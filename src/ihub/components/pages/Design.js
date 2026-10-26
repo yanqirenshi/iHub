@@ -24,7 +24,7 @@ export default function Design () {
           {'ui-assemblies'===tab && <Assemblies/>}
           {'ui-parts'===tab && <Parts/>}
           {'ui-events'===tab && <Events/>}
-          {'wbs'===tab && <Wbs start_id="1001"/>}
+          {'wbs'===tab && <Wbs start_id="1"/>}
           {'help'===tab && <HelpEmpty/>}
         </Frame>
     );

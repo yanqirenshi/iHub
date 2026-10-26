@@ -8,7 +8,7 @@ export default function Parts () {
         <Box>
           <Container maxWidth="lg" sx={{pt:5}}>
             <Box>
-              <WBSTable start_id="1009"/>
+              <WBSTable start_id="1"/>
             </Box>
           </Container>
         </Box>

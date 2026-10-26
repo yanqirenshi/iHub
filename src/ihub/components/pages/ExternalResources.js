@@ -14,7 +14,7 @@ export default function ExternalResources () {
     return (
         <Frame tabs={tabs}
                onChangeTabs={changeTabs}>
-          {'wbs' === tab && <Wbs start_id={1027}/>}
+          {'wbs' === tab && <Wbs start_id={1}/>}
         </Frame>
     );
 }
