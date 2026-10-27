@@ -37,6 +37,13 @@ const TAB_DEFS = {
             { code: 'help',            label: 'Help' },
         ],
     },
+    PAGE_COCKPIT: {
+        selected: 'cockpit',
+        list: [
+            { code: 'cockpit',  label: 'Cockpit' },
+            { code: 'overview', label: 'Overview' },
+        ],
+    },
     PAGE_CLASSES: {
         selected: 'class-diagram',
         list: [

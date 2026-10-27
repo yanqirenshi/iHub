@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 
-import Frame from '../assemblies/frames/Frame.js';
-import { Monitor, Card } from '../panels/cockpit/index.js';
+import { usePageTabs } from '../../hooks/usePageTabs.js';
+
+import Frame from '../assemblies/frames/FrameTabs.js';
+import { Monitor, Card, Overview } from '../panels/cockpit/index.js';
 import Loading from '../panels/Loading.js';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +12,22 @@ import { fetchIssues } from '../../redux/slices/cockpitSlice.js';
 import sogh from '../../manegers/sogh.js';
 
 export default function Cockpit () {
+    const [tabs, changeTabs] = usePageTabs('PAGE_COCKPIT');
+
+    const tab = tabs.selected;
+
+    return (
+        <Frame tabs={tabs}
+               onChangeTabs={changeTabs}>
+
+          {'cockpit'===tab  && <CockpitCards/>}
+          {'overview'===tab && <Overview/>}
+        </Frame>
+    );
+}
+
+// Cockpit タブ: 自分が担当している Github のイシューをカードで並べる。
+function CockpitCards () {
     const dispatch = useDispatch();
 
     const authed = useSelector(s=> s.githubAuth.value);
@@ -28,13 +46,11 @@ export default function Cockpit () {
     ];
 
     return (
-        <Frame>
-          <Monitor>
-            {cards.map(card=> {
-                return <Card key={card.id} data={card}/>;
-            })}
-          </Monitor>
-        </Frame>
+        <Monitor>
+          {cards.map(card=> {
+              return <Card key={card.id} data={card}/>;
+          })}
+        </Monitor>
     );
 }
 
