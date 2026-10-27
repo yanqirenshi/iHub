@@ -53,6 +53,33 @@ test('システム構成図のノードの link は、url だけを持つ', ()=>
     ]);
 });
 
+test('Overview のノードは、id に文字列も使え、d3.unchi の見た目の項目を書ける', ()=> {
+    const data = loadDataDir(join(ROOT, 'src/ihub/data_example'));
+
+    data['overview/nodes'].push({ id: 'note-1', type: 'TEXT', text: ['メモ'], bullet: true, size: { w: 200 }, position: { x: 0, y: 300 } });
+    data['overview/edges'].push({ id: 101, from: { id: 'note-1' }, to: { id: 2 }, to_marker: 'triangle', stroke: { color: '#888888' } });
+
+    assert.deepEqual(validateData(data), []);
+
+    // スキーマに合わないもの (位置が数でない・マーカーの種類が無い)
+    const broken = structuredClone(data);
+
+    broken['overview/nodes'][0].children[0].position = { x: '0', y: 20 };
+    broken['overview/edges'][1].to_marker = 'arrows';
+
+    assert.deepEqual(validateData(broken), [
+        'overview/edges/1/to_marker: 事前に定義された値のいずれかに等しくなければいけない (none, arrow, triangle, triangle-open, circle, circle-open, diamond, diamond-open)',
+        'overview/nodes/0/children/0/position/x: numberでなければいけない',
+    ]);
+
+    // 線の端点のノードが無いもの
+    data['overview/edges'][1].to.id = 'missing';
+
+    assert.deepEqual(validateData(data), [
+        'overview/edges: to.id のノードが見つかりません。(id=101, to.id=missing)',
+    ]);
+});
+
 test('個人の設定 (local) は、無くてもよいが、あればスキーマで検証する', ()=> {
     const data = loadDataDir(join(ROOT, 'src/ihub/data_example'));
 

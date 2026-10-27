@@ -27,7 +27,7 @@ Docs のページは、モデリングの手法などの参考資料をまとめ
 
 | ページ | URL | 内容 |
 |---|---|---|
-| コックピット | `/` | 自分が担当している GitHub の Issue を、カードで並べます。 |
+| コックピット | `/` | タブ: Cockpit (自分が担当している GitHub の Issue を、カードで並べる)・Overview (ポンチ絵。ノードをドラッグすると位置を保存する) |
 | ビジネス | `/business` | タブ: SYSTEMIC DESIGN・TM・機能一覧・WBS・HELP |
 | 画面 | `/screens` | タブ: 画面遷移図・画面・WBS・Help |
 | データ | `/data` | タブ: ER図・WBS・HELP |

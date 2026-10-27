@@ -1,0 +1,32 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Overview (ポンチ絵) の線",
+    "description": "ノードの間の線。from.id/to.id はノード (子のノードを含む) の id を指す。position はポートを取り付ける角度 (0=真下・時計回り。90=左、180=真上、270=右)。見た目の項目 (stroke・label) は、d3.unchi の入力データの形のまま書ける。",
+    "x-id-start": 100,
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id":          { "type": ["integer", "string"] },
+            "from":        { "$ref": "#/$defs/end" },
+            "to":          { "$ref": "#/$defs/end" },
+            "from_marker": { "$ref": "#/$defs/marker" },
+            "to_marker":   { "$ref": "#/$defs/marker" }
+        },
+        "required": ["id", "from", "to"]
+    },
+    "$defs": {
+        "end": {
+            "type": "object",
+            "properties": {
+                "id":       { "type": ["integer", "string"] },
+                "position": { "type": "number" }
+            },
+            "required": ["id"],
+            "additionalProperties": false
+        },
+        "marker": {
+            "enum": ["none", "arrow", "triangle", "triangle-open", "circle", "circle-open", "diamond", "diamond-open"]
+        }
+    }
+}

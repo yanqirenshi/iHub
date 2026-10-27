@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { errorMessage, isWrittenHere, useGetDataQuery, usePatchRecordMutation } from '../redux/api/dataApi.js';
 
@@ -198,4 +198,42 @@ export function useSavePositions (ref, { selector, collection, key = 'id' }) {
     }, [ref, selector, collection, key, patchRecord]);
 
     return [error, ()=> setError(null)];
+}
+
+// ドラッグの終わりを知らせるライブラリ (d3.unchi) で、動かしたノードの位置 (position) を保存する。
+// 戻り値の move(id, { dx, dy }) を、ドラッグの終わりに呼ぶ。
+// 位置は、保存してある position に移動量を足し、整数に丸める。(position が無いときは 0, 0 から)
+//   collection: 位置を保存するコレクション (例: 'overview/nodes')
+//   key:        レコードの id のプロパティ (既定は 'id')
+// 戻り値は、move と、保存できなかったときのメッセージと、それを消す関数。
+export function useMoveRecord (collection, key = 'id') {
+    const { data: all } = useGetDataQuery();
+    const [patchRecord] = usePatchRecordMutation();
+    const [error, setError] = useState(null);
+
+    // 続けて動かしたときも、保存したあとの最新の位置に足すため。
+    const latest = useRef(all);
+    latest.current = all;
+
+    const move = useCallback(async (id, { dx, dy })=> {
+        const record = findRecord(latest.current.collections[collection], key, id);
+
+        if (!record)
+            return;
+
+        const base = record.position || { x: 0, y: 0 };
+
+        const position = {
+            x: Math.round(base.x + dx),
+            y: Math.round(base.y + dy),
+        };
+
+        try {
+            await patchRecord({ name: collection, id, patch: { position } }).unwrap();
+        } catch (e) {
+            setError(errorMessage(e, '動かした位置を保存できません。'));
+        }
+    }, [collection, key, patchRecord]);
+
+    return [move, error, ()=> setError(null)];
 }

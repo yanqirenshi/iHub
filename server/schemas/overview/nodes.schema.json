@@ -1,0 +1,39 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Overview (ポンチ絵) のノード",
+    "description": "コックピットの Overview タブに描く、d3.unchi のノード。children に子のノードを入れ子で持つ。id は子のノードも含めて一意にする。position は親の中での位置で、ドラッグで動かすと書き換わる。見た目の項目 (label・padding・border・background・text など) は、d3.unchi の入力データの形のまま書ける。(検査するのは id・type・_class・size・position・children)",
+    "x-id-start": 1,
+    "type": "array",
+    "items": { "$ref": "#/$defs/node" },
+    "$defs": {
+        "node": {
+            "type": "object",
+            "properties": {
+                "id":       { "type": ["integer", "string"] },
+                "type":     { "type": "string" },
+                "_class":   { "enum": ["BRANCH", "REAF"] },
+                "size":     { "$ref": "#/$defs/size" },
+                "position": { "$ref": "#/$defs/point" },
+                "children": { "type": "array", "items": { "$ref": "#/$defs/node" } }
+            },
+            "required": ["id"]
+        },
+        "point": {
+            "type": "object",
+            "properties": {
+                "x": { "type": "number" },
+                "y": { "type": "number" }
+            },
+            "required": ["x", "y"],
+            "additionalProperties": false
+        },
+        "size": {
+            "type": "object",
+            "properties": {
+                "w": { "type": "number" },
+                "h": { "type": "number" }
+            },
+            "additionalProperties": false
+        }
+    }
+}
