@@ -10,20 +10,41 @@ import { ER_COLLECTIONS, buildErData } from '../../manegers/er.js';
 // ドラッグで動かしたテーブルの位置は、er/entities に保存する。
 const POSITIONS = { selector: 'g.table', collection: 'er/entities', key: '_id' };
 
+// 右クリックで出すインスペクタ。
+const INSPECTOR = {
+    title: (t)=> t.name || t.code || String(t._id),
+    fields: [
+        { path: 'name',        label: '名称' },
+        { path: 'code',        label: 'コード' },
+        { path: '_class',      label: '種類' },
+        { path: 'data_type',   label: 'データ型' },
+        { path: 'description', label: '説明' },
+        { path: '_id',         label: 'ID' },
+    ],
+};
+
 export default function ER (props) {
     return (
         <DiagramBox names={ER_COLLECTIONS}
                     build={buildErData}
                     positions={POSITIONS}
-                    render={source=> <Diagram source={source} callbacks={props.callbacks}/>}/>
+                    inspector={INSPECTOR}
+                    render={(source, onInspect)=> <Diagram source={source} callbacks={props.callbacks} onInspect={onInspect}/>}/>
     );
 }
 
 function Diagram (props) {
     const source = props.source;
+    const onInspect = props.onInspect;
 
     const [rectum] = useState(new Rectum({
-        callbacks: props.callbacks,
+        callbacks: {
+            ...props.callbacks,
+            table: {
+                header:  { contextmenu: (d)=> onInspect(d) },
+                columns: { contextmenu: (d)=> onInspect(d) },
+            },
+        },
         transform: {
             k: 0.7,
             x: 1000.0,

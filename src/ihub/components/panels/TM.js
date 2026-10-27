@@ -10,18 +10,31 @@ import { TM_COLLECTIONS, buildTmData } from '../../manegers/tm.js';
 // ドラッグで動かしたエンティティの位置は、tm/entities に保存する。
 const POSITIONS = { selector: 'g.entity', collection: 'tm/entities' };
 
+// 右クリックで出すインスペクタ。
+const INSPECTOR = {
+    title: (t)=> t.name,
+    fields: [
+        { path: 'name',        label: '名称' },
+        { path: 'type',        label: '種類' },
+        { path: 'description', label: '説明' },
+        { path: 'id',          label: 'ID' },
+    ],
+};
+
 export default function TM () {
     return (
         <DiagramBox names={TM_COLLECTIONS}
                     build={buildTmData}
                     positions={POSITIONS}
-                    render={source=> <Diagram source={source}/>}/>
+                    inspector={INSPECTOR}
+                    render={(source, onInspect)=> <Diagram source={source} onInspect={onInspect}/>}/>
     );
 }
 
 function Diagram (props) {
     const [rectum, setRectum] = useState(null);
     const graph_data = props.source;
+    const onInspect = props.onInspect;
 
     useEffect(()=> {
         if (rectum!==null) return;
@@ -41,11 +54,13 @@ function Diagram (props) {
             callbacks: {
                 entity: {
                     click: (node)=> {
-                    }
+                    },
+                    // 渡るのは正規化後のデータ。元のレコードは _core に入っている。
+                    contextmenu: (entity)=> onInspect(entity._core || entity),
                 }
             }
         }));
-    }, [rectum]);
+    }, [rectum, onInspect]);
 
     useEffect(()=> {
         if (rectum)

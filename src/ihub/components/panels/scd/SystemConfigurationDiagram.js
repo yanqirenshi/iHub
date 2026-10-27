@@ -15,23 +15,39 @@ const style = {
 // ドラッグで動かしたノードの位置は、deployment/nodes に保存する。(子のノードは、親の中での位置)
 const POSITIONS = { selector: 'g.node, g.component', collection: 'deployment/nodes' };
 
+// 右クリックで出すインスペクタ。(core は入力のレコードそのもの。ノードもエッジも同じ)
+const INSPECTOR = {
+    title: (t)=> (t.label && t.label.text) || `${t.type || ''} ${t.id}`.trim(),
+    fields: [
+        { path: 'label.text', label: '名称' },
+        { path: 'type',       label: '種類' },
+        { path: 'id',         label: 'ID' },
+    ],
+};
+
 export default function SystemConfigurationDiagram (props) {
     return (
         <DiagramBox names={DEPLOYMENT_COLLECTIONS}
                     build={buildDeploymentData}
                     positions={POSITIONS}
-                    render={source=> <Diagram source={source}/>}/>
+                    inspector={INSPECTOR}
+                    render={(source, onInspect)=> <Diagram source={source} onInspect={onInspect}/>}/>
     );
 }
 
 function Diagram (props) {
     const graph_data = props.source;
+    const onInspect = props.onInspect;
 
     const [rectum] = React.useState(new Rectum({
         transform: {
             k: 0.3,
             x: 1800.0,
             y: 700.0,
+        },
+        callbacks: {
+            node: { contextmenu: (core)=> onInspect(core) },
+            edge: { contextmenu: (core)=> onInspect(core) },
         },
     }));
 
