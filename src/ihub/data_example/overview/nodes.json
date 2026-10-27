@@ -1,0 +1,75 @@
+[
+    {
+        "id": 1,
+        "type": "NODE",
+        "label": {
+            "text": "iHub",
+            "font": {
+                "size": 18,
+                "weight": "bold"
+            }
+        },
+        "padding": 40,
+        "size": {
+            "w": 200,
+            "h": 150
+        },
+        "position": {
+            "x": 0,
+            "y": 0
+        },
+        "children": [
+            {
+                "id": 11,
+                "type": "NODE",
+                "label": {
+                    "text": "Cockpit",
+                    "align": "center",
+                    "valign": "middle"
+                },
+                "size": {
+                    "w": 160,
+                    "h": 80
+                },
+                "position": {
+                    "x": 0,
+                    "y": 20
+                }
+            },
+            {
+                "id": 12,
+                "type": "NODE",
+                "label": {
+                    "text": "Overview",
+                    "align": "center",
+                    "valign": "middle"
+                },
+                "size": {
+                    "w": 160,
+                    "h": 80
+                },
+                "position": {
+                    "x": 220,
+                    "y": 20
+                }
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "type": "NODE",
+        "label": {
+            "text": "Github",
+            "align": "center",
+            "valign": "middle"
+        },
+        "size": {
+            "w": 160,
+            "h": 80
+        },
+        "position": {
+            "x": 560,
+            "y": 60
+        }
+    }
+]

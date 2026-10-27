@@ -124,7 +124,7 @@ function checkTm ({ identifiers, attributes, entities, relationships }) {
     return errors;
 }
 
-// ノードと線の図 (画面遷移図・システム構成図)。
+// ノードと線の図 (画面遷移図・システム構成図・Overview)。
 function checkGraph (domain, { nodes, edges }) {
     const errors = [];
 
@@ -146,4 +146,5 @@ export const RULES = {
     tm:         checkTm,
     sitemap:    (data)=> checkGraph('sitemap', data),
     deployment: (data)=> checkGraph('deployment', data),
+    overview:   (data)=> checkGraph('overview', data),
 };

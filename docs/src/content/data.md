@@ -23,6 +23,8 @@
 | `sitemap/edges.json` | 画面の遷移 | 画面遷移図 |
 | `deployment/nodes.json` | ノード (入れ子にでき、リンクを付けられる) | システム構成図 |
 | `deployment/edges.json` | ノードの間の線 | システム構成図 |
+| `overview/nodes.json` | ポンチ絵のノード (入れ子にでき、d3.unchi の形で書く) | コックピットの Overview |
+| `overview/edges.json` | ノードの間の線 | コックピットの Overview |
 | `systemic_design/sections.json` | 章とカード | Systemic Design |
 | `local/account_menus.json` | サイドメニューの on/off (個人の設定) | サイドメニュー |
 
