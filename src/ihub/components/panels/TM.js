@@ -11,13 +11,17 @@ import { TM_COLLECTIONS, buildTmData } from '../../manegers/tm.js';
 const POSITIONS = { selector: 'g.entity', collection: 'tm/entities' };
 
 // 右クリックで出すインスペクタ。
+// name は、文字列か、論理名と物理名の組 ({ logical, physical }) のどちらか。(スキーマの name)
+// 読めない項目はインスペクタが出さないので、どちらの形でも並べておく。
 const INSPECTOR = {
-    title: (t)=> t.name,
+    title: (t)=> typeof t.name==='string' ? t.name : t.name?.logical,
     fields: [
-        { path: 'name',        label: '名称' },
-        { path: 'type',        label: '種類' },
-        { path: 'description', label: '説明' },
-        { path: 'id',          label: 'ID' },
+        { path: 'name',          label: '名称' },
+        { path: 'name.logical',  label: '論理名' },
+        { path: 'name.physical', label: '物理名' },
+        { path: 'type',          label: '種類' },
+        { path: 'description',   label: '説明' },
+        { path: 'id',            label: 'ID' },
     ],
 };
 
