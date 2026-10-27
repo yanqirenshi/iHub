@@ -37,6 +37,7 @@ Docs のページは、モデリングの手法などの参考資料をまとめ
 | Systemic Design | `/systemic-design` | Systemic Design のツールキットのカードを並べます。 |
 
 図の編集のしかたは [図の編集](#/diagrams)、WBS は [WBS](#/wbs) を見てください。
+図の要素を右クリックすると、要素の中身を見られます。([図の編集](#/diagrams) の「要素の中身を見る」)
 
 ## ドック
 
