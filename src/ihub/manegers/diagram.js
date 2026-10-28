@@ -7,16 +7,21 @@ import { errorMessage, isWrittenHere, useGetDataQuery, usePatchRecordMutation } 
 // このタブの書き込み (ドラッグした位置の保存) では作り直さず、ほかからの変更 (エディタ・git・別のタブ) のときだけ作り直す。
 // (作り直すと、図を描き直して、表示している位置が初めに戻るため)
 // 戻り値の version は、作り直すたびに増える。図の部品の key に使う。
+// 戻り値の rebuild() を呼ぶと、このタブの次の書き込みのあとにも作り直す。
+// (サイズの変更など、描き直さないと図に出ない書き込みの前に呼ぶ。書き込めなかったときは rebuild(false) で取り消す)
 export function useDiagramData (names, build) {
     const { data: all } = useGetDataQuery();
     const built = useRef(null);
+    const force = useRef(false);
 
     const etags = names.map(name=> all.etags[name]);
 
     const changed = !built.current
-          || etags.some((etag, i)=> etag!==built.current.etags[i] && !isWrittenHere(etag));
+          || etags.some((etag, i)=> etag!==built.current.etags[i] && (force.current || !isWrittenHere(etag)));
 
     if (changed) {
+        force.current = false;
+
         built.current = {
             etags,
             version: built.current ? built.current.version + 1 : 0,
@@ -26,7 +31,9 @@ export function useDiagramData (names, build) {
         built.current.etags = etags;
     }
 
-    return built.current;
+    const rebuild = useCallback((on = true)=> { force.current = on; }, []);
+
+    return { ...built.current, rebuild };
 }
 
 // d3 が要素に結び付けたデータから、レコードの id を取り出す。

@@ -2,11 +2,13 @@ import React from 'react';
 
 import Colonoscope, { getByPath } from '@yanqirenshi/colonoscope';
 
-// 図の要素を右クリックしたときに、コンテンツエリアの右端に出すインスペクタ。(表示のみ)
+// 図の要素を右クリックしたときに、コンテンツエリアの右端に出すインスペクタ。
 // colonoscope をそのまま使わずに包むのは、図ごとに違う「どこに名前があるか」をここで吸収するため。
 //   target:  右クリックした要素のデータ (null のときは出さない)
 //   title:   見出し (関数)。要素のデータから名前を返す
-//   fields:  「プロパティ」タブに並べる項目 [{ path, label }]。すべて読み取り専用
+//   fields:  「プロパティ」タブに並べる項目 [{ path, label, type }]。
+//            type を省くと読み取り専用。'number' や 'text' にすると、書き換えて「適用」できる
+//   onApply: 「適用」のとき。{ path: 入力した文字列 } を受け取る
 //   onClose: 閉じるとき
 const WIDTH = 320;
 
@@ -30,7 +32,7 @@ function plain (target) {
 }
 
 export default function DiagramInspector (props) {
-    const { target, title, fields = [], onClose } = props;
+    const { target, title, fields = [], onApply, onClose } = props;
 
     // colonoscope は、項目の値が文字列でないと描画できず、画面ごと落ちる。
     // d3 が正規化したデータでは、同じ名前の項目がオブジェクトのこともあるので、
@@ -52,7 +54,7 @@ export default function DiagramInspector (props) {
             key: 'props',
             label: 'プロパティ',
             fields: target
-                ? fields.filter(f=> readable(target, f.path)).map(f=> ({ ...f, type: 'readonly' }))
+                ? fields.filter(f=> readable(target, f.path)).map(f=> ({ ...f, type: f.type || 'readonly' }))
                 : [],
         },
         {
@@ -71,6 +73,7 @@ export default function DiagramInspector (props) {
                      title={safeTitle}
                      tabs={tabs}
                      width={WIDTH}
+                     onApply={onApply}
                      onClose={onClose}
                      // コンテンツエリアの右端に、上から下まで。図のドラッグを邪魔しないよう、枠の外には広げない。
                      style={{ position: 'absolute', top: 0, right: 0, bottom: 0, zIndex: 5 }}/>
