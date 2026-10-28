@@ -16,16 +16,24 @@ const INITIAL_VIEW = { k: 1.0, x: 120, y: 120 };
 // 線 (エッジ) か。(core は入力のレコードそのもの。線は from と to を持つ)
 const isEdge = (t)=> !!(t && t.from && t.to);
 
+// ノードの枠線の種類。(d3.unchi が描けるもの)
+const BORDER_TYPES = ['solid', 'dashed', 'dotted'];
+
 // 右クリックで出すインスペクタ。
-// ノードは幅と高さ、線は両端の接続位置 (角度) を書き換えられる。
+// ノードは幅・高さ・背景色・枠線 (種類と色)、線は両端の接続位置 (角度) を書き換えられる。
+// 背景色と枠線は、データに書いていなければ区分ごとの既定で描かれるので、
+// 図に描いている値を _style に写して出す。(_ で始まる項目は「JSON」タブには出ない)
 const INSPECTOR = {
     title: (t)=> (t.label && (typeof t.label==='string' ? t.label : t.label.text)) || `${t.type || ''} ${t.id}`.trim(),
     node: [
-        { path: 'label.text', label: '名称' },
-        { path: 'type',       label: '種類' },
-        { path: 'id',         label: 'ID' },
-        { path: 'size.w',     label: '幅',   type: 'number' },
-        { path: 'size.h',     label: '高さ', type: 'number' },
+        { path: 'label.text',               label: '名称' },
+        { path: 'type',                     label: '種類' },
+        { path: 'id',                       label: 'ID' },
+        { path: 'size.w',                   label: '幅',   type: 'number' },
+        { path: 'size.h',                   label: '高さ', type: 'number' },
+        { path: '_style.background.color',  label: '背景色', type: 'text' },
+        { path: '_style.border.type',       label: `枠線の種類 (${BORDER_TYPES.join(' / ')})`, type: 'text' },
+        { path: '_style.border.color',      label: '枠線の色', type: 'text' },
     ],
     // 接続位置は、ノードの中心から見た角度。0=真下・時計回り (90=左 / 180=真上 / 270=右)
     edge: [
@@ -86,10 +94,73 @@ function portsPatch (values) {
     return ports;
 }
 
+// 右クリックしたノードに、図に描いている背景色と枠線を _style として足す。
+//   core: 入力のレコード、node: d3.unchi が既定を補ったデータ
+function withStyle (core, node) {
+    return {
+        ...core,
+        _style: {
+            background: { color: node?.background?.color ?? '' },
+            border: {
+                type:  node?.border?.type ?? 'solid',
+                color: node?.border?.color ?? '',
+            },
+        },
+    };
+}
+
+// 背景色と枠線の入力から、保存する background / border を作る。
+// 図に描いている値 (style) から変えた項目だけを返す。(変えていない既定の値まで書き込まないため)
+function stylePatch (values, style) {
+    const patch = {};
+
+    const changed = (path, current)=> {
+        const value = values[`_style.${path}`];
+
+        return value!==undefined && value.trim()!==String(current) ? value.trim() : undefined;
+    };
+
+    const color = (value, label)=> {
+        if (value==='' || !CSS.supports('color', value))
+            throw new Error(`${label}は、色 (#ff0000 や red など) で入力してください。`);
+
+        return value;
+    };
+
+    const background = changed('background.color', style.background.color);
+
+    if (background!==undefined)
+        patch.background = { color: color(background, '背景色') };
+
+    const type = changed('border.type', style.border.type);
+
+    if (type!==undefined) {
+        if (!BORDER_TYPES.includes(type))
+            throw new Error(`枠線の種類は、${BORDER_TYPES.join(' / ')} のどれかで入力してください。`);
+
+        patch.border = { type };
+    }
+
+    const borderColor = changed('border.color', style.border.color);
+
+    if (borderColor!==undefined)
+        patch.border = { ...patch.border, color: color(borderColor, '枠線の色') };
+
+    return patch;
+}
+
+// 保存した背景色と枠線を、インスペクタに出している値 (_style) にも重ねる。
+function mergeStyle (style, patch) {
+    return {
+        background: { ...style.background, ...patch.background },
+        border:     { ...style.border,     ...patch.border },
+    };
+}
+
 // Cockpit の Overview タブ: d3.unchi (ポンチ絵) をコンテンツエリア一杯に表示する。
 // 図のデータは data/overview/ にあり、ノードをドラッグすると、動かした位置を overview/nodes に保存する。
 // ノードやエッジを右クリックすると、右端にインスペクタを出す。
-// インスペクタで、ノードの幅・高さと、線の接続位置を書き換えられる。
+// インスペクタで、ノードの幅・高さ・背景色・枠線と、線の接続位置を書き換えられる。
 export default function Overview () {
     const { data, version, rebuild } = useDiagramData(OVERVIEW_COLLECTIONS, buildOverviewData);
     const [move, moveError, closeMoveError] = useMoveRecord('overview/nodes');
@@ -97,7 +168,7 @@ export default function Overview () {
 
     const [target, setTarget] = React.useState(null);
     const [applyError, setApplyError] = React.useState(null);
-    const onInspect = React.useCallback((t)=> setTarget(t), []);
+    const onInspect = React.useCallback((core, datum)=> setTarget(isEdge(core) ? core : withStyle(core, datum)), []);
 
     const box = React.useRef(null);
     const rectum = React.useRef(null);
@@ -106,8 +177,9 @@ export default function Overview () {
 
     const applyNode = async (values)=> {
         const size = sizePatch(values);
+        const style = stylePatch(values, target._style);
 
-        // サイズは描き直さないと図に出ないので、保存したあとに図を作り直す。
+        // サイズや色は描き直さないと図に出ないので、保存したあとに図を作り直す。
         // 作り直しても、いま見ている位置と拡大の度合いは変えない。
         const zoom = [...(box.current?.querySelectorAll('svg') || [])].find(svg=> svg.__zoom)?.__zoom;
         // d3.unchi は、渡した x, y に倍率 k を掛けて使うので、k で割って渡す。
@@ -115,7 +187,7 @@ export default function Overview () {
         rebuild();
 
         try {
-            await patchRecord({ name: 'overview/nodes', id: target.id, patch: { size } }).unwrap();
+            await patchRecord({ name: 'overview/nodes', id: target.id, patch: { size, ...style } }).unwrap();
         } catch (e) {
             // 保存できなかったときは、作り直すのをやめる。(次のドラッグの保存で作り直さないように)
             rebuild(false);
@@ -123,7 +195,13 @@ export default function Overview () {
             throw e;
         }
 
-        setTarget({ ...target, size: { ...target.size, ...size } });
+        setTarget({
+            ...target,
+            size: { ...target.size, ...size },
+            ...(style.background && { background: { ...target.background, ...style.background } }),
+            ...(style.border     && { border:     { ...target.border,     ...style.border } }),
+            _style: mergeStyle(target._style, style),
+        });
     };
 
     const applyEdge = async (values)=> {
@@ -198,7 +276,7 @@ function Diagram (props) {
                     // ドラッグの終わり。掴んだノードについてだけ、1 回呼ばれる。
                     // (子のノードは親の中での位置なので、親を動かしても変わらない)
                     dragend: (core, node, move)=> onMove.current(core.id, move),
-                    contextmenu: (core)=> onInspect.current(core),
+                    contextmenu: (core, node)=> onInspect.current(core, node),
                 },
                 edge: {
                     contextmenu: (core)=> onInspect.current(core),
