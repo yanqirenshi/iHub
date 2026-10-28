@@ -20,13 +20,13 @@ const isEdge = (t)=> !!(t && t.from && t.to);
 const BORDER_TYPES = ['solid', 'dashed', 'dotted'];
 
 // 右クリックで出すインスペクタ。
-// ノードは幅・高さ・背景色・枠線 (種類と色)、線は両端の接続位置 (角度)・色・太さ・ラベルを書き換えられる。
+// ノードは名称・幅・高さ・背景色・枠線 (種類・色・太さ)、線は両端の接続位置 (角度)・色・太さ・ラベルを書き換えられる。
 // 色や太さは、データに書いていなければ既定で描かれるので、
 // 図に描いている値を _style に写して出す。(_ で始まる項目は「JSON」タブには出ない)
 const INSPECTOR = {
     title: (t)=> (t.label && (typeof t.label==='string' ? t.label : t.label.text)) || `${t.type || ''} ${t.id}`.trim(),
     node: [
-        { path: 'label.text',               label: '名称' },
+        { path: '_style.label.text',        label: '名称', type: 'text' },
         { path: 'type',                     label: '種類' },
         { path: 'id',                       label: 'ID' },
         { path: 'size.w',                   label: '幅',   type: 'number' },
@@ -34,6 +34,7 @@ const INSPECTOR = {
         { path: '_style.background.color',  label: '背景色', type: 'text' },
         { path: '_style.border.type',       label: `枠線の種類 (${BORDER_TYPES.join(' / ')})`, type: 'text' },
         { path: '_style.border.color',      label: '枠線の色', type: 'text' },
+        { path: '_style.border.width',      label: '枠線の太さ', type: 'number' },
     ],
     // 接続位置は、ノードの中心から見た角度。0=真下・時計回り (90=左 / 180=真上 / 270=右)
     edge: [
@@ -119,7 +120,9 @@ function withStyle (core, datum) {
             border: {
                 type:  datum?.border?.type ?? 'solid',
                 color: datum?.border?.color ?? '',
+                width: datum?.border?.width ?? '',
             },
+            label: { text: datum?.label?.text ?? '' },
         },
     };
 }
@@ -139,7 +142,32 @@ function toColor (value, label) {
     return value;
 }
 
-// 背景色と枠線の入力から、保存する background / border を作る。
+// 線の太さとして読める (0 より大きい数か) 確かめる。
+function toWidth (value, label) {
+    const n = toNumber(value);
+
+    if (n===null || n <= 0)
+        throw new Error(`${label}は、0 より大きい数で入力してください。`);
+
+    return n;
+}
+
+// 名称・ラベルの入力から、保存する label を作る。(変わっていなければ undefined)
+// 線のラベルは、空にすると消す。(JSON Merge Patch の null で text を除く)
+// ノードの名称は空にできない。(d3.unchi は、名称の無いノードに代わりの文字を描くため)
+function labelPatch (values, style, required) {
+    const text = changedValue(values, 'label.text', style.label.text);
+
+    if (text===undefined)
+        return undefined;
+
+    if (text==='' && required)
+        throw new Error('名称を入力してください。');
+
+    return { text: text==='' ? null : text };
+}
+
+// 名称・背景色・枠線の入力から、保存する label / background / border を作る。
 // 図に描いている値 (style) から変えた項目だけを返す。(変えていない既定の値まで書き込まないため)
 function stylePatch (values, style) {
     const patch = {};
@@ -163,6 +191,16 @@ function stylePatch (values, style) {
     if (borderColor!==undefined)
         patch.border = { ...patch.border, color: toColor(borderColor, '枠線の色') };
 
+    const borderWidth = changedValue(values, 'border.width', style.border.width);
+
+    if (borderWidth!==undefined)
+        patch.border = { ...patch.border, width: toWidth(borderWidth, '枠線の太さ') };
+
+    const label = labelPatch(values, style, true);
+
+    if (label)
+        patch.label = label;
+
     return patch;
 }
 
@@ -178,20 +216,13 @@ function edgeStylePatch (values, style) {
 
     const width = changedValue(values, 'stroke.width', style.stroke.width);
 
-    if (width!==undefined) {
-        const n = toNumber(width);
+    if (width!==undefined)
+        patch.stroke = { ...patch.stroke, width: toWidth(width, '線の太さ') };
 
-        if (n===null || n <= 0)
-            throw new Error('線の太さは、0 より大きい数で入力してください。');
+    const label = labelPatch(values, style);
 
-        patch.stroke = { ...patch.stroke, width: n };
-    }
-
-    // ラベルは、空にすると消す。(JSON Merge Patch の null で text を除く)
-    const text = changedValue(values, 'label.text', style.label.text);
-
-    if (text!==undefined)
-        patch.label = { text: text==='' ? null : text };
+    if (label)
+        patch.label = label;
 
     return patch;
 }
