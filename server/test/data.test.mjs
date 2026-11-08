@@ -37,20 +37,26 @@ test('スキーマに無い項目を見つける', ()=> {
     assert.ok(errors.some(e=> e.startsWith('wbs/projects/') && e.endsWith('(parnet)')), errors.join('\n'));
 });
 
-test('システム構成図のノードの link は、url だけを持つ', ()=> {
+test('システム構成図のノードの link は、url を文字列で持つ', ()=> {
+    // スキーマは @yanqirenshi/model.deployment のもの。(additionalProperties は閉じていない)
     const data = loadDataDir(join(ROOT, 'src/ihub/data_example'));
 
     data['deployment/nodes'][0].link = { url: 'https://example.com/' };
 
     assert.deepEqual(validateData(data), []);
 
+    // url の無い link と null の link は通る。(d3.deployment は描かない)
     data['deployment/nodes'][0].link = {};
-    data['deployment/nodes'][1].link = { url: 'https://example.com/', target: '_blank' };
+    data['deployment/nodes'][1].link = null;
 
-    assert.deepEqual(validateData(data), [
-        'deployment/nodes/0/link: 必要なプロパティurlがなければいけない',
-        'deployment/nodes/1/link: 追加してはいけない (target)',
-    ]);
+    assert.deepEqual(validateData(data), []);
+
+    data['deployment/nodes'][0].link = { url: 1 };
+
+    const errors = validateData(data);
+
+    assert.equal(errors.length, 1);
+    assert.ok(errors[0].startsWith('deployment/nodes/0/link/url: '), errors[0]);
 });
 
 test('Overview のノードは、id に文字列も使え、d3.unchi の見た目の項目を書ける', ()=> {
