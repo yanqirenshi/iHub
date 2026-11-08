@@ -10,6 +10,8 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+import { toHierarchical } from '../../scripts/migrate-er-hierarchical.mjs';
+
 const args = process.argv.slice(2).filter(a=> a!=='--force');
 const force = process.argv.includes('--force');
 
@@ -39,18 +41,17 @@ const files = {
     'deployment/nodes.json': (await load('DEPLOYMENT_MANAGE_OVERVIEW_NODE_DATA.js')).map(deploymentNode),
     'deployment/edges.json': await load('DEPLOYMENT_MANAGE_OVERVIEW_EDGE_DATA.js'),
 
-    // ER 図のテーブルは、位置と大きさをまとめる。
-    'er/entities.json': (await load('ER_DATA/ENTITIES.js')).map(d=> ({
-        _id: d._id, code: d.code, name: d.name, description: d.description, _class: d._class,
-        position: { x: d.x, y: d.y, z: d.z }, size: { w: d.w, h: d.h },
-    })),
-    'er/columns.json':          await load('ER_DATA/COLUMNS.js'),
-    'er/column_instances.json': await load('ER_DATA/COLUMN_INSTANCES.js'),
-    'er/ports.json':            await load('ER_DATA/PORTS.js'),
-    'er/relationships.json': (await load('ER_DATA/RELASHONSHIPS.js')).map(d=> ({
-        _id: d._id, _class: d._class, from_id: d.from_id, from_class: d.from_class,
-        to_id: d.to_id, to_class: d.to_class, data_type: d.data_type, hide: d.hide,
-    })),
+    // ER 図は、古い形式 (フラット形式) を読み、階層形式 (@yanqirenshi/model.er のレコード) にして書く。
+    ...Object.fromEntries(Object.entries(toHierarchical({
+        entities: (await load('ER_DATA/ENTITIES.js')).map(d=> ({
+            _id: d._id, code: d.code, name: d.name, description: d.description, _class: d._class,
+            position: { x: d.x, y: d.y, z: d.z }, size: { w: d.w, h: d.h },
+        })),
+        columns:          await load('ER_DATA/COLUMNS.js'),
+        column_instances: await load('ER_DATA/COLUMN_INSTANCES.js'),
+        ports:            await load('ER_DATA/PORTS.js'),
+        relationships:    await load('ER_DATA/RELASHONSHIPS.js'),
+    })).map(([name, data])=> [`er/${name}.json`, data])),
 
     // 画面のノードは配列にし、画面の遷移には id を振る。
     'sitemap/nodes.json': Object.values(await load('SITEMAP_DATA/SITEMAP_DATA_NODES.js')),

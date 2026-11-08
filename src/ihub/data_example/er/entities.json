@@ -1,10 +1,9 @@
 [
     {
-        "_id": 3,
-        "code": "TABLE-B",
+        "id": 3,
         "name": "Table B",
+        "code": "TABLE-B",
         "description": "",
-        "_class": "TABLE",
         "position": {
             "x": 300,
             "y": 0,
@@ -13,14 +12,33 @@
         "size": {
             "w": 222,
             "h": 333
-        }
+        },
+        "identifiers": [
+            {
+                "id": 13,
+                "identifier": 5
+            },
+            {
+                "id": 28,
+                "identifier": 4
+            }
+        ],
+        "attributes": [
+            {
+                "id": 14,
+                "attribute": 8
+            },
+            {
+                "id": 15,
+                "attribute": 9
+            }
+        ]
     },
     {
-        "_id": 2,
-        "code": "TABLE-A",
+        "id": 2,
         "name": "Table A",
+        "code": "TABLE-A",
         "description": "",
-        "_class": "TABLE",
         "position": {
             "x": -300,
             "y": 0,
@@ -29,6 +47,22 @@
         "size": {
             "w": 222,
             "h": 333
-        }
+        },
+        "identifiers": [
+            {
+                "id": 10,
+                "identifier": 4
+            }
+        ],
+        "attributes": [
+            {
+                "id": 11,
+                "attribute": 6
+            },
+            {
+                "id": 12,
+                "attribute": 7
+            }
+        ]
     }
 ]

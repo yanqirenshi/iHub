@@ -18,12 +18,12 @@ for (const dir of ['data', 'src/ihub/data_example']) {
 test('ファイルの過不足を見つける', ()=> {
     const data = loadDataDir(join(ROOT, 'src/ihub/data_example'));
 
-    delete data['er/ports'];
+    delete data['er/schemas'];
     data['er/unknown'] = [];
 
     const errors = validateData(data);
 
-    assert.ok(errors.includes('er/ports: ファイルがありません。'), errors.join('\n'));
+    assert.ok(errors.includes('er/schemas: ファイルがありません。'), errors.join('\n'));
     assert.ok(errors.includes('er/unknown: スキーマがありません。(server/schemas/er/unknown.schema.json を作ってください)'), errors.join('\n'));
 });
 
@@ -129,20 +129,20 @@ test('TM の relationships で、エンティティの参照が欠けている�
     ]);
 });
 
-test('ER の relationships で、端点の見つからないものを見つける', ()=> {
+test('ER で、参照の見つからないものを見つける', ()=> {
+    // 階層形式 (d3.ter と同じ)。検査は @yanqirenshi/model.er の check。
     const errors = RULES.er({
-        entities:         [{ _id: 1, _class: 'TABLE' }],
-        columns:          [],
-        column_instances: [{ _id: 2, _class: 'COLUMN-INSTANCE' }],
-        ports:            [],
-        relationships:    [
-            { _id: 10, _class: 'EDGE-ER', from_id: 1, from_class: 'TABLE', to_id: 2, to_class: 'COLUMN-INSTANCE' },
-            { _id: 11, _class: 'EDGE-ER', from_id: 1, from_class: 'TABLE', to_id: 2, to_class: 'COLUMN' },
-        ],
+        schemas:       [],
+        identifiers:   [{ id: 10000, name: { logical: 'ID', physical: 'id' } }],
+        attributes:    [],
+        entities:      [{ id: 1, name: 'A', position: { x: 0, y: 0 }, size: { w: 0, h: 0 },
+                          identifiers: [{ id: 100, identifier: 10000 }, { id: 101, identifier: 10001 }], attributes: [] }],
+        relationships: [{ id: 10, from: { entity: 1 }, to: { entity: 2 }, details: [{ from: { id: 100 }, to: { id: 100 } }] }],
     });
 
     assert.deepEqual(errors, [
-        'er/relationships: to の COLUMN が見つかりません。(_id=11, to_id=2)',
+        'er/entities: identifier が identifiers に見つかりません。(entity=1, id=101, identifier=10001)',
+        'er/relationships: to.entity のエンティティが見つかりません。(id=10, to.entity=2)',
     ]);
 });
 

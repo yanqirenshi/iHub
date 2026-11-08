@@ -1,0 +1,18 @@
+[
+    {
+        "id": 4,
+        "name": {
+            "logical": "Table A ID",
+            "physical": "TABLE-A-ID"
+        },
+        "data_type": "INTEGER"
+    },
+    {
+        "id": 5,
+        "name": {
+            "logical": "Table B ID",
+            "physical": "TABLE-B-ID"
+        },
+        "data_type": "INTEGER"
+    }
+]

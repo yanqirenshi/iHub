@@ -1,37 +1,150 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "ER 図のテーブル",
-    "description": "d3.er のテーブル。位置と大きさは position と size に持つ。(d3.er に渡すときに x/y/z と w/h へ写す)",
+    "title": "ER 図のエンティティ",
+    "description": "テーブル。識別子・属性は、マスタの id を参照するインスタンス (identifiers / attributes) として持つ。インスタンスの id は全エンティティを通して一意 (関係の details がこれを指す)。position はドラッグで動かすと書き換わる。size の w / h が 0 のときは内容に合わせる。",
+    "x-id-start": 30000,
     "type": "array",
     "items": {
         "type": "object",
         "properties": {
-            "_id":         { "type": "integer" },
-            "code":        { "type": "string" },
-            "name":        { "type": "string" },
-            "description": { "type": "string" },
-            "_class":      { "const": "TABLE" },
+            "id": {
+                "type": [
+                    "integer",
+                    "string"
+                ]
+            },
+            "name": {
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "logical": {
+                                "type": "string"
+                            },
+                            "physical": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": true
+                    }
+                ]
+            },
+            "code": {
+                "type": [
+                    "string",
+                    "null"
+                ]
+            },
+            "schema": {
+                "type": [
+                    "integer",
+                    "string",
+                    "null"
+                ]
+            },
+            "description": {
+                "type": [
+                    "string",
+                    "null"
+                ]
+            },
             "position": {
                 "type": "object",
                 "properties": {
-                    "x": { "type": "number" },
-                    "y": { "type": "number" },
-                    "z": { "type": "number" }
+                    "x": {
+                        "type": "number"
+                    },
+                    "y": {
+                        "type": "number"
+                    },
+                    "z": {
+                        "type": "number"
+                    }
                 },
-                "required": ["x", "y"],
+                "required": [
+                    "x",
+                    "y"
+                ],
                 "additionalProperties": false
             },
             "size": {
                 "type": "object",
                 "properties": {
-                    "w": { "type": "number" },
-                    "h": { "type": "number" }
+                    "w": {
+                        "type": "number",
+                        "minimum": 0
+                    },
+                    "h": {
+                        "type": "number",
+                        "minimum": 0
+                    }
                 },
-                "required": ["w", "h"],
+                "required": [
+                    "w",
+                    "h"
+                ],
                 "additionalProperties": false
+            },
+            "identifiers": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": [
+                                "integer",
+                                "string"
+                            ]
+                        },
+                        "identifier": {
+                            "type": [
+                                "integer",
+                                "string"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "identifier"
+                    ],
+                    "additionalProperties": true
+                }
+            },
+            "attributes": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": [
+                                "integer",
+                                "string"
+                            ]
+                        },
+                        "attribute": {
+                            "type": [
+                                "integer",
+                                "string"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "attribute"
+                    ],
+                    "additionalProperties": true
+                }
             }
         },
-        "required": ["_id", "code", "name", "_class", "position", "size"],
-        "additionalProperties": false
+        "required": [
+            "id"
+        ],
+        "additionalProperties": true
     }
 }

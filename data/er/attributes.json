@@ -1,0 +1,34 @@
+[
+    {
+        "id": 6,
+        "name": {
+            "logical": "Table A Attr1",
+            "physical": "TABLE-A-ATTR1"
+        },
+        "data_type": "STRING"
+    },
+    {
+        "id": 7,
+        "name": {
+            "logical": "Table A Attr2",
+            "physical": "TABLE-A-ATTR2"
+        },
+        "data_type": "STRING"
+    },
+    {
+        "id": 8,
+        "name": {
+            "logical": "Table B Attr1",
+            "physical": "TABLE-B-ATTR1"
+        },
+        "data_type": "STRING"
+    },
+    {
+        "id": 9,
+        "name": {
+            "logical": "Table B Attr2",
+            "physical": "TABLE-B-ATTR2"
+        },
+        "data_type": "STRING"
+    }
+]
