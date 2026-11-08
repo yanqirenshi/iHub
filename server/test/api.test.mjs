@@ -126,12 +126,12 @@ test('PUT は If-Match を確かめ、検証してから書き込む', async ()=
     assert.equal((await request('/api/er/entities', { method: 'PUT', body: data, headers: { 'if-match': '"x"' } })).status, 412);
 
     const broken = structuredClone(data);
-    delete broken[0].size;
+    broken[0].position.x = 'abc';
 
     const invalid = await request('/api/er/entities', { method: 'PUT', body: broken, headers: { 'if-match': etag } });
 
     assert.equal(invalid.status, 400);
-    assert.deepEqual((await invalid.json()).errors, ['er/entities/0: 必要なプロパティsizeがなければいけない']);
+    assert.deepEqual((await invalid.json()).errors, ['er/entities/0/position/x: numberでなければいけない']);
 
     const changed = structuredClone(data);
     changed[0].name = 'テーブル B';
@@ -159,10 +159,10 @@ test('POST で id を振ってレコードを追加する', async ()=> {
     // ER のテーブル・カラムなどは、ドメインの中で使われていない id にする。
     const table = await request('/api/er/entities', {
         method: 'POST',
-        body: { code: 'TABLE-C', name: 'Table C', _class: 'TABLE', position: { x: 0, y: 0 }, size: { w: 100, h: 100 } },
+        body: { code: 'TABLE-C', name: 'Table C', position: { x: 0, y: 0 }, size: { w: 100, h: 100 } },
     });
 
-    assert.equal((await table.json()).record._id, 16);
+    assert.equal((await table.json()).record.id, 10);
 });
 
 test('POST でルールに合わないレコードは 400 にする', async ()=> {
@@ -186,7 +186,7 @@ test('PATCH でレコードの一部を書き換える', async ()=> {
     assert.equal(res.status, 200);
     assert.deepEqual((await res.json()).record.position, { x: 10, y: 20, z: 0 });
 
-    assert.equal((await request('/api/er/entities/3', { method: 'PATCH', body: { _id: 99 } })).status, 400);
+    assert.equal((await request('/api/er/entities/3', { method: 'PATCH', body: { id: 99 } })).status, 400);
     assert.equal((await request('/api/er/entities/999', { method: 'PATCH', body: { name: 'X' } })).status, 404);
 
     // 入れ子のノード (children) も id で探す。

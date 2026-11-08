@@ -1,33 +1,17 @@
 // ER 図 (d3.er) に使うコレクション。
+// 階層形式 (d3.ter の TM と同じ形) で、@yanqirenshi/model.er のレコードそのもの。
 export const ER_COLLECTIONS = [
+    'er/schemas',
+    'er/identifiers',
+    'er/attributes',
     'er/entities',
-    'er/columns',
-    'er/column_instances',
-    'er/ports',
     'er/relationships',
 ];
 
-// d3.er は、テーブルの位置と大きさを x/y/z と w/h で読む。
-// データは position と size で持っているので、写しておく。
-function table2d3er (table) {
-    return {
-        ...table,
-        x: table.position.x,
-        y: table.position.y,
-        z: table.position.z,
-        w: table.size.w,
-        h: table.size.h,
-    };
-}
-
-// d3.er に渡すデータ (TABLES/COLUMNS/... のフラットな形式) を作る。
-// d3.er はデータを書き換えるので、複製して渡す。
+// d3.er に渡すデータ ({ schemas, identifiers, attributes, entities, relationships }) を作る。
+// コレクションをそのまま渡せる形なので、変換はしない。
+// 読み込んだデータは書き換えられず、d3.er はデータを書き換える (_core などを付ける) ので、複製して渡す。
 export function buildErData (collections) {
-    return structuredClone({
-        TABLES:           collections['er/entities'].map(table2d3er),
-        COLUMNS:          collections['er/columns'],
-        COLUMN_INSTANCES: collections['er/column_instances'],
-        RELASHONSHIPS:    collections['er/relationships'],
-        PORTS:            collections['er/ports'],
-    });
+    return structuredClone(Object.fromEntries(
+        ER_COLLECTIONS.map(name=> [name.slice('er/'.length), collections[name]])));
 }
