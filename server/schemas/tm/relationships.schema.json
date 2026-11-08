@@ -1,74 +1,166 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "TM のリレーションシップ",
-    "description": "エンティティの間の結線。from.entity/to.entity はエンティティの id を指す。同じエンティティを指すと自己結線 (ループ) になる。",
+    "description": "エンティティの間の結線。from.entity / to.entity はエンティティの id (同じエンティティを指すと自己結線 = 再帰のループ)。端点の cardinality (1 / 3) と optionality (0 / 1) は無ければ記号を描かない。position は接続位置の角度 (0=真下・時計回り)。details は線を取り付けるインスタンス (省略すると先頭の識別子)。subset はサブセット結線の区分コード (same は =、different は ×)。mapping は結線の中点から垂下する対応表・対照表・再帰表 (再帰表は自己結線にだけ)。",
+    "x-id-start": 1,
     "type": "array",
     "items": {
         "type": "object",
         "properties": {
-            "id":   { "type": "integer" },
-            "type": { "type": ["string", "null"] },
-            "from": { "$ref": "#/$defs/end" },
-            "to":   { "$ref": "#/$defs/end" },
+            "id": {
+                "type": [
+                    "integer",
+                    "string"
+                ]
+            },
+            "type": {
+                "type": [
+                    "string",
+                    "null"
+                ]
+            },
+            "from": {
+                "$ref": "#/$defs/end"
+            },
+            "to": {
+                "$ref": "#/$defs/end"
+            },
             "details": {
-                "description": "ポートを取り付けるカラム。from.id/to.id は識別子・属性のインスタンスの id を指す。省略すると先頭の識別子に取り付く",
                 "type": "array",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "from": { "$ref": "#/$defs/detail_end" },
-                        "to":   { "$ref": "#/$defs/detail_end" }
+                        "from": {
+                            "$ref": "#/$defs/detail_end"
+                        },
+                        "to": {
+                            "$ref": "#/$defs/detail_end"
+                        }
                     },
-                    "required": ["from", "to"],
-                    "additionalProperties": false
+                    "required": [
+                        "from",
+                        "to"
+                    ]
                 }
             },
             "subset": {
-                "description": "サブセットへの結線に表示する区分コード (same は =、different は ×)",
-                "type": "object",
+                "type": [
+                    "object",
+                    "null"
+                ],
                 "properties": {
-                    "kind": { "enum": ["same", "different"] },
-                    "code": { "type": "string" }
+                    "kind": {
+                        "enum": [
+                            "same",
+                            "different"
+                        ]
+                    },
+                    "code": {
+                        "type": "string"
+                    }
                 },
-                "required": ["kind", "code"],
-                "additionalProperties": false
+                "required": [
+                    "kind",
+                    "code"
+                ]
             },
             "mapping": {
-                "description": "結線の中点から垂下する対応表・対照表・再帰表。entity はエンティティの id を指す",
-                "type": "object",
+                "type": [
+                    "object",
+                    "null"
+                ],
                 "properties": {
-                    "entity": { "type": "integer" }
+                    "entity": {
+                        "type": [
+                            "integer",
+                            "string"
+                        ]
+                    }
                 },
-                "required": ["entity"],
-                "additionalProperties": false
+                "required": [
+                    "entity"
+                ]
             },
-            "label":       { "type": "string" },
-            "description": { "type": "string" }
+            "label": {
+                "type": [
+                    "string",
+                    "null"
+                ]
+            },
+            "description": {
+                "type": [
+                    "string",
+                    "null"
+                ]
+            }
         },
-        "required": ["id", "from", "to"],
-        "additionalProperties": false
+        "required": [
+            "id",
+            "from",
+            "to"
+        ],
+        "additionalProperties": true
     },
     "$defs": {
         "end": {
             "type": "object",
             "properties": {
-                "id":          { "type": "integer", "description": "端点の識別子のインスタンスの id" },
-                "entity":      { "type": "integer" },
-                "cardinality": { "enum": [1, 3], "description": "1 か 多 (3)" },
-                "optionality": { "enum": [0, 1], "description": "0 は任意 (○)、1 は必須 (横棒)" },
-                "position":    { "type": "number", "description": "ポートを取り付ける角度 (0 が真下で時計回り。90 が左、180 が真上、270 が右)" }
+                "entity": {
+                    "type": [
+                        "integer",
+                        "string"
+                    ]
+                },
+                "cardinality": {
+                    "enum": [
+                        1,
+                        3
+                    ],
+                    "description": "1 か 多 (3)。無ければ記号を描かない"
+                },
+                "optionality": {
+                    "enum": [
+                        0,
+                        1
+                    ],
+                    "description": "0 は任意 (○)、1 は必須 (横棒)。無ければ記号を描かない"
+                },
+                "position": {
+                    "type": "number",
+                    "description": "接続位置の角度。0=真下・時計回り (90=左 / 180=真上 / 270=右)"
+                },
+                "id": {
+                    "type": [
+                        "integer",
+                        "string"
+                    ],
+                    "description": "旧来の項目。端点の識別子のインスタンスの id (details に置き換わった)"
+                }
             },
-            "required": ["entity"],
-            "additionalProperties": false
+            "required": [
+                "entity"
+            ],
+            "additionalProperties": true
         },
         "detail_end": {
             "type": "object",
             "properties": {
-                "id":          { "type": "integer" },
-                "description": { "type": "string" }
+                "id": {
+                    "type": [
+                        "integer",
+                        "string"
+                    ]
+                },
+                "description": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
             },
-            "required": ["id"],
-            "additionalProperties": false
+            "required": [
+                "id"
+            ]
         }
     }
 }

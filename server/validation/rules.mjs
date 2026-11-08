@@ -3,6 +3,7 @@
 // スキーマに合っているデータだけを渡す。
 
 import { check as checkEr } from '@yanqirenshi/model.er';
+import { check as checkTm } from '@yanqirenshi/model.tm';
 
 // list の中で key の値が重複していれば、エラーにする。値の集合を返す。
 function checkUnique (errors, label, list, key = 'id') {
@@ -44,58 +45,6 @@ function checkWbs ({ projects, wbs, workpackages }) {
     return errors;
 }
 
-function checkTm ({ identifiers, attributes, entities, relationships }) {
-    const errors = [];
-
-    const identifier_ids = checkUnique(errors, 'tm/identifiers', identifiers);
-    const attribute_ids  = checkUnique(errors, 'tm/attributes', attributes);
-
-    checkUnique(errors, 'tm/entities', entities);
-    checkUnique(errors, 'tm/relationships', relationships);
-
-    // エンティティが持つ識別子・属性のインスタンスの id は、エンティティをまたいで一意にする。
-    // (d3.ter は、インスタンスを id だけで探すため)
-    checkUnique(errors, 'tm/entities の identifiers・attributes', entities.flatMap(e=> [...e.identifiers, ...e.attributes]));
-
-    for (const e of entities) {
-        for (const d of e.identifiers)
-            if (!identifier_ids.has(d.identifier))
-                errors.push(`tm/entities: identifier が identifiers に見つかりません。(entity=${e.id}, id=${d.id}, identifier=${d.identifier})`);
-
-        for (const d of e.attributes)
-            if (!attribute_ids.has(d.attribute))
-                errors.push(`tm/entities: attribute が attributes に見つかりません。(entity=${e.id}, id=${d.id}, attribute=${d.attribute})`);
-    }
-
-    const index = new Map(entities.map(e=> [e.id, e]));
-
-    for (const r of relationships) {
-        for (const end of ['from', 'to']) {
-            const entity = index.get(r[end].entity);
-
-            if (!entity) {
-                errors.push(`tm/relationships: ${end}.entity のエンティティが見つかりません。(id=${r.id}, entity=${r[end].entity})`);
-                continue;
-            }
-
-            if (r[end].id !== undefined && !entity.identifiers.some(d=> d.id===r[end].id))
-                errors.push(`tm/relationships: ${end}.id がエンティティの識別子に見つかりません。(id=${r.id}, entity=${entity.id}, ${end}.id=${r[end].id})`);
-
-            for (const detail of r.details || []) {
-                const instances = [...entity.identifiers, ...entity.attributes];
-
-                if (!instances.some(d=> d.id===detail[end].id))
-                    errors.push(`tm/relationships: details の ${end}.id がエンティティの識別子・属性に見つかりません。(id=${r.id}, entity=${entity.id}, ${end}.id=${detail[end].id})`);
-            }
-        }
-
-        if (r.mapping && !index.has(r.mapping.entity))
-            errors.push(`tm/relationships: mapping.entity のエンティティが見つかりません。(id=${r.id}, entity=${r.mapping.entity})`);
-    }
-
-    return errors;
-}
-
 // ノードと線の図 (画面遷移図・システム構成図・Overview)。
 function checkGraph (domain, { nodes, edges }) {
     const errors = [];
@@ -114,9 +63,9 @@ function checkGraph (domain, { nodes, edges }) {
 
 export const RULES = {
     wbs:        checkWbs,
-    // ER は階層形式 (d3.ter と同じ) で、検査は @yanqirenshi/model.er が持つ。(文言は checkTm に合わせてある)
+    // ER・TM は階層形式 (d3.ter の形) で、検査は @yanqirenshi/model.er・model.tm が持つ。(文言はここの checkTm だったものと同じ)
     er:         (data)=> checkEr(data, 'er/'),
-    tm:         checkTm,
+    tm:         (data)=> checkTm(data, 'tm/'),
     sitemap:    (data)=> checkGraph('sitemap', data),
     deployment: (data)=> checkGraph('deployment', data),
     overview:   (data)=> checkGraph('overview', data),
