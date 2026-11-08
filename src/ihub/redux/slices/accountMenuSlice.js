@@ -2,29 +2,8 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { PAGES } from '../../../config/ACCOUNT_MENUS.js';
 
-function pagePath () {
-    const root_path = window.location.pathname.split('/')[1] || null;
-
-    return root_path ? '/'+root_path : '/';
-}
-
-function selectedItem (pages) {
-    const page_path = pagePath();
-
-    for (const page of pages) {
-        const item = page.items.find(i=>i.url===page_path);
-
-        if (item)
-            return item.code;
-    }
-
-    return 'cockpit';
-}
-
-// NOTE: selectedItem(PAGES) reads window.location.pathname eagerly, at the
-// moment this module is first evaluated (same timing as the original recoil
-// atom's default value) — this only reflects the correct initial route
-// because it runs once, at app startup, before any navigation happens.
+// サイドメニューで強調する項目 (selected_item) は、ここには持たない。
+// 今の URL から決まるものなので、Frame.js で useLocation() から導出する。(#6)
 const accountMenuSlice = createSlice({
     name: 'accountMenu',
     initialState: {
@@ -36,7 +15,6 @@ const accountMenuSlice = createSlice({
             current_page: PAGES[0]?.label,
             pages: PAGES,
         },
-        selectedItem: selectedItem(PAGES),
         isOpend: false,
     },
     reducers: {
@@ -49,9 +27,6 @@ const accountMenuSlice = createSlice({
         menuClosed (state) {
             state.isOpend = false;
         },
-        menuItemSelected (state, action) {
-            state.selectedItem = action.payload;
-        },
         // 個人の設定 (on/off) を反映したページに差し替える。
         menuPagesChanged (state, action) {
             state.menu.pages = action.payload;
@@ -59,5 +34,5 @@ const accountMenuSlice = createSlice({
     },
 });
 
-export const { menuChanged, menuOpened, menuClosed, menuItemSelected, menuPagesChanged } = accountMenuSlice.actions;
+export const { menuChanged, menuOpened, menuClosed, menuPagesChanged } = accountMenuSlice.actions;
 export default accountMenuSlice.reducer;
