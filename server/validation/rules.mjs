@@ -2,6 +2,8 @@
 // 関数の引数はドメインのコレクション ({ entities: [...], ... })、戻り値はエラーのメッセージの配列。
 // スキーマに合っているデータだけを渡す。
 
+import { check as checkEr } from '@yanqirenshi/model.er';
+
 // list の中で key の値が重複していれば、エラーにする。値の集合を返す。
 function checkUnique (errors, label, list, key = 'id') {
     const values = new Set();
@@ -38,36 +40,6 @@ function checkWbs ({ projects, wbs, workpackages }) {
     for (const d of workpackages)
         if (!wbs_ids.has(d.parent))
             errors.push(`wbs/workpackages: parent の WBS が見つかりません。(id=${d.id}, parent=${d.parent})`);
-
-    return errors;
-}
-
-// ER の _class と、そのデータを置くコレクション。
-const ER_CLASS_COLLECTIONS = {
-    'TABLE':           'entities',
-    'COLUMN':          'columns',
-    'COLUMN-INSTANCE': 'column_instances',
-    'PORT-ER-OUT':     'ports',
-    'PORT-ER-IN':      'ports',
-};
-
-function checkEr (er) {
-    const errors = [];
-
-    for (const collection of ['entities', 'columns', 'column_instances', 'ports', 'relationships'])
-        checkUnique(errors, `er/${collection}`, er[collection], '_id');
-
-    // relationships の端点は、_class と _id の組で指す。
-    const keys = new Set();
-
-    for (const collection of new Set(Object.values(ER_CLASS_COLLECTIONS)))
-        for (const d of er[collection])
-            keys.add(`${d._class}:${d._id}`);
-
-    for (const r of er.relationships)
-        for (const end of ['from', 'to'])
-            if (!keys.has(`${r[end + '_class']}:${r[end + '_id']}`))
-                errors.push(`er/relationships: ${end} の ${r[end + '_class']} が見つかりません。(_id=${r._id}, ${end}_id=${r[end + '_id']})`);
 
     return errors;
 }
@@ -142,7 +114,8 @@ function checkGraph (domain, { nodes, edges }) {
 
 export const RULES = {
     wbs:        checkWbs,
-    er:         checkEr,
+    // ER は階層形式 (d3.ter と同じ) で、検査は @yanqirenshi/model.er が持つ。(文言は checkTm に合わせてある)
+    er:         (data)=> checkEr(data, 'er/'),
     tm:         checkTm,
     sitemap:    (data)=> checkGraph('sitemap', data),
     deployment: (data)=> checkGraph('deployment', data),

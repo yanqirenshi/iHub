@@ -10,11 +10,11 @@
 | `wbs/projects.json` | WBS のプロジェクト | WBS |
 | `wbs/wbs.json` | WBS のノード | WBS |
 | `wbs/workpackages.json` | ワークパッケージ | WBS |
-| `er/entities.json` | ER 図のテーブル | ER 図 |
-| `er/columns.json` | テーブルをまたいで使うカラムの定義 | ER 図 |
-| `er/column_instances.json` | テーブルの中のカラム | ER 図 |
-| `er/ports.json` | 線の端点 | ER 図 |
-| `er/relationships.json` | テーブル・カラム・ポートの結び付き | ER 図 |
+| `er/schemas.json` | テーブルの名前空間 (スキーマ) のマスタ | ER 図 |
+| `er/identifiers.json` | 識別子 (主キー) のマスタ | ER 図 |
+| `er/attributes.json` | 属性 (カラム) のマスタ | ER 図 |
+| `er/entities.json` | テーブル (識別子・属性のインスタンスを持つ) | ER 図 |
+| `er/relationships.json` | テーブルの間の関係 (FK) | ER 図 |
 | `tm/identifiers.json` | 識別子のマスタ | TM |
 | `tm/attributes.json` | 属性のマスタ | TM |
 | `tm/entities.json` | エンティティ | TM |
@@ -72,7 +72,7 @@ npm run test:data
 - 合っていないときは、場所と理由を日本語で表示します。
 
 ```
-er/entities/0: 必要なプロパティsizeがなければいけない
+er/entities/0/position/x: numberでなければいけない
 sitemap/edges: to.id のノードが見つかりません。(id=2000001, to.id=123)
 ```
 

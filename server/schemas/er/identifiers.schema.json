@@ -1,0 +1,56 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "ER 図の識別子",
+    "description": "識別子 (主キー) のマスタ。entities[].identifiers[].identifier から id で参照される。",
+    "x-id-start": 10000,
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": [
+                    "integer",
+                    "string"
+                ]
+            },
+            "name": {
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "logical": {
+                                "type": "string"
+                            },
+                            "physical": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": true
+                    }
+                ]
+            },
+            "description": {
+                "type": [
+                    "string",
+                    "null"
+                ]
+            },
+            "data_type": {
+                "type": [
+                    "string",
+                    "null"
+                ]
+            }
+        },
+        "required": [
+            "id"
+        ],
+        "additionalProperties": true
+    }
+}

@@ -1,25 +1,118 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "ER 図の結び付き",
-    "description": "テーブル・カラム・ポートの間の結び付き。from_id/to_id は、from_class/to_class の種類のデータの _id を指す。",
+    "title": "ER 図の関係",
+    "description": "エンティティどうしの関係 (FK など)。from / to はエンティティの id と、その端の見た目 (カーディナリティ・オプショナリティ・接続位置の角度) を持つ。details は線を取り付けるインスタンスの id (省略すると各エンティティの先頭の識別子)。",
     "x-id-start": 10000000,
     "type": "array",
     "items": {
         "type": "object",
         "properties": {
-            "_id":        { "type": "integer" },
-            "_class":     { "const": "EDGE-ER" },
-            "from_id":    { "type": "integer" },
-            "from_class": { "$ref": "#/$defs/class" },
-            "to_id":      { "type": "integer" },
-            "to_class":   { "$ref": "#/$defs/class" },
-            "data_type":  { "type": "string", "description": "FK (外部キー)・HAVE (持つ)・INSTANCE-OF (カラムの実体) など" },
-            "hide":       { "type": "boolean" }
+            "id": {
+                "type": [
+                    "integer",
+                    "string"
+                ]
+            },
+            "type": {
+                "type": [
+                    "string",
+                    "null"
+                ]
+            },
+            "from": {
+                "$ref": "#/$defs/end"
+            },
+            "to": {
+                "$ref": "#/$defs/end"
+            },
+            "details": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "from": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": [
+                                        "integer",
+                                        "string"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "id"
+                            ]
+                        },
+                        "to": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": [
+                                        "integer",
+                                        "string"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "id"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "from",
+                        "to"
+                    ]
+                }
+            },
+            "description": {
+                "type": [
+                    "string",
+                    "null"
+                ]
+            },
+            "hide": {
+                "type": "boolean"
+            }
         },
-        "required": ["_id", "_class", "from_id", "from_class", "to_id", "to_class", "data_type"],
-        "additionalProperties": false
+        "required": [
+            "id",
+            "from",
+            "to"
+        ],
+        "additionalProperties": true
     },
     "$defs": {
-        "class": { "enum": ["TABLE", "COLUMN", "COLUMN-INSTANCE", "PORT-ER-OUT", "PORT-ER-IN"] }
+        "end": {
+            "type": "object",
+            "properties": {
+                "entity": {
+                    "type": [
+                        "integer",
+                        "string"
+                    ]
+                },
+                "cardinality": {
+                    "enum": [
+                        1,
+                        3
+                    ]
+                },
+                "optionality": {
+                    "enum": [
+                        0,
+                        1
+                    ]
+                },
+                "position": {
+                    "type": "number",
+                    "description": "接続位置の角度。0=真下・時計回り (90=左 / 180=真上 / 270=右)"
+                }
+            },
+            "required": [
+                "entity"
+            ],
+            "additionalProperties": true
+        }
     }
 }
