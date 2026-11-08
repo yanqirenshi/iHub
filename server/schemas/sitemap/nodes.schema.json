@@ -1,70 +1,121 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "画面遷移図のノード",
-    "description": "d3.sitemap に渡す画面のノード。children に子のノードを入れ子で持つ。id は子のノードも含めて一意にする。",
+    "description": "d3.sitemap に渡す画面のノード。children に子のノードを入れ子で持つ。id は子のノードも含めて一意にする。position は親の中での位置で、ドラッグで動かすと書き換わる。見た目の項目 (label・padding・border・background・path) は d3.sitemap の入力の形のまま書ける。",
     "x-id-start": 1000000,
     "type": "array",
-    "items": { "$ref": "#/$defs/node" },
+    "items": {
+        "$ref": "#/$defs/node"
+    },
     "$defs": {
         "node": {
             "type": "object",
             "properties": {
-                "id":   { "type": "integer" },
-                "type": { "const": "NODE" },
+                "id": {
+                    "type": [
+                        "integer",
+                        "string"
+                    ]
+                },
+                "type": {
+                    "type": "string"
+                },
                 "label": {
                     "type": "object",
                     "properties": {
-                        "contents": { "type": "string" },
-                        "position": { "$ref": "#/$defs/point" },
-                        "font":     { "$ref": "#/$defs/font" }
-                    },
-                    "required": ["contents"],
-                    "additionalProperties": false
+                        "contents": {
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        }
+                    }
                 },
-                "size":     { "$ref": "#/$defs/size" },
-                "position": { "$ref": "#/$defs/point" },
-                "link": {
+                "size": {
                     "type": "object",
                     "properties": {
-                        "icon":     { "type": "string" },
-                        "position": { "$ref": "#/$defs/point" },
-                        "url":      { "type": "string" }
+                        "w": {
+                            "type": "number",
+                            "minimum": 0
+                        },
+                        "h": {
+                            "type": "number",
+                            "minimum": 0
+                        }
                     },
-                    "required": ["url"],
-                    "additionalProperties": false
+                    "required": [
+                        "w",
+                        "h"
+                    ]
                 },
-                "node_type": { "type": "string", "description": "window など" },
-                "children":  { "type": "array", "items": { "$ref": "#/$defs/node" } }
+                "position": {
+                    "type": "object",
+                    "properties": {
+                        "x": {
+                            "type": "number"
+                        },
+                        "y": {
+                            "type": "number"
+                        }
+                    },
+                    "required": [
+                        "x",
+                        "y"
+                    ]
+                },
+                "link": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "url": {
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        },
+                        "icon": {
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        },
+                        "position": {
+                            "type": "object",
+                            "properties": {
+                                "x": {
+                                    "type": "number"
+                                },
+                                "y": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "x",
+                                "y"
+                            ]
+                        }
+                    }
+                },
+                "node_type": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "window など (利用側の項目)"
+                },
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/node"
+                    }
+                }
             },
-            "required": ["id", "type", "label", "size", "position"],
-            "additionalProperties": false
-        },
-        "point": {
-            "type": "object",
-            "properties": {
-                "x": { "type": "number" },
-                "y": { "type": "number" }
-            },
-            "required": ["x", "y"],
-            "additionalProperties": false
-        },
-        "size": {
-            "type": "object",
-            "properties": {
-                "w": { "type": "number" },
-                "h": { "type": "number" }
-            },
-            "required": ["w", "h"],
-            "additionalProperties": false
-        },
-        "font": {
-            "type": "object",
-            "properties": {
-                "size":   { "type": "number" },
-                "color":  { "type": "string" },
-                "weight": { "type": ["string", "number"] }
-            },
-            "additionalProperties": false
+            "required": [
+                "id"
+            ],
+            "additionalProperties": true
         }
     }
 }

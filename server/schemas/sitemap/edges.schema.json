@@ -1,37 +1,63 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "画面遷移図の遷移",
-    "description": "画面のノードの間の遷移。from.id/to.id はノードの id を指す。position はポートを取り付ける角度。",
+    "description": "画面のノードの間の遷移。from.id / to.id はノード (子を含む) の id。position は接続位置の角度 (0=真下・時計回り。省略すると 90=左)。",
     "x-id-start": 2000001,
     "type": "array",
     "items": {
         "type": "object",
         "properties": {
-            "id":   { "type": "integer" },
-            "from": { "$ref": "#/$defs/end" },
-            "to":   { "$ref": "#/$defs/end" },
+            "id": {
+                "type": [
+                    "integer",
+                    "string"
+                ]
+            },
+            "from": {
+                "$ref": "#/$defs/end"
+            },
+            "to": {
+                "$ref": "#/$defs/end"
+            },
             "stroke": {
                 "type": "object",
                 "properties": {
-                    "color": { "type": "string" },
-                    "width": { "type": "number" },
-                    "type":  { "type": "string" }
-                },
-                "additionalProperties": false
+                    "color": {
+                        "type": "string"
+                    },
+                    "width": {
+                        "type": "number"
+                    },
+                    "type": {
+                        "type": "string"
+                    }
+                }
             }
         },
-        "required": ["id", "from", "to"],
-        "additionalProperties": false
+        "required": [
+            "id",
+            "from",
+            "to"
+        ],
+        "additionalProperties": true
     },
     "$defs": {
         "end": {
             "type": "object",
             "properties": {
-                "id":       { "type": "integer" },
-                "position": { "type": "number" }
+                "id": {
+                    "type": [
+                        "integer",
+                        "string"
+                    ]
+                },
+                "position": {
+                    "type": "number"
+                }
             },
-            "required": ["id"],
-            "additionalProperties": false
+            "required": [
+                "id"
+            ]
         }
     }
 }
