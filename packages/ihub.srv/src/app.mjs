@@ -8,6 +8,7 @@ import { serveStatic } from '@hono/node-server/serve-static';
 import FileStore from './stores/FileStore.mjs';
 import DataService, { HttpError } from './services/DataService.mjs';
 import guard from './guard.mjs';
+import { registerGithub } from './github.mjs';
 import { createValidation } from './validation/index.mjs';
 import { watchData } from './watcher.mjs';
 
@@ -60,7 +61,9 @@ function respond (c, result, status = 200) {
 //   schemas_dir … 追加のスキーマのフォルダ ({domain}/{collection}.schema.json)
 //   rules       … 追加の整合性ルール ({ ドメイン: (コレクション)=> エラーの配列 })
 //   routes      … 追加のルート。(app)=> {} の形で、/api/{domain}/{collection} より先に登録する
-export function createApp ({ data_dir, static_dir = null, watch = false, app_name = 'iHub', extensions = {} }) {
+// github: GitHub の OAuth の設定 ({ client_id, client_secret })。省略すると環境変数 GITHUB_OAUTH_CLIENT_ID・GITHUB_OAUTH_CLIENT_SECRET から読む。
+//   どちらも無いときは、/api/github/token が configured: false を返すだけで、ほかは変わらない。(github.mjs)
+export function createApp ({ data_dir, static_dir = null, watch = false, app_name = 'iHub', extensions = {}, github = {} }) {
     const validation = createValidation({ schemas_dir: extensions.schemas_dir, rules: extensions.rules });
     const service = new DataService(new FileStore(data_dir), validation);
     const client_header = clientHeader(app_name);
@@ -74,6 +77,9 @@ export function createApp ({ data_dir, static_dir = null, watch = false, app_nam
 
     if (extensions.routes)
         extensions.routes(app);
+
+    // GitHub の OAuth。(/api/:domain/:collection より先に登録する。/api/github/token がコレクションと見なされないように)
+    registerGithub(app, github);
 
     // 全データ (起動時に画面が読み込む)
     app.get('/api/data', async c=> c.json(await service.readAll()));

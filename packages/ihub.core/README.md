@@ -169,6 +169,19 @@ const config = {
 };
 ```
 
+## GitHub との接続
+
+画面は、GitHub (Scrum・コックピット・Issue の追加) に、次のどちらかのトークンで接続します。
+両方あるときは、OAuth のトークンを先に使います。
+
+1. OAuth で得たトークン。API サーバー ([@yanqirenshi/ihub.srv](../ihub.srv/README.md)) に OAuth App の Client ID と Client secret を設定すると使えます。(環境変数 `GITHUB_OAUTH_CLIENT_ID`・`GITHUB_OAUTH_CLIENT_SECRET`、または `createApp({ github })`)
+Scrum のページの Account タブの `GithubOAuth` (認証・切断のボタンと状態) で、認証します。
+2. 個人用アクセストークン。設定の `github.token` に渡します。
+
+どちらも設定しないときは、GitHub には接続しません。(ほかの機能は、いままでどおり使えます)
+OAuth App の作り方と環境変数は、[GitHub との連携](https://github.com/yanqirenshi/iHub/blob/main/docs/src/content/github.md) を見てください。
+`GithubOAuth` は、自分のページにも置けます。(`import { GithubOAuth } from '@yanqirenshi/ihub.core'`)
+
 ## 公開しているもの
 
 ```js
@@ -183,7 +196,7 @@ import { IHub, pages, Frame } from '@yanqirenshi/ihub.core';
 | `pages` | ページ (`pages.Cockpit`・`pages.Data`・`pages.WbsNode` など) |
 | `docPages` | ドキュメントのページ (`docPages.ER`・`docPages.TM` など) |
 | `panels` | ページの中身 (`panels.ER`・`panels.TM` など) |
-| `Frame`・`FrameTabs`・`FrameWbsNode`・`FrameWbsNodeTabs`・`TabbedPage`・`Link`・`TableTMRelationships` など | 中間の部品 (`components/assemblies/index.js`) |
+| `GithubOAuth`・`Frame`・`FrameTabs`・`FrameWbsNode`・`FrameWbsNodeTabs`・`TabbedPage`・`Link`・`TableTMRelationships` など | 中間の部品 (`components/assemblies/index.js`) |
 | `ItemWbsNode`・`LinkWBS`・`Tabs` など | 小さな部品 (`components/parts/index.js`) |
 | `usePageTabs`・`mergeTabs` | ページのタブ |
 | `manegers`・`wbs`・`useWbs`・`sogh` | データのマネージャ |

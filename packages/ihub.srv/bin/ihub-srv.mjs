@@ -16,6 +16,7 @@ const USAGE = `使い方:
       API サーバーを起動します。(--data の既定は data、--port の既定は環境変数 IHUB_API_PORT か 4000)
       --app-name には、画面の設定の app.name と同じ名前を指定します。(既定は iHub。書き込んだ画面の id を送るヘッダー名 X-{name}-Client に使います)
       --static にビルドした画面のフォルダを指定すると、画面も出します。
+      作業フォルダの .env.local があれば、環境変数として読み込みます。(GitHub の OAuth の GITHUB_OAUTH_CLIENT_ID・GITHUB_OAUTH_CLIENT_SECRET など)
   ihub-srv check <dir>... [--schemas <dir>]
       データのフォルダを、スキーマとルールで検証します。問題があれば 1 で終わります。
       --schemas には、アプリが足したスキーマのフォルダを指定します。
@@ -55,6 +56,10 @@ function listFiles (dir) {
 }
 
 function start (values) {
+    // 作業フォルダの .env.local があれば、環境変数に読み込む。(GITHUB_OAUTH_CLIENT_ID など。すでにある環境変数は上書きしない)
+    if (existsSync(resolve('.env.local')))
+        process.loadEnvFile(resolve('.env.local'));
+
     const app_name = values['app-name'] ?? 'iHub';
     const static_dir = values.static ? resolve(values.static) : null;
     const data_dir = resolve(values.data ?? 'data');
