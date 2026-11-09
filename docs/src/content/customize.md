@@ -2,11 +2,11 @@
 
 ## 設定の渡し方 (`src/index.js`)
 
-iHub 本体 (`src/ihub/`) は、アプリのファイル (`src/config/`・`src/operators/`・`src/wbs/` など) を import しません。
+iHub 本体 (`@yanqirenshi/ihub.core`。リポジトリでは `packages/ihub.core/`) は、アプリのファイル (`src/config/`・`src/operators/`・`src/wbs/` など) を import しません。
 アプリに固有のものは、`src/index.js` で設定 (`config`) にまとめて、`<IHub>` に渡します。
 
 ```jsx
-import { IHub } from './ihub/IHub.js';
+import { IHub } from '@yanqirenshi/ihub.core';
 // (ほかの import は省略)
 
 // 作り直さないように、モジュールの中で 1 つだけ作ります。
@@ -46,7 +46,7 @@ root.render(
 
 - WBS のページを読み込む動的 `import()` は、ページのあるアプリ側 (`src/index.js`) に書きます。(webpack が、アプリのフォルダを束ねるため)
 - 必須の項目が無いときは、起動したときに、どの項目が無いかを示すエラーになります。
-- 部品から設定を読むときは、`import { useConfig } from '../../ihub/config.js'` の `useConfig()` を使います。
+- 部品から設定を読むときは、`import { useConfig } from '@yanqirenshi/ihub.core'` の `useConfig()` を使います。
 
 ## ページを足して、サイドメニューに出す
 
@@ -61,7 +61,7 @@ root.render(
 import React from 'react';
 import Container from '@mui/material/Container';
 
-import Frame from '../../ihub/components/assemblies/frames/Frame.js';
+import { Frame } from '@yanqirenshi/ihub.core';
 
 export default function MyPage () {
     return (
@@ -224,7 +224,8 @@ function icon (d, fillRule) {
 ### そのほかの見た目
 
 `src/index.css` に、CSS を書きます。
-`src/index.css` は `src/ihub/index.css` のあとに読み込むので、iHub の見た目を上書きできます。
+`src/index.css` は、iHub の CSS (`@yanqirenshi/ihub.core` の `index.css`) のあとに読み込むので、iHub の見た目を上書きできます。
+(`src/index.js` で、`<IHub>` を import したあとに、`import './index.css'` を書きます)
 
 ## アプリの名前を出す
 
@@ -237,6 +238,3 @@ function icon (d, fillRule) {
 | `public/index.html` | `<title>` | ブラウザのタブ |
 | `package.json` | `name` | パッケージの名前 (`npm start` のログなど) |
 
-iHub 本体のフォルダ (`src/ihub/`) の名前は、アプリの名前に変えないでください。
-アプリのファイル (`src/Router.js`・`src/wbs/` など) は、`src/ihub/` の部品を読み込んでいます。
-名前を変えると、iHub を取り込むたびに、フォルダの名前と読み込むパスを置き換え直すことになります。

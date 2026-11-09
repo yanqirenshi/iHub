@@ -60,7 +60,7 @@ WBS のノードごとに、ページを作れます。
 import React from 'react';
 import Container from '@mui/material/Container';
 
-import Frame from '../ihub/components/assemblies/frames/FrameWbsNode.js';
+import { FrameWbsNode as Frame } from '@yanqirenshi/ihub.core';
 
 export default function P1000 (props) {
     const wbs_node = props.wbs_node;
@@ -76,11 +76,11 @@ export default function P1000 (props) {
 ```
 
 - `FrameWbsNode` で囲むと、ノードの見出しと、配下の WBS の表が付きます。
-見出しや表が要らないときは、`Frame` (`../ihub/components/assemblies/frames/Frame.js`) で囲みます。
+見出しや表が要らないときは、`Frame` (`import { Frame } from '@yanqirenshi/ihub.core'`) で囲みます。
 - `props.wbs_node` で、ノードのデータを受け取れます。
 - ページのファイルを足したり消したりしたときは、画面を読み直してください。
 
 ## 雛形
 
-`src/ihub/wbs_example/` に、ページのファイルの例があります。
-`src/wbs/` に置いたときの import の書き方になっているので、そのまま `src/wbs/` にコピーして使えます。
+`packages/ihub.core/examples/wbs/` (`@yanqirenshi/ihub.core` の `examples/wbs/`) に、ページのファイルの例があります。
+`@yanqirenshi/ihub.core` から import しているので、そのまま `src/wbs/` にコピーして使えます。

@@ -15,16 +15,18 @@ iHub 本体を書き換えずにおくと、iHub が新しくなったときに�
 | `src/operators/` | ドックの吹き出しの中身 |
 | `src/Router.js` | ページの URL |
 | `src/index.js` | 入り口。アプリの設定 (サイドメニュー・配色・ドック・WBS のページなど) を組み立てて、`<IHub config={config}>` に渡し、`Router` を描きます。([設定の渡し方](#/customize)) |
-| `src/index.css` | 見た目の上書き (`src/ihub/index.css` のあとに読み込みます) |
+| `src/index.css` | 見た目の上書き (iHub の CSS のあとに読み込みます) |
 | `public/` | 画像など |
 
 ## iHub 本体 (書き換えないもの)
 
 | フォルダ・ファイル | 内容 |
 |---|---|
-| `src/ihub/` | 用意してある部品 (`components`)・Redux (`redux`)・データの扱い (`manegers`)・画面全体の `IHub.js`・設定の `config.js` など。アプリのファイルは import せず、設定として受け取ります |
-| `src/ihub/data_example/` | `data/` の雛形 |
-| `src/ihub/wbs_example/` | `src/wbs/` の雛形 |
+| `packages/ihub.core/` | 画面の部品 (`@yanqirenshi/ihub.core`)。`src/` に部品 (`components`)・Redux (`redux`)・データの扱い (`manegers`)・画面全体の `IHub.js`・設定の `config.js` などがあり、Babel で `dist/` に変換して使います。アプリのファイルは import せず、設定として受け取ります |
+| `packages/ihub.core/examples/data/` | `data/` の雛形 |
+| `packages/ihub.core/examples/wbs/` | `src/wbs/` の雛形 |
+| `packages/ihub.core/examples/app/wbs/` | `src/wbs/` の `NotFoundWbsNodeData.js`・`NotFoundWbsNodeComponent.js` の雛形 |
+| `src/js/` | service worker と reportWebVitals (CRA のもの) |
 | `src/setupProxy.js` | 開発サーバーから API サーバーへの中継 |
 | `packages/ihub.srv/` | API サーバー (`@yanqirenshi/ihub.srv`。データの読み書き・検証・変更の通知) |
 | `packages/ihub.srv/src/schemas/` | データのフォーマット (JSON Schema) |
@@ -35,7 +37,7 @@ iHub 本体に直したいところが見つかったときは、iHub のリポ�
 
 ## 用意してある部品
 
-`src/ihub/components/` の部品は、自分のページでも使えます。
+`@yanqirenshi/ihub.core` (`packages/ihub.core/src/components/`) の部品は、自分のページでも使えます。
 
 | フォルダ | 内容 |
 |---|---|

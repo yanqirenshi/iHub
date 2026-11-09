@@ -12,7 +12,7 @@ import {Leaf} from '@yanqirenshi/manipulater';
 import DOCK_COLOR from './dockColor.js';
 
 import ACCOUNT_MENU_ITEMS, { ACCOUNT_MENU_PAGES, isActive } from '../config/ACCOUNT_MENUS.js';
-import { errorMessage, useCollections, usePatchCollectionMutation } from '../ihub/redux/api/dataApi.js';
+import { errorMessage, useCollections, usePatchCollectionMutation } from '@yanqirenshi/ihub.core';
 
 // 吹き出しの大きさ
 const LEAF_W = 444;

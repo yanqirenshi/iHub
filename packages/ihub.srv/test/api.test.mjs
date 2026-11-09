@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 import { createApp } from '../src/app.mjs';
 
-const EXAMPLE = fileURLToPath(new URL('../../../src/ihub/data_example/', import.meta.url));
+const EXAMPLE = fileURLToPath(new URL('../../ihub.core/examples/data/', import.meta.url));
 
 let dir;
 let app;

@@ -1,9 +1,9 @@
 // iHub の入り口。
-// 設定 (config) を組み立てて、コア (src/ihub/) の <IHub> に渡し、アプリの Router を描く。
+// 設定 (config) を組み立てて、コア (@yanqirenshi/ihub.core) の <IHub> に渡し、アプリの Router を描く。
 // コアからアプリのファイルは import しないので、アプリに固有のものは、すべてここから設定として渡す。
 //
-// IHub は、bulma と src/ihub/index.css の CSS を読むので、ほかの import より先に書く。(CSS の読み込み順を保つため)
-import { IHub } from './ihub/IHub.js';
+// IHub は、bulma と iHub の CSS (@yanqirenshi/ihub.core の index.css) を読むので、ほかの import より先に書く。(CSS の読み込み順を保つため)
+import { IHub } from '@yanqirenshi/ihub.core';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
@@ -16,8 +16,8 @@ import Operators from './operators/Operators.js';
 import { withIcons, withoutIcons } from './operators/labels.js';
 import NotFoundWbsNodeData from './wbs/NotFoundWbsNodeData.js';
 import NotFoundWbsNodeComponent from './wbs/NotFoundWbsNodeComponent.js';
-import * as serviceWorkerRegistration from './ihub/js/serviceWorkerRegistration';
-import reportWebVitals from './ihub/js/reportWebVitals';
+import * as serviceWorkerRegistration from './js/serviceWorkerRegistration';
+import reportWebVitals from './js/reportWebVitals';
 // アプリのスタイル。ほかの CSS より後に読み、上書きできるようにする。
 import './index.css';
 

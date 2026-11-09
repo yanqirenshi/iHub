@@ -54,5 +54,5 @@ API サーバー (`packages/ihub.srv/`) は、`data/` の JSON を読み書き�
 ## コレクションを足すとき
 
 1. `packages/ihub.srv/src/schemas/{domain}/{collection}.schema.json` を作ります。
-2. `data/{domain}/{collection}.json` と `src/ihub/data_example/{domain}/{collection}.json` を作ります。
+2. `data/{domain}/{collection}.json` と `packages/ihub.core/examples/data/{domain}/{collection}.json` を作ります。
 3. コレクションをまたぐ検査が必要なときは、`packages/ihub.srv/src/validation/rules.mjs` に書きます。

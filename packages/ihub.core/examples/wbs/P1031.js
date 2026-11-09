@@ -1,0 +1,22 @@
+import React from 'react';
+
+import Container from '@mui/material/Container';
+import {Section, P} from 'tion';
+
+import { FrameWbsNode as Frame } from '@yanqirenshi/ihub.core';
+
+import TableOverview from './P1031/TableOverview.js';
+
+// import wbs from '../manegers/wbs.js';
+
+export default function P1031 (props) {
+    let num = 1;
+
+    return (
+        <Frame>
+          <Container maxWidth="lg" sx={{pt:5}}>
+            <TableOverview/>
+          </Container>
+        </Frame>
+    );
+}

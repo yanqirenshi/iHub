@@ -26,7 +26,7 @@ iHub の画面 (`@yanqirenshi/ihub.core`) は、起動時にこの API サーバ
 ## CLI
 
 ```
-ihub-srv [--data <dir>] [--static <dir>] [--port <n>]
+ihub-srv [--data <dir>] [--static <dir>] [--port <n>] [--app-name <name>]
 ihub-srv check <dir>... [--schemas <dir>]
 ihub-srv init [dir]
 ```
@@ -42,6 +42,7 @@ ihub-srv --data data
 | `--data <dir>`   | データのフォルダ | `data` |
 | `--static <dir>` | ビルドした画面のフォルダ。指定すると、API と画面を一緒に出す | 無し (API だけ) |
 | `--port <n>`     | 待ち受けるポート | 環境変数 `IHUB_API_PORT`、無ければ 4000 |
+| `--app-name <name>` | `createApp` の `app_name`。画面の設定の `app.name` と同じ名前にする | `iHub` |
 
 127.0.0.1 で待ち受けます。
 `data` のフォルダの JSON の変更も見張り、エディタや git で変えたときも画面へ知らせます。
@@ -99,7 +100,7 @@ serve(app, { port: 4000, app_name: 'iHub' });
 `app_name` が `iHub` のときは `X-iHub-Client`、`iwo Studio` のときは `X-iwo-Studio-Client` です。
 英数字とハイフン以外の文字は `-` にします。
 ヘッダー名の規則は、`x-{app_name の英数字とハイフン以外を - にして、小文字にしたもの}-client` です。
-画面 (`@yanqirenshi/ihub.core`) は、設定の `app.name` から、同じ規則でヘッダー名を作ります。(`src/ihub/config.js` の `clientHeaderName`。規則を変えるときは、両方を合わせてください)
+画面 (`@yanqirenshi/ihub.core`) は、設定の `app.name` から、同じ規則でヘッダー名を作ります。(`packages/ihub.core/src/config.js` の `clientHeaderName`。規則を変えるときは、両方を合わせてください)
 
 コレクションの一覧 (`COLLECTIONS`) は、パッケージの `src/schemas/` と `extensions.schemas_dir` の両方から作ります。
 
@@ -157,7 +158,7 @@ iHub のリポジトリのルートで `npm run test:data` を実行すると、
 パッケージのコレクション (iHub 本体のもの) を足すとき:
 
 1. `src/schemas/{domain}/{collection}.schema.json` を作ります。
-2. `data/{domain}/{collection}.json` と、雛形のデータ (`src/ihub/data_example/{domain}/{collection}.json`) を作ります。
+2. `data/{domain}/{collection}.json` と、雛形のデータ (`packages/ihub.core/examples/data/{domain}/{collection}.json`) を作ります。
 3. コレクションをまたぐ検査が必要なときは、`src/validation/rules.mjs` に書きます。
 
 アプリ固有のコレクションを足すとき:

@@ -8,15 +8,15 @@ import { RULES } from '../src/validation/rules.mjs';
 
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 
-// data/ と、その雛形の src/ihub/data_example/ は、同じフォーマット (スキーマ) にそろえる。
-for (const dir of ['data', 'src/ihub/data_example']) {
+// data/ と、その雛形の packages/ihub.core/examples/data/ は、同じフォーマット (スキーマ) にそろえる。
+for (const dir of ['data', 'packages/ihub.core/examples/data']) {
     test(`${dir} がスキーマとルールに合っている`, ()=> {
         assert.deepEqual(validateDataDir(join(ROOT, dir)), []);
     });
 }
 
 test('ファイルの過不足を見つける', ()=> {
-    const data = loadDataDir(join(ROOT, 'src/ihub/data_example'));
+    const data = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
 
     delete data['er/schemas'];
     data['er/unknown'] = [];
@@ -28,7 +28,7 @@ test('ファイルの過不足を見つける', ()=> {
 });
 
 test('スキーマに無い項目を見つける', ()=> {
-    const data = loadDataDir(join(ROOT, 'src/ihub/data_example'));
+    const data = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
 
     data['wbs/projects'].push({ id: 999999, name: 'X', parnet: 1 });
 
@@ -39,7 +39,7 @@ test('スキーマに無い項目を見つける', ()=> {
 
 test('システム構成図のノードの link は、url を文字列で持つ', ()=> {
     // スキーマは @yanqirenshi/model.deployment のもの。(additionalProperties は閉じていない)
-    const data = loadDataDir(join(ROOT, 'src/ihub/data_example'));
+    const data = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
 
     data['deployment/nodes'][0].link = { url: 'https://example.com/' };
 
@@ -60,7 +60,7 @@ test('システム構成図のノードの link は、url を文字列で持つ'
 });
 
 test('Overview のノードは、id に文字列も使え、d3.unchi の見た目の項目を書ける', ()=> {
-    const data = loadDataDir(join(ROOT, 'src/ihub/data_example'));
+    const data = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
 
     data['overview/nodes'].push({ id: 'note-1', type: 'TEXT', text: ['メモ'], bullet: true, size: { w: 200 }, position: { x: 0, y: 300 } });
     data['overview/edges'].push({ id: 101, from: { id: 'note-1' }, to: { id: 2 }, to_marker: 'triangle', stroke: { color: '#888888' } });
@@ -87,7 +87,7 @@ test('Overview のノードは、id に文字列も使え、d3.unchi の見た�
 });
 
 test('個人の設定 (local) は、無くてもよいが、あればスキーマで検証する', ()=> {
-    const data = loadDataDir(join(ROOT, 'src/ihub/data_example'));
+    const data = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
 
     assert.deepEqual(validateData(data), []);
 

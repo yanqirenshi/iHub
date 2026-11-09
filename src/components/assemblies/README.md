@@ -1,4 +1,4 @@
 ## assemblies/
 
 ユーザーが定義するコンポーネントを配置する場所です。
-プリセットされたコンポーネントは src/ihub/components/assemblies/ にあります。
+プリセットされたコンポーネントは @yanqirenshi/ihub.core (packages/ihub.core/src/components/assemblies/) にあります。
