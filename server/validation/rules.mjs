@@ -6,6 +6,7 @@ import { check as checkEr } from '@yanqirenshi/model.er';
 import { check as checkTm } from '@yanqirenshi/model.tm';
 import { check as checkSitemap } from '@yanqirenshi/model.sitemap';
 import { check as checkDeployment } from '@yanqirenshi/model.deployment';
+import { check as checkUnchi } from '@yanqirenshi/model.unchi';
 
 // list の中で key の値が重複していれば、エラーにする。値の集合を返す。
 function checkUnique (errors, label, list, key = 'id') {
@@ -47,28 +48,12 @@ function checkWbs ({ projects, wbs, workpackages }) {
     return errors;
 }
 
-// ノードと線の図 (Overview)。(画面遷移図・システム構成図は @yanqirenshi/model.sitemap・model.deployment の check に移した。文言は同じ)
-function checkGraph (domain, { nodes, edges }) {
-    const errors = [];
-
-    const node_ids = checkUnique(errors, `${domain}/nodes`, flatten(nodes));
-
-    checkUnique(errors, `${domain}/edges`, edges);
-
-    for (const edge of edges)
-        for (const end of ['from', 'to'])
-            if (!node_ids.has(edge[end].id))
-                errors.push(`${domain}/edges: ${end}.id のノードが見つかりません。(id=${edge.id}, ${end}.id=${edge[end].id})`);
-
-    return errors;
-}
-
 export const RULES = {
     wbs:        checkWbs,
-    // ER・TM は階層形式 (d3.ter の形) で、検査は @yanqirenshi/model.er・model.tm が持つ。(文言はここの checkTm だったものと同じ)
+    // 図の検査は、図ごとの model.* パッケージが持つ。(文言は、もとここにあった検査と同じ)
     er:         (data)=> checkEr(data, 'er/'),
     tm:         (data)=> checkTm(data, 'tm/'),
     sitemap:    (data)=> checkSitemap(data, 'sitemap/'),
     deployment: (data)=> checkDeployment(data, 'deployment/'),
-    overview:   (data)=> checkGraph('overview', data),
+    overview:   (data)=> checkUnchi(data, 'overview/'),
 };
