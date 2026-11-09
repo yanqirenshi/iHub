@@ -11,14 +11,14 @@ iHub のコア (画面の部品) です。
 新しいアプリは、雛形から作ります。(マニュアルの「導入のしかた」)
 
 ```
-npx --yes --legacy-peer-deps --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ihub-srv init --app
+npx --yes --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ihub-srv init --app
 npm install
 npx ihub-srv init
 npm start
 ```
 
 `ihub-srv init --app` が、`package.json`・`src/index.js` などのアプリのファイルを作ります。
-(最初の `npx` にだけ `--legacy-peer-deps` を付けます。`npx` の一時的な入れ先では、`react` が 19 に解決されて、`ERESOLVE` で止まるためです。`package.json` ができたあとの `npm install` には、要りません)
+(雛形の `package.json` は React 19 を使います。React 18.3.1 以上の 18 でも動きます)
 すでにあるアプリに入れるときは、次のとおりです。
 
 ```
@@ -29,7 +29,7 @@ iHub をコピーして使っていたアプリは、マニュアルの「コピ
 
 次のパッケージは、アプリのものと 1 つにするため、アプリで入れます。(peerDependencies)
 
-`react`・`react-dom`・`react-redux`・`@reduxjs/toolkit`・`react-router`・`react-router-dom`・`@mui/material`・`@mui/icons-material`・`@emotion/react`・`@emotion/styled`
+`react`・`react-dom` (18.3.1 以上の 18 か 19)・`react-redux`・`@reduxjs/toolkit`・`react-router-dom`・`@mui/material`・`@mui/icons-material`・`@emotion/react`・`@emotion/styled`
 
 ## 使う
 

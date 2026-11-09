@@ -16,7 +16,7 @@
 ```
 mkdir docs
 cd docs
-npx --yes --legacy-peer-deps --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ihub-srv init --app
+npx --yes --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ihub-srv init --app
 ```
 
 アプリのファイルの雛形ができます。
@@ -35,7 +35,7 @@ npx --yes --legacy-peer-deps --package=@yanqirenshi/ihub.core --package=@yanqire
 | `public/` | 画像など |
 | `.gitignore`・`.env.local.template` | git で共有しないもの・環境変数の雛形 |
 
-- `--legacy-peer-deps` は、この最初のコマンドだけに付けます。(`npx` の一時的な入れ先には、アプリの `package.json` がまだ無いので、`react` などの peerDependencies が、最新の版 (react 19) に解決されて、iHub が求める 18 と合わず、`ERESOLVE` で止まるためです。雛形の `package.json` ができたあとの `npm install` には、要りません)
+- 雛形の `package.json` は、React 19 を使います。(React 18 のままにするときは、`package.json` の `react`・`react-dom` を `^18.3.1` にします。iHub は、どちらでも動きます)
 - 同じ名前のファイルがあるときは、何も書かずに止まります。(`--force` で上書き、`--skip-existing` で、無いものだけを作ります)
 
 ## 2. パッケージを入れる
