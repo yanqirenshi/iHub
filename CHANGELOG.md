@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.2.2 (2026-11)
+
+- `@yanqirenshi/ihub.core`: 設計のページの 4 つのパネルが、`start_id` を受け取れるようにし、`panels` から export した。(`panels.DesignPanels` など。設定なしでは、変わらない)
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(版をそろえるだけ)
+
 ## 0.2.1 (2026-11)
 
 - `@yanqirenshi/ihub.core`: 「リストの key が無い」警告 (`SystemicDesign`・BPMN のパレット) を、なくした。(画面の見た目と動きは、変わらない)

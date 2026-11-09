@@ -203,7 +203,8 @@ diff -r <iHub の clone>/src/ihub <アプリ>/src/ihub
 | 直していたところ | 移し方 |
 |---|---|
 | ページにタブを足していた (`hooks/usePageTabs.js` の `TAB_DEFS`・`pages/*.js`) | 設定の `tabs` と `panels` |
-| ページの WBS の `start_id` を変えていた (`pages/*.js`・`panels/design/*.js`) | 設定の `panels` (下の例) |
+| ページの WBS の `start_id` を変えていた (`pages/*.js`) | 設定の `panels` (下の例) |
+| 設計のページの 4 つのパネルの `start_id` を変えていた (`panels/design/*.js`) | 設定の `panels` で、`panels.DesignPanels` などに `start_id` を渡す (下の例。0.2.2 以降) |
 | Help を書き換えていた (`pages/Help/Section*.js`) | 設定の `help.sections` |
 | GitHub の OAuth を足していた (`server/github.mjs` など) | 不要。(iHub 本体に入っています。[GitHub との連携](#/github)) |
 | サーバーに、アプリ固有のコレクションを足していた (`server/schemas/`・`validation/rules.mjs`) | `createApp` の `extensions` ([API サーバー](#/api)) |
@@ -265,6 +266,32 @@ const config = {
     panels: { PAGE_DATA: { wbs: WbsFrom1003 } },
 };
 ```
+
+**例: 設計のページの 4 つのパネルの `start_id` を変えていたとき** (`@yanqirenshi/ihub.core` 0.2.2 以降)
+
+コピー版では、`panels/design/Panels.js`・`Assemblies.js`・`Parts.js`・`Events.js` の `<WBSTable start_id="1"/>` を、タブごとに書き換えていました。
+4 つのパネルは、`start_id` を受け取れます。(無いときは、`"1"`) `panels.DesignPanels`・`DesignAssemblies`・`DesignParts`・`DesignEvents` に、`start_id` を渡して、差し替えます。
+
+```jsx
+import { panels } from '@yanqirenshi/ihub.core';
+
+// 部品は、描画のたびに作り直さないように、モジュールの中で 1 度だけ作る。
+const withStartId = (Panel, start_id)=> function DesignWbs () { return <Panel start_id={start_id}/>; };
+
+const config = {
+    // (省略)
+    panels: {
+        PAGE_DESIGN: {
+            'ui-panels':     withStartId(panels.DesignPanels,     '1007'),
+            'ui-assemblies': withStartId(panels.DesignAssemblies, '1008'),
+            'ui-parts':      withStartId(panels.DesignParts,      '1009'),
+            'ui-events':     withStartId(panels.DesignEvents,     '1010'),
+        },
+    },
+};
+```
+
+(0.2.1 以前では、`WBSTable` を使って、パネルの並び (`Box`・`Container`) を、アプリで写して、差し替えます)
 
 ページの id (`PAGE_DATA` など) の一覧は、`@yanqirenshi/ihub.core` の README にあります。
 

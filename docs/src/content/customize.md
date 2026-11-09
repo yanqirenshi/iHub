@@ -97,6 +97,18 @@ tabs: {
 (既定のタブのパネルも、同じ code で差し替えられます。例: `panels: { PAGE_DATA: { 'er-diagram': MyEr } }`)
 設定を渡さないときは、いままでどおりのタブとパネルです。
 
+設計のページ (`PAGE_DESIGN`) の 4 つのパネル (`ui-panels`・`ui-assemblies`・`ui-parts`・`ui-events`) は、WBS の表を出します。
+`panels.DesignPanels`・`DesignAssemblies`・`DesignParts`・`DesignEvents` は、`start_id` (この id のノードから下だけを出す。無いときは `"1"`) を受け取れます。(0.2.2 以降)
+
+```jsx
+import { panels } from '@yanqirenshi/ihub.core';
+
+// 部品は、モジュールの中で 1 つだけ作る。
+const withStartId = (Panel, start_id)=> function DesignWbs () { return <Panel start_id={start_id}/>; };
+
+panels: { PAGE_DESIGN: { 'ui-panels': withStartId(panels.DesignPanels, '1007') } }
+```
+
 アプリのページも、同じ形で作れます。
 
 ```jsx
