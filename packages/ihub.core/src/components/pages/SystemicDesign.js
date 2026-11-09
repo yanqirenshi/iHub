@@ -20,7 +20,7 @@ export default function SystemicDesign () {
             <Container maxWidth="lg" sx={{pt: 3, pb:22}}>
               {DATA.map(row=> {
                   return (
-                      <Box sx={{mt: 3}}>
+                      <Box key={row.label} sx={{mt: 3}}>
                         <S variant="h5">
                           {row.label}
                         </S>
