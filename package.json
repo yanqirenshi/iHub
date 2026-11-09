@@ -34,7 +34,7 @@
     "@yanqirenshi/model.tm": "^0.1.0",
     "@yanqirenshi/model.unchi": "^0.1.0",
     "@yanqirenshi/react-masonry-component": "^7.0.0",
-    "@yanqirenshi/table.wbs": "^0.0.20",
+    "@yanqirenshi/table.wbs": "^0.0.22",
     "ajv": "^8.20.0",
     "ajv-i18n": "^4.2.0",
     "bulma": "^0.9.4",
