@@ -12,9 +12,10 @@ export default function Level2Table () {
           <Table>
             <TableHead>
               <TableRow>
-                {columns[0].map(col=> {
+                {columns[0].map((col,i)=> {
                     return (
-                        <TableCell size="small"
+                        <TableCell key={i}
+                                   size="small"
                                    sx={col.sx}
                                    rowSpan={col.span_row || 1}
                                    colSpan={col.span_col || 1}>
@@ -25,9 +26,10 @@ export default function Level2Table () {
               </TableRow>
 
               <TableRow>
-                {columns[1].map(col=> {
+                {columns[1].map((col,i)=> {
                     return (
-                        <TableCell size="small"
+                        <TableCell key={i}
+                                   size="small"
                                    sx={col.sx}
                                    rowSpan={col.span_row || 1}
                                    colSpan={col.span_col || 1}>

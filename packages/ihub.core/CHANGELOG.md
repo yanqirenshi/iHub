@@ -4,6 +4,15 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 次の版 (未公開)
+
+### 修正
+
+- 「リストの key が無い」警告 (`Each child in a list should have a unique "key" prop.`) を、なくした。(画面の見た目と動きは、変わらない)
+  - `SystemicDesign` (システミックデザインのページ): セクションに、`label` の `key` を付けた。
+  - BPMN のパレット レベル 1 (`Level1`): 表の行に `name`、画像にファイル名の `key` を付けた。
+  - BPMN のパレット レベル 2 (`Level2Table`): 見出しのセルに、添字の `key` を付けた。(見出しの定義に、一意な値が無いため)
+
 ## 0.2.0 (2026-11)
 
 React 19 に対応し、MUI 5 の重複をなくしました。

@@ -110,11 +110,12 @@ function Table (props) {
           <tbody>
             {rows.map(row=> {
                 return (
-                    <tr>
+                    <tr key={row.name}>
                       <td>
                         {row.image.map(file_name=> {
                             return (
-                                <img src={`/bpmn/${file_name}`}
+                                <img key={file_name}
+                                     src={`/bpmn/${file_name}`}
                                      alt={file_name}
                                      style={{width:44, height:44}}/>
                             );
