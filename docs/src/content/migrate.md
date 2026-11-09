@@ -55,17 +55,45 @@ npx --yes --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ih
 | `test:data` | `node --test "server/test/**/*.test.mjs"` | `ihub-srv check data` |
 
 - 画面の設定の `app.name` を、`iHub` 以外にしたときは、`start:api` と `serve` に `--app-name <同じ名前>` を付けます。
+- `test`・`eject` は、雛形の `package.json` にはありません。(残してもかまいません) 手順 1 で `src/App.test.js` を消すと、テストが 1 つも無くなるので、`npm test` は、テストが無いと言って止まります。(CRA の雛形のままの `App.test.js` は、もともと `learn react` という文字を探すだけで、動かないテストです) テストを書かないときは、`test` を消してかまいません。
 
-`dependencies` から、iHub 本体が持つパッケージを消します。
+`package.json` の `dependencies` と、`overrides` を直します。
 
-- 消すもの: `@yanqirenshi/colonoscope`・`d3.deployment`・`d3.er`・`d3.sitemap`・`d3.ter`・`d3.unchi`・`menubook`・`model.*`・`react-masonry-component`・`table.wbs`・`beach`、`@splidejs/react-splide`・`@uiw/react-md-editor`・`bulma`・`react-measure`・`sogh`・`tion`、サーバーの `hono`・`@hono/node-server`・`ajv`・`ajv-i18n`
-- 残すもの: アプリが直接使うパッケージ。(例: `@yanqirenshi/manipulater`・`@yanqirenshi/markdown.sitter`・`react`・`react-redux`・`react-router-dom`・`@mui/*`・`@emotion/*`、DFD などを足していたときの `@yanqirenshi/d3.dfd`)
+**消すもの**
+
+- iHub 本体が持つパッケージ: `@yanqirenshi/colonoscope`・`d3.deployment`・`d3.er`・`d3.sitemap`・`d3.ter`・`d3.unchi`・`menubook`・`model.*`・`react-masonry-component`・`table.wbs`・`beach`、`@splidejs/react-splide`・`@uiw/react-md-editor`・`bulma`・`react-measure`・`sogh`・`tion`、サーバーの `hono`・`@hono/node-server`・`ajv`・`ajv-i18n`
+- `react-router`。(`react-router-dom` が、必要な `react-router` を持ってきます。アプリの `package.json` に `react-router` も書いていると、`react-router-dom` の中の版とずれて 2 つ入り、`/wbs/{id}` のページが空になることがあります。[困ったとき](#/troubleshooting) を見てください)
+- `overrides` の、`tion` の `react-router-dom` の項目。(`tion` 0.1.3 以降では、要りません。`tion` は消すので、`overrides` ごと消します)
+
+**残すもの**
+
+アプリが直接使うパッケージです。(例: `@yanqirenshi/manipulater`・`@yanqirenshi/markdown.sitter`・`react`・`react-redux`・`react-router-dom`・`@mui/*`・`@emotion/*`、DFD などを足していたときの `@yanqirenshi/d3.dfd`)
+
+**上げるもの**
+
+アプリが直接使っている、iHub のパッケージ (`@yanqirenshi/manipulater` など) は、MUI を peerDependencies にした版に上げます。(`@yanqirenshi/manipulater` は `^0.1.0`) 古い版のままだと、その版が `@mui/material` 5 を持ち込んで、MUI が 2 つ入ります。
+
+**使っていないもの**
+
+コピー元の iHub の `package.json` から引き継いだだけで、アプリが使っていないものが残っていることがあります。(例: `@yanqirenshi/d3.gantt`・`d3.network`・`wnqi.big.size`・`react-bpmn`・`winbox`・`@fortawesome/*`・`workbox-*`・`@testing-library/*`)
+
+- アプリの `src/` で `import` されていなければ、消してかまいません。(`grep -rn "<パッケージ名>" src` で確かめられます)
+- 消すのは任意です。迷うときは、残してかまいません。(残しても、動きは変わりません。`npm install` が少し重くなるだけです)
+- `workbox-*` は、雛形の `src/js/serviceWorkerRegistration.js` が使いません。(`src/` に、Workbox を使う `service-worker.js` を置いているときだけ、要ります)
 
 ```
 npm install
 ```
 
 `package-lock.json` は、消さずに、そのまま使ってください。(消すと、依存するパッケージの版が変わって、動かなくなることがあります)
+
+`@mui/material` が、1 つだけ入ったことを確かめます。
+
+```
+npm ls @mui/material
+```
+
+すべての行が、同じ版 (`9.x`) で、`@mui/material@5` が出ないことを確かめてください。(5 が出るときは、それを持ち込んでいるパッケージを、上の「上げるもの」のように上げます。`npm ls @mui/material` の木に、持ち込んでいるパッケージが出ます)
 
 ### 4. `src/index.js` などを、パッケージの形にする
 
@@ -78,6 +106,19 @@ git diff src
 
 上書きするのは、コアの `import` を替えるためです。
 コピー版でこれらのファイルを直していたときは、`git diff` で、自分の直したところが消えていないかを確かめて、移し直します。
+
+手順 2 と、この手順のあとで、`git status` に出るものは、次のとおりです。(UkiyoSnow の例)
+
+| 状態 | ファイル | 内容 |
+|---|---|---|
+| 新しい (`??`) | `src/js/` (`serviceWorkerRegistration.js`・`reportWebVitals.js`) | CRA のもの。手順 2 の `--skip-existing` が作る |
+| 新しい (`??`) | `src/operators/dockColor.js` | ドックの色。`import { DOCK_COLOR } from '../ihub/manegers/colors.js'` の代わり |
+| 変わった (` M`) | `src/index.js`・`src/Router.js` | 設定を渡す形・`import` の替え |
+| 変わった (` M`) | `src/operators/` の、コアを `import` していたもの・`src/wbs/` | `import` の替え。(`import` が無いファイルは、変わりません) |
+| 変わった (` M`) | `package.json` | 手順 2・3 |
+
+アプリに、`.gitignore`・`.env.local.template`・`public/` が無いときは、それらも新しいファイルとして出ます。
+`import` の替えだけの差分なら、そのままで良いです。
 
 `import` の替え方は、次のとおりです。(上書きせずに、手で直すときの参考にしてください)
 
@@ -108,6 +149,10 @@ npx ihub-srv migrate-er data
 
 `data/er/` を、階層形式 (`identifiers.json`・`attributes.json` など) に変換します。
 (`columns.json` などは、消えます。変換したデータは、検査してから書きます)
+
+`data/er/schemas.json` も作ります。中身は、`[]` (空) です。
+これは、テーブルの名前空間 (データベースのスキーマ。例: `PUBLIC`) のマスタで、階層形式の 5 つのファイルの 1 つです。
+フラット形式には、スキーマの情報が無かったので、空になります。(テーブルの `schema` は、付きません) ER 図の描画には使わないので、空のままで、困ることはありません。テーブルの名前空間を持たせたいときは、あとから足します。([データの管理](#/data))
 
 **データが、`src/data/*.js` のとき** ([#21](https://github.com/yanqirenshi/iHub/pull/21) より前の iHub)
 
@@ -162,7 +207,17 @@ diff -r <iHub の clone>/src/ihub <アプリ>/src/ihub
 | Help を書き換えていた (`pages/Help/Section*.js`) | 設定の `help.sections` |
 | GitHub の OAuth を足していた (`server/github.mjs` など) | 不要。(iHub 本体に入っています。[GitHub との連携](#/github)) |
 | サーバーに、アプリ固有のコレクションを足していた (`server/schemas/`・`validation/rules.mjs`) | `createApp` の `extensions` ([API サーバー](#/api)) |
+| ER のテーブルの色分けを、描いたあとに塗り直していた (`panels/ER.js` の `paintTableColors` など)。`server/schemas/er/entities.schema.json` に `color` を足していた | 不要。(iHub 本体が、テーブルの `color` (`{ base, inner }`) で描くようになりました。スキーマにも入っています。手順 5 の `migrate-er` が、`color` をそのまま写します) |
 | 図の描き方など、部品の中を直していた | 設定の差し替え口が無いので、iHub のリポジトリに Issue を立てます。それまでは、そのパネルを、アプリで書いて、`panels` で差し替えます |
+
+**iHub 本体が取り込んだので、移さなくてよいもの**
+
+コピーした時期より後に、iHub 本体が取り込んだものがあります。
+差に見えても、次のものは、移さずに、そのままで良いです。
+
+- 上の表の、GitHub の OAuth と、ER のテーブルの色分け・`color`
+- `server/schemas/` の差のうち、iHub 本体のスキーマに入ったもの。(`ihub-srv check data` が通れば、合っています。通らないときは、メッセージの場所を直すか、`createApp` の `extensions` で、アプリのスキーマを足します)
+- ページを移ったあとの、サイドメニューの名前の表示。(コピー版では、ページを開き直さないと変わらないことがありましたが、いまは、開いているページの名前になります)
 
 **例: DFD のタブを足していたとき**
 

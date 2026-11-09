@@ -100,21 +100,21 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 アプリは、コアの中を触らずに、`config.tabs` でタブを、`config.panels` でパネルを重ねられます。
 (ページの id は、`hooks/usePageTabs.js` の `TAB_DEFS` の名前です。`PAGE_DATA`・`PAGE_BATCHS`・`PAGE_BUSINESS`・`PAGE_DESIGN` など)
 
-例: Data のページに、DFD のタブを足します。(UkiyoSnow/hub が、`usePageTabs.js` と `pages/Data.js` を書き換えて足していたものです)
+例: Batchs のページに、DFD のタブを足します。(UkiyoSnow/hub が、`usePageTabs.js` と `pages/Batchs.js` を書き換えて足していたものです)
 
 ```jsx
 import Dfd from './components/panels/Dfd.js';
 
 const config = {
     // (省略)
-    tabs:   { PAGE_DATA: { list: [{ code: 'dfd', label: 'DFD' }] } },   // タブを足す
-    panels: { PAGE_DATA: { dfd: Dfd } },                                // そのタブに出すパネル
+    tabs:   { PAGE_BATCHS: { list: [{ code: 'dfd', label: 'DFD' }] } },   // タブを足す
+    panels: { PAGE_BATCHS: { dfd: Dfd } },                              // そのタブに出すパネル
 };
 ```
 
 - パネルは、`({ tab })` を受け取る関数の部品です。`tab` は、選んでいるタブ (`{ code, label }`) です。
 - パネルの部品は、モジュールの中で 1 つだけ作ります。(描画のたびに作り直すと、タブを切り替えるたびに作り直されます)
-- 選んだタブは、URL の `?tab=` で決まります。(例: `/data?tab=dfd`)
+- 選んだタブは、URL の `?tab=` で決まります。(例: `/batchs?tab=dfd`)
 
 `tabs[ページの id]` の重ね方:
 
@@ -126,7 +126,7 @@ const config = {
 
 ```jsx
 tabs: {
-    PAGE_DATA: {
+    PAGE_BATCHS: {
         selected: 'dfd',                                  // 初めに DFD を開く
         list: [
             { code: 'dfd', label: 'DFD' },                // 足す
