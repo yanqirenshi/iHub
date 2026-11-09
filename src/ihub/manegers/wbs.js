@@ -1,5 +1,8 @@
 import { useCollections } from '../redux/api/dataApi.js';
 
+// 兄弟の並び。データに order があればそれ、無ければ id の順。
+const orderOf = (data)=> data.order ?? data.id;
+
 let i = 1000000000;
 
 class Wbs {
@@ -35,6 +38,9 @@ class Wbs {
     ///// ////////////////////////////////////////////////////////////////
     ///// Node
     ///// ////////////////////////////////////////////////////////////////
+    // order は兄弟の並び (orderOf)。
+    // WBS の表 (@yanqirenshi/table.wbs → wnqi.big.size) は、order が無いと日付で並べようとして、
+    // 日付の無い WBS では比較が常に -1 になり、逆順になるため、いつも渡す。
     data2project (data) {
         return {
             _id: data.id,
@@ -43,6 +49,7 @@ class Wbs {
             label: data.name,
             name: data.name,
             description: data.description,
+            order: orderOf(data),
         };
     }
     data2wbs (data) {
@@ -53,6 +60,7 @@ class Wbs {
             label: data.name,
             name: data.name,
             description: data.description,
+            order: orderOf(data),
         };
     }
     data2workpackage (data) {
@@ -63,6 +71,7 @@ class Wbs {
             label: data.name,
             name: data.name,
             description: data.description,
+            order: orderOf(data),
         };
     }
     data2projects (pools, projects) {

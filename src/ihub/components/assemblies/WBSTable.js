@@ -1,9 +1,21 @@
 "use client";
 
-import Link from '../assemblies/Link.js';
+import WbsTable, { Supporter } from '@yanqirenshi/table.wbs';
 
-import Table from './Wnqi.Big.Size/index.js';
+import Link from '../assemblies/Link.js';
 import { useWbs } from '../../manegers/wbs.js';
+
+// WBS の表 (@yanqirenshi/table.wbs) に、iHub の WBS のデータ (manegers/wbs.js) を渡す。
+// 表の見た目は bulma (src/ihub/index.js で読み込む) に任せる。
+//
+//   start_id: この id のノードから下だけを出す。(無ければプロジェクト全体)
+//   columns:  列の定義。(無ければ Code・Name・Description)
+
+// 列のセルの定型。Code は /wbs/{id} へのリンクにする。
+const supporter = new Supporter({
+    defaultPath: 'wbs',
+    link: (to, label)=> <Link href={to}>{label}</Link>,
+});
 
 export default function WBSTable (props) {
     const start_id = props.start_id || null;
@@ -26,12 +38,12 @@ export default function WBSTable (props) {
 
     // 表はデータが変わっても作り直さないので、WBS が変わったら表ごと作り直す。
     return (
-        <Table key={wbs.version}
-               source={wbs_source}
-               columns={columns}
-               options={options}
-               style={style_table}
-               start_id={start_id}/>
+        <WbsTable key={wbs.version}
+                  source={wbs_source}
+                  columns={columns}
+                  options={options}
+                  style={style_table}
+                  start_id={start_id}/>
     );
 }
 
@@ -40,25 +52,20 @@ function defaultColumns () {
         {
             label: 'Code',
             required: true,
-            contents: (c, d) => {
-                return (
-                    <Link href={`/wbs/${d._id}`}>
-                      {d._id}
-                    </Link>
-                );
-            },
+            value: (d)=> d._id,
+            contents: supporter.cellID,
         },
         {
             label: 'Name',
             leveling: true,
             required: true,
-            contents: (c, d) => d.label,
+            value: (d)=> d.label,
+            contents: supporter.cellLabel,
         },
         {
             label: 'Description',
-            contents: (c, d) => {
-                return d.description;
-            },
+            value: (d)=> d.description,
+            contents: supporter.cellDescription,
         },
     ];
 }
