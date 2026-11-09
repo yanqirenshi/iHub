@@ -21,7 +21,11 @@ import Section03 from './components/pages/Help/Section03.js';
 //                 labels     … { withIcons, withoutIcons }
 //   wbs:        { page, NotFoundData, NotFoundComponent }   WBS のノードのページ。(必須)
 //                 page       … (path)=> import(...)。動的 import は、ページのあるアプリ側に置く
-//   help:       { sections }                          Help の内容。(既定 いまの 3 つ)
+//   tabs:       { PAGE_DATA: { selected, list } }     ページのタブ。既定 (hooks/usePageTabs.js の TAB_DEFS) に重ねる。(既定 {})
+//                 selected   … 上書きする
+//                 list       … code が同じものは差し替え、無いものは末尾に足す。{ code, hidden: true } は消す
+//   panels:     { PAGE_DATA: { dfd: Dfd } }           タブの code → パネルの部品。既定に重ねる。({ tab })=> 部品。(既定 {})
+//   help:       { sections }                          Help の内容。(部品の配列。各部品は { size } を受け取る。既定 いまの 3 つ)
 //   github:     { token }                             個人用アクセストークン
 // }
 //
@@ -32,6 +36,8 @@ export const DEFAULT_CONFIG = {
     app: { name: 'iHub' },
     menuColors: {},
     colors: {},
+    tabs: {},
+    panels: {},
     help: { sections: [Section01, Section02, Section03] },
     github: { token: undefined },
 };
@@ -60,6 +66,8 @@ export function resolveConfig (config = {}) {
         app:        { ...DEFAULT_CONFIG.app,        ...config.app },
         menuColors: { ...DEFAULT_CONFIG.menuColors, ...config.menuColors },
         colors:     { ...DEFAULT_CONFIG.colors,     ...config.colors },
+        tabs:       { ...DEFAULT_CONFIG.tabs,       ...config.tabs },
+        panels:     { ...DEFAULT_CONFIG.panels,     ...config.panels },
         help:       { ...DEFAULT_CONFIG.help,       ...config.help },
         github:     { ...DEFAULT_CONFIG.github,     ...config.github },
     };

@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { usePageTabs } from '../../hooks/usePageTabs.js';
-
-import Frame from '../assemblies/frames/FrameTabs.js';
+import TabbedPage from '../assemblies/TabbedPage.js';
 import { Monitor, Card, Overview } from '../panels/cockpit/index.js';
 import Loading from '../panels/Loading.js';
 
@@ -11,19 +9,15 @@ import { fetchIssues } from '../../redux/slices/cockpitSlice.js';
 
 import sogh from '../../manegers/sogh.js';
 
+// タブの code → パネルの部品。(設定の panels.PAGE_COCKPIT が重なる)
+// CockpitCards は、下にある。(関数の宣言は先に使える)
+const PANELS = {
+    cockpit: CockpitCards,
+    overview: Overview,
+};
+
 export default function Cockpit () {
-    const [tabs, changeTabs] = usePageTabs('PAGE_COCKPIT');
-
-    const tab = tabs.selected;
-
-    return (
-        <Frame tabs={tabs}
-               onChangeTabs={changeTabs}>
-
-          {'cockpit'===tab  && <CockpitCards/>}
-          {'overview'===tab && <Overview/>}
-        </Frame>
-    );
+    return <TabbedPage pageId="PAGE_COCKPIT" panels={PANELS}/>;
 }
 
 // Cockpit タブ: 自分が担当している Github のイシューをカードで並べる。

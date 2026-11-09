@@ -1,29 +1,21 @@
 import React from 'react';
 
-import { usePageTabs } from '../../hooks/usePageTabs.js';
-
-import Frame from '../assemblies/frames/FrameTabs.js';
-
+import TabbedPage from '../assemblies/TabbedPage.js';
 import SystemDynamics from '../panels/SystemDynamics.js';
 import TM from '../panels/TM.js';
 import Procedures from '../panels/Procedures.js';
 import Wbs from '../panels/Wbs.js';
 import HelpEmpty from '../panels/HelpEmpty.js';
 
+// タブの code → パネルの部品。(設定の panels.PAGE_BUSINESS が重なる)
+const PANELS = {
+    'systemic-design': SystemDynamics,
+    tm: TM,
+    procedures: Procedures,
+    wbs: Wbs,
+    help: HelpEmpty,
+};
+
 export default function Business () {
-    const [tabs, changeTabs] = usePageTabs('PAGE_BUSINESS');
-
-    const tab = tabs.selected;
-
-    return (
-        <Frame tabs={tabs}
-               onChangeTabs={changeTabs}>
-
-          {'systemic-design'===tab && <SystemDynamics/>}
-          {'tm'===tab              && <TM/>}
-          {'procedures'===tab      && <Procedures/>}
-          {'wbs'===tab             && <Wbs/>}
-          {'help'===tab            && <HelpEmpty/>}
-        </Frame>
-    );
+    return <TabbedPage pageId="PAGE_BUSINESS" panels={PANELS}/>;
 }

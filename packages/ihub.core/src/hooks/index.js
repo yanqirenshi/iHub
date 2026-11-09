@@ -1,1 +1,1 @@
-export { usePageTabs } from './usePageTabs.js';
+export { usePageTabs, mergeTabs } from './usePageTabs.js';

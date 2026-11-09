@@ -1,11 +1,12 @@
 import { Splide, SplideSlide } from '@splidejs/react-splide';
 import '@splidejs/react-splide/css';
 
-import Section01 from './Help/Section01.js';
-import Section02 from './Help/Section02.js';
-import Section03 from './Help/Section03.js';
+import { useConfig } from '../../config.js';
 
+// Help。内容は、設定の help.sections (部品の配列) で決める。(既定は、config.js の iHub の 3 つ)
+// 各部品は、{ size } (画面に収まる大きさ) を受け取る。
 export default function Help () {
+    const { help } = useConfig();
     const size = calSize(window.innerWidth, window.innerHeight);
 
     const options = {
@@ -18,17 +19,11 @@ export default function Help () {
         <Splide options={options}
                 aria-label="React Splide Example">
 
-          <SplideSlide>
-            <Section01 size={size}/>
-          </SplideSlide>
-
-          <SplideSlide>
-            <Section02 size={size}/>
-          </SplideSlide>
-
-          <SplideSlide>
-            <Section03 size={size}/>
-          </SplideSlide>
+          {help.sections.map((Section, index)=> (
+              <SplideSlide key={index}>
+                <Section size={size}/>
+              </SplideSlide>
+          ))}
 
         </Splide>
     );
