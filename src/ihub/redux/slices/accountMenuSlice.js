@@ -1,22 +1,26 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { PAGES } from '../../../config/ACCOUNT_MENUS.js';
-
-// サイドメニューで強調する項目 (selected_item) は、ここには持たない。
-// 今の URL から決まるものなので、Frame.js で useLocation() から導出する。(#6)
-const accountMenuSlice = createSlice({
-    name: 'accountMenu',
-    initialState: {
+// サイドメニューの初期の状態。(pages は、設定の menus.pages)
+// 初めに開くページは、pages の先頭のページにする。
+// (アプリに合わせて、ページの名前 (label) を設定だけで変えられるようにするため)
+export function initialAccountMenu (pages = []) {
+    return {
         menu: {
             avater: { enterd: false, clicked: true },
             menu: { enterd: false },
-            // 初めに開くページは、src/config/ACCOUNT_MENUS.js の先頭のページにする。
-            // (アプリに合わせて、ページの名前 (label) を設定だけで変えられるようにするため)
-            current_page: PAGES[0]?.label,
-            pages: PAGES,
+            current_page: pages[0]?.label,
+            pages,
         },
         isOpend: false,
-    },
+    };
+}
+
+// サイドメニューで強調する項目 (selected_item) は、ここには持たない。
+// 今の URL から決まるものなので、Frame.js で useLocation() から導出する。(#6)
+// 初期の状態は、createStore が設定から渡す。(preloadedState)
+const accountMenuSlice = createSlice({
+    name: 'accountMenu',
+    initialState: initialAccountMenu(),
     reducers: {
         menuChanged (state, action) {
             state.menu = action.payload;

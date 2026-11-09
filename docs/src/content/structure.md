@@ -14,7 +14,7 @@ iHub 本体を書き換えずにおくと、iHub が新しくなったときに�
 | `src/wbs/` | WBS のノードのページ (`P{id}.js`) |
 | `src/operators/` | ドックの吹き出しの中身 |
 | `src/Router.js` | ページの URL |
-| `src/App.js` | 画面全体 |
+| `src/index.js` | 入り口。アプリの設定 (サイドメニュー・配色・ドック・WBS のページなど) を組み立てて、`<IHub config={config}>` に渡し、`Router` を描きます。([設定の渡し方](#/customize)) |
 | `src/index.css` | 見た目の上書き (`src/ihub/index.css` のあとに読み込みます) |
 | `public/` | 画像など |
 
@@ -22,7 +22,7 @@ iHub 本体を書き換えずにおくと、iHub が新しくなったときに�
 
 | フォルダ・ファイル | 内容 |
 |---|---|
-| `src/ihub/` | 用意してある部品 (`components`)・Redux (`redux`)・データの扱い (`manegers`) など |
+| `src/ihub/` | 用意してある部品 (`components`)・Redux (`redux`)・データの扱い (`manegers`)・画面全体の `IHub.js`・設定の `config.js` など。アプリのファイルは import せず、設定として受け取ります |
 | `src/ihub/data_example/` | `data/` の雛形 |
 | `src/ihub/wbs_example/` | `src/wbs/` の雛形 |
 | `src/setupProxy.js` | 開発サーバーから API サーバーへの中継 |

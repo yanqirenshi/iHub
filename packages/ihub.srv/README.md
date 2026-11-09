@@ -98,6 +98,8 @@ serve(app, { port: 4000, app_name: 'iHub' });
 
 `app_name` が `iHub` のときは `X-iHub-Client`、`iwo Studio` のときは `X-iwo-Studio-Client` です。
 英数字とハイフン以外の文字は `-` にします。
+ヘッダー名の規則は、`x-{app_name の英数字とハイフン以外を - にして、小文字にしたもの}-client` です。
+画面 (`@yanqirenshi/ihub.core`) は、設定の `app.name` から、同じ規則でヘッダー名を作ります。(`src/ihub/config.js` の `clientHeaderName`。規則を変えるときは、両方を合わせてください)
 
 コレクションの一覧 (`COLLECTIONS`) は、パッケージの `src/schemas/` と `extensions.schemas_dir` の両方から作ります。
 
