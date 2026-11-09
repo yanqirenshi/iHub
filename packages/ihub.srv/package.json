@@ -2,18 +2,41 @@
   "name": "@yanqirenshi/ihub.srv",
   "version": "0.1.0",
   "description": "iHub の API サーバー。data/ の JSON を、スキーマとルールで検証しながら読み書きする。",
+  "keywords": [
+    "ihub",
+    "api-server",
+    "hono",
+    "json-schema",
+    "design-document"
+  ],
+  "homepage": "https://github.com/yanqirenshi/iHub/tree/main/packages/ihub.srv#readme",
+  "bugs": {
+    "url": "https://github.com/yanqirenshi/iHub/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanqirenshi/iHub.git",
+    "directory": "packages/ihub.srv"
+  },
+  "license": "MIT",
+  "author": "yanqirenshi@gmail.com",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "exports": {
     ".": "./src/index.mjs"
   },
-  "bin": {
-    "ihub-srv": "./bin/ihub-srv.mjs"
-  },
   "files": [
     "src",
     "bin",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
+  "bin": {
+    "ihub-srv": "./bin/ihub-srv.mjs"
+  },
   "scripts": {
     "test": "node --test \"test/**/*.test.mjs\""
   },
@@ -30,10 +53,5 @@
     "ajv": "^8.20.0",
     "ajv-i18n": "^4.2.0",
     "hono": "^4.13.13"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yanqirenshi/iHub.git",
-    "directory": "packages/ihub.srv"
   }
 }

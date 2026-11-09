@@ -2,6 +2,28 @@
   "name": "@yanqirenshi/ihub.core",
   "version": "0.1.0",
   "description": "iHub のコア (画面の部品)。設計データを、図や表で見て、編集する。",
+  "keywords": [
+    "ihub",
+    "react",
+    "wbs",
+    "er",
+    "diagram",
+    "design-document"
+  ],
+  "homepage": "https://github.com/yanqirenshi/iHub/tree/main/packages/ihub.core#readme",
+  "bugs": {
+    "url": "https://github.com/yanqirenshi/iHub/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanqirenshi/iHub.git",
+    "directory": "packages/ihub.core"
+  },
+  "license": "MIT",
+  "author": "yanqirenshi@gmail.com",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "dist/index.js",
   "module": "dist/index.js",
   "exports": {
@@ -13,7 +35,9 @@
   "files": [
     "dist",
     "examples",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "babel src --out-dir dist --delete-dir-on-start && node scripts/copy-assets.mjs",
@@ -55,11 +79,6 @@
     "react-redux": "^9.3.0",
     "react-router": "^7.18.1",
     "react-router-dom": "^7.18.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yanqirenshi/iHub.git",
-    "directory": "packages/ihub.core"
   },
   "devDependencies": {
     "@babel/cli": "^8.1.0",
