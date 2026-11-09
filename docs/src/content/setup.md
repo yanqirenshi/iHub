@@ -23,7 +23,7 @@ npx --yes --legacy-peer-deps --package=@yanqirenshi/ihub.core --package=@yanqire
 
 | ファイル・フォルダ | 内容 |
 |---|---|
-| `package.json` | 2 つのパッケージと、必要なパッケージ・`scripts`・`overrides`。(すでにあるときは、足りない項目だけを足します) |
+| `package.json` | 2 つのパッケージと、必要なパッケージ・`scripts`。(すでにあるときは、足りない項目だけを足します) |
 | `src/index.js` | 入り口。アプリの設定を組み立てて、iHub に渡します。([設定の渡し方](#/customize)) |
 | `src/Router.js` | ページの URL |
 | `src/config/` | サイドメニューの項目・色・アイコン・アプリの配色・ドックのボタン |
@@ -35,7 +35,7 @@ npx --yes --legacy-peer-deps --package=@yanqirenshi/ihub.core --package=@yanqire
 | `public/` | 画像など |
 | `.gitignore`・`.env.local.template` | git で共有しないもの・環境変数の雛形 |
 
-- 最初の 1 回だけ、`--legacy-peer-deps` を付けます。(iHub が使っている `tion` が、`react-router-dom` の 6 を求めているため、`package.json` の `overrides` が無い状態の `npm install` は、`ERESOLVE` で止まります。雛形の `package.json` には `overrides` が入っているので、2 回目からは要りません)
+- `--legacy-peer-deps` は、この最初のコマンドだけに付けます。(`npx` の一時的な入れ先には、アプリの `package.json` がまだ無いので、`react` などの peerDependencies が、最新の版 (react 19) に解決されて、iHub が求める 18 と合わず、`ERESOLVE` で止まるためです。雛形の `package.json` ができたあとの `npm install` には、要りません)
 - 同じ名前のファイルがあるときは、何も書かずに止まります。(`--force` で上書き、`--skip-existing` で、無いものだけを作ります)
 
 ## 2. パッケージを入れる

@@ -17,7 +17,8 @@ npx ihub-srv init
 npm start
 ```
 
-`ihub-srv init --app` が、`package.json` (下の `overrides` も入ります)・`src/index.js` などのアプリのファイルを作ります。
+`ihub-srv init --app` が、`package.json`・`src/index.js` などのアプリのファイルを作ります。
+(最初の `npx` にだけ `--legacy-peer-deps` を付けます。`npx` の一時的な入れ先では、`react` が 19 に解決されて、`ERESOLVE` で止まるためです。`package.json` ができたあとの `npm install` には、要りません)
 すでにあるアプリに入れるときは、次のとおりです。
 
 ```
@@ -29,19 +30,6 @@ iHub をコピーして使っていたアプリは、マニュアルの「コピ
 次のパッケージは、アプリのものと 1 つにするため、アプリで入れます。(peerDependencies)
 
 `react`・`react-dom`・`react-redux`・`@reduxjs/toolkit`・`react-router`・`react-router-dom`・`@mui/material`・`@mui/icons-material`・`@emotion/react`・`@emotion/styled`
-
-`tion` (iHub が使うパッケージ) は、`react-router-dom` の 6 を求めているため、`react-router-dom` の 7 を使うときは、アプリの `package.json` に次の `overrides` が要ります。
-(無いと、`npm install` が `ERESOLVE` で失敗します)
-
-```json
-{
-  "overrides": {
-    "tion": {
-      "react-router-dom": "$react-router-dom"
-    }
-  }
-}
-```
 
 ## 使う
 

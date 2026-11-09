@@ -50,7 +50,7 @@ test('init --app は、アプリのファイルを作り、package.json が無�
 
     assert.equal(pkg.scripts['start:api'], 'ihub-srv --data data');
     assert.ok(pkg.dependencies['@yanqirenshi/ihub.core']);
-    assert.ok(pkg.overrides.tion);
+    assert.equal(pkg.overrides, undefined);
 
     // 同じ名前のファイルがあれば、何も書かずに 1 で終わる。--force なら上書きする。
     assert.equal(run('init', '--app', dir).status, 1);
