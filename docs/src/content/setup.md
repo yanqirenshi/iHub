@@ -31,6 +31,7 @@ npx --yes --legacy-peer-deps --package=@yanqirenshi/ihub.core --package=@yanqire
 | `src/wbs/` | WBS のノードのページ。(ページが無いときの表示の 2 つが入っています) |
 | `src/setupProxy.js` | 開発サーバーから API サーバーへの中継 |
 | `src/index.css` | 見た目の上書き |
+| `src/js/` | service worker の登録 (`serviceWorkerRegistration.js`) と、reportWebVitals (`reportWebVitals.js`)。CRA のものです |
 | `public/` | 画像など |
 | `.gitignore`・`.env.local.template` | git で共有しないもの・環境変数の雛形 |
 
