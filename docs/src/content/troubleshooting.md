@@ -2,7 +2,8 @@
 
 | 症状 | 原因と直し方 |
 |---|---|
-| `npx ... ihub-srv init --app` が `ERESOLVE` で止まる | 最初の `npx` に、`--legacy-peer-deps` を付けてください。([導入のしかた](#/setup)) `package.json` ができたあとの `npm install` には、要りません。 |
+| `npx ... ihub-srv init --app` が `ERESOLVE` で止まる | `@yanqirenshi/ihub.core` 0.1.x を使っているときは、最初の `npx` に `--legacy-peer-deps` が要ります。(`react` が 19 に解決されて、0.1.x が求める 18 と合わないためです) 0.2.0 以降では、要りません。 |
+| 画面が表示されない (`/wbs/{id}` のページが空になる) | `react-router` と `react-router-dom` が、別の版で 2 つ入っています。(`npm ls react-router` で確かめられます) `package.json` の `react-router` を消して (`react-router-dom` が、必要な `react-router` を持ってきます)、`npm install` をやり直してください。 |
 | `package.json` に、`overrides` (`tion` の `react-router-dom`) が残っている | `@yanqirenshi/ihub.core` 0.1.0 の雛形で作った `package.json` には、`overrides` が入っています。0.1.1 以降 (`tion` 0.1.3 以降) では要りませんが、残っていても害は無いので、消してかまいません。(`tion` が 0.1.2 以前だと、`npm install` が `ERESOLVE` で止まります。`npm update tion` で、0.1.3 以降にしてください) |
 | 「データを読み込めませんでした」と表示される | API サーバーが動いていません。`npm start` で起動してください。(`npm run start:web` だけでは、API サーバーは起動しません) `npm start` のログに `[api]` のエラーが出ているときは、ポート 4000 をほかのアプリが使っていないか確かめてください。 |
 | 画面の上に「… がフォーマットやルールに合っていないため、画面に反映していません。」と出る | `data/` の JSON に、書き間違いや、参照先の無いデータがあります。メッセージに出ている場所を直してください。`npx ihub-srv check data` でも確かめられます。 |

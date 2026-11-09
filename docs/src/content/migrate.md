@@ -38,7 +38,7 @@ git rm -r src/ihub server src/App.js src/App.test.js
 ### 2. 雛形のファイルを足す
 
 ```
-npx --yes --legacy-peer-deps --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ihub-srv init --app --skip-existing
+npx --yes --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ihub-srv init --app --skip-existing
 ```
 
 - すでにあるファイル (`src/config/` など、自分のもの) は、そのままにして、無いものだけを作ります。(`src/js/` など)
