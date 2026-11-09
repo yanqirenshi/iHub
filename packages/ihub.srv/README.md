@@ -10,7 +10,7 @@ iHub の画面 (`@yanqirenshi/ihub.core`) は、起動時にこの API サーバ
 
 |   |            |                                                                     |
 |---|------------|---------------------------------------------------------------------|
-| - | bin/ihub-srv.mjs | CLI (起動・check・init)                                       |
+| - | bin/ihub-srv.mjs | CLI (起動・check・init・convert-legacy・migrate-er)           |
 | - | src/index.mjs    | 公開するもの (createApp・serve・validateData・validateDataDir・COLLECTIONS) |
 | - | src/app.mjs      | API のルート (createApp)                                      |
 | - | src/serve.mjs    | 127.0.0.1 で待ち受ける                                        |
@@ -20,7 +20,7 @@ iHub の画面 (`@yanqirenshi/ihub.core`) は、起動時にこの API サーバ
 | d | src/stores       | data/ の JSON ファイルの読み書き                              |
 | d | src/schemas      | コレクションごとの JSON Schema ({domain}/{collection}.schema.json) |
 | d | src/validation   | スキーマと、コレクションをまたぐルール (id の重複・参照の整合性) による検証 |
-| d | src/tools        | 古い形式のデータ (src/data/*.js) を、data/ の JSON に変換するスクリプト |
+| d | src/tools        | `convert-legacy`・`migrate-er` の変換 (古い形式のデータを、新しい形式に変換する) |
 | d | test             | テスト                                                        |
 
 ## CLI
@@ -29,6 +29,9 @@ iHub の画面 (`@yanqirenshi/ihub.core`) は、起動時にこの API サーバ
 ihub-srv [--data <dir>] [--static <dir>] [--port <n>] [--app-name <name>]
 ihub-srv check <dir>... [--schemas <dir>]
 ihub-srv init [dir]
+ihub-srv init --app [dir] [--force | --skip-existing | --only <path>...]
+ihub-srv convert-legacy <古い src/data のフォルダ> <data のフォルダ> [--force]
+ihub-srv migrate-er <data のフォルダ>
 ```
 
 ### 起動
@@ -67,6 +70,47 @@ ihub-srv init data
 
 雛形 (`@yanqirenshi/ihub.core` の `examples/data`) から、データのフォルダを作ります。
 フォルダに同じ名前のファイルがあるときは、何も書かずに 1 で終わります。
+
+### init --app
+
+```
+ihub-srv init --app [dir]
+```
+
+雛形 (`@yanqirenshi/ihub.core` の `examples/app`) から、アプリのファイル (`src/index.js`・`src/Router.js`・`src/config/`・`src/operators/`・`src/wbs/`・`src/setupProxy.js`・`public/`・`.gitignore`・`.env.local.template` など) を作ります。
+`dir` の既定は、作業フォルダです。
+
+| オプション | 内容 |
+|---|---|
+| (なし) | 同じ名前のファイルがあるときは、何も書かずに 1 で終わります。 |
+| `--force` | 上書きします。 |
+| `--skip-existing` | すでにあるファイルはそのままにして、無いものだけを作ります。 |
+| `--only <path>` | 雛形のうち、`path` (ファイル、またはフォルダ。例: `src/index.js`) だけを、上書きして作ります。何度でも指定できます。`package.json` は変えません。 |
+
+`package.json` があるときは、足りない項目 (`dependencies`・`scripts`・`overrides`・`eslintConfig`・`browserslist`) だけを足します。(すでにある項目は変えません。`--only` のときは、触りません) 無いときは、雛形から作ります。
+作ったあとは、`npm install` を実行してください。
+
+### convert-legacy
+
+```
+ihub-srv convert-legacy src/data data
+```
+
+データが `src/data/*.js` だったころ ([#21](https://github.com/yanqirenshi/iHub/pull/21) より前) の iHub をコピーしたアプリのデータを、`data/` の JSON に変換します。
+
+- 書き出し先に同じ名前のファイルがあるときは、何も書かずに 1 で終わります。(上書きするときは `--force` を付けます)
+- `src/data/` の `ACCOUNT_MENUS.js`・`ICONS.js`・`OPERATOR_ITEMS.js` は変換しません。`src/config/` に移します。
+- ER は、階層形式にして書きます。
+
+### migrate-er
+
+```
+ihub-srv migrate-er data
+```
+
+`data/er/` を、フラット形式 (`columns.json`・`column_instances.json`・`ports.json` がある形) から、階層形式 (`identifiers.json`・`attributes.json` など。`@yanqirenshi/model.er` のレコード) に変換します。
+変換したデータを検査して (問題があれば、何も書かずに 1 で終わります)、書き換えます。
+変換済みのときは、止まります。
 
 ## createApp
 
@@ -141,6 +185,8 @@ GitHub の OAuth App (Web アプリケーションフロー) で、画面が Git
 - OAuth App の Authorization callback URL は、画面を開く URL の `/api/github/oauth/callback` にします。(例: 開発サーバーなら `http://localhost:3000/api/github/oauth/callback`、`ihub-srv --static` なら `http://localhost:4000/api/github/oauth/callback`)
 - 求める権限は `repo`・`project`・`read:org` です。
 - `/api/{domain}/{collection}` より先に登録するので、`/api/github/token` がコレクションと見なされることはありません。
+- `/api/github/token` が、トークンを画面に返せるのは、API サーバーが、`guard` (`Host`・`Origin` の確認) で、このパソコンの中からの要求だけを受け付けているためです。この確認を外して公開しないでください。
+- callback URL は、要求の `Host` から、`http://` 固定で作ります。`https` の後ろ (リバースプロキシなど) に置く構成は、想定していません。
 
 ## 変更の通知
 
@@ -190,12 +236,5 @@ iHub のリポジトリのルートで `npm run test:data` を実行すると、
 
 ## 古い形式のデータを変換するとき
 
-データが src/data/*.js だったころの iHub をコピーしたアプリは、次のコマンドで data/ の JSON に変換できます。
-
-```
-node node_modules/@yanqirenshi/ihub.srv/src/tools/convert-legacy-data.mjs src/data data
-```
-
-- 書き出し先に同じ名前のファイルがあるときは、何も書かずに止まります。(上書きするときは --force を付けます)
-- src/data/ の ACCOUNT_MENUS.js・ICONS.js・OPERATOR_ITEMS.js は変換しません。src/config/ に移します。
-- MODULE_TYPELESS_PACKAGE_JSON という警告が出ますが、問題はありません。
+`ihub-srv convert-legacy` (データが `src/data/*.js` のとき) と、`ihub-srv migrate-er` (ER がフラット形式のとき) で変換できます。
+コピー版のアプリを、パッケージを使う形に移す手順全体は、マニュアルの「コピー版からの移行」を見てください。

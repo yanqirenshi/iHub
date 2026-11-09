@@ -2,7 +2,7 @@
 
 ## 設定の渡し方 (`src/index.js`)
 
-iHub 本体 (`@yanqirenshi/ihub.core`。リポジトリでは `packages/ihub.core/`) は、アプリのファイル (`src/config/`・`src/operators/`・`src/wbs/` など) を import しません。
+iHub 本体 (`@yanqirenshi/ihub.core`) は、アプリのファイル (`src/config/`・`src/operators/`・`src/wbs/` など) を import しません。
 アプリに固有のものは、`src/index.js` で設定 (`config`) にまとめて、`<IHub>` に渡します。
 
 ```jsx
@@ -54,7 +54,7 @@ root.render(
 
 タブのあるページ (`pages.Data`・`pages.Batchs`・`pages.Business` など) は、タブの一覧と、タブごとのパネルの表で描いています。
 アプリは、コアの中を触らずに、`config.tabs` でタブを、`config.panels` でパネルを重ねられます。
-(ページの id は、`hooks/usePageTabs.js` の `TAB_DEFS` の名前です。`PAGE_DATA`・`PAGE_BATCHS`・`PAGE_BUSINESS`・`PAGE_DESIGN` など)
+(ページの id は、`PAGE_DATA`・`PAGE_BATCHS`・`PAGE_BUSINESS`・`PAGE_DESIGN` などです。一覧は、`@yanqirenshi/ihub.core` の README の「ページの id」にあります)
 
 例: Data のページに、DFD のタブを足します。(UkiyoSnow/hub が、`usePageTabs.js` と `pages/Data.js` を書き換えて足していたものです)
 
@@ -254,7 +254,7 @@ iHub は、サイドメニューを差し色の梅紫にするため、`backgrou
 ### サイドメニューの色
 
 `src/config/ACCOUNT_MENU_COLORS.js` で、サイドメニューの背景の色と、文字の色を決めます。
-iHub 本体の `Frame.js` を直す必要はありません。
+iHub 本体 (`node_modules/` の中) を直す必要はありません。
 
 | 項目 | 書き方 | 内容 |
 |---|---|---|

@@ -5,9 +5,8 @@
 //   階層形式 (新):     er/{schemas,identifiers,attributes,entities,relationships}.json
 //                      d3.ter (TM) と同じ形。@yanqirenshi/model.er のレコード
 //
-// 使い方: node node_modules/@yanqirenshi/ihub.srv/src/tools/migrate-er-hierarchical.mjs <data フォルダ>
-//   例:   node node_modules/@yanqirenshi/ihub.srv/src/tools/migrate-er-hierarchical.mjs data
-//         node node_modules/@yanqirenshi/ihub.srv/src/tools/migrate-er-hierarchical.mjs src/ihub/data_example
+// 使い方: ihub-srv migrate-er <data フォルダ>
+//   例:   ihub-srv migrate-er data
 //
 // <data フォルダ>/er/ の 5 つのファイルを読み、階層形式の 5 つのファイルに書き換える。
 // (columns.json・column_instances.json・ports.json は消す)
@@ -189,7 +188,7 @@ if (process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url)
     const dir = process.argv[2];
 
     if (!dir) {
-        console.error('使い方: node node_modules/@yanqirenshi/ihub.srv/src/tools/migrate-er-hierarchical.mjs <data フォルダ>');
+        console.error('使い方: ihub-srv migrate-er <data フォルダ>');
         process.exit(1);
     }
 

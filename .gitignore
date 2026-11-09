@@ -39,3 +39,6 @@ src/data/samples/
 
 # ビルドした成果物 (npm run build -w @yanqirenshi/ihub.core)
 /packages/*/dist
+# 雛形のアプリ (参照アプリから、ビルドのときに作る)
+/packages/ihub.core/examples/app/src
+/packages/ihub.core/examples/app/public

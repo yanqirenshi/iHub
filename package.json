@@ -61,7 +61,7 @@
     "prebuild": "npm run build -w @yanqirenshi/ihub.core",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "test:data": "ihub-srv check data packages/ihub.core/examples/data && npm test -w @yanqirenshi/ihub.srv",
+    "test:data": "npm run build -w @yanqirenshi/ihub.core && ihub-srv check data packages/ihub.core/examples/data && npm test -w @yanqirenshi/ihub.srv",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

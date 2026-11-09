@@ -8,9 +8,23 @@ iHub のコア (画面の部品) です。
 
 ## 入れる
 
+新しいアプリは、雛形から作ります。(マニュアルの「導入のしかた」)
+
+```
+npx --yes --legacy-peer-deps --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ihub-srv init --app
+npm install
+npx ihub-srv init
+npm start
+```
+
+`ihub-srv init --app` が、`package.json` (下の `overrides` も入ります)・`src/index.js` などのアプリのファイルを作ります。
+すでにあるアプリに入れるときは、次のとおりです。
+
 ```
 npm install @yanqirenshi/ihub.core @yanqirenshi/ihub.srv
 ```
+
+iHub をコピーして使っていたアプリは、マニュアルの「コピー版からの移行」を見てください。
 
 次のパッケージは、アプリのものと 1 つにするため、アプリで入れます。(peerDependencies)
 
@@ -169,6 +183,32 @@ const config = {
 };
 ```
 
+### ページの id
+
+| ページの id | ページ | タブの code | 初めに開くタブ |
+|---|---|---|---|
+| `PAGE_API` | `pages.Api` (参照アプリでは `/api`) | `wbs`・`help` | `wbs` |
+| `PAGE_BATCHS` | `pages.Batchs` (参照アプリでは `/batchs`) | `wbs`・`help` | `wbs` |
+| `PAGE_BPMN` | `docPages.BPMN` (参照アプリでは `/bpmn`) | `palettes`・`styles`・`methods`・`overview` | `palettes` |
+| `PAGE_BUSINESS` | `pages.Business` (参照アプリでは `/business`) | `systemic-design`・`tm`・`procedures`・`wbs`・`help` | `tm` |
+| `PAGE_COCKPIT` | `pages.Cockpit` (参照アプリでは `/`) | `cockpit`・`overview` | `cockpit` |
+| `PAGE_CLASSES` | `pages.Classes` (参照アプリでは `/classes`) | `class-diagram`・`wbs`・`help` | `class-diagram` |
+| `PAGE_DATA` | `pages.Data` (参照アプリでは `/data`) | `er-diagram`・`wbs`・`help` | `er-diagram` |
+| `PAGE_DDD` | `pages.DDD` (参照アプリでは `/ddd`) | `ubiquitous-language`・`model-driven-design`・`hands-on-modeler`・`declarative-design`・`layer-architecture`・`overview` | `layer-architecture` |
+| `PAGE_DESIGN` | `pages.Design` (参照アプリでは `/design`) | `ui-panels`・`ui-assemblies`・`ui-parts`・`ui-events`・`wbs`・`help` | `ui-parts` |
+| `PAGE_DEVOPS` | `pages.DevOps` (参照アプリでは `/devops`) | `bpmn`・`wbs`・`help` | `bpmn` |
+| `PAGE_MARKETS` | `pages.Markets` (参照アプリでは `/markets`) | `user-scenario`・`customer-journey-map`・`use-case`・`wbs`・`help` | `user-scenario` |
+| `PAGE_MESSAGES` | `pages.Messages` (参照アプリでは `/message`) | `model`・`wbs`・`help` | `wbs` |
+| `PAGE_ORGANIZATIONS` | `pages.Organizations` (参照アプリでは `/organizations`) | `wbs`・`help` | `wbs` |
+| `PAGE_SCREENS` | `pages.Screens` (参照アプリでは `/screens`) | `screen-transition-diagram`・`screens`・`wbs`・`help` | `screen-transition-diagram` |
+| `PAGE_SYSTEMS` | `pages.SystemEnvironment` (参照アプリでは `/system-environment`) | `system-configuration-diagram`・`wbs`・`help` | `system-configuration-diagram` |
+| `PAGE_ACCOUNT` | `pages.Account` (参照アプリでは `/account`) | `menus`・`operators`・`pages` | `menus` |
+| `PAGE_EXTERNAL_RESOURCES` | `pages.ExternalResources` (参照アプリでは `/external-resources`) | `wbs` | `wbs` |
+| `PAGE_SCRUM` | `pages.Scrum` (参照アプリでは `/scrum`) | `timeline`・`gantt-chart`・`issues`・`pull-requests`・`repositories`・`projects`・`account`・`help` | `projects` |
+
+タブの名前 (label) は、`hooks/usePageTabs.js` の `TAB_DEFS` にあります。
+`TabbedPage` で作った自分のページは、`pageId` に、好きな id (`PAGE_MY` など) を付けられます。
+
 ## GitHub との接続
 
 画面は、GitHub (Scrum・コックピット・Issue の追加) に、次のどちらかのトークンで接続します。
@@ -217,7 +257,7 @@ import { IHub, pages, Frame } from '@yanqirenshi/ihub.core';
 |---|---|
 | `examples/data/` | `data/` の雛形。`ihub-srv init` がコピーします |
 | `examples/wbs/` | WBS のノードのページの例。`src/wbs/` にコピーして使えます |
-| `examples/app/wbs/` | `NotFoundWbsNodeData.js`・`NotFoundWbsNodeComponent.js` の雛形。`src/wbs/` にコピーして、設定の `wbs` に渡します |
+| `examples/app/` | アプリのファイル (`src/`・`public/`・`.gitignore` など) の雛形。`ihub-srv init --app` がコピーします。`src/` と `public/` は、iHub のリポジトリの参照アプリから、ビルドのときに作ります |
 
 `@yanqirenshi/ihub.core/examples/*` から、パスで読めます。
 
