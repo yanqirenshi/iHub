@@ -1,6 +1,6 @@
 // コレクションの読み書きの手順。
 // 書き込みは 1 つずつ順に行い、書く前にドメインのデータ全体をスキーマとルールで検証する。
-import { COLLECTIONS, defaultData, findCollection, validateDomain } from '../validation/index.mjs';
+// 検証の道具 (COLLECTIONS・findCollection・defaultData・validateDomain) は、createValidation() で作ったものを受け取る。
 import { flatten } from '../validation/rules.mjs';
 import { etagOf } from '../stores/FileStore.mjs';
 
@@ -50,7 +50,7 @@ function findRecord (list, key, id) {
 
 // 新しい id を振る。
 // コレクションの最大の id + 1 (空のときは x-id-start) から、ドメインの中で使われていない id まで進める。
-function allocateId (collection, domain) {
+function allocateId (COLLECTIONS, collection, domain) {
     const used = new Set();
 
     for (const c of COLLECTIONS.filter(d=> d.domain===collection.domain && d.idKey))
@@ -82,8 +82,9 @@ function assertObject (value, label) {
 }
 
 export default class DataService {
-    constructor (store) {
+    constructor (store, validation) {
         this.store = store;
+        this.validation = validation;
         this.queue = Promise.resolve();
         // 変更を知らせる先 (画面への通知)
         this.listeners = new Set();
@@ -106,7 +107,7 @@ export default class DataService {
     // ファイルが API の外 (エディタや git) で変わったときに呼ぶ。
     // 検証して、合っていれば changed、合っていなければ invalid を知らせる。
     changed (name) {
-        const collection = findCollection(name);
+        const collection = this.validation.findCollection(name);
 
         if (!collection)
             return Promise.resolve();
@@ -127,7 +128,7 @@ export default class DataService {
 
             this.etags.set(name, etag);
 
-            const errors = validateDomain(collection.domain, domain);
+            const errors = this.validation.validateDomain(collection.domain, domain);
 
             if (errors.length > 0)
                 return this.notify({ type: 'invalid', name, errors });
@@ -137,7 +138,7 @@ export default class DataService {
     }
 
     collection (name) {
-        const collection = findCollection(name);
+        const collection = this.validation.findCollection(name);
 
         if (!collection)
             throw new HttpError(404, `コレクションがありません。(${name})`);
@@ -152,7 +153,7 @@ export default class DataService {
             return data;
 
         if (collection.optional)
-            return defaultData(collection);
+            return this.validation.defaultData(collection);
 
         throw new HttpError(404, `データのファイルがありません。(data/${collection.name}.json)`);
     }
@@ -160,7 +161,7 @@ export default class DataService {
     async loadDomain (domain) {
         const data = {};
 
-        for (const c of COLLECTIONS.filter(d=> d.domain===domain))
+        for (const c of this.validation.COLLECTIONS.filter(d=> d.domain===domain))
             data[c.name] = await this.load(c);
 
         return data;
@@ -170,7 +171,7 @@ export default class DataService {
         const collections = {};
         const etags = {};
 
-        for (const c of COLLECTIONS) {
+        for (const c of this.validation.COLLECTIONS) {
             collections[c.name] = await this.load(c);
             etags[c.name] = etagOf(collections[c.name]);
         }
@@ -213,8 +214,8 @@ export default class DataService {
             const { data, record, conflict } = change(collection, structuredClone(current), domain);
 
             // もともとあったエラーは除いて、この変更で増えたエラーだけを見る。
-            const before = new Set(validateDomain(collection.domain, domain));
-            const errors = validateDomain(collection.domain, { ...domain, [collection.name]: data })
+            const before = new Set(this.validation.validateDomain(collection.domain, domain));
+            const errors = this.validation.validateDomain(collection.domain, { ...domain, [collection.name]: data })
                   .filter(e=> !before.has(e));
 
             if (errors.length > 0) {
@@ -260,7 +261,7 @@ export default class DataService {
 
             assertObject(body, '追加するレコード');
 
-            const record = body[key]===undefined ? { [key]: allocateId(collection, domain), ...body } : body;
+            const record = body[key]===undefined ? { [key]: allocateId(this.validation.COLLECTIONS, collection, domain), ...body } : body;
 
             current.push(record);
 

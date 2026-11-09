@@ -19,7 +19,7 @@ my-app/                 # アプリのリポジトリ
 └─ docs/                # ドキュメントサイト (iHub をコピーしたもの)
     ├─ data/            # このアプリの設計データ
     ├─ src/             # 画面
-    ├─ server/          # API サーバー
+    ├─ packages/        # API サーバー (ihub.srv)
     └─ package.json
 ```
 

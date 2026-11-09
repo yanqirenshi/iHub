@@ -1,8 +1,8 @@
 // 古い形式のデータ (src/data/*.js) を、新しい形式 (data/{domain}/{collection}.json) に変換する。
 // iHub をコピーしたアプリを、データが src/data/*.js だったころ (yanqirenshi/iHub#21 より前) から移すときに使う。
 //
-// 使い方: node server/tools/convert-legacy-data.mjs <古い src/data のフォルダ> <書き出し先の data フォルダ> [--force]
-// 例:     node server/tools/convert-legacy-data.mjs src/data data
+// 使い方: node node_modules/@yanqirenshi/ihub.srv/src/tools/convert-legacy-data.mjs <古い src/data のフォルダ> <書き出し先の data フォルダ> [--force]
+// 例:     node node_modules/@yanqirenshi/ihub.srv/src/tools/convert-legacy-data.mjs src/data data
 //
 // 書き出し先に同じ名前のファイルがあるときは、何も書かずに止める。(--force を付けると上書きする)
 // src/data/ の ACCOUNT_MENUS.js・ICONS.js・OPERATOR_ITEMS.js は変換しない。(src/config/ に移す)
@@ -10,13 +10,13 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import { toHierarchical } from '../../scripts/migrate-er-hierarchical.mjs';
+import { toHierarchical } from './migrate-er-hierarchical.mjs';
 
 const args = process.argv.slice(2).filter(a=> a!=='--force');
 const force = process.argv.includes('--force');
 
 if (args.length!==2) {
-    console.error('使い方: node server/tools/convert-legacy-data.mjs <古い src/data のフォルダ> <書き出し先の data フォルダ> [--force]');
+    console.error('使い方: node node_modules/@yanqirenshi/ihub.srv/src/tools/convert-legacy-data.mjs <古い src/data のフォルダ> <書き出し先の data フォルダ> [--force]');
     process.exit(1);
 }
 

@@ -17,7 +17,7 @@
 | ファイル・フォルダ | 内容 |
 |---|---|
 | `src/` | 画面 |
-| `server/` | API サーバー |
+| `packages/` | API サーバー (`ihub.srv`)。ルートの `package.json` の `workspaces` で使います |
 | `public/` | 画像など |
 | `data/` | 設計のデータ (下の「データを用意する」を見てください) |
 | `package.json`・`package-lock.json` | パッケージの一覧 |

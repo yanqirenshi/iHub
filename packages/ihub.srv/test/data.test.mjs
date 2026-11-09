@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadDataDir, validateData, validateDataDir } from '../validation/index.mjs';
-import { RULES } from '../validation/rules.mjs';
+import { loadDataDir, validateData, validateDataDir } from '../src/validation/index.mjs';
+import { RULES } from '../src/validation/rules.mjs';
 
-const ROOT = fileURLToPath(new URL('../../', import.meta.url));
+const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 
 // data/ と、その雛形の src/ihub/data_example/ は、同じフォーマット (スキーマ) にそろえる。
 for (const dir of ['data', 'src/ihub/data_example']) {
@@ -24,7 +24,7 @@ test('ファイルの過不足を見つける', ()=> {
     const errors = validateData(data);
 
     assert.ok(errors.includes('er/schemas: ファイルがありません。'), errors.join('\n'));
-    assert.ok(errors.includes('er/unknown: スキーマがありません。(server/schemas/er/unknown.schema.json を作ってください)'), errors.join('\n'));
+    assert.ok(errors.includes('er/unknown: スキーマがありません。(er/unknown.schema.json を、extensions.schemas_dir のフォルダに作ってください)'), errors.join('\n'));
 });
 
 test('スキーマに無い項目を見つける', ()=> {
