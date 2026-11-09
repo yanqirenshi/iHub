@@ -1,3 +1,7 @@
+export { default as DesignAssemblies } from './design/Assemblies.js';
+export { default as DesignEvents     } from './design/Events.js';
+export { default as DesignPanels     } from './design/Panels.js';
+export { default as DesignParts      } from './design/Parts.js';
 export { default as ER             } from './ER.js';
 export { default as HelpEmpty      } from './HelpEmpty.js';
 export { default as Loading        } from './Loading.js';
