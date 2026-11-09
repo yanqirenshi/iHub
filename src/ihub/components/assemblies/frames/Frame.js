@@ -9,34 +9,36 @@ import { menuChanged, menuOpened, menuClosed } from '../../../redux/slices/accou
 import MenuBook from '@yanqirenshi/menubook';
 import Manipulater from '@yanqirenshi/manipulater';
 
-import OperatorsLeafs from '../../../../operators/Operators.js';
-import { withIcons, withoutIcons } from '../../../../operators/labels.js';
-import ACCOUNT_MENU_COLORS from '../../../../config/ACCOUNT_MENU_COLORS.js';
-import { DOCK_COLOR } from '../../../manegers/colors.js';
+import { useConfig } from '../../../config.js';
+import { dockColor } from '../../../manegers/colors.js';
 
 const sx = {
     maxWidth: '100vw',
     height: '100vh',
 };
 
-// サイドメニューの背景の色。(src/config/ACCOUNT_MENU_COLORS.js の background)
-// null のときは、配色の主の色 (src/config/COLORS.js の main) にする。
+// サイドメニューの背景の色。(設定の menuColors.background。src/config/ACCOUNT_MENU_COLORS.js)
+// null のときは、配色の主の色 (設定の colors.main。src/config/COLORS.js) にする。
 // どちらも null のときは、menubook の既定の色になる。
-const menu_theme_color = ACCOUNT_MENU_COLORS.background || DOCK_COLOR || undefined;
+function menuThemeColor (menu_colors, dock_color) {
+    return menu_colors.background || dock_color || undefined;
+}
 
-// サイドメニューの文字の色。(src/config/ACCOUNT_MENU_COLORS.js の text)
+// サイドメニューの文字の色。(設定の menuColors.text)
 // menubook は文字の色を #ffffff に固定し、アイコンを反転して白くしているため、決めてあるときは上書きする。
-// メニューを開いているときのアカウントの円の色。(src/config/ACCOUNT_MENU_COLORS.js の avatar)
+// メニューを開いているときのアカウントの円の色。(設定の menuColors.avatar)
 // menubook は、円を CSS のクラス pair-color1 で塗っているため、決めてあるときは上書きする。
-const menu_sx = {
-    ...(ACCOUNT_MENU_COLORS.text && {
-        '& *': { color: `${ACCOUNT_MENU_COLORS.text} !important` },
-        '& img': { filter: 'none !important' },
-    }),
-    ...(ACCOUNT_MENU_COLORS.avatar && {
-        '& .pair-color1': { background: `${ACCOUNT_MENU_COLORS.avatar} !important` },
-    }),
-};
+function menuSx (menu_colors) {
+    return {
+        ...(menu_colors.text && {
+            '& *': { color: `${menu_colors.text} !important` },
+            '& img': { filter: 'none !important' },
+        }),
+        ...(menu_colors.avatar && {
+            '& .pair-color1': { background: `${menu_colors.avatar} !important` },
+        }),
+    };
+}
 
 // サイドメニューで強調する項目の code を、今の URL から決める。(#6)
 // menubook は選択中の項目を自分では決めず、渡した code を強調するだけなので、ここで決める。
@@ -59,6 +61,14 @@ function selectedItemCode (pages, pathname) {
 export default function Frame (props) {
     const children = props.children;
 
+    const { colors, menuColors, operators: operators_config } = useConfig();
+    const { Leafs: OperatorsLeafs, labels: { withIcons, withoutIcons } } = operators_config;
+
+    // 設定は変わらないので、色は 1 度だけ作る。
+    const dock_color = React.useMemo(()=> dockColor(colors), [colors]);
+    const menu_theme_color = React.useMemo(()=> menuThemeColor(menuColors, dock_color), [menuColors, dock_color]);
+    const menu_sx = React.useMemo(()=> menuSx(menuColors), [menuColors]);
+
     const dispatch = useDispatch();
     const window_size = useSelector(s=> s.window.value);
     const operators = useSelector(s=> s.operators);
@@ -74,7 +84,7 @@ export default function Frame (props) {
                                              [menu.pages, location.pathname]);
 
     // Manipulater の useEffect が operators の変化で再実行されるため、参照を固定する。
-    const operators_with_icons = React.useMemo(()=> withIcons(operators), [operators]);
+    const operators_with_icons = React.useMemo(()=> withIcons(operators), [withIcons, operators]);
 
     const actions = {
         menu: {
@@ -104,7 +114,7 @@ export default function Frame (props) {
 
           <Manipulater operators={operators_with_icons}
                        window_size={window_size}
-                       theme_color={DOCK_COLOR || undefined}
+                       theme_color={dock_color || undefined}
                        actions={actions}
                        leafs={root=> <OperatorsLeafs root={root}/>}/>
 

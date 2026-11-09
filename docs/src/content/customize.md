@@ -1,5 +1,53 @@
 # カスタマイズ
 
+## 設定の渡し方 (`src/index.js`)
+
+iHub 本体 (`src/ihub/`) は、アプリのファイル (`src/config/`・`src/operators/`・`src/wbs/` など) を import しません。
+アプリに固有のものは、`src/index.js` で設定 (`config`) にまとめて、`<IHub>` に渡します。
+
+```jsx
+import { IHub } from './ihub/IHub.js';
+// (ほかの import は省略)
+
+// 作り直さないように、モジュールの中で 1 つだけ作ります。
+const config = {
+    app: { name: 'iHub' },
+    menus: { pages: PAGES, makePages },
+    menuColors: ACCOUNT_MENU_COLORS,
+    colors: COLORS,
+    operators: { items: OPERATOR_ITEMS, Leafs: Operators, labels: { withIcons, withoutIcons } },
+    wbs: {
+        page: (path)=> import(`./wbs/${path}.js`),
+        NotFoundData: NotFoundWbsNodeData,
+        NotFoundComponent: NotFoundWbsNodeComponent,
+    },
+    github: { token: process.env.REACT_APP_GITHU_PARSONAL_TOKEN },
+};
+
+root.render(
+    <React.StrictMode>
+      <IHub config={config}>
+        <Router/>
+      </IHub>
+    </React.StrictMode>
+);
+```
+
+| 項目 | 内容 | 既定 |
+|---|---|---|
+| `app.name` | 画面の名前。書き込んだ画面の id を API サーバーへ送るヘッダー名 (`X-{name}-Client`) にも使います。英数字とハイフン以外の文字は `-` にして、小文字にします | `iHub` |
+| `menus` | サイドメニュー。`pages` は既定のページ (`ACCOUNT_MENUS.js` の `PAGES`)、`makePages` は個人の設定 (on/off) を反映したページを作る関数です | (必須) |
+| `menuColors` | サイドメニューの色 (`ACCOUNT_MENU_COLORS.js`) | `{}` |
+| `colors` | アプリの配色 (`COLORS.js`) | `{}` |
+| `operators` | ドック。`items` はボタンの一覧、`Leafs` は吹き出しの中身、`labels` はボタンのアイコンを差し込む関数 | (必須) |
+| `wbs` | WBS のノードのページ。`page` はページを読み込む関数、`NotFoundData` はデータに無いとき、`NotFoundComponent` はページのファイルが無いときの表示です | (必須) |
+| `help` | Help の内容 (`sections`) | iHub の 3 つ |
+| `github` | GitHub の個人用アクセストークン (`token`) | 無し |
+
+- WBS のページを読み込む動的 `import()` は、ページのあるアプリ側 (`src/index.js`) に書きます。(webpack が、アプリのフォルダを束ねるため)
+- 必須の項目が無いときは、起動したときに、どの項目が無いかを示すエラーになります。
+- 部品から設定を読むときは、`import { useConfig } from '../../ihub/config.js'` の `useConfig()` を使います。
+
 ## ページを足して、サイドメニューに出す
 
 例として、`/my-page` に「自分のページ」を足します。
@@ -90,6 +138,8 @@ const ICONS = {
 | `src/operators/labels.js` | ボタンのアイコン (Manipulater が持っていないもの) |
 
 ボタンを足すときは、3 つを合わせて変えてください。
+この 3 つは、`src/index.js` の設定の `operators` で iHub に渡しています。
+アイコンの色には、ドックの色 (`src/operators/dockColor.js`。配色の主の色) を使います。
 
 ## 見た目を変える
 

@@ -13,7 +13,7 @@ iHub のリポジトリで直したところを、iHub をコピーしたアプ�
 
 ## 置き換えないもの (アプリのもの)
 
-`data/`・`src/config/`・`src/components/`・`src/wbs/`・`src/operators/`・`src/Router.js`・`src/App.js`・`src/index.css`・`.env.local`
+`data/`・`src/config/`・`src/components/`・`src/wbs/`・`src/operators/`・`src/Router.js`・`src/index.js`・`src/index.css`・`.env.local`
 
 ## 手順
 

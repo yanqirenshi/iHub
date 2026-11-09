@@ -4,9 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { authStarted, authSucceeded, authFailed } from './redux/slices/githubAuthSlice.js';
 
+import { useConfig } from './config.js';
 import sogh from './manegers/sogh.js';
 
 export default function Github (props) {
+    const { github } = useConfig();
     const dispatch = useDispatch();
     const auth = useSelector(s=> s.githubAuth.value);
 
@@ -16,11 +18,11 @@ export default function Github (props) {
         dispatch(authStarted());
 
         sogh.connect(
-            process.env.REACT_APP_GITHU_PARSONAL_TOKEN,
+            github.token,
             (viewer)=> dispatch(authSucceeded({ avatarUrl: viewer.avatarUrl() })),
             (error)=> dispatch(authFailed()),
         );
-    }, [auth, dispatch]); // TODO: setAuthed これ入れたないなぁ。。。
+    }, [auth, github, dispatch]); // TODO: setAuthed これ入れたないなぁ。。。
 
 
     return null;

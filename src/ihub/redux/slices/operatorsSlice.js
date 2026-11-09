@@ -1,32 +1,32 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import ROOTS from '../../../config/OPERATOR_ITEMS.js';
-
 const border_width = 3;
 
-function buildInitial () {
+// ドックの初期の状態。(roots は、設定の operators.items)
+export function initialOperators (roots) {
     return {
         initialized: false,
         active: null,
-        // ROOTS['a'|'b'|'c'] is shared singleton data — clone rather than mutate in
+        // roots['a'|'b'|'c'] is shared singleton data — clone rather than mutate in
         // place, since Immer freezes this slice's initial state.
-        list: [
-            ROOTS['a'],
-            ROOTS['b'],
-            ROOTS['c'],
+        list: roots ? [
+            roots['a'],
+            roots['b'],
+            roots['c'],
         ].map(d=> ({
             ...d,
             size: { w: 55, h: 55 },
             position: { x: null, y: null },
             border: { w: border_width },
             branch: {},
-        })),
+        })) : [],
     };
 }
 
+// 初期の状態は、createStore が設定から渡す。(preloadedState)
 const operatorsSlice = createSlice({
     name: 'operators',
-    initialState: buildInitial(),
+    initialState: initialOperators(),
     reducers: {
         operatorsChanged (state, action) {
             return action.payload;

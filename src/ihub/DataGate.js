@@ -10,11 +10,12 @@ import Loading from './components/panels/Loading.js';
 import { CLIENT_ID, collectionUpdated, dataApi, useGetDataQuery } from './redux/api/dataApi.js';
 import { menuPagesChanged } from './redux/slices/accountMenuSlice.js';
 import { setWbsData } from './manegers/wbs.js';
-import { makePages } from '../config/ACCOUNT_MENUS.js';
+import { useConfig } from './config.js';
 
 // API サーバーからデータを読み込んでから、画面を表示する。
 // そのあとは変更の通知を受けて、変わったコレクションだけを読み直す。
 export default function DataGate (props) {
+    const { menus } = useConfig();
     const { data, error } = useGetDataQuery();
     const dispatch = useDispatch();
     const [notice, closeNotice] = useDataEvents();
@@ -24,8 +25,8 @@ export default function DataGate (props) {
     // サイドメニューに、個人の設定 (on/off) を反映する。
     useEffect(()=> {
         if (actives)
-            dispatch(menuPagesChanged(makePages(actives)));
-    }, [actives, dispatch]);
+            dispatch(menuPagesChanged(menus.makePages(actives)));
+    }, [actives, menus, dispatch]);
 
     if (error)
         return <LoadError error={error}/>;

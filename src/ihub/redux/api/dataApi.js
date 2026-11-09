@@ -1,5 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+import { clientHeaderName } from '../../config.js';
+
 // この画面 (タブ) の id。
 // 書き込むときに API サーバーへ送り、変更の通知が自分の書き込みのものかを見分けるために使う。
 export const CLIENT_ID = window.crypto?.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).slice(2);
@@ -32,14 +34,15 @@ async function onWritten (arg, { dispatch, queryFulfilled }) {
     }
 }
 
-// API サーバー (server/) からデータを読み書きする。
+// API サーバー (@yanqirenshi/ihub.srv) からデータを読み書きする。
 // 起動時に GET /api/data で全データを読み込み、そのあとはコレクションごとに差し替える。
 export const dataApi = createApi({
     reducerPath: 'dataApi',
     baseQuery: fetchBaseQuery({
         baseUrl: '/api',
-        prepareHeaders: (headers)=> {
-            headers.set('X-iHub-Client', CLIENT_ID);
+        // ヘッダー名は、設定の app.name から作る。(設定は createStore が thunk の extra に渡す)
+        prepareHeaders: (headers, { extra })=> {
+            headers.set(clientHeaderName(extra.config.app.name), CLIENT_ID);
 
             return headers;
         },
