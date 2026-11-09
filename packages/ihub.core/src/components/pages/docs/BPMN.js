@@ -1,25 +1,19 @@
 import React from 'react';
 
-import { usePageTabs } from '../../../hooks/usePageTabs.js';
-
-import Frame from '../../assemblies/frames/FrameTabs.js';
+import TabbedPage from '../../assemblies/TabbedPage.js';
 import Overview from '../../panels/bpmn/Overview.js';
 import Palettes from '../../panels/bpmn/Palettes.js';
 import Methods from '../../panels/bpmn/Methods.js';
 import Styles from '../../panels/bpmn/Styles.js';
 
+// タブの code → パネルの部品。(設定の panels.PAGE_BPMN が重なる)
+const PANELS = {
+    palettes: Palettes,
+    methods: Methods,
+    styles: Styles,
+    overview: Overview,
+};
+
 export default function BPMN () {
-    const [tabs, changeTabs] = usePageTabs('PAGE_BPMN');
-
-    const tab = tabs.selected;
-
-    return (
-        <Frame tabs={tabs}
-               onChangeTabs={changeTabs}>
-          {'palettes'===tab && <Palettes/>}
-          {'methods'===tab  && <Methods/>}
-          {'styles'===tab   && <Styles/>}
-          {'overview'===tab            && <Overview/>}
-        </Frame>
-    );
+    return <TabbedPage pageId="PAGE_BPMN" panels={PANELS}/>;
 }

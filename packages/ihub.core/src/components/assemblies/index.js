@@ -1,6 +1,7 @@
 export { default as Account                } from './Account.js';
 export { default as AddWbsNode             } from './AddWbsNode.js';
 export { default as Link                   } from './Link.js';
+export { default as TabbedPage             } from './TabbedPage.js';
 export { default as TableTMRelationships   } from './TableTMRelationships.js';
 export { default as TabsSearchParam        } from './TabsSearchParam.js';
 export { default as WBSTable               } from './WBSTable.js';

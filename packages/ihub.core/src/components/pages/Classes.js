@@ -1,25 +1,15 @@
 import React from 'react';
 
-import { usePageTabs } from '../../hooks/usePageTabs.js';
-import Frame from '../assemblies/frames/FrameTabs.js';
+import TabbedPage from '../assemblies/TabbedPage.js';
 import Wbs from '../panels/Wbs.js';
 import HelpEmpty from '../panels/HelpEmpty.js';
 
+// タブの code → パネルの部品。(設定の panels.PAGE_CLASSES が重なる)
+const PANELS = {
+    wbs: Wbs,
+    help: HelpEmpty,
+};
+
 export default function Classes () {
-    const [tabs, changeTabs] = usePageTabs('PAGE_CLASSES');
-
-    const tab = tabs.selected;
-
-    return (
-        <Frame tabs={tabs}
-               onChangeTabs={changeTabs}>
-
-          {'systemic-design'===tab && <div/>}
-          {'tm'===tab && <div/>}
-          {'procedures'===tab && <div/>}
-
-          {'wbs'===tab && <Wbs/>}
-          {'help'===tab && <HelpEmpty/>}
-        </Frame>
-    );
+    return <TabbedPage pageId="PAGE_CLASSES" panels={PANELS}/>;
 }

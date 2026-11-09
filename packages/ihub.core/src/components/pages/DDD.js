@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { usePageTabs } from '../../hooks/usePageTabs.js';
-
-import Frame from '../assemblies/frames/FrameTabs.js';
+import TabbedPage from '../assemblies/TabbedPage.js';
 import Overview from '../panels/ddd/Overview.js';
 import LayerArchitecture from '../panels/ddd/LayerArchitecture.js';
 import UbiquitousLanguage from '../panels/ddd/UbiquitousLanguage.js';
@@ -10,20 +8,16 @@ import ModelDrivenDesign from '../panels/ddd/ModelDrivenDesign.js';
 import HandsOnModeler from '../panels/ddd/HandsOnModeler.js';
 import DeclarativeDesign from '../panels/ddd/DeclarativeDesign.js';
 
+// タブの code → パネルの部品。(設定の panels.PAGE_DDD が重なる)
+const PANELS = {
+    overview: Overview,
+    'layer-architecture': LayerArchitecture,
+    'ubiquitous-language': UbiquitousLanguage,
+    'model-driven-design': ModelDrivenDesign,
+    'hands-on-modeler': HandsOnModeler,
+    'declarative-design': DeclarativeDesign,
+};
+
 export default function DDD () {
-    const [tabs, changeTabs] = usePageTabs('PAGE_DDD');
-
-    const tab = tabs.selected;
-
-    return (
-        <Frame tabs={tabs}
-               onChangeTabs={changeTabs}>
-          {'overview'===tab && <Overview/>}
-          {'layer-architecture'===tab && <LayerArchitecture/>}
-          {'ubiquitous-language'===tab && <UbiquitousLanguage/>}
-          {'model-driven-design'===tab && <ModelDrivenDesign/>}
-          {'hands-on-modeler'===tab && <HandsOnModeler/>}
-          {'declarative-design'===tab && <DeclarativeDesign/>}
-        </Frame>
-    );
+    return <TabbedPage pageId="PAGE_DDD" panels={PANELS}/>;
 }

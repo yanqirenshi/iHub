@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { usePageTabs } from '../../hooks/usePageTabs.js';
-
-import Frame from '../assemblies/frames/FrameTabs.js';
+import TabbedPage from '../assemblies/TabbedPage.js';
 import Wbs from '../panels/Wbs.js';
 import HelpEmpty from '../panels/HelpEmpty.js';
 
@@ -11,21 +9,19 @@ import Assemblies from '../panels/design/Assemblies.js';
 import Parts from '../panels/design/Parts.js';
 import Events from '../panels/design/Events.js';
 
+// WBS は、start_id="1" で出す。(部品は、描画のたびに作り直さないよう、ここで 1 つだけ作る)
+const WbsFromRoot = ()=> <Wbs start_id="1"/>;
+
+// タブの code → パネルの部品。(設定の panels.PAGE_DESIGN が重なる)
+const PANELS = {
+    'ui-panels': Panels,
+    'ui-assemblies': Assemblies,
+    'ui-parts': Parts,
+    'ui-events': Events,
+    wbs: WbsFromRoot,
+    help: HelpEmpty,
+};
+
 export default function Design () {
-    const [tabs, changeTabs] = usePageTabs('PAGE_DESIGN');
-
-    const tab = tabs.selected;
-
-    return (
-        <Frame tabs={tabs}
-               onChangeTabs={changeTabs}>
-
-          {'ui-panels'===tab && <Panels/>}
-          {'ui-assemblies'===tab && <Assemblies/>}
-          {'ui-parts'===tab && <Parts/>}
-          {'ui-events'===tab && <Events/>}
-          {'wbs'===tab && <Wbs start_id="1"/>}
-          {'help'===tab && <HelpEmpty/>}
-        </Frame>
-    );
+    return <TabbedPage pageId="PAGE_DESIGN" panels={PANELS}/>;
 }

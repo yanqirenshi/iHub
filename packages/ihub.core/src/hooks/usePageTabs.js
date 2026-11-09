@@ -1,4 +1,7 @@
+import React from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+import { useConfig } from '../config.js';
 
 // Every entry here is normalized to the flat {selected, list} shape.
 // `selected` here is only the DEFAULT tab; the current selection lives in
@@ -161,10 +164,47 @@ const TAB_DEFS = {
     },
 };
 
+// 既定のタブ (def) に、アプリのタブ (override。設定の tabs[pageId]) を重ねる。
+//   selected … 上書きする
+//   list     … code が同じものは差し替え、無いものは末尾に足す。{ code, hidden: true } は、そのタブを消す
+export function mergeTabs (def, override) {
+    const base = def || { selected: null, list: [] };
+
+    if (!override)
+        return base;
+
+    let list = [...base.list];
+
+    for (const tab of override.list || []) {
+        const index = list.findIndex(t=> t.code===tab.code);
+
+        if (tab.hidden) {
+            if (index >= 0)
+                list.splice(index, 1);
+        } else if (index >= 0) {
+            list[index] = tab;
+        } else {
+            list.push(tab);
+        }
+    }
+
+    const selected = override.selected ?? base.selected;
+
+    return {
+        ...base,
+        // 既定のタブを消したときは、先頭のタブにする。
+        selected: list.some(t=> t.code===selected) ? selected : (list[0]?.code ?? null),
+        list,
+    };
+}
+
+// pageId のページのタブ。(既定は TAB_DEFS。設定の tabs[pageId] で、足す・差し替える・消す)
 export function usePageTabs (pageId) {
     const [searchParams, setSearchParams] = useSearchParams();
+    const { tabs: tabs_config } = useConfig();
 
-    const def = TAB_DEFS[pageId];
+    const def = React.useMemo(()=> mergeTabs(TAB_DEFS[pageId], tabs_config[pageId]),
+                              [pageId, tabs_config]);
 
     const param = searchParams.get('tab');
     const selected = def.list.some(t=> t.code===param) ? param : def.selected;

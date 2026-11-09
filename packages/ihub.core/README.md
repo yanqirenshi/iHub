@@ -83,12 +83,91 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 | `colors` | 配色 (`base`・`main`・`sub`・`accent`)。CSS の色 (`'#rrggbb'`) | `{}` |
 | `operators` | ドック。`items` はボタンの一覧、`Leafs` は吹き出しの中身、`labels` は `{ withIcons, withoutIcons }` | (必須) |
 | `wbs` | WBS のノードのページ。`page` はページを読み込む関数、`NotFoundData`・`NotFoundComponent` はページが無いときの表示 | (必須) |
-| `help` | Help の内容 (`sections`) | iHub の 3 つ |
+| `tabs` | ページのタブ。`{ ページの id: { selected, list } }`。既定のタブに重ねる ([ページのタブとパネルを足す](#ページのタブとパネルを足す)) | `{}` |
+| `panels` | タブの code → パネルの部品。`{ ページの id: { code: 部品 } }`。既定に重ねる | `{}` |
+| `help` | Help の内容 (`sections`。部品の配列) | iHub の 3 つ |
 | `github` | GitHub の個人用アクセストークン (`token`) | 無し |
 
 - 動的 `import()` (`wbs.page`) は、ページのあるアプリ側に書きます。(webpack がアプリのフォルダを束ねるため)
 - 必須の項目が無いときは、起動したときに、どの項目が無いかを示すエラーになります。
 - 詳しくは、`src/config.js` のコメントを見てください。
+
+## ページのタブとパネルを足す
+
+タブのあるページ (`pages.Data`・`pages.Batchs`・`pages.Business` など) は、タブの一覧と、タブごとのパネルの表で描いています。
+アプリは、コアの中を触らずに、`config.tabs` でタブを、`config.panels` でパネルを重ねられます。
+(ページの id は、`hooks/usePageTabs.js` の `TAB_DEFS` の名前です。`PAGE_DATA`・`PAGE_BATCHS`・`PAGE_BUSINESS`・`PAGE_DESIGN` など)
+
+例: Data のページに、DFD のタブを足します。(UkiyoSnow/hub が、`usePageTabs.js` と `pages/Data.js` を書き換えて足していたものです)
+
+```jsx
+import Dfd from './components/panels/Dfd.js';
+
+const config = {
+    // (省略)
+    tabs:   { PAGE_DATA: { list: [{ code: 'dfd', label: 'DFD' }] } },   // タブを足す
+    panels: { PAGE_DATA: { dfd: Dfd } },                                // そのタブに出すパネル
+};
+```
+
+- パネルは、`({ tab })` を受け取る関数の部品です。`tab` は、選んでいるタブ (`{ code, label }`) です。
+- パネルの部品は、モジュールの中で 1 つだけ作ります。(描画のたびに作り直すと、タブを切り替えるたびに作り直されます)
+- 選んだタブは、URL の `?tab=` で決まります。(例: `/data?tab=dfd`)
+
+`tabs[ページの id]` の重ね方:
+
+| 項目 | 内容 |
+|---|---|
+| `selected` | 初めに開くタブの code。既定を上書きします |
+| `list` | タブの一覧。`code` が同じものは差し替え、無いものは末尾に足します |
+| `{ code, hidden: true }` | そのタブを消します。(消したタブが初めに開くタブのときは、先頭のタブになります) |
+
+```jsx
+tabs: {
+    PAGE_DATA: {
+        selected: 'dfd',                                  // 初めに DFD を開く
+        list: [
+            { code: 'dfd', label: 'DFD' },                // 足す
+            { code: 'wbs', label: '作業' },               // 名前を変える (差し替え)
+            { code: 'help', hidden: true },               // Help のタブを消す
+        ],
+    },
+},
+```
+
+`panels[ページの id][code]` は、既定のパネルを上書きします。
+(既定のタブのパネルも、同じ code で差し替えられます。例: `panels: { PAGE_DATA: { 'er-diagram': MyEr } }`)
+設定を渡さないときは、いままでどおりのタブとパネルです。
+
+アプリのページも、同じ形で作れます。
+
+```jsx
+import { TabbedPage } from '@yanqirenshi/ihub.core';
+
+const PANELS = { overview: Overview, notes: Notes };
+
+export default function MyPage () {
+    return <TabbedPage pageId="PAGE_MY" panels={PANELS}/>;
+}
+
+// 設定: tabs: { PAGE_MY: { selected: 'overview', list: [{ code: 'overview', label: '概要' }, { code: 'notes', label: 'メモ' }] } }
+```
+
+## Help を差し替える
+
+`config.help.sections` に、部品の配列を渡すと、Help のページの内容 (縦に並ぶスライド) が変わります。
+各部品は、`{ size }` (画面に収まる大きさ `{ w, h }`) を受け取ります。
+既定は、iHub の 3 つです。
+
+```jsx
+import Section01 from './components/help/Section01.js';
+import Section02 from './components/help/Section02.js';
+
+const config = {
+    // (省略)
+    help: { sections: [Section01, Section02] },
+};
+```
 
 ## 公開しているもの
 
@@ -104,9 +183,9 @@ import { IHub, pages, Frame } from '@yanqirenshi/ihub.core';
 | `pages` | ページ (`pages.Cockpit`・`pages.Data`・`pages.WbsNode` など) |
 | `docPages` | ドキュメントのページ (`docPages.ER`・`docPages.TM` など) |
 | `panels` | ページの中身 (`panels.ER`・`panels.TM` など) |
-| `Frame`・`FrameTabs`・`FrameWbsNode`・`FrameWbsNodeTabs`・`Link`・`TableTMRelationships` など | 中間の部品 (`components/assemblies/index.js`) |
+| `Frame`・`FrameTabs`・`FrameWbsNode`・`FrameWbsNodeTabs`・`TabbedPage`・`Link`・`TableTMRelationships` など | 中間の部品 (`components/assemblies/index.js`) |
 | `ItemWbsNode`・`LinkWBS`・`Tabs` など | 小さな部品 (`components/parts/index.js`) |
-| `usePageTabs` | ページのタブ |
+| `usePageTabs`・`mergeTabs` | ページのタブ |
 | `manegers`・`wbs`・`useWbs`・`sogh` | データのマネージャ |
 | `dataApi`・`useGetDataQuery`・`usePatchCollectionMutation`・`useAddRecordMutation`・`usePatchRecordMutation`・`useCollections`・`errorMessage` | API サーバーからのデータの読み書き |
 | `fetchRepositories`・`fetchProjectsV2` | GitHub (Scrum) |

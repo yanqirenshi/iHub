@@ -1,24 +1,17 @@
 import React from 'react';
 
-import { usePageTabs } from '../../hooks/usePageTabs.js';
-
-import Frame from '../assemblies/frames/FrameTabs.js';
+import TabbedPage from '../assemblies/TabbedPage.js';
 import * as panel from '../panels/sogh/index.js';
 import HelpEmpty from '../panels/HelpEmpty.js';
 
+// タブの code → パネルの部品。(設定の panels.PAGE_SCRUM が重なる)
+const PANELS = {
+    repositories: panel.Repositories,
+    projects: panel.Projects,
+    account: panel.Account,
+    help: HelpEmpty,
+};
+
 export default function Scrum () {
-    const [tabs, changeTabs] = usePageTabs('PAGE_SCRUM');
-
-    const tab = tabs.selected;
-
-    return (
-        <Frame tabs={tabs}
-               onChangeTabs={changeTabs}>
-
-          {'repositories'===tab && <panel.Repositories/>}
-          {'projects'===tab && <panel.Projects/>}
-          {'account'===tab && <panel.Account/>}
-          {'help'===tab && <HelpEmpty/>}
-        </Frame>
-    );
+    return <TabbedPage pageId="PAGE_SCRUM" panels={PANELS}/>;
 }

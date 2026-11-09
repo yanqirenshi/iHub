@@ -1,24 +1,17 @@
 import React from 'react';
 
-import { usePageTabs } from '../../hooks/usePageTabs.js';
-
-import Frame from '../assemblies/frames/FrameTabs.js';
+import TabbedPage from '../assemblies/TabbedPage.js';
 import SystemConfigurationDiagram from '../panels/scd/SystemConfigurationDiagram.js';
 import Wbs from '../panels/Wbs.js';
 import HelpEmpty from '../panels/HelpEmpty.js';
 
+// タブの code → パネルの部品。(設定の panels.PAGE_SYSTEMS が重なる)
+const PANELS = {
+    'system-configuration-diagram': SystemConfigurationDiagram,
+    wbs: Wbs,
+    help: HelpEmpty,
+};
+
 export default function SystemEnvironment () {
-    const [tabs, changeTabs] = usePageTabs('PAGE_SYSTEMS');
-
-    const tab = tabs.selected;
-
-    return (
-        <Frame tabs={tabs}
-               onChangeTabs={changeTabs}>
-
-          {'system-configuration-diagram'===tab && <SystemConfigurationDiagram/>}
-          {'wbs'===tab && <Wbs/>}
-          {'help'===tab && <HelpEmpty/>}
-        </Frame>
-    );
+    return <TabbedPage pageId="PAGE_SYSTEMS" panels={PANELS}/>;
 }
