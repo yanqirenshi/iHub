@@ -20,8 +20,7 @@ import DOCK_COLOR from './dockColor.js';
 // <markdown-workspace> などのカスタム要素を登録する。
 import '@yanqirenshi/markdown.sitter';
 
-import { fetchProjectsV2 } from '../ihub/redux/slices/scrumSlice.js';
-import sogh from '../ihub/manegers/sogh.js';
+import { fetchProjectsV2, sogh } from '@yanqirenshi/ihub.core';
 
 // 吹き出しの大きさ
 const LEAF_W = 1111;

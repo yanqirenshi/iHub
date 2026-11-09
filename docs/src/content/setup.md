@@ -34,16 +34,15 @@
 | `.env.local` | 個人のトークンです。 |
 | `data/local/` | 個人の設定です。 |
 
-コピーした `src/ihub/` の名前は、アプリの名前に変えないでください。
 画面に出る名前の変え方は、[カスタマイズ](#/customize) の「アプリの名前を出す」を見てください。
 
 ## 2. データを用意する
 
 `data/` は、アプリの設計のデータを入れるフォルダです。
-最初は、雛形の `src/ihub/data_example/` の中身を `data/` にコピーして始めると、フォーマットに合ったサンプルから書き換えていけます。
+最初は、雛形の `packages/ihub.core/examples/data/` の中身を `data/` にコピーして始めると、フォーマットに合ったサンプルから書き換えていけます。
 
 ```
-src/ihub/data_example/   →   data/
+packages/ihub.core/examples/data/   →   data/
 ```
 
 データのフォーマットは、[データの管理](#/data) を見てください。

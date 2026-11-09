@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const BIN = fileURLToPath(new URL('../bin/ihub-srv.mjs', import.meta.url));
-const EXAMPLE = fileURLToPath(new URL('../../../src/ihub/data_example/', import.meta.url));
+const EXAMPLE = fileURLToPath(new URL('../../ihub.core/examples/data/', import.meta.url));
 
 const run = (...args)=> spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8' });
 

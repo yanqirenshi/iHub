@@ -68,7 +68,7 @@ WBS の id は、URL (`/wbs/{id}`) とページのファイル名 (`P{id}.js`) �
 npm run test:data
 ```
 
-- `data/` と `src/ihub/data_example/` が、スキーマとルールに合っているかを確かめます。(`ihub-srv check data src/ihub/data_example` と同じです。API サーバーのテストも動きます)
+- `data/` と `packages/ihub.core/examples/data/` が、スキーマとルールに合っているかを確かめます。(`ihub-srv check data packages/ihub.core/examples/data` と同じです。API サーバーのテストも動きます)
 - 別のフォルダを確かめるときは、`npx ihub-srv check <フォルダ>` を使います。
 - 合っていないときは、場所と理由を日本語で表示します。
 
@@ -86,6 +86,6 @@ sitemap/edges: to.id のノードが見つかりません。(id=2000001, to.id=1
 
 ## 雛形
 
-`src/ihub/data_example/` は、`data/` の雛形です。
+`packages/ihub.core/examples/data/` (`@yanqirenshi/ihub.core` の `examples/data/`) は、`data/` の雛形です。
 `data/` と同じフォーマットで、サンプルのデータが入っています。
 新しくアプリのドキュメントを作るときは、ここから始めてください。

@@ -1,20 +1,20 @@
 #!/usr/bin/env node
 // ihub-srv … iHub の API サーバーの CLI。
-//   ihub-srv [--data <dir>] [--static <dir>] [--port <n>]  … 起動する
+//   ihub-srv [--data <dir>] [--static <dir>] [--port <n>] [--app-name <name>]  … 起動する
 //   ihub-srv check <dir>... [--schemas <dir>]               … データのフォルダを検証する
 //   ihub-srv init [dir]                                     … 雛形から data/ を作る
 import { cpSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join, relative, resolve, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 import { createApp, serve } from '../src/index.mjs';
 import { createValidation } from '../src/validation/index.mjs';
 
 const USAGE = `使い方:
-  ihub-srv [--data <dir>] [--static <dir>] [--port <n>]
+  ihub-srv [--data <dir>] [--static <dir>] [--port <n>] [--app-name <name>]
       API サーバーを起動します。(--data の既定は data、--port の既定は環境変数 IHUB_API_PORT か 4000)
+      --app-name には、画面の設定の app.name と同じ名前を指定します。(既定は iHub。書き込んだ画面の id を送るヘッダー名 X-{name}-Client に使います)
       --static にビルドした画面のフォルダを指定すると、画面も出します。
   ihub-srv check <dir>... [--schemas <dir>]
       データのフォルダを、スキーマとルールで検証します。問題があれば 1 で終わります。
@@ -25,6 +25,7 @@ const USAGE = `使い方:
 const OPTIONS = {
     data:    { type: 'string' },
     static:  { type: 'string' },
+    'app-name': { type: 'string' },
     port:    { type: 'string' },
     schemas: { type: 'string' },
     help:    { type: 'boolean', short: 'h' },
@@ -32,7 +33,7 @@ const OPTIONS = {
 
 // 雛形のデータのフォルダ。
 function templateDir () {
-    // @yanqirenshi/ihub.core が入っていれば、その examples/data。
+    // @yanqirenshi/ihub.core の examples/data。
     try {
         const core = dirname(createRequire(import.meta.url).resolve('@yanqirenshi/ihub.core/package.json'));
         const dir = join(core, 'examples', 'data');
@@ -40,14 +41,8 @@ function templateDir () {
         if (existsSync(dir))
             return dir;
     } catch (e) {
-        // 無ければ、次を探す。
+        // 入っていないときは、下のエラーにする。
     }
-
-    // iHub のリポジトリの中。(@yanqirenshi/ihub.core のパッケージ化 (#68) までの間の置き場)
-    const dir = fileURLToPath(new URL('../../../src/ihub/data_example/', import.meta.url));
-
-    if (existsSync(dir))
-        return dir;
 
     throw new Error('雛形のデータが見つかりません。@yanqirenshi/ihub.core を入れてください。');
 }
@@ -60,7 +55,7 @@ function listFiles (dir) {
 }
 
 function start (values) {
-    const app_name = 'iHub';
+    const app_name = values['app-name'] ?? 'iHub';
     const static_dir = values.static ? resolve(values.static) : null;
     const data_dir = resolve(values.data ?? 'data');
 
@@ -122,7 +117,15 @@ function check (dirs, values) {
 
 function init (dir) {
     const out = resolve(dir ?? 'data');
-    const from = templateDir();
+    let from;
+
+    try {
+        from = templateDir();
+    } catch (e) {
+        console.error(e.message);
+        return 1;
+    }
+
     const files = listFiles(from);
     const exists = files.filter(file=> existsSync(join(out, file)));
 
