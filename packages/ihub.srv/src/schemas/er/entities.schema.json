@@ -91,6 +91,21 @@
                 ],
                 "additionalProperties": false
             },
+            "color": {
+                "type": "object",
+                "description": "テーブルの色 (任意。#159)。CSS の色の文字列。書いていない色は既定 (ENTITY_DEFAULTS.color) で描く。",
+                "properties": {
+                    "base": {
+                        "type": "string",
+                        "description": "テーブルの外枠の背景色"
+                    },
+                    "inner": {
+                        "type": "string",
+                        "description": "テーブル名とカラムの欄の背景色"
+                    }
+                },
+                "additionalProperties": false
+            },
             "identifiers": {
                 "type": "array",
                 "items": {

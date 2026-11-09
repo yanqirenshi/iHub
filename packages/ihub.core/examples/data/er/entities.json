@@ -13,6 +13,10 @@
             "w": 222,
             "h": 333
         },
+        "color": {
+            "base": "#fdba74",
+            "inner": "#ffedd5"
+        },
         "identifiers": [
             {
                 "id": 13,

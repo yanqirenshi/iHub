@@ -112,6 +112,8 @@ ihub-srv migrate-er data
 変換したデータを検査して (問題があれば、何も書かずに 1 で終わります)、書き換えます。
 変換済みのときは、止まります。
 
+フラット形式の項目のうち、階層形式に写し先が決まっていないもの (TABLE の `color` など、アプリが足した項目) は、そのまま entity (COLUMN は identifiers / attributes) に写します。
+
 ## createApp
 
 ```js

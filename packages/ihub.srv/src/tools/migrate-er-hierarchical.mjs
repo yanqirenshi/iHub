@@ -10,6 +10,7 @@
 //
 // <data フォルダ>/er/ の 5 つのファイルを読み、階層形式の 5 つのファイルに書き換える。
 // (columns.json・column_instances.json・ports.json は消す)
+// 写し先の決まっていない項目 (TABLE の color など、アプリが足した項目) は、そのまま entity (COLUMN は identifiers / attributes) に写す。
 // 変換したあと、model.er の check で参照の整合を確かめる。(エラーがあれば 1 で終わる)
 //
 // 変換の規則:
@@ -73,6 +74,11 @@ export function toHierarchical (flat) {
     const identifier_columns = new Set(
         instances.filter(d=> d.column_type==='IDENTIFIER').map(d=> column_of.get(d._id)));
 
+    // フラット形式の項目のうち、階層形式に写し先が決まっているもの。これ以外の項目 (アプリが足した項目) は、そのまま写す。
+    const COLUMN_KNOWN = ['_id', '_class', 'code', 'name', 'description', 'data_type'];
+    const TABLE_KNOWN = ['_id', '_class', 'code', 'name', 'description', 'position', 'size'];
+    const rest = (d, known)=> Object.fromEntries(Object.entries(d).filter(([k])=> !known.includes(k)));
+
     const master = (column)=> {
         const out = { id: column._id, name: { logical: column.name, physical: column.code } };
 
@@ -82,7 +88,7 @@ export function toHierarchical (flat) {
         if (column.data_type)
             out.data_type = column.data_type;
 
-        return out;
+        return { ...out, ...rest(column, COLUMN_KNOWN) };
     };
 
     const sorted = (list)=> [...list].sort((a, b)=> a._id - b._id);
@@ -100,6 +106,7 @@ export function toHierarchical (flat) {
             description: table.description ?? '',
             position: table.position,
             size: table.size,
+            ...rest(table, TABLE_KNOWN),
             identifiers: mine.filter(d=> identifier_columns.has(column_of.get(d._id)))
                 .map(d=> ({ id: d._id, identifier: column_of.get(d._id) })),
             attributes: mine.filter(d=> !identifier_columns.has(column_of.get(d._id)))

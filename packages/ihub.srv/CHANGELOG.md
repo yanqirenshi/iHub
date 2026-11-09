@@ -29,6 +29,11 @@ iHub をフォルダごとコピーして使っていたアプリは、[コピ�
 - `ihub-srv convert-legacy <src/data> <data> [--force]`: 古い形式のデータを、`data/` の JSON に変換する。
 - `ihub-srv migrate-er <data>`: ER のデータを、フラット形式から階層形式に変換する。
 
+### データのフォーマット
+
+- ER のエンティティに、テーブルの色 `color: { base, inner }` (どちらも任意) を足した。(`@yanqirenshi/model.er` 0.2.0 のスキーマ)
+- `ihub-srv migrate-er` が、フラット形式の TABLE・COLUMN の、写し先の決まっていない項目 (`color` など) を、そのまま entity (COLUMN は identifiers / attributes) に写す。
+
 ### GitHub の OAuth
 
 - OAuth App の Web アプリケーションフロー。(`GET /api/github/token`・`GET /api/github/oauth/login`・`GET /api/github/oauth/callback`・`DELETE /api/github/token`)
