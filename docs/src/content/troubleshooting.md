@@ -2,7 +2,8 @@
 
 | 症状 | 原因と直し方 |
 |---|---|
-| `npm install` が `ERESOLVE` で止まる | `package.json` に、`overrides` (`tion` の `react-router-dom`) がありません。[導入のしかた](#/setup) の雛形の `package.json` を見て、足してください。(`@yanqirenshi/ihub.core` の README にも書いています) |
+| `npx ... ihub-srv init --app` が `ERESOLVE` で止まる | 最初の `npx` に、`--legacy-peer-deps` を付けてください。([導入のしかた](#/setup)) `package.json` ができたあとの `npm install` には、要りません。 |
+| `package.json` に、`overrides` (`tion` の `react-router-dom`) が残っている | `@yanqirenshi/ihub.core` 0.1.0 の雛形で作った `package.json` には、`overrides` が入っています。0.1.1 以降 (`tion` 0.1.3 以降) では要りませんが、残っていても害は無いので、消してかまいません。(`tion` が 0.1.2 以前だと、`npm install` が `ERESOLVE` で止まります。`npm update tion` で、0.1.3 以降にしてください) |
 | 「データを読み込めませんでした」と表示される | API サーバーが動いていません。`npm start` で起動してください。(`npm run start:web` だけでは、API サーバーは起動しません) `npm start` のログに `[api]` のエラーが出ているときは、ポート 4000 をほかのアプリが使っていないか確かめてください。 |
 | 画面の上に「… がフォーマットやルールに合っていないため、画面に反映していません。」と出る | `data/` の JSON に、書き間違いや、参照先の無いデータがあります。メッセージに出ている場所を直してください。`npx ihub-srv check data` でも確かめられます。 |
 | 図をドラッグしても、位置が保存されない | API サーバーが止まっているか、データのファイルがフォーマットに合っていません。図の上のエラーを確かめてください。TM は、エンティティの見出しをつかんでドラッグします。 |

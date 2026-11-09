@@ -55,7 +55,6 @@ npx --yes --legacy-peer-deps --package=@yanqirenshi/ihub.core --package=@yanqire
 | `test:data` | `node --test "server/test/**/*.test.mjs"` | `ihub-srv check data` |
 
 - 画面の設定の `app.name` を、`iHub` 以外にしたときは、`start:api` と `serve` に `--app-name <同じ名前>` を付けます。
-- `overrides` (`tion` の `react-router-dom`) が無いときは、足します。(`@yanqirenshi/ihub.core` の README を見てください)
 
 `dependencies` から、iHub 本体が持つパッケージを消します。
 

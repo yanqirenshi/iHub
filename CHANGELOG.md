@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.1.1 (2026-11)
+
+- `@yanqirenshi/ihub.core`: `tion` を 0.1.3 以降にして、アプリの `package.json` の `overrides` を要らなくした。(最初の `npx ... init --app` の `--legacy-peer-deps` は、まだ要る)雛形から `overrides` を消した。
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(版をそろえるだけ)
+
 ## 0.1.0 (2026-11)
 
 iHub のコア (`src/ihub/`) と API サーバー (`server/`) を、npm のパッケージにした、最初の版です。

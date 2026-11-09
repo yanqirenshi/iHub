@@ -19,7 +19,7 @@ iHub 本体 (`@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`) は、`node_mod
 | `src/setupProxy.js` | 開発サーバーから API サーバーへの中継 |
 | `src/js/` | service worker の登録と reportWebVitals (CRA のもの) |
 | `public/` | 画像など |
-| `package.json` | 2 つのパッケージと、`scripts`・`overrides` |
+| `package.json` | 2 つのパッケージと、`scripts` |
 | `.env.local` | 個人のトークンなど。git では共有しません。 |
 
 雛形は、`npx ihub-srv init --app` で作れます。([導入のしかた](#/setup))

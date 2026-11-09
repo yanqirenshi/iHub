@@ -46,11 +46,6 @@
     "workbox-strategies": "^7.4.1",
     "workbox-streams": "^7.4.1"
   },
-  "overrides": {
-    "tion": {
-      "react-router-dom": "$react-router-dom"
-    }
-  },
   "scripts": {
     "start": "concurrently -k -n web,api,core -c cyan,green,yellow \"npm:start:web\" \"npm:start:api\" \"npm:build:core:watch\"",
     "prestart": "npm run build -w @yanqirenshi/ihub.core",
