@@ -1,0 +1,11 @@
+{
+  "name": "@yanqirenshi/ihub.core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "iHub のコア (画面の部品)。中身は #68 で src/ihub/ から移す。",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanqirenshi/iHub.git",
+    "directory": "packages/ihub.core"
+  }
+}

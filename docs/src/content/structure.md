@@ -26,9 +26,9 @@ iHub 本体を書き換えずにおくと、iHub が新しくなったときに�
 | `src/ihub/data_example/` | `data/` の雛形 |
 | `src/ihub/wbs_example/` | `src/wbs/` の雛形 |
 | `src/setupProxy.js` | 開発サーバーから API サーバーへの中継 |
-| `server/` | API サーバー (データの読み書き・検証・変更の通知) |
-| `server/schemas/` | データのフォーマット (JSON Schema) |
-| `server/tools/` | 古い形式のデータ (`src/data/*.js`) を、`data/` の JSON に変換するスクリプト |
+| `packages/ihub.srv/` | API サーバー (`@yanqirenshi/ihub.srv`。データの読み書き・検証・変更の通知) |
+| `packages/ihub.srv/src/schemas/` | データのフォーマット (JSON Schema) |
+| `packages/ihub.srv/src/tools/` | 古い形式のデータ (`src/data/*.js`) を、`data/` の JSON に変換するスクリプト |
 
 iHub 本体に直したいところが見つかったときは、iHub のリポジトリで直してから、アプリへ取り込んでください。
 アプリの側で直したときは、iHub のリポジトリにも反映してください。

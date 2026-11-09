@@ -5,9 +5,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createApp } from '../app.mjs';
+import { createApp } from '../src/app.mjs';
 
-const EXAMPLE = fileURLToPath(new URL('../../src/ihub/data_example/', import.meta.url));
+const EXAMPLE = fileURLToPath(new URL('../../../src/ihub/data_example/', import.meta.url));
 
 let dir;
 let app;

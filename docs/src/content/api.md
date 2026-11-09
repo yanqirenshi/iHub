@@ -1,8 +1,8 @@
 # API サーバー
 
-API サーバー (`server/`) は、`data/` の JSON を読み書きします。
+API サーバー (`packages/ihub.srv/`) は、`data/` の JSON を読み書きします。
 画面は、この API を通してデータを読み書きします。
-詳しくは、`server/README.md` も見てください。
+詳しくは、`packages/ihub.srv/README.md` も見てください。
 
 ## API
 
@@ -53,6 +53,6 @@ API サーバー (`server/`) は、`data/` の JSON を読み書きします。
 
 ## コレクションを足すとき
 
-1. `server/schemas/{domain}/{collection}.schema.json` を作ります。
+1. `packages/ihub.srv/src/schemas/{domain}/{collection}.schema.json` を作ります。
 2. `data/{domain}/{collection}.json` と `src/ihub/data_example/{domain}/{collection}.json` を作ります。
-3. コレクションをまたぐ検査が必要なときは、`server/validation/rules.mjs` に書きます。
+3. コレクションをまたぐ検査が必要なときは、`packages/ihub.srv/src/validation/rules.mjs` に書きます。

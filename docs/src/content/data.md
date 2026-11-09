@@ -30,7 +30,7 @@
 
 ## フォーマット
 
-フォーマットは、`server/schemas/{ドメイン}/{コレクション}.schema.json` の JSON Schema で決めています。
+フォーマットは、`packages/ihub.srv/src/schemas/{ドメイン}/{コレクション}.schema.json` の JSON Schema で決めています。
 各項目の説明も、スキーマの `description` に書いてあります。
 
 たとえば、`wbs/wbs.json` の 1 件は次のような形です。
@@ -68,7 +68,8 @@ WBS の id は、URL (`/wbs/{id}`) とページのファイル名 (`P{id}.js`) �
 npm run test:data
 ```
 
-- `data/` と `src/ihub/data_example/` が、スキーマとルールに合っているかを確かめます。
+- `data/` と `src/ihub/data_example/` が、スキーマとルールに合っているかを確かめます。(`ihub-srv check data src/ihub/data_example` と同じです。API サーバーのテストも動きます)
+- 別のフォルダを確かめるときは、`npx ihub-srv check <フォルダ>` を使います。
 - 合っていないときは、場所と理由を日本語で表示します。
 
 ```
