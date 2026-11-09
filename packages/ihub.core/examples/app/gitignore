@@ -1,0 +1,15 @@
+# 依存パッケージ
+/node_modules
+
+# ビルドした画面
+/build
+
+# 個人のトークンなど
+.env.local
+
+# 個人の設定 (サイドメニューの on/off など) と、書き込み途中の一時ファイルは共有しない
+/data/local/
+/data/**/*.tmp
+
+.DS_Store
+npm-debug.log*
