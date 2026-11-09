@@ -4,6 +4,12 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 次の版 (未公開)
+
+### 修正
+
+- 雛形の `.env.local.template` (`ihub-srv init --app` が作る) に、GitHub の OAuth の 2 つの変数 (`GITHUB_OAUTH_CLIENT_ID`・`GITHUB_OAUTH_CLIENT_SECRET`) の欄を足した。(OAuth で認証するときだけ要る。これまでは、docs の「GitHub との連携」にだけ書かれていた)
+
 ## 0.2.2 (2026-11)
 
 ### 追加

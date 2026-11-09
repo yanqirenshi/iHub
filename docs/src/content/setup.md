@@ -74,6 +74,7 @@ iHub のリポジトリの参照アプリと、同じ画面が開きます。
 
 コックピット・Scrum のページ・ドックの「Issue の追加」は、GitHub の情報を使います。
 使うときは、`.env.local.template` をコピーして `.env.local` を作り、GitHub の個人用アクセストークンを書きます。
+(OAuth で認証するときは、テンプレートの `GITHUB_OAUTH_CLIENT_ID`・`GITHUB_OAUTH_CLIENT_SECRET` に、OAuth App の値を書きます。[GitHub との連携](#/github) を見てください)
 
 ```
 REACT_APP_GITHU_PARSONAL_TOKEN=ghp_xxxxxxxxxxxxxxxx
