@@ -45,6 +45,7 @@ ihub-srv --data data
 | `--app-name <name>` | `createApp` の `app_name`。画面の設定の `app.name` と同じ名前にする | `iHub` |
 
 127.0.0.1 で待ち受けます。
+作業フォルダの `.env.local` があれば、環境変数として読み込みます。(すでにある環境変数は上書きしません)
 `data` のフォルダの JSON の変更も見張り、エディタや git で変えたときも画面へ知らせます。
 
 ### check
@@ -95,6 +96,7 @@ serve(app, { port: 4000, app_name: 'iHub' });
 | `app_name`   | ログの名前と、書き込んだ画面の id を送るヘッダー名 (`X-{app_name}-Client`) | `iHub` |
 | `extensions.schemas_dir` | アプリが足すスキーマのフォルダ (`{domain}/{collection}.schema.json`)。パッケージのスキーマと同じ名前のコレクションは足せない | 無し |
 | `extensions.rules`       | アプリが足す整合性ルール。`{ ドメイン: (そのドメインのコレクション)=> エラーのメッセージの配列 }`。パッケージのルールと同じドメインのときは、両方を検査する | 無し |
+| `github`     | GitHub の OAuth の設定 `{ client_id, client_secret }`。省略すると、環境変数 `GITHUB_OAUTH_CLIENT_ID`・`GITHUB_OAUTH_CLIENT_SECRET` から読む。どちらも無いときは、`/api/github/token` が `configured: false` を返すだけ | 環境変数 |
 | `extensions.routes`      | 追加のルート。`(app)=> {}` で Hono のアプリを受け取る。`/api/{domain}/{collection}` より先に登録する | 無し |
 
 `app_name` が `iHub` のときは `X-iHub-Client`、`iwo Studio` のときは `X-iwo-Studio-Client` です。
@@ -121,6 +123,24 @@ serve(app, { port: 4000, app_name: 'iHub' });
 - If-Match に ETag を指定すると、読み込んだあとにほかで変更されていたときは 412 を返します。
 - 書き込みは 1 つずつ順に行い、一時ファイルに書いてから置き換えます。
 - 書き込むときに `X-{app_name}-Client` ヘッダー (既定は X-iHub-Client) で画面 (タブ) の id を送ると、変更の通知にその id が付きます。
+
+## GitHub の OAuth
+
+GitHub の OAuth App (Web アプリケーションフロー) で、画面が GitHub に接続するためのトークンを得ます。
+コードとトークンの交換は、client secret を画面に出さないため、API サーバーが行います。
+トークンは、API サーバーのメモリにだけ持ちます。(ファイルには書きません。API サーバーを起動し直したら、認証し直します)
+
+| メソッド | パス | 内容 |
+|---|---|---|
+| GET    | /api/github/token               | `{ configured, token }`。configured は OAuth App が設定されているか、token は OAuth で得たトークン (無ければ null) |
+| GET    | /api/github/oauth/login         | GitHub の認可画面へ送り出す。`return_to` に、認証のあとに戻る画面のパス (この画面の中のパスだけ) を指定する |
+| GET    | /api/github/oauth/callback      | GitHub から戻ってくる。コードをトークンに替えて、`return_to` へ戻す |
+| DELETE | /api/github/token               | OAuth のトークンを捨てる (接続を切る) |
+
+- OAuth App の Client ID と Client secret は、`createApp` の `github` か、環境変数 `GITHUB_OAUTH_CLIENT_ID`・`GITHUB_OAUTH_CLIENT_SECRET` で渡します。どちらも無いときは、`configured: false` を返すだけで、ほかは変わりません。
+- OAuth App の Authorization callback URL は、画面を開く URL の `/api/github/oauth/callback` にします。(例: 開発サーバーなら `http://localhost:3000/api/github/oauth/callback`、`ihub-srv --static` なら `http://localhost:4000/api/github/oauth/callback`)
+- 求める権限は `repo`・`project`・`read:org` です。
+- `/api/{domain}/{collection}` より先に登録するので、`/api/github/token` がコレクションと見なされることはありません。
 
 ## 変更の通知
 

@@ -1,9 +1,34 @@
 # GitHub との連携
 
 iHub は、GitHub の Issue や Projects を表示したり、Issue を追加したりできます。
-使うには、GitHub の個人用アクセストークンを設定します。
+使うには、OAuth で認証するか、GitHub の個人用アクセストークンを設定します。
+両方あるときは、OAuth で得たトークンを使います。
+どちらも設定しないときは、GitHub には接続しません。(ほかの機能は、いままでどおり使えます)
 
-## トークンを設定する
+## OAuth で認証する
+
+1. GitHub の Settings → Developer settings → OAuth Apps で、OAuth App を登録します。
+   Authorization callback URL は `http://localhost:3000/api/github/oauth/callback` にします。
+   (開発サーバーのポートを変えているときは、そのポートにします。`npm run serve` で開くときは `http://localhost:4000/api/github/oauth/callback` です)
+2. `.env.local` に、OAuth App の Client ID と Client secret を書きます。
+
+```
+GITHUB_OAUTH_CLIENT_ID=Ov23xxxxxxxxxxxxxxxx
+GITHUB_OAUTH_CLIENT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+3. `npm start` をやり直します。(API サーバーが起動したときに読み込むため)
+4. Scrum (`/scrum`) の Account タブの「GitHub で認証する」を押します。
+   GitHub の認可画面で許可すると、元の画面に戻り、アカウントが表示されます。
+
+- 権限は `repo`・`project`・`read:org` を求めます。
+- client secret は API サーバーだけが読みます。(`REACT_APP_` で始まらないので、画面の JavaScript には入りません)
+- トークンは API サーバーのメモリにだけ持ちます。API サーバーを起動し直したら、認証し直してください。
+- 「接続を切る」を押すと、OAuth のトークンを捨てます。個人用アクセストークンがあれば、そちらでつなぎ直します。
+- API サーバーを `ihub-srv` で起動するときは、作業フォルダの `.env.local` を、環境変数として読み込みます。
+  (`createApp` で起動するときは、`createApp({ github: { client_id, client_secret } })` でも渡せます。[@yanqirenshi/ihub.srv](https://github.com/yanqirenshi/iHub/tree/main/packages/ihub.srv) の README を見てください)
+
+## 個人用アクセストークンを設定する
 
 `.env.local` に、トークンを書きます。
 
@@ -13,6 +38,7 @@ REACT_APP_GITHU_PARSONAL_TOKEN=ghp_xxxxxxxxxxxxxxxx
 
 - トークンには、`repo`・`project`・`read:org` の権限を付けてください。
 - 書いたあとは、`npm start` をやり直してください。(起動したときに読み込むため)
+- 画面の設定では、`github: { token: process.env.REACT_APP_GITHU_PARSONAL_TOKEN }` として渡します。([設定の渡し方](#/customize))
 - トークンを設定すると、サイドメニューに GitHub のアカウントの画像が表示されます。
 
 ## コックピット (`/`)
@@ -41,5 +67,5 @@ GitHub の Projects やリポジトリの情報を見るページです。
 
 ## 注意
 
-トークンは、ビルドした画面の JavaScript の中に入ります。
+個人用アクセストークンは、ビルドした画面の JavaScript の中に入ります。
 自分のパソコンだけで使い、ほかの人が見られる場所に画面を置かないでください。
