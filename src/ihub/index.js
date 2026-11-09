@@ -7,6 +7,8 @@ import { ThemeProvider } from '@mui/material/styles';
 
 import { store } from './redux/store.js';
 import { BASE, CSS_VARIABLES, THEME } from './manegers/colors.js';
+// WBS の表 (@yanqirenshi/table.wbs) の見た目。index.css より先に読み、iHub 側で上書きできるようにする
+import 'bulma/css/bulma.min.css';
 import './index.css';
 import App from '../App';
 import DataGate from './DataGate.js';
