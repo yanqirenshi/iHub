@@ -2,7 +2,7 @@
 
 | 症状 | 原因と直し方 |
 |---|---|
-| `npx ... ihub-srv init --app` が `ERESOLVE` で止まる | `@yanqirenshi/ihub.core` 0.1.x を使っているときは、最初の `npx` に `--legacy-peer-deps` が要ります。(`react` が 19 に解決されて、0.1.x が求める 18 と合わないためです) 0.2.0 以降では、要りません。 |
+| `npx ... ihub-srv init --app` が `ERESOLVE` で止まる | `@yanqirenshi/ihub.core` 0.1.x を使っているときは、最初の `npx` に `--legacy-peer-deps` が要ります。(`react` が 19 に解決されて、0.1.x が求める 18 と合わないためです) 0.2.0 以降では、要りません。0.2.0 以降なのに止まるときは、以前に 0.1.x を `--legacy-peer-deps` 付きで `npx` したときのキャッシュが、残っています。(エラーに `Found: @yanqirenshi/ihub.core@0.1.1` のような行が出ます) `npm cache npx ls` で、`@yanqirenshi/ihub.core, @yanqirenshi/ihub.srv` と書かれた行の、先頭のキーを調べて、`npm cache npx rm <キー>` で消してから、もう一度実行してください。(`npm cache clean --force` では、消えません。`npm cache npx` が無い古い npm では、`npm config get cache` で分かるフォルダの `_npx/<キー>` を、消してください) |
 | 画面が表示されない (`/wbs/{id}` のページが空になる) | `react-router` と `react-router-dom` が、別の版で 2 つ入っています。(`npm ls react-router` で確かめられます) `package.json` の `react-router` を消して (`react-router-dom` が、必要な `react-router` を持ってきます)、`npm install` をやり直してください。 |
 | `package.json` に、`overrides` (`tion` の `react-router-dom`) が残っている | `@yanqirenshi/ihub.core` 0.1.0 の雛形で作った `package.json` には、`overrides` が入っています。0.1.1 以降 (`tion` 0.1.3 以降) では要りませんが、残っていても害は無いので、消してかまいません。(`tion` が 0.1.2 以前だと、`npm install` が `ERESOLVE` で止まります。`npm update tion` で、0.1.3 以降にしてください) |
 | 「データを読み込めませんでした」と表示される | API サーバーが動いていません。`npm start` で起動してください。(`npm run start:web` だけでは、API サーバーは起動しません) `npm start` のログに `[api]` のエラーが出ているときは、ポート 4000 をほかのアプリが使っていないか確かめてください。 |
