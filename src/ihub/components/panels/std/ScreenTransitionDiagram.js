@@ -26,8 +26,7 @@ const collectionName = (collection)=> `sitemap/${collection}`;
 
 // 画面 (/screens) の画面遷移図タブ: d3.sitemap をコンテンツエリア一杯に表示する。
 // 図のデータは data/sitemap/ にあり、画面のノードをドラッグすると、動かした位置を sitemap/nodes に保存する。
-// ノードを右クリックすると、右端のインスペクタに出し、項目を書き換えられる。
-// (線は、d3.sitemap にクリックの通知が無いので、インスペクタを開けない)
+// ノードや線 (path と両端のポートの○) を右クリックすると、右端のインスペクタに出し、項目を書き換えられる。
 //
 // 図ごとの知識 (編集できる項目・検証・patch への変換・既定値) は @yanqirenshi/model.sitemap が持つ。
 // ここは view (d3.sitemap) と model (model.sitemap) とインスペクタ (colonoscope の ModelInspector) をつなぎ、
@@ -37,7 +36,7 @@ export default function ScreenTransitionDiagram () {
     const collections = useCollections();
     const [patchRecord] = usePatchRecordMutation();
 
-    // 右クリックしたノードの id
+    // 右クリックした要素。{ collection: 'nodes' | 'edges', id }
     const [target, setTarget] = React.useState(null);
     const [error, setError] = React.useState(null);
 
@@ -46,10 +45,10 @@ export default function ScreenTransitionDiagram () {
     const latest = React.useRef(collections);
     latest.current = collections;
 
-    const nodeOf = (id)=> findById(latest.current[collectionName('nodes')], id);
+    const recordOf = ({ collection, id })=> findById(latest.current[collectionName(collection)], id);
 
-    // インスペクタに渡すのは、既定値 (枠線・背景色など、図に描いている値) を重ねたレコード。
-    const record = target!==null ? nodeOf(target) : null;
+    // インスペクタに渡すのは、既定値 (枠線・背景色・線の色など、図に描いている値) を重ねたレコード。
+    const record = target ? recordOf(target) : null;
     const current = React.useMemo(()=> record ? withDefaults(record) : null, [record]);
 
     // model が返した変更 ({ collection, id, patch }) を保存する。
@@ -58,7 +57,7 @@ export default function ScreenTransitionDiagram () {
     // ドラッグの終わり: 動かした位置を保存する。(図は動かし終えているので、作り直さない)
     // 子のノードの position は親の中での位置なので、親を動かしても親の patch だけでよい。
     const onMove = async (core, move)=> {
-        const node = nodeOf(core.id);
+        const node = recordOf({ collection: 'nodes', id: core.id });
 
         if (!node)
             return;
@@ -71,7 +70,7 @@ export default function ScreenTransitionDiagram () {
     };
 
     // 適用: 変えた項目だけが patch に入る。不正な値は ModelError (利用者向けの日本語)。
-    // 名称・色・サイズは、描き直さないと図に出ないので、保存したあとに図を作り直す。
+    // 名称・色・サイズ・線の角度は、描き直さないと図に出ないので、保存したあとに図を作り直す。
     const onApply = async (values)=> {
         setError(null);
 
@@ -133,12 +132,16 @@ function Diagram (props) {
     React.useEffect(()=> {
         const r = new Rectum({
             transform: INITIAL_VIEW,
-            // コールバックの core は入力のレコードそのもの。(子のノードも)
+            // コールバックの core は入力のレコードそのもの。(子のノードも、線も)
             callbacks: {
                 node: {
-                    contextmenu: (core)=> onInspect.current(core.id),
+                    contextmenu: (core)=> onInspect.current({ collection: 'nodes', id: core.id }),
                     // ドラッグの終わり (動いたときだけ)
                     dragend: (core, _node, move)=> onMove.current(core, move),
+                },
+                // 線の path と両端のポートの○ (d3.sitemap 0.9.0+)
+                edge: {
+                    contextmenu: (core)=> onInspect.current({ collection: 'edges', id: core.id }),
                 },
             },
         });
