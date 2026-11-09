@@ -25,8 +25,13 @@ GITHUB_OAUTH_CLIENT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 - client secret は API サーバーだけが読みます。(`REACT_APP_` で始まらないので、画面の JavaScript には入りません)
 - トークンは API サーバーのメモリにだけ持ちます。API サーバーを起動し直したら、認証し直してください。
 - 「接続を切る」を押すと、OAuth のトークンを捨てます。個人用アクセストークンがあれば、そちらでつなぎ直します。
+- API サーバーが、トークンを画面に返せる (`GET /api/github/token`) のは、API サーバーが、このパソコンの中からの要求だけを受け付ける (`Host`・`Origin` の確認) ためです。API サーバーを、ほかのパソコンから使えるようにしたり、公開したりしないでください。
+- callback URL は、画面を開く URL から作ります。(`http://` 固定です。`https` の後ろに置く構成は、想定していません)
 - API サーバーを `ihub-srv` で起動するときは、作業フォルダの `.env.local` を、環境変数として読み込みます。
   (`createApp` で起動するときは、`createApp({ github: { client_id, client_secret } })` でも渡せます。[@yanqirenshi/ihub.srv](https://github.com/yanqirenshi/iHub/tree/main/packages/ihub.srv) の README を見てください)
+
+OAuth の手順は、実際の OAuth App で確かめる必要があります。(iHub のテストは、GitHub への要求を差し替えて、認証の流れを確かめています)
+OAuth App を用意したときに、上の手順で、認証できることを確かめてください。
 
 ## 個人用アクセストークンを設定する
 

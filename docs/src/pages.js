@@ -12,6 +12,7 @@ import structure       from './content/structure.md?raw';
 import customize       from './content/customize.md?raw';
 import build           from './content/build.md?raw';
 import update          from './content/update.md?raw';
+import migrate         from './content/migrate.md?raw';
 import api             from './content/api.md?raw';
 import troubleshooting from './content/troubleshooting.md?raw';
 
@@ -40,6 +41,7 @@ export const SECTIONS = [
             { path: '/customize', title: 'カスタマイズ',   content: customize },
             { path: '/build',     title: 'ビルドと配信',   content: build },
             { path: '/update',    title: 'iHub の更新',    content: update },
+            { path: '/migrate',   title: 'コピー版からの移行', content: migrate },
             { path: '/api',       title: 'API サーバー',   content: api },
         ],
     },

@@ -82,5 +82,8 @@ export default function P1000 (props) {
 
 ## 雛形
 
-`packages/ihub.core/examples/wbs/` (`@yanqirenshi/ihub.core` の `examples/wbs/`) に、ページのファイルの例があります。
+`@yanqirenshi/ihub.core` の `examples/wbs/` (`node_modules/@yanqirenshi/ihub.core/examples/wbs/`) に、ページのファイルの例があります。
 `@yanqirenshi/ihub.core` から import しているので、そのまま `src/wbs/` にコピーして使えます。
+
+ページが無いノード (データはあるが、`src/wbs/` にファイルが無い) と、データに無いノードの表示は、`src/wbs/NotFoundWbsNodeComponent.js`・`src/wbs/NotFoundWbsNodeData.js` で決めます。
+(`npx ihub-srv init --app` で作る雛形に入っています。画面の設定の `wbs` に渡しています)

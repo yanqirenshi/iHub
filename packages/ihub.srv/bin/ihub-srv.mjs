@@ -2,7 +2,7 @@
 // ihub-srv … iHub の API サーバーの CLI。
 //   ihub-srv [--data <dir>] [--static <dir>] [--port <n>] [--app-name <name>]  … 起動する
 //   ihub-srv check <dir>... [--schemas <dir>]               … データのフォルダを検証する
-//   ihub-srv init [dir] [--app] [--force]                   … 雛形から data/ (--app のときは、アプリの src/・public/ など) を作る
+//   ihub-srv init [dir] [--app] [--force|--skip-existing|--only <path>]  … 雛形から data/ (--app のときは、アプリの src/・public/ など) を作る
 //   ihub-srv convert-legacy <src/data> <data> [--force]     … 古い形式のデータ (src/data/*.js) を data/ の JSON に変換する
 //   ihub-srv migrate-er <data>                              … ER のデータを、フラット形式から階層形式に変換する
 import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -28,7 +28,10 @@ const USAGE = `使い方:
       雛形から、データのフォルダ (既定は data) を作ります。同じ名前のファイルがあるときは、何も書かずに止まります。
   ihub-srv init --app [dir] [--force]
       雛形から、アプリのファイル (src/・public/・.gitignore など。dir の既定は作業フォルダ) を作ります。
-      同じ名前のファイルがあるときは、何も書かずに止まります。(--force を付けると上書きします)
+      同じ名前のファイルがあるときは、何も書かずに止まります。
+        --force          上書きします
+        --skip-existing  すでにあるファイルはそのままにして、無いものだけを作ります
+        --only <path>    雛形のうち、path (ファイルかフォルダ。例: src/index.js) だけを、上書きして作ります。(何度でも指定できます。package.json は変えません)
       package.json があるときは、足りない項目 (dependencies・scripts・overrides など) だけを足します。(すでにある項目は変えません)
   ihub-srv convert-legacy <古い src/data のフォルダ> <書き出し先の data フォルダ> [--force]
       古い形式のデータ (src/data/*.js) を、data/ の JSON に変換します。(同じ名前のファイルがあるときは、何も書かずに止まります)
@@ -43,6 +46,8 @@ const OPTIONS = {
     schemas: { type: 'string' },
     app:     { type: 'boolean' },
     force:   { type: 'boolean' },
+    'skip-existing': { type: 'boolean' },
+    only:    { type: 'string', multiple: true },
     help:    { type: 'boolean', short: 'h' },
 };
 
@@ -214,7 +219,7 @@ function mergePackageJson (file, template, out) {
 }
 
 // 雛形のアプリ (src/・public/・.gitignore など) から、アプリのファイルを作る。
-function initApp (dir, force) {
+function initApp (dir, { force = false, skip_existing = false, only = [] } = {}) {
     const out = resolve(dir ?? '.');
     let from;
 
@@ -230,12 +235,27 @@ function initApp (dir, force) {
         return 1;
     }
 
-    const files = listFiles(from)
+    // --only のときは、指定したパス (ファイルか、フォルダの下) のものだけを、上書きして作る。
+    const only_paths = only.map(p=> p.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/$/, ''));
+    const selected = (file)=> only_paths.length===0 || only_paths.some(p=> file===p || file.startsWith(p + '/'));
+
+    let files = listFiles(from)
         .filter(file=> file!=='package.template.json')
-        .map(file=> ({ from: file, to: APP_RENAMES[file] ?? file }));
+        .map(file=> ({ from: file, to: APP_RENAMES[file] ?? file }))
+        .filter(f=> selected(f.to));
+
+    if (only_paths.length > 0 && files.length===0) {
+        console.error(`雛形に、指定したパスのファイルがありません。(${only_paths.join(', ')})`);
+        return 1;
+    }
+
+    // すでにあるファイルを、そのままにする。
+    if (skip_existing)
+        files = files.filter(f=> !existsSync(join(out, f.to)));
+
     const exists = files.filter(f=> existsSync(join(out, f.to)));
 
-    if (exists.length > 0 && !force) {
+    if (exists.length > 0 && !force && only_paths.length===0) {
         console.error('同じ名前のファイルがあるため、何も書きませんでした。上書きするときは --force を付けてください。');
 
         for (const f of exists.slice(0, 10))
@@ -253,6 +273,10 @@ function initApp (dir, force) {
     }
 
     console.log(`${files.length} 個のファイルを作りました。(${dir ?? '.'})`);
+
+    // --only のときは、package.json は変えない。
+    if (only_paths.length > 0)
+        return 0;
 
     const template = JSON.parse(readFileSync(join(from, 'package.template.json'), 'utf8'));
     const added = mergePackageJson(join(out, 'package.json'), template, out);
@@ -326,7 +350,7 @@ if (values.help) {
 } else if (command==='check') {
     code = check(rest, values);
 } else if (command==='init') {
-    code = values.app ? initApp(rest[0], values.force) : init(rest[0]);
+    code = values.app ? initApp(rest[0], { force: values.force, skip_existing: values['skip-existing'], only: values.only }) : init(rest[0]);
 } else if (command==='convert-legacy') {
     code = await convertLegacyCommand(rest, values);
 } else if (command==='migrate-er') {

@@ -1,49 +1,71 @@
 # フォルダ構成
 
-iHub のフォルダは、「アプリごとに書き換えるもの」と「iHub 本体 (書き換えないもの)」に分かれています。
-iHub 本体を書き換えずにおくと、iHub が新しくなったときに、そのまま取り込めます。([iHub の更新](#/update))
+## アプリのフォルダ
 
-## アプリごとに書き換えるもの
+iHub を使うアプリのフォルダには、アプリのファイルだけがあります。
+iHub 本体 (`@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`) は、`node_modules/` に入ります。
 
 | フォルダ・ファイル | 内容 |
 |---|---|
 | `data/` | 設計のデータ (JSON)。git で共有します。 |
 | `data/local/` | 個人の設定。画面から変わります。git では共有しません。 |
+| `src/index.js` | 入り口。アプリの設定 (サイドメニュー・配色・ドック・WBS のページ・タブ・パネルなど) を組み立てて、`<IHub config={config}>` に渡し、`Router` を描きます。([設定の渡し方](#/customize)) |
+| `src/Router.js` | ページの URL |
 | `src/config/` | サイドメニューの項目 (`ACCOUNT_MENUS.js`)・サイドメニューの色 (`ACCOUNT_MENU_COLORS.js`)・アプリの配色 (`COLORS.js`)・アイコン (`ICONS.js`)・ドックのボタン (`OPERATOR_ITEMS.js`) |
 | `src/components/` | 自分で作る部品 (`assemblies`・`pages`・`panels`・`parts`) |
-| `src/wbs/` | WBS のノードのページ (`P{id}.js`) |
+| `src/wbs/` | WBS のノードのページ (`P{id}.js`)・ページが無いときの表示 (`NotFoundWbsNodeData.js`・`NotFoundWbsNodeComponent.js`) |
 | `src/operators/` | ドックの吹き出しの中身 |
-| `src/Router.js` | ページの URL |
-| `src/index.js` | 入り口。アプリの設定 (サイドメニュー・配色・ドック・WBS のページなど) を組み立てて、`<IHub config={config}>` に渡し、`Router` を描きます。([設定の渡し方](#/customize)) |
 | `src/index.css` | 見た目の上書き (iHub の CSS のあとに読み込みます) |
-| `public/` | 画像など |
-
-## iHub 本体 (書き換えないもの)
-
-| フォルダ・ファイル | 内容 |
-|---|---|
-| `packages/ihub.core/` | 画面の部品 (`@yanqirenshi/ihub.core`)。`src/` に部品 (`components`)・Redux (`redux`)・データの扱い (`manegers`)・画面全体の `IHub.js`・設定の `config.js` などがあり、Babel で `dist/` に変換して使います。アプリのファイルは import せず、設定として受け取ります |
-| `packages/ihub.core/examples/data/` | `data/` の雛形 |
-| `packages/ihub.core/examples/wbs/` | `src/wbs/` の雛形 |
-| `packages/ihub.core/examples/app/wbs/` | `src/wbs/` の `NotFoundWbsNodeData.js`・`NotFoundWbsNodeComponent.js` の雛形 |
-| `src/js/` | service worker と reportWebVitals (CRA のもの) |
 | `src/setupProxy.js` | 開発サーバーから API サーバーへの中継 |
-| `packages/ihub.srv/` | API サーバー (`@yanqirenshi/ihub.srv`。データの読み書き・検証・変更の通知) |
-| `packages/ihub.srv/src/schemas/` | データのフォーマット (JSON Schema) |
-| `packages/ihub.srv/src/tools/` | 古い形式のデータ (`src/data/*.js`) を、`data/` の JSON に変換するスクリプト |
+| `src/js/` | service worker の登録と reportWebVitals (CRA のもの) |
+| `public/` | 画像など |
+| `package.json` | 2 つのパッケージと、`scripts`・`overrides` |
+| `.env.local` | 個人のトークンなど。git では共有しません。 |
 
-iHub 本体に直したいところが見つかったときは、iHub のリポジトリで直してから、アプリへ取り込んでください。
-アプリの側で直したときは、iHub のリポジトリにも反映してください。
+雛形は、`npx ihub-srv init --app` で作れます。([導入のしかた](#/setup))
+`src/config/`・`src/operators/`・`src/wbs/` などは、アプリごとに書き換えるものです。
+iHub が新しくなっても、書き換えたものは、そのまま使えます。([iHub の更新](#/update))
+
+## iHub 本体 (パッケージの中身)
+
+| パッケージ | 内容 |
+|---|---|
+| `@yanqirenshi/ihub.core` | 画面の部品。`dist/` に、Babel で変換した ESM が入っています。 |
+| `@yanqirenshi/ihub.core` の `examples/data/` | `data/` の雛形 (`ihub-srv init` がコピーします) |
+| `@yanqirenshi/ihub.core` の `examples/wbs/` | WBS のノードのページの例 |
+| `@yanqirenshi/ihub.core` の `examples/app/` | アプリのファイルの雛形 (`ihub-srv init --app` がコピーします) |
+| `@yanqirenshi/ihub.srv` | API サーバー (データの読み書き・検証・変更の通知)。`ihub-srv` のコマンドも入っています。 |
+| `@yanqirenshi/ihub.srv` の `src/schemas/` | データのフォーマット (JSON Schema) |
+
+`node_modules/` の中は、直さないでください。([iHub の更新](#/update) の「iHub 本体を直したいとき」)
 
 ## 用意してある部品
 
-`@yanqirenshi/ihub.core` (`packages/ihub.core/src/components/`) の部品は、自分のページでも使えます。
+`@yanqirenshi/ihub.core` の部品は、自分のページでも使えます。
 
-| フォルダ | 内容 |
+```jsx
+import { Frame, pages, panels } from '@yanqirenshi/ihub.core';
+```
+
+| 名前 | 内容 |
 |---|---|
-| `pages/` | ページ |
-| `panels/` | ページの中身 (ER 図・TM など) |
-| `assemblies/` | 中間の部品 (枠の `frames/Frame.js`・`frames/FrameWbsNode.js` など) |
-| `parts/` | 小さな部品 |
+| `pages` | ページ (`pages.Data`・`pages.Cockpit` など) |
+| `docPages` | ドキュメントのページ (`docPages.ER`・`docPages.TM` など) |
+| `panels` | ページの中身 (ER 図・TM など) |
+| `Frame`・`FrameTabs`・`FrameWbsNode`・`TabbedPage` など | 中間の部品 (枠・タブのあるページ) |
+| `ItemWbsNode`・`LinkWBS`・`Tabs` など | 小さな部品 |
 
-自分で作る部品は、`src/components/` の同じ名前のフォルダに置きます。
+公開している名前の一覧は、`@yanqirenshi/ihub.core` の README にあります。
+
+## iHub のリポジトリ (開発者向け)
+
+iHub のリポジトリは、npm workspaces のモノレポです。
+
+| フォルダ・ファイル | 内容 |
+|---|---|
+| `packages/ihub.core/` | `@yanqirenshi/ihub.core` |
+| `packages/ihub.srv/` | `@yanqirenshi/ihub.srv` |
+| (ルート) `src/`・`public/`・`data/` | 参照アプリ。2 つのパッケージを使う、見本のアプリです。(`examples/app/` の雛形は、ここから作ります) |
+| `docs/` | このマニュアル |
+
+ビルドやテスト、公開のしかたは、リポジトリのルートの `README.md` を見てください。
