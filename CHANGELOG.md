@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.2.1 (2026-11)
+
+- `@yanqirenshi/ihub.core`: 「リストの key が無い」警告 (`SystemicDesign`・BPMN のパレット) を、なくした。(画面の見た目と動きは、変わらない)
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(版をそろえるだけ)
+
 ## 0.2.0 (2026-11)
 
 - `@yanqirenshi/ihub.core`: React 19 に対応した。(peerDependencies は `^18.3.1 || ^19.0.0`。React 18 のままでも動く) `tion`・`menubook`・`manipulater`・`sogh` を、MUI を peerDependencies にした版に上げて、`@mui/material` の重複 (MUI 5) をなくした。最初の `npx ... init --app` の `--legacy-peer-deps` は、要らなくなった。peerDependencies から `react-router` を消した。
