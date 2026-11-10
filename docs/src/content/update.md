@@ -20,6 +20,22 @@ npm install @yanqirenshi/ihub.core@^0.2.0 @yanqirenshi/ihub.srv@^0.2.0
 - 2 つのパッケージは、同じ版にそろえてください。
 - 新しい版があるかは、`npm outdated` で確かめられます。
 
+更新したあとは、2 つが同じ版になったかを、次のコマンドで確かめます。
+
+```
+npm ls @yanqirenshi/ihub.core @yanqirenshi/ihub.srv
+```
+
+```
++-- @yanqirenshi/ihub.core@0.2.7
+`-- @yanqirenshi/ihub.srv@0.2.7
+```
+
+- 出力の最初の行には、アプリの名前と場所が出ます。
+その下の 2 行の `@` のあとの版が、同じになっていれば大丈夫です。(上は 0.2.7 の例です)
+- 版が違うときは、片方に、`package.json` の範囲に合わない版として `invalid` が付くことがあります。
+上の `npm install` で、同じ版を指定して、入れ直してください。
+
 ## 版の付け方
 
 iHub は、[semver](https://semver.org/lang/ja/) で版を付けます。
@@ -34,11 +50,23 @@ iHub は、[semver](https://semver.org/lang/ja/) で版を付けます。
 
 1. 変更の内容を、[CHANGELOG](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) で確かめます。
 iHub の PR や Issue には、「アプリで直すところ」を書いていることがあります。
-2. 設定の形が変わったときは、`src/index.js` の設定 (`config`) を、CHANGELOG のとおりに直します。
+2. `@yanqirenshi/ihub.core` の peerDependencies (React・MUI など) の求める版が変わったときは、アプリの `package.json` の版を合わせます。
+CHANGELOG に、peerDependencies の変更が書かれています。(例: 0.2.0 は、React 19 に対応して、`react`・`react-dom` が `^18.3.1 || ^19.0.0` になりました)
+[導入のしかた](#/setup) の「アプリで入れるパッケージの版」の表を見て、アプリの `package.json` の `react`・`@mui/material` などを、求める版に直します。
+(合っていないと、`npm install` が `ERESOLVE` で止まったり、同じパッケージが 2 つ入って、動かなくなったりします)
+直したら `npm install` して、1 つだけ入っていることを確かめます。
+
+```
+npm ls @mui/material
+```
+
+(出力に `deduped` と付いているものは、同じものを使っています。版の違うものが 2 つ出てきたときは、`package.json` の版を、表に合わせ直します)
+
+3. 設定の形が変わったときは、`src/index.js` の設定 (`config`) を、CHANGELOG のとおりに直します。
 (設定の項目は、[カスタマイズ](#/customize) の「設定の渡し方」と、`@yanqirenshi/ihub.core` の README にあります)
-3. データのフォーマットが変わったときは、`npx ihub-srv check data` で、直すところを確かめます。
+4. データのフォーマットが変わったときは、`npx ihub-srv check data` で、直すところを確かめます。
 直したら、もう一度 `npx ihub-srv check data` で確かめます。
-4. 雛形のファイル (`src/config/`・`src/operators/` など) が変わったときは、新しい雛形を別のフォルダに作って、自分のファイルと見比べます。
+5. 雛形のファイル (`src/config/`・`src/operators/` など) が変わったときは、新しい雛形を別のフォルダに作って、自分のファイルと見比べます。
 
 ```
 npx ihub-srv init --app ../ihub-template
@@ -51,7 +79,7 @@ npx ihub-srv init --app ../ihub-template
 npx ihub-srv init --app --only src/operators --only src/wbs
 ```
 
-5. `npm start` で、動きを確かめます。
+6. `npm start` で、動きを確かめます。
 
 ## iHub 本体を直したいとき
 
