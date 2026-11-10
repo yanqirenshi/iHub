@@ -8,7 +8,7 @@ import { ModelInspector } from '@yanqirenshi/colonoscope';
 import { ModelError, applyPatch, fieldsOf, findById, movePatch, titleOf, withDefaults } from '@yanqirenshi/model.er';
 
 import { useConfig } from '../../config.js';
-import { useDiagramData } from '../../manegers/diagram.js';
+import { useDiagramData, useDiagramView } from '../../manegers/diagram.js';
 import { ER_COLLECTIONS, buildErData } from '../../manegers/er.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../redux/api/dataApi.js';
 
@@ -123,6 +123,9 @@ function Diagram (props) {
 
     const [rectum, setRectum] = React.useState(null);
 
+    // カメラ (移動位置と拡大縮小) を、ブラウザに保管して、次に開いたときに戻す。
+    const bindView = useDiagramView('er');
+
     // 設定の diagrams.er.grid (d3 の grid の設定。例: { draw: false }) を、そのまま d3 に渡す。(無いときは、渡さない)
     const { diagrams } = useConfig();
     const grid = diagrams.er.grid;
@@ -152,10 +155,12 @@ function Diagram (props) {
             },
         });
 
+        bindView(r);
+
         r.data(data);
 
         setRectum(r);
-    }, [data, grid]);
+    }, [bindView, data, grid]);
 
     if (!rectum) return null;
 

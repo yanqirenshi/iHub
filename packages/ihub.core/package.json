@@ -1,6 +1,6 @@
 {
   "name": "@yanqirenshi/ihub.core",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "iHub のコア (画面の部品)。設計データを、図や表で見て、編集する。",
   "keywords": [
     "ihub",
@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "@splidejs/react-splide": "^0.7.12",
+    "@yanqirenshi/assh0le": "^0.5.9",
     "@yanqirenshi/beach": "^0.0.1",
     "@yanqirenshi/colonoscope": "^0.5.0",
     "@yanqirenshi/d3.deployment": "^0.11.0",

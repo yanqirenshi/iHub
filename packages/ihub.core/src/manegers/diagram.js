@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react';
 
+import { useConfig } from '../config.js';
 import { isWrittenHere, useGetDataQuery } from '../redux/api/dataApi.js';
 
 // 図 (d3 のライブラリ) に渡すデータを作る。
@@ -49,4 +50,82 @@ export function findRecord (records, key, id) {
     }
 
     return null;
+}
+
+// 図のカメラ (移動位置と拡大縮小 { k, x, y }) を、ブラウザの localStorage に保管して、次に開いたときに同じ位置に戻す。
+// 人ごと・ブラウザごとの保管で、data/ は変えない。鍵は `ihub:{app.name}:view:{code}`。
+// (開発中は、どのアプリも localhost:3000 で開くので、アプリの名前 app.name で分ける。code は図ごとの名前)
+const VIEW_KEY = (app_name, code)=> `ihub:${app_name}:view:${code}`;
+
+// localStorage が使えないとき (保管できない設定など) でも、図を作り直したときに位置を引き継げるように、このページの中の控えも持つ。
+const viewMemory = new Map();
+
+// { k, x, y } として使える値か。(数で、k は 0 より大きい) 使えないときは null
+function validView (v) {
+    if (!v || typeof v!=='object')
+        return null;
+
+    const ok = [v.k, v.x, v.y].every(n=> typeof n==='number' && Number.isFinite(n));
+
+    return ok && v.k>0 ? { k: v.k, x: v.x, y: v.y } : null;
+}
+
+// 保管した値。無い・壊れている・localStorage が使えないときは null (= 初めの位置)
+function readView (key) {
+    try {
+        const v = validView(JSON.parse(window.localStorage.getItem(key)));
+
+        if (v)
+            return v;
+    } catch (e) {
+        // 使えない・壊れた値: 黙って、控え (無ければ初めの位置) を使う
+    }
+
+    return viewMemory.get(key) || null;
+}
+
+function writeView (key, view) {
+    const v = validView(view);
+
+    if (!v)
+        return;
+
+    viewMemory.set(key, v);
+
+    try {
+        window.localStorage.setItem(key, JSON.stringify(v));
+    } catch (e) {
+        // 保管できなくても、図は動く
+    }
+}
+
+// 図のカメラを保管して戻す。戻り値の関数に、作った Rectum (d3 の図) を渡す。
+//
+//   const bindView = useDiagramView('er');
+//   ...
+//   const rectum = new Rectum({ transform: INITIAL_VIEW, ... });
+//   bindView(rectum);       // 保管した値があれば、その位置に戻す。操作の終わりに保管する
+//   rectum.data(data);
+//
+// - code: 図ごとの名前。(例: 'er')
+// - 保管した値が無い (初めて開く)・壊れている・localStorage が使えないときは、何もせず、Rectum の初めの位置のまま。
+// - 図を作り直すたびに呼ぶ。(保管した位置で作り直される)
+// - 戻したときは保管し直さない。(d3.svg の view() は onViewChange を呼ばない)
+export function useDiagramView (code) {
+    const { app } = useConfig();
+    const key = VIEW_KEY(app.name, code);
+
+    return useCallback((rectum)=> {
+        if (typeof rectum.view!=='function' || typeof rectum.onViewChange!=='function')
+            return rectum;
+
+        const saved = readView(key);
+
+        if (saved)
+            rectum.view(saved);
+
+        rectum.onViewChange((view)=> writeView(key, view));
+
+        return rectum;
+    }, [key]);
 }

@@ -21,7 +21,7 @@ export * from './components/parts/index.js';        // ItemWbsNode・LinkWBS な
 export * from './hooks/index.js';                   // usePageTabs
 export { default as HelpSlide } from './components/pages/Help/Slide.js';   // Help の 1 枚のスライド (help.sections のセクションで使う)
 export * as manegers from './manegers/index.js';
-export { wbs, useWbs, sogh } from './manegers/index.js';
+export { wbs, useWbs, sogh, useDiagramView } from './manegers/index.js';
 
 // データ (API サーバーからの読み書き)
 export {

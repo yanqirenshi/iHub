@@ -4,6 +4,24 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.2.7 (2026-11)
+
+### 追加
+
+- 図の位置と拡大を、ブラウザ (`localStorage`) に自動で覚えて、次に開いたときに戻すようにした。(yanqirenshi/iHub#115)
+  - 対象は、ER 図・TM・画面遷移図・システム構成図・Overview の 5 つ。図ごとに別々に覚える。
+  - 人ごと・ブラウザごとの記憶で、`data/` は変わらない。鍵は `ihub:{app.name}:view:{図の code}`。(図の code: `er`・`tm`・`std`・`scd`・`overview`。開発中は、どのアプリも `localhost:3000` で開くので、アプリの名前で分けた)
+  - 操作が終わったとき (ホイールを止めたとき・ドラッグを離したとき) に覚える。覚えたものが無いとき (初めて開くとき) は、これまでと同じ初めの位置。
+  - 覚えた値が壊れているとき・`localStorage` が使えないときは、何も言わずに初めの位置で開く。
+  - ほかのタブ・エディタ・git でデータが変わって図を描き直したときは、**初めの位置に戻らず**、覚えた位置で描き直す。(0.2.6 までは、初めの位置に戻った)
+  - Overview の、描き直すときに svg の `__zoom` を読んで位置を引き継ぐ処理は、この仕組みに置き換えた。
+- `useDiagramView(code)` を export した。アプリが足したパネルの図 (d3.* の `Rectum`) でも、同じように覚えられる。(`const bindView = useDiagramView('dfd'); bindView(rectum);`)
+
+### 変更
+
+- `dependencies` に `@yanqirenshi/assh0le` の `^0.5.9` を足した。(カメラを取り出して戻す `view`・`onViewChange` を持つ版。`package-lock.json` が古いアプリでも、assh0le 0.5.9・d3.svg 0.4.2 以上になる)
+- 確かめた: 5 つの図それぞれで、動かして拡大 → ページを読み直す → 同じ位置と拡大で開いた。ほかのタブに移って戻る・ノードのドラッグ・ほかからの変更・インスペクタでの変更 (Overview) の描き直しのあとも、位置は変わらなかった。覚えたものが無いときは、これまでと同じ初めの位置。`app.name` を変えると、位置は混ざらなかった。壊れた値や、`localStorage` が使えないときも、図は出た。
+
 ## 0.2.6 (2026-11)
 
 - コードの変更は無い。(`@yanqirenshi/ihub.srv` 0.2.6 と、版をそろえるだけ)

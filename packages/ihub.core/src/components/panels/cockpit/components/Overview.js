@@ -7,7 +7,7 @@ import D3Unchi, { Rectum } from '@yanqirenshi/d3.unchi';
 import { ModelInspector } from '@yanqirenshi/colonoscope';
 import { ModelError, applyPatch, collectionOf, fieldsOf, mergePatch, movePatch, titleOf, withDefaults } from '@yanqirenshi/model.unchi';
 
-import { findRecord, useDiagramData } from '../../../../manegers/diagram.js';
+import { findRecord, useDiagramData, useDiagramView } from '../../../../manegers/diagram.js';
 import { OVERVIEW_COLLECTIONS, buildOverviewData } from '../../../../manegers/overview.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../../../redux/api/dataApi.js';
 
@@ -38,10 +38,7 @@ export default function Overview () {
     const [target, setTarget] = React.useState(null);
     const [error, setError] = React.useState(null);
 
-    const box = React.useRef(null);
     const rectum = React.useRef(null);
-    // 図を作り直すときに、いまのズーム / パンを引き継ぐため。({ version: 作り直したあとの版, transform })
-    const view = React.useRef(null);
 
     // レコードは、読み込んだデータ (保存のたびに差し替わる) から id で引く。
     // d3.unchi に渡した複製 (コールバックの core) は、保存しても変わらないため。
@@ -58,11 +55,8 @@ export default function Overview () {
     const save = (change)=> patchRecord({ name: collectionName(change.collection), id: change.id, patch: change.patch }).unwrap();
 
     // 保存したあとに図を作り直す。(サイズや色など、描き直さないと図に出ない変更のとき)
-    // 作り直しても、いま見ている位置と拡大の度合いは変えない。
+    // 作り直しても、いま見ている位置と拡大の度合いは変えない。(操作の終わりに保管したカメラで作り直す)
     const saveAndRebuild = async (change)=> {
-        const zoom = [...(box.current?.querySelectorAll('svg') || [])].find(svg=> svg.__zoom)?.__zoom;
-        // d3.unchi は、渡した x, y に倍率 k を掛けて使うので、k で割って渡す。
-        view.current = zoom ? { version: version + 1, transform: { k: zoom.k, x: zoom.x / zoom.k, y: zoom.y / zoom.k } } : null;
         rebuild();
 
         try {
@@ -70,7 +64,6 @@ export default function Overview () {
         } catch (e) {
             // 保存できなかったときは、作り直すのをやめる。(次のドラッグの保存で作り直さないように)
             rebuild(false);
-            view.current = null;
             throw e;
         }
     };
@@ -122,10 +115,9 @@ export default function Overview () {
     };
 
     return (
-        <Box ref={box} sx={{ width: '100%', height: '100%', position: 'relative' }}>
+        <Box sx={{ width: '100%', height: '100%', position: 'relative' }}>
           {/* ほかからデータが変わったときと、サイズを変えたときは、図を作り直す */}
-          <Diagram key={version} data={data} rectum={rectum} onMove={onMove} onInspect={onInspect}
-                   view={view.current?.version===version ? view.current.transform : null}/>
+          <Diagram key={version} data={data} rectum={rectum} onMove={onMove} onInspect={onInspect}/>
 
           {/* 項目は model (fieldsOf) が決める。コンテンツエリアの右端に、上から下まで */}
           <ModelInspector target={current}
@@ -158,10 +150,12 @@ function Diagram (props) {
 
     const [rectum, setRectum] = React.useState(null);
 
+    // カメラ (移動位置と拡大縮小) を、ブラウザに保管して、次に開いたとき・作り直したときに戻す。
+    const bindView = useDiagramView('overview');
+
     React.useEffect(()=> {
         const r = new Rectum({
-            // サイズを変えて作り直したときは、それまでのズーム / パンを引き継ぐ。(ほかから変わったときは初めに戻す)
-            transform: props.view || INITIAL_VIEW,
+            transform: INITIAL_VIEW,
             callbacks: {
                 node: {
                     // ドラッグの終わり。掴んだノードについてだけ、1 回呼ばれる。
@@ -175,11 +169,13 @@ function Diagram (props) {
             },
         });
 
+        bindView(r);
+
         r.data(data);
 
         props.rectum.current = r;
         setRectum(r);
-    }, [data]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [bindView, data]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!rectum) return null;
 
