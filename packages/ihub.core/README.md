@@ -31,6 +31,8 @@ iHub をコピーして使っていたアプリは、マニュアルの「コピ
 
 `react`・`react-dom` (18.3.1 以上の 18 か 19)・`react-redux`・`@reduxjs/toolkit`・`react-router-dom`・`@mui/material`・`@mui/icons-material`・`@emotion/react`・`@emotion/styled`
 
+求める版と、推奨 (雛形の版) の表は、マニュアルの [導入のしかた](https://github.com/yanqirenshi/iHub/blob/main/docs/src/content/setup.md) の「アプリで入れるパッケージの版」にあります。(Node.js は 22 以上)
+
 ## 使う
 
 アプリの `src/index.js` で、設定 (`config`) を組み立てて、`<IHub>` に渡します。

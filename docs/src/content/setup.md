@@ -9,6 +9,27 @@
 - git
 - GitHub の個人用アクセストークン、または OAuth App (GitHub と連携する画面を使うとき)
 
+### アプリで入れるパッケージの版
+
+iHub (`@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`) は、次のパッケージを、アプリのものと 1 つにするため、アプリで入れる形 (peerDependencies) にしています。
+
+| パッケージ | 求める版 (`@yanqirenshi/ihub.core` の peerDependencies) | 推奨 (雛形の版) |
+|---|---|---|
+| Node.js | 22 以上 (`@yanqirenshi/ihub.srv` の `engines`) | 24 (動作を確かめています) |
+| `react` | `^18.3.1` または `^19.0.0` | `^19.0.0` (新しく作るときは 19。18.3.1 以上の 18 でも動きます) |
+| `react-dom` | `^18.3.1` または `^19.0.0` | `^19.0.0` (`react` と同じ版) |
+| `@mui/material` | `^9.2.0` | `^9.2.0` |
+| `@mui/icons-material` | `^9.2.0` | `^9.2.0` |
+| `@emotion/react` | `^11.14.0` | `^11.14.0` |
+| `@emotion/styled` | `^11.14.1` | `^11.14.1` |
+| `react-router-dom` | `^7.18.1` | `^7.18.1` |
+| `react-redux` | `^9.3.0` | `^9.3.0` |
+| `@reduxjs/toolkit` | `^2.12.0` | `^2.12.0` |
+
+- **この手順 (雛形から作る) では、自分で入れる必要はありません。** 雛形の `package.json` に、推奨の版で入っています。
+- 既存のアプリに iHub を入れるときや、[コピー版から移す](#/migrate)ときに、この表を見て、アプリの `package.json` の版を、求める版に合わせてください。(合っていないと、`npm install` が `ERESOLVE` で止まったり、同じパッケージが 2 つ入って、動かなくなったりします)
+- `@mui/material` は、1 つだけ入ることを、`npm ls @mui/material` で確かめられます。
+
 ## 1. フォルダを作って、雛形を作る
 
 ドキュメントサイト用のフォルダ (例: `docs/`) を作り、そこで次のコマンドを実行します。

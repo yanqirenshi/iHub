@@ -4,6 +4,12 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 次の版 (未公開)
+
+### 変更
+
+- `engines` の `node` を、`>=20.12` から `>=22` にした。(docs の「導入のしかた」の「Node.js (22 以上。24 で動作を確かめています)」と、そろえた。Node.js 20 は、2026-04 に保守期間が終わっているため。22 より前の Node.js で、動かなくなる機能の変更ではなく、保守期間の終わった版を、対象から外す)
+
 ## 0.2.5 (2026-11)
 
 ### 修正
