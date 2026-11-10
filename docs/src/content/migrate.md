@@ -181,6 +181,16 @@ npx ihub-srv migrate-er data
 `data/er/` を、階層形式 (`identifiers.json`・`attributes.json` など) に変換します。
 (`columns.json` などは、消えます。変換したデータは、検査してから書きます)
 
+**主キー (識別子)**
+
+フラット形式の主キーのインスタンスには、`column_type` が `IDENTIFIER` のデータと、`ID` のデータがあります。
+`migrate-er` は、どちらも、識別子 (`identifiers.json`) にします。(`ihub.srv` 0.2.4 以前は、`IDENTIFIER` だけで、`ID` の主キーは、属性 (`attributes.json`) になりました)
+`ihub.core` 0.2.5 以降 (`@yanqirenshi/d3.er` 0.6.1) は、識別子を、テーブルのカラムの先頭に描きます。(`IDENTIFIER` のデータは、これまで、末尾に描かれていました)
+識別子か属性かは、COLUMN ごとではなく、**インスタンスごと**に決めます。主キー (`ID`・`IDENTIFIER`) のインスタンスだけが識別子で、それ以外 (外部キーなど) は属性です。
+同じ COLUMN が、あるテーブルでは主キー、ほかのテーブルでは外部キーのとき (例: `user_id`) は、識別子のマスタと、属性のマスタに分かれます。(階層形式では、`identifiers[]` は識別子のマスタを、`attributes[]` は属性のマスタを指すため)
+そのため、ER 図のカラムの並びは、移す前 (主キー → 属性 → タイムスタンプ → そのほか) と同じになります。
+0.2.4 以前の `migrate-er` で変換したアプリは、元のフラット形式のデータ (git の履歴) から、0.2.5 以降の `migrate-er` で変換し直すと、主キーが識別子になり、先頭に描かれます。
+
 **カラムの名前 (マスタが分かれることがあります)**
 
 フラット形式では、カラムのインスタンス (`column_instances.json`) が、自分の `logical_name`・`physical_name`・`description` (と `data_type`) を持てました。

@@ -13,7 +13,8 @@
 ## 0.2.5 (2026-11)
 
 - `@yanqirenshi/ihub.core`: 設定の `diagrams` で、ER 図・TM 図の `grid` (d3.er・d3.ter の設定) を渡せるようにした。(`diagrams: { er: { grid: { draw: false } } }` でグリッド線を消す。設定が無いときは、変わらない)
-- `@yanqirenshi/ihub.srv`: コードの変更は無い。(版をそろえるだけ)
+- `@yanqirenshi/ihub.srv`: `ihub-srv migrate-er` が、`column_type` が `ID` の主キーも識別子にするようにした。(これまでは `IDENTIFIER` だけ。0.2.4 以前で変換したアプリは、元のフラット形式のデータから変換し直すと、主キーが識別子になる)
+- `@yanqirenshi/ihub.core`: `@yanqirenshi/d3.er` を 0.6.1 にした。(識別子が、テーブルのカラムの先頭に描かれる)
 
 ## 0.2.4 (2026-11)
 

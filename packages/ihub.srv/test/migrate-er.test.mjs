@@ -162,6 +162,112 @@ test('同じ COLUMN を違う名前で 2 回使うテーブル (synapse_relation
     assert.deepEqual(toHierarchical(flat), data);
 });
 
+// ---- 主キー (column_type が ID のデータ・IDENTIFIER のデータ) (yanqirenshi/iHub#106) ----
+
+test('column_type が ID の主キー (iwo.Studio・Bokasafn のデータ) も、identifiers に入る', ()=> {
+    const data = toHierarchical(flatOf({
+        tables: [{ _id: 1, code: 'T1' }],
+        columns: [{ _id: 10, code: 'ID', name: 'ID' }, { _id: 11, code: 'NAME', name: '名前' }],
+        instances: [
+            { _id: 100, table: 1, column: 10, column_type: 'ID' },
+            { _id: 101, table: 1, column: 11, column_type: 'ATTRIBUTE' },
+        ],
+    }));
+
+    assert.deepEqual(data.identifiers.map(d=> d.id), [10]);
+    assert.deepEqual(data.attributes.map(d=> d.id), [11]);
+    assert.deepEqual(data.entities[0].identifiers, [{ id: 100, identifier: 10 }]);
+    assert.deepEqual(data.entities[0].attributes, [{ id: 101, attribute: 11 }]);
+    assert.deepEqual(check(data, 'er/'), []);
+});
+
+test('ID と IDENTIFIER が混ざったデータは、どちらの主キーも identifiers に入る', ()=> {
+    const data = toHierarchical(flatOf({
+        tables: [{ _id: 1, code: 'T1' }, { _id: 2, code: 'T2' }],
+        columns: [
+            { _id: 10, code: 'A-ID', name: 'A' },
+            { _id: 11, code: 'B-ID', name: 'B' },
+            { _id: 12, code: 'V', name: '値' },
+        ],
+        instances: [
+            { _id: 100, table: 1, column: 10, column_type: 'ID' },
+            { _id: 101, table: 2, column: 11, column_type: 'IDENTIFIER' },
+            { _id: 102, table: 2, column: 12, column_type: 'ATTRIBUTE' },
+            { _id: 103, table: 1, column: 12, column_type: 'TIMESTAMP' },
+        ],
+    }));
+
+    assert.deepEqual(data.identifiers.map(d=> d.id), [10, 11]);
+    assert.deepEqual(data.attributes.map(d=> d.id), [12]);
+    assert.deepEqual(data.entities.map(e=> [e.identifiers.length, e.attributes.length]), [[1, 1], [1, 1]]);
+    assert.deepEqual(check(data, 'er/'), []);
+});
+
+test('主キーでない column_type (ATTRIBUTE・TIMESTAMP・無し) は、attributes に入る', ()=> {
+    const data = toHierarchical(flatOf({
+        tables: [{ _id: 1, code: 'T1' }],
+        columns: [{ _id: 10, code: 'A', name: 'a' }, { _id: 11, code: 'B', name: 'b' }, { _id: 12, code: 'C', name: 'c' }],
+        instances: [
+            { _id: 100, table: 1, column: 10, column_type: 'ATTRIBUTE' },
+            { _id: 101, table: 1, column: 11, column_type: 'TIMESTAMP' },
+            { _id: 102, table: 1, column: 12, column_type: undefined },
+        ],
+    }));
+
+    assert.deepEqual(data.identifiers, []);
+    assert.equal(data.attributes.length, 3);
+});
+
+test('同じ COLUMN が、主キーと外部キーの両方で使われるときは、識別子のマスタと属性のマスタに分かれる (インスタンスごとの振り分け)', ()=> {
+    const flat = flatOf({
+        tables: [{ _id: 1, code: 'USER' }, { _id: 2, code: 'POST' }, { _id: 3, code: 'LIKE' }],
+        columns: [{ _id: 10, code: 'USER-ID', name: 'ユーザー ID' }, { _id: 11, code: 'TITLE', name: '題' }],
+        instances: [
+            { _id: 100, table: 1, column: 10, column_type: 'ID' },            // 主キー
+            { _id: 101, table: 2, column: 10, column_type: 'ATTRIBUTE' },     // 外部キー
+            { _id: 102, table: 2, column: 11, column_type: 'ATTRIBUTE' },
+            { _id: 103, table: 3, column: 10, column_type: 'ATTRIBUTE' },     // 外部キー (同じ名前なので、101 と同じマスタ)
+        ],
+    });
+    const data = toHierarchical(flat);
+
+    // 識別子のマスタ 1 つ (最初に現れた 100 が、COLUMN の _id を引き継ぐ)。属性のマスタは、ユーザー ID (外部キー) と題。
+    assert.deepEqual(data.identifiers.map(d=> [d.id, d.name.logical]), [[10, 'ユーザー ID']]);
+    assert.equal(data.attributes.length, 2);
+
+    const fk = data.attributes.find(d=> d.name.logical==='ユーザー ID');
+    const ids = new Set([...flat.entities, ...flat.columns, ...flat.column_instances, ...flat.relationships].map(d=> d._id));
+
+    assert.ok(fk && fk.id!==10 && !ids.has(fk.id), '外部キーのマスタは、重ならない id');
+
+    // 主キーのインスタンスだけが identifiers[]、外部キーは attributes[]。(それぞれ、同じ側のマスタを指す)
+    const by = (id)=> data.entities.find(e=> e.id===id);
+
+    assert.deepEqual(by(1).identifiers, [{ id: 100, identifier: 10 }]);
+    assert.deepEqual(by(1).attributes, []);
+    assert.deepEqual(by(2).identifiers, []);
+    assert.deepEqual(by(2).attributes.map(a=> [a.id, a.attribute]), [[101, fk.id], [102, 11]]);
+    assert.deepEqual(by(3).attributes, [{ id: 103, attribute: fk.id }]);
+    assert.deepEqual(check(data, 'er/'), []);
+    assert.deepEqual(toHierarchical(flat), data);
+});
+
+test('外部キーのほうが先に現れても、COLUMN の _id を引き継ぐのは 1 つだけ (どちらの側か問わず)', ()=> {
+    const data = toHierarchical(flatOf({
+        tables: [{ _id: 1, code: 'POST' }, { _id: 2, code: 'USER' }],
+        columns: [{ _id: 10, code: 'USER-ID', name: 'ユーザー ID' }],
+        instances: [
+            { _id: 100, table: 1, column: 10, column_type: 'ATTRIBUTE' },     // 外部キー (先)
+            { _id: 101, table: 2, column: 10, column_type: 'IDENTIFIER' },    // 主キー (後)
+        ],
+    }));
+
+    assert.deepEqual(data.attributes.map(d=> d.id), [10]);
+    assert.equal(data.identifiers.length, 1);
+    assert.notEqual(data.identifiers[0].id, 10);
+    assert.deepEqual(check(data, 'er/'), []);
+});
+
 test('識別子の COLUMN は、名前が違っても、identifiers に入る', ()=> {
     const data = toHierarchical(flatOf({
         tables: [{ _id: 1, code: 'T1' }],

@@ -15,15 +15,15 @@
 //
 // 変換の規則:
 //   COLUMN            → identifiers / attributes
-//                       (column_type が IDENTIFIER のインスタンスが参照している COLUMN を identifiers に、それ以外を attributes に)
+//                       (column_type が IDENTIFIER か ID (主キー) のインスタンスが指すマスタを identifiers に、それ以外のインスタンスが指すマスタを attributes に。
+//                        同じ COLUMN が、あるテーブルでは主キー、ほかのテーブルでは外部キーのときは、識別子のマスタと、属性のマスタに分ける)
 //                       name は { logical: name, physical: code }。
 //                       ただし、インスタンスが持つ名前 (logical_name・physical_name・description) と data_type が COLUMN と違うときは、
 //                       その名前の組ごとに、別のマスタを作る。(階層形式では、名前はマスタだけが持ち、インスタンスはマスタを指すだけのため)
-//                       - 同じ COLUMN の、同じ名前のインスタンスは、1 つのマスタを指す
-//                       - COLUMN で最初に現れた名前 (インスタンスの _id の順) のマスタが、COLUMN の _id を引き継ぐ
+//                       - 同じ COLUMN の、同じ (識別子 / 属性・名前) のインスタンスは、1 つのマスタを指す
+//                       - COLUMN で最初に現れた組 (インスタンスの _id の順) のマスタが、COLUMN の _id を引き継ぐ (1 つだけ)
 //                         (どのインスタンスも COLUMN と同じ名前なら、いままでどおり COLUMN の _id・name・code のマスタ 1 つ)
-//                       - 2 つ目からの名前のマスタには、ER のデータの中のどの _id とも重ならない id を、_id の順に振る (何度変換しても同じ)
-//                       - 識別子 / 属性の振り分けは COLUMN ごと。(同じ COLUMN のマスタは、同じ側に入る)
+//                       - 2 つ目からの組のマスタには、ER のデータの中のどの _id とも重ならない id を、_id の順に振る (何度変換しても同じ)
 //                       - インスタンスの、写し先の決まっていない項目 (アプリが足した項目) は、entities[].identifiers[] / attributes[] の行に写す
 //   TABLE             → entities (position / size はそのまま)
 //                       identifiers[] / attributes[] は、TABLE→COLUMN-INSTANCE の行と、COLUMN→COLUMN-INSTANCE (INSTANCE-OF) の行から組む
@@ -83,9 +83,12 @@ export function convert (flat) {
         if (is(edge, 'TABLE', 'COLUMN-INSTANCE'))
             table_of.set(edge.to_id, edge.from_id);
 
-    // 識別子として使われている COLUMN。
-    const identifier_columns = new Set(
-        instances.filter(d=> d.column_type==='IDENTIFIER').map(d=> column_of.get(d._id)));
+    // 識別子 (主キー) のインスタンスか。
+    // フラット形式では、主キーのインスタンスの column_type が、IDENTIFIER のデータと、ID のデータがある。どちらも識別子にする。
+    // (識別子 / 属性は、COLUMN ごとではなく、インスタンスごとに決める。同じ COLUMN が、あるテーブルでは主キー、ほかのテーブルでは外部キーのとき、
+    //  主キーのインスタンスだけが識別子)
+    const IDENTIFIER_TYPES = ['IDENTIFIER', 'ID'];
+    const is_identifier = (instance)=> IDENTIFIER_TYPES.includes(instance.column_type);
 
     // フラット形式の項目のうち、階層形式に写し先が決まっているもの。これ以外の項目 (アプリが足した項目) は、そのまま写す。
     const COLUMN_KNOWN = ['_id', '_class', 'code', 'name', 'description', 'data_type'];
@@ -105,7 +108,7 @@ export function convert (flat) {
         data_type: instance.data_type || column.data_type || '',
     });
 
-    // COLUMN ごとの、名前の組 → マスタの id。(インスタンスの _id の順に、最初に現れた名前が、COLUMN の _id を引き継ぐ)
+    // COLUMN ごとの、(識別子 / 属性・名前の組) → マスタ。(インスタンスの _id の順に、最初に現れた組が、COLUMN の _id を引き継ぐ)
     const masters_of = new Map(columns.map(c=> [c._id, new Map()]));
     const master_of = new Map();    // インスタンス → マスタの id
     const column_by_id = byId(columns);
@@ -116,11 +119,12 @@ export function convert (flat) {
     for (const instance of sorted(instances)) {
         const column = column_by_id.get(column_of.get(instance._id));
         const names = names_of(instance, column);
-        const key = JSON.stringify([names.logical, names.physical, names.description, names.data_type]);
+        const identifier = is_identifier(instance);
+        const key = JSON.stringify([identifier, names.logical, names.physical, names.description, names.data_type]);
         const known = masters_of.get(column._id);
 
         if (!known.has(key))
-            known.set(key, { id: known.size===0 ? column._id : next_id++, names });
+            known.set(key, { id: known.size===0 ? column._id : next_id++, names, identifier });
 
         master_of.set(instance._id, known.get(key).id);
     }
@@ -137,17 +141,19 @@ export function convert (flat) {
         return { ...out, ...rest(column, COLUMN_KNOWN) };
     };
 
-    // COLUMN ごとのマスタ。(インスタンスが 1 つも無い COLUMN は、COLUMN の名前のマスタ 1 つ)
-    const masters_for = (column)=> {
+    // COLUMN ごとのマスタ。identifier が true のものが identifiers、false のものが attributes に入る。
+    // (インスタンスが 1 つも無い COLUMN は、COLUMN の名前の、属性のマスタ 1 つ)
+    const masters_for = (identifier)=> (column)=> {
         const known = [...masters_of.get(column._id).values()];
 
-        return known.length > 0
-            ? known.map(m=> master(column, m.id, m.names))
-            : [master(column, column._id, { logical: column.name, physical: column.code, description: column.description || '', data_type: column.data_type || '' })];
+        if (known.length===0)
+            return identifier ? [] : [master(column, column._id, { logical: column.name, physical: column.code, description: column.description || '', data_type: column.data_type || '' })];
+
+        return known.filter(m=> m.identifier===identifier).map(m=> master(column, m.id, m.names));
     };
 
-    const identifiers = sorted(columns.filter(c=> identifier_columns.has(c._id))).flatMap(masters_for);
-    const attributes = sorted(columns.filter(c=> !identifier_columns.has(c._id))).flatMap(masters_for);
+    const identifiers = sorted(columns).flatMap(masters_for(true));
+    const attributes = sorted(columns).flatMap(masters_for(false));
 
     const entities = tables.map(table=> {
         const mine = sorted(instances.filter(d=> table_of.get(d._id)===table._id));
@@ -160,9 +166,9 @@ export function convert (flat) {
             position: table.position,
             size: table.size,
             ...rest(table, TABLE_KNOWN),
-            identifiers: mine.filter(d=> identifier_columns.has(column_of.get(d._id)))
+            identifiers: mine.filter(is_identifier)
                 .map(d=> ({ id: d._id, identifier: master_of.get(d._id), ...rest(d, INSTANCE_KNOWN) })),
-            attributes: mine.filter(d=> !identifier_columns.has(column_of.get(d._id)))
+            attributes: mine.filter(d=> !is_identifier(d))
                 .map(d=> ({ id: d._id, attribute: master_of.get(d._id), ...rest(d, INSTANCE_KNOWN) })),
         };
     });
