@@ -16,7 +16,15 @@
 // 変換の規則:
 //   COLUMN            → identifiers / attributes
 //                       (column_type が IDENTIFIER のインスタンスが参照している COLUMN を identifiers に、それ以外を attributes に)
-//                       name は { logical: name, physical: code }
+//                       name は { logical: name, physical: code }。
+//                       ただし、インスタンスが持つ名前 (logical_name・physical_name・description) と data_type が COLUMN と違うときは、
+//                       その名前の組ごとに、別のマスタを作る。(階層形式では、名前はマスタだけが持ち、インスタンスはマスタを指すだけのため)
+//                       - 同じ COLUMN の、同じ名前のインスタンスは、1 つのマスタを指す
+//                       - COLUMN で最初に現れた名前 (インスタンスの _id の順) のマスタが、COLUMN の _id を引き継ぐ
+//                         (どのインスタンスも COLUMN と同じ名前なら、いままでどおり COLUMN の _id・name・code のマスタ 1 つ)
+//                       - 2 つ目からの名前のマスタには、ER のデータの中のどの _id とも重ならない id を、_id の順に振る (何度変換しても同じ)
+//                       - 識別子 / 属性の振り分けは COLUMN ごと。(同じ COLUMN のマスタは、同じ側に入る)
+//                       - インスタンスの、写し先の決まっていない項目 (アプリが足した項目) は、entities[].identifiers[] / attributes[] の行に写す
 //   TABLE             → entities (position / size はそのまま)
 //                       identifiers[] / attributes[] は、TABLE→COLUMN-INSTANCE の行と、COLUMN→COLUMN-INSTANCE (INSTANCE-OF) の行から組む
 //                       INSTANCE-OF の行が無いインスタンスは、code の同じ COLUMN を参照する
@@ -36,6 +44,11 @@ const HIERARCHICAL_FILES = ['schemas', 'identifiers', 'attributes', 'entities', 
 
 // フラット形式のコレクション ({ entities, columns, column_instances, ports, relationships }) を、階層形式にする。
 export function toHierarchical (flat) {
+    return convert(flat).data;
+}
+
+// 階層形式にして、マスタの数 ({ columns: COLUMN の数, masters: 作ったマスタの数 }) も返す。
+export function convert (flat) {
     const { entities: tables, columns, column_instances: instances, ports, relationships: edges } = flat;
 
     const byId = (list)=> new Map(list.map(d=> [d._id, d]));
@@ -79,22 +92,62 @@ export function toHierarchical (flat) {
     const TABLE_KNOWN = ['_id', '_class', 'code', 'name', 'description', 'position', 'size'];
     const rest = (d, known)=> Object.fromEntries(Object.entries(d).filter(([k])=> !known.includes(k)));
 
-    const master = (column)=> {
-        const out = { id: column._id, name: { logical: column.name, physical: column.code } };
+    // インスタンスの項目のうち、マスタか、行の id・参照に写し先が決まっているもの。これ以外の項目 (アプリが足した項目) は、行にそのまま写す。
+    const INSTANCE_KNOWN = ['_id', '_class', 'code', 'physical_name', 'logical_name', 'description', 'column_type', 'data_type'];
 
-        if (column.description)
-            out.description = column.description;
+    const sorted = (list)=> [...list].sort((a, b)=> a._id - b._id);
 
-        if (column.data_type)
-            out.data_type = column.data_type;
+    // マスタの名前の組。(インスタンスの値が無い・空のときは、COLUMN の値)
+    const names_of = (instance, column)=> ({
+        logical: instance.logical_name || column.name,
+        physical: instance.physical_name || column.code,
+        description: instance.description || column.description || '',
+        data_type: instance.data_type || column.data_type || '',
+    });
+
+    // COLUMN ごとの、名前の組 → マスタの id。(インスタンスの _id の順に、最初に現れた名前が、COLUMN の _id を引き継ぐ)
+    const masters_of = new Map(columns.map(c=> [c._id, new Map()]));
+    const master_of = new Map();    // インスタンス → マスタの id
+    const column_by_id = byId(columns);
+
+    // 2 つ目からの名前のマスタの id。ER のデータの中のどの _id とも重ならない値から、順に振る。
+    let next_id = Math.max(0, ...[tables, columns, instances, ports, edges].flat().map(d=> d._id).filter(Number.isFinite)) + 1;
+
+    for (const instance of sorted(instances)) {
+        const column = column_by_id.get(column_of.get(instance._id));
+        const names = names_of(instance, column);
+        const key = JSON.stringify([names.logical, names.physical, names.description, names.data_type]);
+        const known = masters_of.get(column._id);
+
+        if (!known.has(key))
+            known.set(key, { id: known.size===0 ? column._id : next_id++, names });
+
+        master_of.set(instance._id, known.get(key).id);
+    }
+
+    const master = (column, id, names)=> {
+        const out = { id, name: { logical: names.logical, physical: names.physical } };
+
+        if (names.description)
+            out.description = names.description;
+
+        if (names.data_type)
+            out.data_type = names.data_type;
 
         return { ...out, ...rest(column, COLUMN_KNOWN) };
     };
 
-    const sorted = (list)=> [...list].sort((a, b)=> a._id - b._id);
+    // COLUMN ごとのマスタ。(インスタンスが 1 つも無い COLUMN は、COLUMN の名前のマスタ 1 つ)
+    const masters_for = (column)=> {
+        const known = [...masters_of.get(column._id).values()];
 
-    const identifiers = sorted(columns.filter(c=> identifier_columns.has(c._id))).map(master);
-    const attributes = sorted(columns.filter(c=> !identifier_columns.has(c._id))).map(master);
+        return known.length > 0
+            ? known.map(m=> master(column, m.id, m.names))
+            : [master(column, column._id, { logical: column.name, physical: column.code, description: column.description || '', data_type: column.data_type || '' })];
+    };
+
+    const identifiers = sorted(columns.filter(c=> identifier_columns.has(c._id))).flatMap(masters_for);
+    const attributes = sorted(columns.filter(c=> !identifier_columns.has(c._id))).flatMap(masters_for);
 
     const entities = tables.map(table=> {
         const mine = sorted(instances.filter(d=> table_of.get(d._id)===table._id));
@@ -108,9 +161,9 @@ export function toHierarchical (flat) {
             size: table.size,
             ...rest(table, TABLE_KNOWN),
             identifiers: mine.filter(d=> identifier_columns.has(column_of.get(d._id)))
-                .map(d=> ({ id: d._id, identifier: column_of.get(d._id) })),
+                .map(d=> ({ id: d._id, identifier: master_of.get(d._id), ...rest(d, INSTANCE_KNOWN) })),
             attributes: mine.filter(d=> !identifier_columns.has(column_of.get(d._id)))
-                .map(d=> ({ id: d._id, attribute: column_of.get(d._id) })),
+                .map(d=> ({ id: d._id, attribute: master_of.get(d._id), ...rest(d, INSTANCE_KNOWN) })),
         };
     });
 
@@ -159,7 +212,19 @@ export function toHierarchical (flat) {
               return out;
           });
 
-    return { schemas: [], identifiers, attributes, entities, relationships };
+    const data = { schemas: [], identifiers, attributes, entities, relationships };
+
+    return { data, stats: { columns: columns.length, masters: identifiers.length + attributes.length } };
+}
+
+// 変換した結果の説明。(マスタの数と、名前の違いで増えた数)
+export function summary (data, stats) {
+    const added = stats.masters - stats.columns;
+
+    return `identifiers ${data.identifiers.length}, attributes ${data.attributes.length},` +
+        ` entities ${data.entities.length}, relationships ${data.relationships.length}。` +
+        `マスタは、COLUMN から ${stats.columns} 件、名前の違いで増えたもの ${added} 件` +
+        ` (COLUMN と名前の違うインスタンスごとに、別のマスタを作ります)`;
 }
 
 // API サーバーと同じ書き方 (4 つの空白で字下げし、最後に改行) で書く。
@@ -174,7 +239,7 @@ export function migrateDir (dir) {
         throw new Error(`${er}: フラット形式ではありません。(columns.json がありません。変換済みです)`);
 
     const flat = Object.fromEntries(FLAT_FILES.map(name=> [name, JSON.parse(readFileSync(join(er, `${name}.json`), 'utf8'))]));
-    const data = toHierarchical(flat);
+    const { data, stats } = convert(flat);
 
     const errors = check(data, 'er/');
 
@@ -188,7 +253,7 @@ export function migrateDir (dir) {
         if (!HIERARCHICAL_FILES.includes(name))
             unlinkSync(join(er, `${name}.json`));
 
-    return data;
+    return { data, stats };
 }
 
 if (process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url)) {
@@ -200,11 +265,9 @@ if (process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url)
     }
 
     try {
-        const data = migrateDir(resolve(dir));
+        const { data, stats } = migrateDir(resolve(dir));
 
-        console.log(`${dir}/er を階層形式にしました。` +
-                    ` (identifiers ${data.identifiers.length}, attributes ${data.attributes.length},` +
-                    ` entities ${data.entities.length}, relationships ${data.relationships.length}。check: 問題なし)`);
+        console.log(`${dir}/er を階層形式にしました。 (${summary(data, stats)}。check: 問題なし)`);
     } catch (e) {
         console.error(e.message);
         process.exit(1);

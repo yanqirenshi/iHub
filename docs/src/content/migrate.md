@@ -150,6 +150,18 @@ npx ihub-srv migrate-er data
 `data/er/` を、階層形式 (`identifiers.json`・`attributes.json` など) に変換します。
 (`columns.json` などは、消えます。変換したデータは、検査してから書きます)
 
+**カラムの名前 (マスタが分かれることがあります)**
+
+フラット形式では、カラムのインスタンス (`column_instances.json`) が、自分の `logical_name`・`physical_name`・`description` (と `data_type`) を持てました。
+階層形式では、名前はマスタ (`identifiers.json`・`attributes.json`) だけが持ち、テーブルのカラムは、マスタを指すだけです。
+そのため、`migrate-er` は、インスタンスの名前が、COLUMN (`columns.json`) の `name`・`code` と違うときは、名前の違うインスタンスごとに、別のマスタを作ります。
+
+- インスタンスの名前が COLUMN と同じ (または無い) ときは、これまでどおり、COLUMN から作る 1 つのマスタを指します。
+- 同じ COLUMN で、同じ名前のインスタンスは、1 つのマスタを指します。
+- 同じ COLUMN を、違う名前で使っているとき (例: 同じテーブルの `synapse_id_from`・`synapse_id_to`) は、名前ごとに、マスタが分かれます。ER 図には、インスタンスごとの名前が出ます。
+- 最初に現れた名前 (インスタンスの `_id` の順) のマスタが、COLUMN の `_id` を引き継ぎます。2 つ目からのマスタには、ER のデータのどの `_id` とも重ならない値を振ります。(何度変換しても、同じ結果になります)
+- 変換したあとに、マスタの数 (COLUMN から作った数と、名前の違いで増えた数) を表示します。
+
 `data/er/schemas.json` も作ります。中身は、`[]` (空) です。
 これは、テーブルの名前空間 (データベースのスキーマ。例: `PUBLIC`) のマスタで、階層形式の 5 つのファイルの 1 つです。
 フラット形式には、スキーマの情報が無かったので、空になります。(テーブルの `schema` は、付きません) ER 図の描画には使わないので、空のままで、困ることはありません。テーブルの名前空間を持たせたいときは、あとから足します。([データの管理](#/data))
@@ -171,6 +183,9 @@ npx ihub-srv check data
 ```
 
 **変換で、なくなるもの**
+
+`ihub.srv` 0.2.2 以前の `migrate-er` で変換したアプリは、カラムのインスタンスの `physical_name`・`description` が、COLUMN の `code`・`description` に替わっています。(0.2.3 で直りました)
+元のフラット形式のデータ (git の履歴にあります) から、`@yanqirenshi/ihub.srv` 0.2.3 以降の `migrate-er` で変換し直すと、名前が戻ります。
 
 `migrate-er` は、フラット形式の項目のうち、階層形式に写し先が決まっていないもの (コピー版で、アプリが足した項目) も、そのまま ER のテーブル (`er/entities.json`) とカラム (`identifiers.json`・`attributes.json`) に写します。
 データとしては、失われません。
