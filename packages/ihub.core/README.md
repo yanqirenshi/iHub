@@ -183,6 +183,27 @@ const config = {
 };
 ```
 
+セクションの中の 1 枚のスライドは、`HelpSlide` (`@yanqirenshi/ihub.core` が export します。0.2.4 以降) で作れます。
+`HelpSlide` は、画面に収まる大きさ (`size`) の枠の中に、子要素を出します。
+セクションは、`@splidejs/react-splide` の `Splide` で、スライドを並べます。(`@splidejs/react-splide` は、アプリの `dependencies` に、iHub 本体と同じ版の範囲 (`^0.7.12`) で入れてください)
+
+```jsx
+import { Splide } from '@splidejs/react-splide';
+import '@splidejs/react-splide/css';
+import { HelpSlide } from '@yanqirenshi/ihub.core';
+
+export default function Section01 ({ size }) {
+    return (
+        <Splide options={ { rewind: true } } aria-label="Help">
+          <HelpSlide size={size}>
+            <h2>はじめに</h2>
+            <p>この画面の使い方です。</p>
+          </HelpSlide>
+        </Splide>
+    );
+}
+```
+
 ### ページの id
 
 | ページの id | ページ | タブの code | 初めに開くタブ |
@@ -238,6 +259,8 @@ import { IHub, pages, Frame } from '@yanqirenshi/ihub.core';
 | `panels` | ページの中身 (`panels.ER`・`panels.TM` など) |
 | `GithubOAuth`・`Frame`・`FrameTabs`・`FrameWbsNode`・`FrameWbsNodeTabs`・`TabbedPage`・`Link`・`TableTMRelationships` など | 中間の部品 (`components/assemblies/index.js`) |
 | `ItemWbsNode`・`LinkWBS`・`Tabs` など | 小さな部品 (`components/parts/index.js`) |
+| `HelpSlide` | Help のセクションで使う、1 枚のスライド (0.2.4 以降。[Help を差し替える](#help-を差し替える)) | 
+| `HelpSlide` | Help のセクションで使う、1 枚のスライド (0.2.4 以降。[Help を差し替える](#help-を差し替える)) |
 | `usePageTabs`・`mergeTabs` | ページのタブ |
 | `manegers`・`wbs`・`useWbs`・`sogh` | データのマネージャ |
 | `dataApi`・`useGetDataQuery`・`usePatchCollectionMutation`・`useAddRecordMutation`・`usePatchRecordMutation`・`useCollections`・`errorMessage` | API サーバーからのデータの読み書き |

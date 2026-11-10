@@ -69,6 +69,17 @@ npx --yes --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ih
 
 アプリが直接使うパッケージです。(例: `@yanqirenshi/manipulater`・`@yanqirenshi/markdown.sitter`・`react`・`react-redux`・`react-router-dom`・`@mui/*`・`@emotion/*`、DFD などを足していたときの `@yanqirenshi/d3.dfd`)
 
+上の「消すもの」に挙げたパッケージでも、**アプリの `src/` が `import` しているものは、消さずに残します。**
+(iHub 本体が持っていても、アプリが直接 `import` するときは、アプリの `dependencies` に要ります。例: `src/wbs/` のページが `tion` を使う・Help のセクションが `@splidejs/react-splide` を使う)
+消す前に、`src/` で `import` されていないかを、確かめてください。
+
+```
+grep -rn "from 'tion'\|from '@splidejs/react-splide'" src
+```
+
+(確かめるパッケージ名は、上の「消すもの」のそれぞれに替えます。`grep -rhoE "from '[^./'][^']*'" src | sort -u` で、`src/` が `import` しているパッケージの一覧が出ます)
+残すときは、iHub 本体と同じ版の範囲にしてください。(例: `tion` は `^0.2.0`、`@splidejs/react-splide` は `^0.7.12`。範囲がずれて、2 つの版が入ると、動かなくなることがあります)
+
 **上げるもの**
 
 アプリが直接使っている、iHub のパッケージ (`@yanqirenshi/manipulater` など) は、MUI を peerDependencies にした版に上げます。(`@yanqirenshi/manipulater` は `^0.1.0`) 古い版のままだと、その版が `@mui/material` 5 を持ち込んで、MUI が 2 つ入ります。
@@ -106,6 +117,18 @@ git diff src
 
 上書きするのは、コアの `import` を替えるためです。
 コピー版でこれらのファイルを直していたときは、`git diff` で、自分の直したところが消えていないかを確かめて、移し直します。
+(上書きすると、アプリが変えたコメントなども、雛形のものに戻ります。例: `src/Router.js` の `== iHub ==` を、アプリの名前に変えていたとき。`git diff` で見つけて、移し直してください)
+
+**アプリが自分で書いたファイルは、上書きされません。**
+`--only` が上書きするのは、雛形にあるファイルだけです。
+アプリが自分で書いた `src/wbs/P{id}.js` (WBS のノードのページ) や、`src/operators/` に足したファイルは、`import` が替わらないので、手で替えます。
+`src/ihub/` を指している `import` を、次のように探します。
+
+```
+grep -rn "ihub/" src
+```
+
+下の表のとおりに替えます。(同じファイルの `import` が複数あるときは、1 つの `import { ... } from '@yanqirenshi/ihub.core'` にまとめられます)
 
 手順 2 と、この手順のあとで、`git status` に出るものは、次のとおりです。(UkiyoSnow の例)
 
@@ -128,6 +151,14 @@ git diff src
 | `import * as page_docs from './ihub/components/pages/docs/index.js'` | `import { docPages as page_docs } from '@yanqirenshi/ihub.core'` |
 | `import Frame from '../ihub/components/assemblies/frames/Frame.js'` | `import { Frame } from '@yanqirenshi/ihub.core'` |
 | `import Frame from '../ihub/components/assemblies/frames/FrameWbsNode.js'` | `import { FrameWbsNode as Frame } from '@yanqirenshi/ihub.core'` |
+| `import FrameTabs from '../ihub/components/assemblies/frames/FrameTabs.js'` (`FrameWbsNodeTabs` も同じ) | `import { FrameTabs } from '@yanqirenshi/ihub.core'` |
+| `import Link from '../ihub/components/assemblies/Link.js'` | `import { Link } from '@yanqirenshi/ihub.core'` |
+| `import GithubOAuth from '../ihub/components/assemblies/GithubOAuth.js'` | `import { GithubOAuth } from '@yanqirenshi/ihub.core'` |
+| `import WBSTable from '../ihub/components/assemblies/WBSTable.js'` (`Account`・`AddWbsNode`・`TabbedPage`・`TableTMRelationships`・`TabsSearchParam` も同じ) | `import { WBSTable } from '@yanqirenshi/ihub.core'` |
+| `import ItemWbsNode from '../ihub/components/parts/ItemWbsNode.js'` (`ErrorBoundary`・`HeadWbsPage`・`LinkInSite`・`LinkOutSite`・`LinkWBS`・`Tabs` も同じ) | `import { ItemWbsNode } from '@yanqirenshi/ihub.core'` |
+| `import Wbs from '../ihub/components/panels/Wbs.js'` (`ER`・`TM`・`HelpEmpty` など、`panels/` のもの) | `import { panels } from '@yanqirenshi/ihub.core'` のあと、`panels.Wbs` |
+| `import { usePageTabs } from '../ihub/hooks/usePageTabs.js'` | `import { usePageTabs } from '@yanqirenshi/ihub.core'` |
+| `import { useWbs } from '../ihub/manegers/wbs.js'` | `import { useWbs } from '@yanqirenshi/ihub.core'` (`wbs` も同じ) |
 | `import { errorMessage, useCollections, usePatchCollectionMutation } from '../ihub/redux/api/dataApi.js'` | `import { errorMessage, useCollections, usePatchCollectionMutation } from '@yanqirenshi/ihub.core'` |
 | `import { fetchProjectsV2 } from '../ihub/redux/slices/scrumSlice.js'` | `import { fetchProjectsV2 } from '@yanqirenshi/ihub.core'` |
 | `import sogh from '../ihub/manegers/sogh.js'` | `import { sogh } from '@yanqirenshi/ihub.core'` |
@@ -220,7 +251,7 @@ diff -r <iHub の clone>/src/ihub <アプリ>/src/ihub
 | ページにタブを足していた (`hooks/usePageTabs.js` の `TAB_DEFS`・`pages/*.js`) | 設定の `tabs` と `panels` |
 | ページの WBS の `start_id` を変えていた (`pages/*.js`) | 設定の `panels` (下の例) |
 | 設計のページの 4 つのパネルの `start_id` を変えていた (`panels/design/*.js`) | 設定の `panels` で、`panels.DesignPanels` などに `start_id` を渡す (下の例。0.2.2 以降) |
-| Help を書き換えていた (`pages/Help/Section*.js`) | 設定の `help.sections` |
+| Help を書き換えていた (`pages/Help/Section*.js`) | 設定の `help.sections` (下の例。0.2.4 以降は、`Slide` を `HelpSlide` で使える) |
 | GitHub の OAuth を足していた (`server/github.mjs` など) | 不要。(iHub 本体に入っています。[GitHub との連携](#/github)) |
 | サーバーに、アプリ固有のコレクションを足していた (`server/schemas/`・`validation/rules.mjs`) | `createApp` の `extensions` ([API サーバー](#/api)) |
 | ER のテーブルの色分けを、描いたあとに塗り直していた (`panels/ER.js` の `paintTableColors` など)。`server/schemas/er/entities.schema.json` に `color` を足していた | 不要。(iHub 本体が、テーブルの `color` (`{ base, inner }`) で描くようになりました。スキーマにも入っています。手順 5 の `migrate-er` が、`color` をそのまま写します) |
@@ -308,7 +339,57 @@ const config = {
 
 (0.2.1 以前では、`WBSTable` を使って、パネルの並び (`Box`・`Container`) を、アプリで写して、差し替えます)
 
+**例: Help を書き換えていたとき** (`@yanqirenshi/ihub.core` 0.2.4 以降)
+
+コピー版では、`src/ihub/components/pages/Help/Section01.js`〜`Section03.js` の中身を書き換えていました。
+iHub の既定の Help (3 つのセクション) を書き換えるときは、セクションを、アプリに写して、`help.sections` で渡します。
+
+1. コピー版の `Section01.js`〜 (`git show HEAD:src/ihub/components/pages/Help/Section01.js` で、手順 1 で消す前のファイルを見られます) を、アプリの `src/components/help/` に写します。
+2. セクションが使う `Slide` (`import Slide from './Slide.js'`) は、写さずに、`@yanqirenshi/ihub.core` の `HelpSlide` に替えます。
+3. セクションが使う `@splidejs/react-splide` は、アプリの `dependencies` に残します。(手順 3 の「残すもの」)
+4. `src/index.js` の設定で、`help.sections` に渡します。
+
+```jsx
+// src/components/help/Section01.js
+import { Splide } from '@splidejs/react-splide';
+import '@splidejs/react-splide/css';
+import { HelpSlide } from '@yanqirenshi/ihub.core';   // コピー版の import Slide from './Slide.js' の代わり
+
+export default function Section01 (props) {
+    const size = props.size;
+
+    return (
+        <Splide options={ { rewind: true } } aria-label="Help">
+          <HelpSlide size={size}>
+            {/* 書き換えた内容 */}
+          </HelpSlide>
+        </Splide>
+    );
+}
+```
+
+```jsx
+// src/index.js
+import Section01 from './components/help/Section01.js';
+
+const config = {
+    // (省略)
+    help: { sections: [Section01] },
+};
+```
+
+(0.2.3 以前では、`Slide.js` もアプリに写します)
+
 ページの id (`PAGE_DATA` など) の一覧は、`@yanqirenshi/ihub.core` の README にあります。
+
+**例: アプリの `docs/` (iHub のマニュアルのコピー) があるとき**
+
+コピー版のアプリは、iHub のマニュアルを、アプリの `docs/` にコピーして、持っていることがあります。
+(コピー版の前提 (フォルダごとコピーする・`src/ihub/` を直す・`server/`) が書かれています)
+次のどちらかで、直します。どちらでもかまいません。
+
+- iHub のマニュアル ([docs/src/content](https://github.com/yanqirenshi/iHub/tree/main/docs/src/content)) へのリンクに替える。(アプリの `docs/` は、アプリ固有の説明だけにする)
+- アプリの説明に書き直す。(「iHub を、npm のパッケージで使っているアプリ」として、`about`・`setup`・`structure`・`update` などを書き直し、ほかのページは、`src/ihub/`・`server/` を指している行を直す) 見つけ方は、`grep -rn "src/ihub\|server/\|コピー" docs/src`
 
 ### 7. 動きを確かめる
 
@@ -320,6 +401,18 @@ npm start
 - 足していたタブ (DFD など) が出る。
 - 図をドラッグして保存できる。
 - `npm run build` が通る。
+
+**移す前と、同じにならないところ**
+
+コピーした時期より後の、iHub 本体の更新で、見た目が変わるところがあります。
+(アプリの直し間違いではありません)
+
+- WBS の表: 見出しの表記 (`WP COLUMNS` → `Wp Columns`) と、表の上のツールバー (検索・列・ダウンロード) が、新しくなります。(`@yanqirenshi/table.wbs` 0.0.22。iHub の #63・#64) 表の中身は、同じです。
+- サイドメニューの名前の表示が、開いているページの名前になります。(コピー版は、ページを開き直さないと変わらないことがありました)
+- ER のテーブルの `color` で、図の色が描かれます。(コピー版でテーブルの色を塗り直していたとき)
+
+移す前と後を比べるときは、これらの違いを除いて、同じになることを確かめてください。
+(例: 同じ手順で、全ページを開いて、画面の文字を比べます。WBS の表の見出しは、`Wp Columns` を `WP COLUMNS` に戻して比べると、一致します)
 
 ## 移したあと
 

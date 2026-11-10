@@ -19,6 +19,7 @@ export * as panels from './components/panels/index.js';
 export * from './components/assemblies/index.js';   // Frame・FrameTabs・FrameWbsNode・FrameWbsNodeTabs・Link など
 export * from './components/parts/index.js';        // ItemWbsNode・LinkWBS など
 export * from './hooks/index.js';                   // usePageTabs
+export { default as HelpSlide } from './components/pages/Help/Slide.js';   // Help の 1 枚のスライド (help.sections のセクションで使う)
 export * as manegers from './manegers/index.js';
 export { wbs, useWbs, sogh } from './manegers/index.js';
 
