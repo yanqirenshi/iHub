@@ -255,6 +255,7 @@ diff -r <iHub の clone>/src/ihub <アプリ>/src/ihub
 | GitHub の OAuth を足していた (`server/github.mjs` など) | 不要。(iHub 本体に入っています。[GitHub との連携](#/github)) |
 | サーバーに、アプリ固有のコレクションを足していた (`server/schemas/`・`validation/rules.mjs`) | `createApp` の `extensions` ([API サーバー](#/api)) |
 | ER のテーブルの色分けを、描いたあとに塗り直していた (`panels/ER.js` の `paintTableColors` など)。`server/schemas/er/entities.schema.json` に `color` を足していた | 不要。(iHub 本体が、テーブルの `color` (`{ base, inner }`) で描くようになりました。スキーマにも入っています。手順 5 の `migrate-er` が、`color` をそのまま写します) |
+| ER 図・TM 図のグリッド線を消していた (`panels/ER.js`・`TM.js` で、`new Rectum({ ... })` に `grid: { draw: false }` を渡していた) | 設定の `diagrams` (`diagrams: { er: { grid: { draw: false } }, tm: { grid: { draw: false } } }`。0.2.5 以降。[カスタマイズ](#/customize) の「図のグリッド線を消す」) |
 | 図の描き方など、部品の中を直していた | 設定の差し替え口が無いので、iHub のリポジトリに Issue を立てます。それまでは、そのパネルを、アプリで書いて、`panels` で差し替えます |
 
 **iHub 本体が取り込んだので、移さなくてよいもの**
