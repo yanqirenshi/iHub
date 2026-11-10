@@ -117,7 +117,7 @@ ihub-srv migrate-er data
 カラムのインスタンスの名前 (`logical_name`・`physical_name`・`description`) と `data_type` は、COLUMN と違うときは、名前の違うインスタンスごとに、別のマスタ (identifiers / attributes) を作って指します。(階層形式では、名前はマスタだけが持つため。同じ COLUMN で同じ名前のインスタンスは、1 つのマスタを指す。最初の名前のマスタが COLUMN の `_id` を引き継ぎ、2 つ目からは、ER のどの `_id` とも重ならない値を振る) 変換のあとに、マスタの数 (COLUMN から作った数・名前の違いで増えた数) を表示します。
 0.2.2 以前の `migrate-er` は、インスタンスの名前を、COLUMN の `name`・`code` に替えていました。0.2.3 以降で、元のフラット形式のデータから変換し直すと、名前が戻ります。
 
-主キーのインスタンス (`column_type` が `IDENTIFIER` か `ID`) が指す COLUMN は、識別子 (`identifiers.json`) にします。それ以外は、属性 (`attributes.json`) です。(0.2.4 以前は、`IDENTIFIER` だけが識別子で、`ID` の主キーは属性になっていました。0.2.5 以降で、元のフラット形式のデータから変換し直すと、識別子になります)
+主キーのインスタンス (`column_type` が `IDENTIFIER` か `ID`) が指すマスタは、識別子 (`identifiers.json`)、それ以外のインスタンス (外部キーなど) が指すマスタは、属性 (`attributes.json`) です。識別子か属性かは、COLUMN ごとではなく、インスタンスごとに決めます。(同じ COLUMN が、あるテーブルでは主キー、ほかのテーブルでは外部キーのときは、識別子のマスタと属性のマスタに分かれます。0.2.4 以前は、`IDENTIFIER` だけが識別子で、`ID` の主キーは属性になっていました。0.2.5 以降で、元のフラット形式のデータから変換し直すと、主キーが識別子になります)
 
 ## createApp
 

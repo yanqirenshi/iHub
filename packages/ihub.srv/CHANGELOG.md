@@ -10,9 +10,10 @@
 
 - `ihub-srv migrate-er` が、`column_type` が `ID` の主キーも、識別子 (`identifiers.json`) にするようにした。(yanqirenshi/iHub#106)
   - これまでは、`IDENTIFIER` だけを識別子にしていた。フラット形式の主キーのインスタンスには、`IDENTIFIER` のデータ (UkiyoSnow) と、`ID` のデータ (iwo.Studio・Bokasafn) があり、`ID` の主キーは、すべて属性 (`attributes.json`) になっていた。
-  - いまは、`IDENTIFIER` か `ID` のインスタンスが指す COLUMN を、識別子にする。それ以外は、これまでどおり、属性。
+  - いまは、`IDENTIFIER` か `ID` のインスタンスが指すマスタを、識別子にする。それ以外のインスタンス (外部キーなど) が指すマスタは、属性。識別子か属性かは、COLUMN ごとではなく、**インスタンスごと**に決める。
+  - 同じ COLUMN が、あるテーブルでは主キー、ほかのテーブルでは外部キーのとき (例: `user_id`) は、識別子のマスタと、属性のマスタに分ける。(階層形式では、`identifiers[]` は識別子のマスタを、`attributes[]` は属性のマスタを指すため。#100 のマスタの鍵に、識別子 / 属性の別を足した。COLUMN の `_id` を引き継ぐのは、COLUMN ごとに 1 つのマスタだけ)
   - **0.2.4 以前の `migrate-er` で変換したアプリ**は、元のフラット形式のデータ (git の履歴) から、0.2.5 以降の `migrate-er` で変換し直すと、主キーが識別子になる。
-- 確かめた: iwo.Studio・Bokasafn・UkiyoSnow の、変換前のフラット形式のデータで、主キーのインスタンスが、すべて identifiers に入った。インスタンスの名前も、すべて残った。(`ihub-srv check` も通る)
+- 確かめた: iwo.Studio・Bokasafn・UkiyoSnow の、変換前のフラット形式のデータで、主キーのインスタンスだけが、すべて identifiers に入り (それ以外は、すべて attributes)、インスタンスの名前も、すべて残った。ER 図 (d3.er 0.6.1) のカラムの並びは、移す前 (主キー → 属性 → タイムスタンプ → そのほか) と同じになった。(`ihub-srv check` も通る)
 
 ## 0.2.4 (2026-11)
 
