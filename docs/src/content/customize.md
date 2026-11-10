@@ -400,7 +400,7 @@ function Diagram ({ data }) {
 - `bindView(rectum)` は、`Rectum` を作ったあと、`data()` を呼ぶ前に呼びます。図を作り直すたびに呼ぶと、覚えた位置で作り直されます。
 - 覚えたものが無い (初めて開く)・壊れている・`localStorage` が使えないときは、何もしません。`Rectum` の初めの位置 (`transform`) のままです。
 - 鍵は、`ihub:{app.name}:view:{code}` です。
-- コンストラクタに `view` を渡す形ではなく、作ったあとに `bindView` を呼ぶ形にしてください。(d3.er・d3.gantt の `Rectum` は、コンストラクタの `view` を受け取りません)
+- `Rectum` のコンストラクタに `view`・`onViewChange` を渡す必要はありません。作ったあとに `bindView` を呼べば、位置を戻すことと、操作のたびに覚えることの両方を行います。
 - `Rectum` が `view`・`onViewChange` を持つ必要があります。(`@yanqirenshi/assh0le` 0.5.9 以降。iHub の `dependencies` に入っています。古い `package-lock.json` のアプリは、`npm install` で更新されます)
 
 ## アプリの名前を出す
