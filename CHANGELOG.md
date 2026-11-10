@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.2.6 (2026-11)
+
+- `@yanqirenshi/ihub.srv`: `engines` の `node` を、`>=20.12` から `>=22` にした。(docs の「Node.js 22 以上」と、そろえた。保守期間の終わった Node.js 20 を、対象から外す。動きの変更は無い)
+- `@yanqirenshi/ihub.core`: コードの変更は無い。(版をそろえるだけ。README に、docs の版の表へのリンクを足した)
+
 ## 0.2.5 (2026-11)
 
 - `@yanqirenshi/ihub.core`: 設定の `diagrams` で、ER 図・TM 図の `grid` (d3.er・d3.ter の設定) を渡せるようにした。(`diagrams: { er: { grid: { draw: false } } }` でグリッド線を消す。設定が無いときは、変わらない)

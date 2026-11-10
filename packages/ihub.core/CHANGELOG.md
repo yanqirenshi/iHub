@@ -4,6 +4,11 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.2.6 (2026-11)
+
+- コードの変更は無い。(`@yanqirenshi/ihub.srv` 0.2.6 と、版をそろえるだけ)
+- README の peerDependencies の一覧に、マニュアルの「導入のしかた」の「アプリで入れるパッケージの版」の表へのリンクと、「Node.js は 22 以上」を足した。(`ihub.srv` の `engines` を `>=22` にしたことに合わせた)
+
 ## 0.2.5 (2026-11)
 
 ### 追加
