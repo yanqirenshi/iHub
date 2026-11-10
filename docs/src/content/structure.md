@@ -54,6 +54,7 @@ import { Frame, pages, panels } from '@yanqirenshi/ihub.core';
 | `panels` | ページの中身 (ER 図・TM など) |
 | `Frame`・`FrameTabs`・`FrameWbsNode`・`TabbedPage` など | 中間の部品 (枠・タブのあるページ) |
 | `ItemWbsNode`・`LinkWBS`・`Tabs` など | 小さな部品 |
+| `HelpSlide` | Help のセクションで使う、1 枚のスライド ([カスタマイズ](#/customize) の「Help を差し替える」) |
 
 公開している名前の一覧は、`@yanqirenshi/ihub.core` の README にあります。
 
