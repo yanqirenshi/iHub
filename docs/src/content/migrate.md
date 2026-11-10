@@ -223,6 +223,29 @@ npx ihub-srv convert-legacy src/data data
 npx ihub-srv check data
 ```
 
+**コレクションのファイルが無いとき** (データの形式が古くなくても、確かめます)
+
+コピーした時期より後に、iHub に増えたコレクション (例: `data/overview/`。コックピットの Overview タブのデータ) のファイルが、コピー版の `data/` に無いと、`npx ihub-srv check data` が、次のように止まります。
+
+```
+NG: data (2 件)
+  overview/edges: ファイルがありません。
+  overview/nodes: ファイルがありません。
+```
+
+足りないファイルを、足します。次のどちらでもかまいません。
+
+- 雛形 (`@yanqirenshi/ihub.core` の `examples/data/`。`node_modules/@yanqirenshi/ihub.core/examples/data/`) から、同じ名前のファイルを写す。(サンプルのデータが入っています。アプリに合わせて、書き換えます)
+- 空 (`[]`) のファイルを作る。(図が空になるだけで、動きます)
+
+```
+mkdir -p data/overview
+echo "[]" > data/overview/nodes.json
+echo "[]" > data/overview/edges.json
+```
+
+足したら、もう一度 `npx ihub-srv check data` で確かめます。
+
 **変換で、なくなるもの**
 
 `ihub.srv` 0.2.2 以前の `migrate-er` で変換したアプリは、カラムのインスタンスの `physical_name`・`description` が、COLUMN の `code`・`description` に替わっています。(0.2.3 で直りました)
@@ -266,6 +289,7 @@ diff -r <iHub の clone>/src/ihub <アプリ>/src/ihub
 | サーバーに、アプリ固有のコレクションを足していた (`server/schemas/`・`validation/rules.mjs`) | `createApp` の `extensions` ([API サーバー](#/api)) |
 | ER のテーブルの色分けを、描いたあとに塗り直していた (`panels/ER.js` の `paintTableColors` など)。`server/schemas/er/entities.schema.json` に `color` を足していた | 不要。(iHub 本体が、テーブルの `color` (`{ base, inner }`) で描くようになりました。スキーマにも入っています。手順 5 の `migrate-er` が、`color` をそのまま写します) |
 | ER 図・TM 図のグリッド線を消していた (`panels/ER.js`・`TM.js` で、`new Rectum({ ... })` に `grid: { draw: false }` を渡していた) | 設定の `diagrams` (`diagrams: { er: { grid: { draw: false } }, tm: { grid: { draw: false } } }`。0.2.5 以降。[カスタマイズ](#/customize) の「図のグリッド線を消す」) |
+| コピー版の `server/index.mjs` の、起動のログに、アプリの名前を入れていた (例: `bokasafn の API サーバーを起動しました`) | 移せない。(`ihub-srv` の起動のログは、iHub の表記のままで、変えられません。動きには関係しません。画面の名前 (`app.name`) と、書き込んだ画面の id を送るヘッダー (`--app-name`) は、別です) |
 | 図の描き方など、部品の中を直していた | 設定の差し替え口が無いので、iHub のリポジトリに Issue を立てます。それまでは、そのパネルを、アプリで書いて、`panels` で差し替えます |
 
 **iHub 本体が取り込んだので、移さなくてよいもの**
@@ -413,6 +437,11 @@ npm start
 - 図をドラッグして保存できる。
 - `npm run build` が通る。
 
+**移す前の画面と、比べるとき**
+
+コピー版が古く、タブの選択を URL (`?tab=`) に持たないとき (コピー版の `hooks/usePageTabs.js` が無く、タブの選択を、画面の中の状態に持つ古い版) は、`/data?tab=wbs` のように URL でタブを指定して比べられません。
+コピー版 (移す前) は、各ページを開いて、**タブを 1 つずつ押して**、比べてください。(移したあとは、`?tab=` の URL でも、タブを押しても、同じです) 比べるものは、画面の文字・図の見た目です。
+
 **移す前と、同じにならないところ**
 
 コピーした時期より後の、iHub 本体の更新で、見た目が変わるところがあります。
@@ -421,6 +450,11 @@ npm start
 - WBS の表: 見出しの表記 (`WP COLUMNS` → `Wp Columns`) と、表の上のツールバー (検索・列・ダウンロード) が、新しくなります。(`@yanqirenshi/table.wbs` 0.0.22。iHub の #63・#64) 表の中身は、同じです。
 - サイドメニューの名前の表示が、開いているページの名前になります。(コピー版は、ページを開き直さないと変わらないことがありました)
 - ER のテーブルの `color` で、図の色が描かれます。(コピー版でテーブルの色を塗り直していたとき)
+- 本文の文字の色が、黒 (`rgb(0, 0, 0)`) から、`rgb(74, 74, 74)` (`#4a4a4a`) になります。(`<IHub>` が bulma を読み込み、bulma の `body { color: #4a4a4a }` が効くため。コピー版は、`body` の文字の色を決めていませんでした) 黒のままにしたいときは、アプリの `src/index.css` で上書きします。(`src/index.css` は、iHub の CSS のあとに読み込まれます)
+
+```css
+body { color: #000; }
+```
 
 移す前と後を比べるときは、これらの違いを除いて、同じになることを確かめてください。
 (例: 同じ手順で、全ページを開いて、画面の文字を比べます。WBS の表の見出しは、`Wp Columns` を `WP COLUMNS` に戻して比べると、一致します)
