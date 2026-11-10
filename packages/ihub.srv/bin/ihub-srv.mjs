@@ -13,7 +13,7 @@ import { parseArgs } from 'node:util';
 import { createApp, serve } from '../src/index.mjs';
 import { createValidation } from '../src/validation/index.mjs';
 import { convertLegacy } from '../src/tools/convert-legacy-data.mjs';
-import { migrateDir } from '../src/tools/migrate-er-hierarchical.mjs';
+import { migrateDir, summary } from '../src/tools/migrate-er-hierarchical.mjs';
 
 const USAGE = `使い方:
   ihub-srv [--data <dir>] [--static <dir>] [--port <n>] [--app-name <name>]
@@ -317,11 +317,9 @@ function migrateEr (args) {
     }
 
     try {
-        const data = migrateDir(resolve(args[0]));
+        const { data, stats } = migrateDir(resolve(args[0]));
 
-        console.log(`${args[0]}/er を階層形式にしました。` +
-                    ` (identifiers ${data.identifiers.length}, attributes ${data.attributes.length},` +
-                    ` entities ${data.entities.length}, relationships ${data.relationships.length}。check: 問題なし)`);
+        console.log(`${args[0]}/er を階層形式にしました。 (${summary(data, stats)}。check: 問題なし)`);
 
         return 0;
     } catch (e) {

@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.2.3 (2026-11)
+
+- `@yanqirenshi/ihub.srv`: `ihub-srv migrate-er` が、カラムのインスタンスの名前 (`physical_name` など) を、落とさないようにした。名前の違うインスタンスごとに、別のマスタを作る。0.2.2 以前で変換したアプリは、元のフラット形式のデータから変換し直すと、名前が戻る。
+- `@yanqirenshi/ihub.core`: 雛形の `.env.local.template` に、GitHub の OAuth の 2 つの変数の欄を足した。(コードの変更は無い。版をそろえるだけ)
+
 ## 0.2.2 (2026-11)
 
 - `@yanqirenshi/ihub.core`: 設計のページの 4 つのパネルが、`start_id` を受け取れるようにし、`panels` から export した。(`panels.DesignPanels` など。設定なしでは、変わらない)

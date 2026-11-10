@@ -114,6 +114,9 @@ ihub-srv migrate-er data
 
 フラット形式の項目のうち、階層形式に写し先が決まっていないもの (TABLE の `color` など、アプリが足した項目) は、そのまま entity (COLUMN は identifiers / attributes) に写します。
 
+カラムのインスタンスの名前 (`logical_name`・`physical_name`・`description`) と `data_type` は、COLUMN と違うときは、名前の違うインスタンスごとに、別のマスタ (identifiers / attributes) を作って指します。(階層形式では、名前はマスタだけが持つため。同じ COLUMN で同じ名前のインスタンスは、1 つのマスタを指す。最初の名前のマスタが COLUMN の `_id` を引き継ぎ、2 つ目からは、ER のどの `_id` とも重ならない値を振る) 変換のあとに、マスタの数 (COLUMN から作った数・名前の違いで増えた数) を表示します。
+0.2.2 以前の `migrate-er` は、インスタンスの名前を、COLUMN の `name`・`code` に替えていました。0.2.3 以降で、元のフラット形式のデータから変換し直すと、名前が戻ります。
+
 ## createApp
 
 ```js

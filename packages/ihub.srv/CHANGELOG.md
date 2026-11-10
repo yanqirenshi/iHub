@@ -4,6 +4,22 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.2.3 (2026-11)
+
+### 修正
+
+- `ihub-srv migrate-er` が、カラムのインスタンスの名前を、落とさないようにした。(yanqirenshi/iHub#100)
+  - これまでは、インスタンス (`column_instances.json`) の `physical_name`・`description` を捨て、マスタの名前を、COLUMN の `{ logical: name, physical: code }` にしていた。(例: `id` が `USER-ID` になる。同じ COLUMN を違う名前で 2 回使うテーブルは、どちらも同じ名前になる)
+  - いまは、インスタンスの名前 (`logical_name`・`physical_name`・`description`) と `data_type` が COLUMN と違うときは、名前の違うインスタンスごとに、別のマスタ (identifiers / attributes) を作って指す。
+    - COLUMN と同じ名前 (または名前が無い) インスタンスは、これまでどおり、COLUMN の 1 つのマスタを指す。
+    - 同じ COLUMN で同じ名前のインスタンスは、1 つのマスタを指す。
+    - 最初に現れた名前 (インスタンスの `_id` の順) のマスタが、COLUMN の `_id` を引き継ぎ、2 つ目からのマスタには、ER のどの `_id` とも重ならない値を振る。(何度変換しても、同じ結果になる)
+    - インスタンスの、写し先の決まっていない項目 (アプリが足した項目) は、`entities[].identifiers[]` / `attributes[]` の行に、そのまま写す。
+  - 変換のあとに、マスタの数 (COLUMN から作った数・名前の違いで増えた数) を表示する。
+  - 描画 (d3.er・model.er) は、変わらない。
+  - **0.2.2 以前の `migrate-er` で変換したアプリ**は、元のフラット形式のデータ (git の履歴) から、0.2.3 以降の `migrate-er` で変換し直すと、名前が戻る。
+- 確かめた: iwo.Studio (インスタンス 132 件) と UkiyoSnow (202 件) の、変換前のフラット形式のデータで、すべてのインスタンスの名前が、変換のあとのマスタの名前と一致した。(`ihub-srv check` も通る)
+
 ## 0.2.2 (2026-11)
 
 - コードの変更は無い。(`@yanqirenshi/ihub.core` 0.2.2 と、版をそろえるだけ)
