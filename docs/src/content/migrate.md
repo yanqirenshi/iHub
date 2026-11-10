@@ -82,6 +82,8 @@ grep -rn "from 'tion'\|from '@splidejs/react-splide'" src
 
 **上げるもの**
 
+アプリで入れる、MUI・React などの版は、[導入のしかた](#/setup) の「アプリで入れるパッケージの版」の表に、合わせます。
+
 アプリが直接使っている、iHub のパッケージ (`@yanqirenshi/manipulater` など) は、MUI を peerDependencies にした版に上げます。(`@yanqirenshi/manipulater` は `^0.1.0`) 古い版のままだと、その版が `@mui/material` 5 を持ち込んで、MUI が 2 つ入ります。
 
 **使っていないもの**
