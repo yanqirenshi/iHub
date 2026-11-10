@@ -15,7 +15,7 @@
 //
 // 変換の規則:
 //   COLUMN            → identifiers / attributes
-//                       (column_type が IDENTIFIER のインスタンスが参照している COLUMN を identifiers に、それ以外を attributes に)
+//                       (column_type が IDENTIFIER か ID (主キー) のインスタンスが参照している COLUMN を identifiers に、それ以外を attributes に)
 //                       name は { logical: name, physical: code }。
 //                       ただし、インスタンスが持つ名前 (logical_name・physical_name・description) と data_type が COLUMN と違うときは、
 //                       その名前の組ごとに、別のマスタを作る。(階層形式では、名前はマスタだけが持ち、インスタンスはマスタを指すだけのため)
@@ -83,9 +83,11 @@ export function convert (flat) {
         if (is(edge, 'TABLE', 'COLUMN-INSTANCE'))
             table_of.set(edge.to_id, edge.from_id);
 
-    // 識別子として使われている COLUMN。
+    // 識別子 (主キー) として使われている COLUMN。
+    // フラット形式では、主キーのインスタンスの column_type が、IDENTIFIER のデータと、ID のデータがある。どちらも識別子にする。
+    const IDENTIFIER_TYPES = ['IDENTIFIER', 'ID'];
     const identifier_columns = new Set(
-        instances.filter(d=> d.column_type==='IDENTIFIER').map(d=> column_of.get(d._id)));
+        instances.filter(d=> IDENTIFIER_TYPES.includes(d.column_type)).map(d=> column_of.get(d._id)));
 
     // フラット形式の項目のうち、階層形式に写し先が決まっているもの。これ以外の項目 (アプリが足した項目) は、そのまま写す。
     const COLUMN_KNOWN = ['_id', '_class', 'code', 'name', 'description', 'data_type'];

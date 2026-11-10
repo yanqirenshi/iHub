@@ -13,6 +13,11 @@
   - コピー版で、`panels/ER.js`・`TM.js` に `grid: { draw: false }` を足してグリッド線を消していたアプリ (Bokasafn など) が、パネルを差し替えずに移せる。([コピー版からの移行](https://github.com/yanqirenshi/iHub/blob/main/docs/src/content/migrate.md) の手順 6 の表)
   - 書き方は、[カスタマイズ](https://github.com/yanqirenshi/iHub/blob/main/docs/src/content/customize.md) の「図のグリッド線を消す」と、この README の「図のグリッド線を消す」
 
+### 変更
+
+- `@yanqirenshi/d3.er` を `^0.6.1` にした。(識別子 (階層形式の `identifiers[]`) が、テーブルのカラムの先頭に描かれる。0.6.0 までは、末尾に描かれていた) `ihub-srv migrate-er` が、`column_type` が `ID` の主キーも識別子にするようになった (`@yanqirenshi/ihub.srv` 0.2.5) ので、変換し直したデータでは、主キーが先頭に描かれる。
+  - **利用側への影響**: すでに階層形式のデータ (`IDENTIFIER` の識別子を持つ。例: UkiyoSnow) では、識別子が、末尾から先頭に移る。(データの変更は要らない)
+
 ## 0.2.4 (2026-11)
 
 ### 追加

@@ -6,7 +6,13 @@
 
 ## 0.2.5 (2026-11)
 
-- コードの変更は無い。(`@yanqirenshi/ihub.core` 0.2.5 と、版をそろえるだけ)
+### 修正
+
+- `ihub-srv migrate-er` が、`column_type` が `ID` の主キーも、識別子 (`identifiers.json`) にするようにした。(yanqirenshi/iHub#106)
+  - これまでは、`IDENTIFIER` だけを識別子にしていた。フラット形式の主キーのインスタンスには、`IDENTIFIER` のデータ (UkiyoSnow) と、`ID` のデータ (iwo.Studio・Bokasafn) があり、`ID` の主キーは、すべて属性 (`attributes.json`) になっていた。
+  - いまは、`IDENTIFIER` か `ID` のインスタンスが指す COLUMN を、識別子にする。それ以外は、これまでどおり、属性。
+  - **0.2.4 以前の `migrate-er` で変換したアプリ**は、元のフラット形式のデータ (git の履歴) から、0.2.5 以降の `migrate-er` で変換し直すと、主キーが識別子になる。
+- 確かめた: iwo.Studio・Bokasafn・UkiyoSnow の、変換前のフラット形式のデータで、主キーのインスタンスが、すべて identifiers に入った。インスタンスの名前も、すべて残った。(`ihub-srv check` も通る)
 
 ## 0.2.4 (2026-11)
 

@@ -162,6 +162,62 @@ test('同じ COLUMN を違う名前で 2 回使うテーブル (synapse_relation
     assert.deepEqual(toHierarchical(flat), data);
 });
 
+// ---- 主キー (column_type が ID のデータ・IDENTIFIER のデータ) (yanqirenshi/iHub#106) ----
+
+test('column_type が ID の主キー (iwo.Studio・Bokasafn のデータ) も、identifiers に入る', ()=> {
+    const data = toHierarchical(flatOf({
+        tables: [{ _id: 1, code: 'T1' }],
+        columns: [{ _id: 10, code: 'ID', name: 'ID' }, { _id: 11, code: 'NAME', name: '名前' }],
+        instances: [
+            { _id: 100, table: 1, column: 10, column_type: 'ID' },
+            { _id: 101, table: 1, column: 11, column_type: 'ATTRIBUTE' },
+        ],
+    }));
+
+    assert.deepEqual(data.identifiers.map(d=> d.id), [10]);
+    assert.deepEqual(data.attributes.map(d=> d.id), [11]);
+    assert.deepEqual(data.entities[0].identifiers, [{ id: 100, identifier: 10 }]);
+    assert.deepEqual(data.entities[0].attributes, [{ id: 101, attribute: 11 }]);
+    assert.deepEqual(check(data, 'er/'), []);
+});
+
+test('ID と IDENTIFIER が混ざったデータは、どちらの主キーも identifiers に入る', ()=> {
+    const data = toHierarchical(flatOf({
+        tables: [{ _id: 1, code: 'T1' }, { _id: 2, code: 'T2' }],
+        columns: [
+            { _id: 10, code: 'A-ID', name: 'A' },
+            { _id: 11, code: 'B-ID', name: 'B' },
+            { _id: 12, code: 'V', name: '値' },
+        ],
+        instances: [
+            { _id: 100, table: 1, column: 10, column_type: 'ID' },
+            { _id: 101, table: 2, column: 11, column_type: 'IDENTIFIER' },
+            { _id: 102, table: 2, column: 12, column_type: 'ATTRIBUTE' },
+            { _id: 103, table: 1, column: 12, column_type: 'TIMESTAMP' },
+        ],
+    }));
+
+    assert.deepEqual(data.identifiers.map(d=> d.id), [10, 11]);
+    assert.deepEqual(data.attributes.map(d=> d.id), [12]);
+    assert.deepEqual(data.entities.map(e=> [e.identifiers.length, e.attributes.length]), [[1, 1], [1, 1]]);
+    assert.deepEqual(check(data, 'er/'), []);
+});
+
+test('主キーでない column_type (ATTRIBUTE・TIMESTAMP・無し) は、attributes に入る', ()=> {
+    const data = toHierarchical(flatOf({
+        tables: [{ _id: 1, code: 'T1' }],
+        columns: [{ _id: 10, code: 'A', name: 'a' }, { _id: 11, code: 'B', name: 'b' }, { _id: 12, code: 'C', name: 'c' }],
+        instances: [
+            { _id: 100, table: 1, column: 10, column_type: 'ATTRIBUTE' },
+            { _id: 101, table: 1, column: 11, column_type: 'TIMESTAMP' },
+            { _id: 102, table: 1, column: 12, column_type: undefined },
+        ],
+    }));
+
+    assert.deepEqual(data.identifiers, []);
+    assert.equal(data.attributes.length, 3);
+});
+
 test('識別子の COLUMN は、名前が違っても、identifiers に入る', ()=> {
     const data = toHierarchical(flatOf({
         tables: [{ _id: 1, code: 'T1' }],
