@@ -7,7 +7,7 @@ import D3Sitemap, { Rectum } from '@yanqirenshi/d3.sitemap';
 import { ModelInspector } from '@yanqirenshi/colonoscope';
 import { ModelError, applyPatch, fieldsOf, findById, movePatch, titleOf, withDefaults } from '@yanqirenshi/model.sitemap';
 
-import { useDiagramData } from '../../../manegers/diagram.js';
+import { useDiagramData, useDiagramView } from '../../../manegers/diagram.js';
 import { SITEMAP_COLLECTIONS, buildSitemapData } from '../../../manegers/sitemap.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../../redux/api/dataApi.js';
 
@@ -129,6 +129,9 @@ function Diagram (props) {
 
     const [rectum, setRectum] = React.useState(null);
 
+    // カメラ (移動位置と拡大縮小) を、ブラウザに保管して、次に開いたときに戻す。
+    const bindView = useDiagramView('std');
+
     React.useEffect(()=> {
         const r = new Rectum({
             transform: INITIAL_VIEW,
@@ -146,10 +149,12 @@ function Diagram (props) {
             },
         });
 
+        bindView(r);
+
         r.data(data);
 
         setRectum(r);
-    }, [data]);
+    }, [bindView, data]);
 
     if (!rectum) return null;
 

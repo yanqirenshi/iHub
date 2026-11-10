@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.2.7 (2026-11)
+
+- `@yanqirenshi/ihub.core`: 図の位置と拡大を、ブラウザ (`localStorage`) に自動で覚えて、次に開いたときに戻すようにした。(ER 図・TM・画面遷移図・システム構成図・Overview。人ごと・ブラウザごとの記憶で、`data/` は変わらない。覚えたものが無いときは、これまでと同じ初めの位置。ほかからデータが変わって図を描き直したときは、初めの位置に戻らず、覚えた位置で描き直す) `useDiagramView` を export した。アプリが足したパネルの図でも使える。`dependencies` に `@yanqirenshi/assh0le` の `^0.5.9` を足した。
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(版をそろえるだけ)
+
 ## 0.2.6 (2026-11)
 
 - `@yanqirenshi/ihub.srv`: `engines` の `node` を、`>=20.12` から `>=22` にした。(docs の「Node.js 22 以上」と、そろえた。保守期間の終わった Node.js 20 を、対象から外す。動きの変更は無い)

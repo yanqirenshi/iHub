@@ -257,6 +257,25 @@ const config = {
 - 渡さないときは、これまでどおり、グリッド線が出ます。
 - ER 図・TM 図は、別々に設定できます。ER 図・TM 図以外の図 (Overview・画面遷移図など) は、対象外です。
 
+## 図の位置を覚える
+
+ER 図・TM・画面遷移図・システム構成図・Overview は、動かした位置と拡大の度合いを、ブラウザの `localStorage` に自動で覚えて、次に開いたときに戻します。(0.2.7 以降)
+人ごと・ブラウザごとの記憶で、`data/` は変わりません。鍵は `ihub:{app.name}:view:{図の code}` です。(図の code: `er`・`tm`・`std`・`scd`・`overview`)
+
+アプリが足した図のパネルでも、`useDiagramView(code)` で覚えられます。
+
+```jsx
+import { useDiagramView } from '@yanqirenshi/ihub.core';
+
+const bindView = useDiagramView('dfd');     // 図の code。ほかと重ならない名前にする
+
+const rectum = new Rectum({ transform: INITIAL_VIEW });
+bindView(rectum);                            // 覚えた位置があれば戻す。操作が終わるたびに覚える
+rectum.data(data);
+```
+
+使い方と、覚えた位置を消す方法は、[図の編集](https://github.com/yanqirenshi/iHub/blob/main/docs/src/content/diagrams.md) と [カスタマイズ](https://github.com/yanqirenshi/iHub/blob/main/docs/src/content/customize.md) を見てください。
+
 ## GitHub との接続
 
 画面は、GitHub (Scrum・コックピット・Issue の追加) に、次のどちらかのトークンで接続します。
@@ -290,6 +309,7 @@ import { IHub, pages, Frame } from '@yanqirenshi/ihub.core';
 | `HelpSlide` | Help のセクションで使う、1 枚のスライド (0.2.4 以降。[Help を差し替える](#help-を差し替える)) |
 | `usePageTabs`・`mergeTabs` | ページのタブ |
 | `manegers`・`wbs`・`useWbs`・`sogh` | データのマネージャ |
+| `useDiagramView` | 図の位置と拡大を、ブラウザに覚える (0.2.7 以降。[図の位置を覚える](#図の位置を覚える)) |
 | `dataApi`・`useGetDataQuery`・`usePatchCollectionMutation`・`useAddRecordMutation`・`usePatchRecordMutation`・`useCollections`・`errorMessage` | API サーバーからのデータの読み書き |
 | `fetchRepositories`・`fetchProjectsV2` | GitHub (Scrum) |
 

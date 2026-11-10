@@ -366,6 +366,43 @@ const config = {
 `src/index.css` は、iHub の CSS (`@yanqirenshi/ihub.core` の `index.css`) のあとに読み込むので、iHub の見た目を上書きできます。
 (`src/index.js` で、`<IHub>` を import したあとに、`import './index.css'` を書きます)
 
+## アプリが足した図の位置を覚える
+
+iHub の 5 つの図は、動かした位置と拡大の度合いを、ブラウザに覚えます。([図の編集](#/diagrams) の「図の位置と拡大を覚える」)
+アプリが足したパネルの図 (d3.* の `Rectum`) でも、`useDiagramView` で同じように覚えられます。(0.2.7 以降)
+
+```jsx
+import React from 'react';
+import { Rectum } from '@yanqirenshi/d3.dfd';
+import { useDiagramView } from '@yanqirenshi/ihub.core';
+
+const INITIAL_VIEW = { k: 1.0, x: 0.0, y: 0.0 };
+
+function Diagram ({ data }) {
+    // 図の code。アプリの図ごとに、ほかと重ならない名前にする。(iHub の図は er・tm・std・scd・overview)
+    const bindView = useDiagramView('dfd');
+    const [rectum, setRectum] = React.useState(null);
+
+    React.useEffect(()=> {
+        const r = new Rectum({ transform: INITIAL_VIEW });
+
+        bindView(r);      // 覚えた位置があれば、その位置に戻す。操作が終わるたびに、覚える
+
+        r.data(data);
+
+        setRectum(r);
+    }, [bindView, data]);
+
+    // (省略) rectum を、図の部品に渡して描く
+}
+```
+
+- `bindView(rectum)` は、`Rectum` を作ったあと、`data()` を呼ぶ前に呼びます。図を作り直すたびに呼ぶと、覚えた位置で作り直されます。
+- 覚えたものが無い (初めて開く)・壊れている・`localStorage` が使えないときは、何もしません。`Rectum` の初めの位置 (`transform`) のままです。
+- 鍵は、`ihub:{app.name}:view:{code}` です。
+- コンストラクタに `view` を渡す形ではなく、作ったあとに `bindView` を呼ぶ形にしてください。(d3.er・d3.gantt の `Rectum` は、コンストラクタの `view` を受け取りません)
+- `Rectum` が `view`・`onViewChange` を持つ必要があります。(`@yanqirenshi/assh0le` 0.5.9 以降。iHub の `dependencies` に入っています。古い `package-lock.json` のアプリは、`npm install` で更新されます)
+
 ## アプリの名前を出す
 
 画面などに出る名前は、次のところで変えます。
