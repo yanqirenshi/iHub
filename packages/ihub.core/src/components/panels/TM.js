@@ -7,6 +7,7 @@ import D3Ter, { Rectum } from '@yanqirenshi/d3.ter';
 import { ModelInspector } from '@yanqirenshi/colonoscope';
 import { ModelError, applyPatch, fieldsOf, findById, movePatch, titleOf, withDefaults } from '@yanqirenshi/model.tm';
 
+import { useConfig } from '../../config.js';
 import { useDiagramData } from '../../manegers/diagram.js';
 import { TM_COLLECTIONS, buildTmData } from '../../manegers/tm.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../redux/api/dataApi.js';
@@ -122,6 +123,10 @@ function Diagram (props) {
 
     const [rectum, setRectum] = React.useState(null);
 
+    // 設定の diagrams.tm.grid (d3 の grid の設定。例: { draw: false }) を、そのまま d3 に渡す。(無いときは、渡さない)
+    const { diagrams } = useConfig();
+    const grid = diagrams.tm.grid;
+
     React.useEffect(()=> {
         // 識別子・属性の行: その行が参照するマスタ (d._master._core) を出す。
         const master = (collection)=> (d)=> {
@@ -133,6 +138,7 @@ function Diagram (props) {
 
         const r = new Rectum({
             transform: INITIAL_VIEW,
+            ...(grid!==undefined && { grid }),
             svg: { style: { background: '#fff' } },
             // コールバックの d は d3.ter の内部のデータで、入力のレコードは d._core にある。
             callbacks: {
@@ -150,7 +156,7 @@ function Diagram (props) {
         r.data(data);
 
         setRectum(r);
-    }, [data]);
+    }, [data, grid]);
 
     if (!rectum) return null;
 

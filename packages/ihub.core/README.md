@@ -89,6 +89,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 | `panels` | タブの code → パネルの部品。`{ ページの id: { code: 部品 } }`。既定に重ねる | `{}` |
 | `help` | Help の内容 (`sections`。部品の配列) | iHub の 3 つ |
 | `github` | GitHub の個人用アクセストークン (`token`) | 無し |
+| `diagrams` | ER 図・TM 図の設定。`{ er: { grid }, tm: { grid } }`。`grid` は、d3.er・d3.ter の `grid` の設定を、そのまま渡す ([図のグリッド線](#図のグリッド線を消す)) | 渡さない |
 
 - 動的 `import()` (`wbs.page`) は、ページのあるアプリ側に書きます。(webpack がアプリのフォルダを束ねるため)
 - 必須の項目が無いときは、起動したときに、どの項目が無いかを示すエラーになります。
@@ -229,6 +230,30 @@ export default function Section01 ({ size }) {
 
 タブの名前 (label) は、`hooks/usePageTabs.js` の `TAB_DEFS` にあります。
 `TabbedPage` で作った自分のページは、`pageId` に、好きな id (`PAGE_MY` など) を付けられます。
+
+## 図のグリッド線を消す
+
+ER 図・TM 図は、背景にグリッド線を描きます。
+設定の `diagrams` で、図ごとに、d3.er・d3.ter の `grid` の設定を渡せます。(値は、iHub では解釈せずに、そのまま渡します。0.2.5 以降)
+
+```jsx
+const config = {
+    // (省略)
+    diagrams: {
+        er: { grid: { draw: false } },    // ER 図のグリッド線を描かない
+        tm: { grid: { draw: false } },    // TM 図のグリッド線を描かない
+    },
+};
+```
+
+| `grid` の項目 | 内容 | 既定 |
+|---|---|---|
+| `draw` | `false` にすると、グリッド線を描かない | `true` |
+| `size` | グリッドを描く範囲 (原点から上下左右に、この大きさまで) | `10000` |
+| `span` | グリッドの間隔 | `100` |
+
+- 渡さないときは、これまでどおり、グリッド線が出ます。
+- ER 図・TM 図は、別々に設定できます。ER 図・TM 図以外の図 (Overview・画面遷移図など) は、対象外です。
 
 ## GitHub との接続
 

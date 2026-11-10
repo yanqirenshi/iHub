@@ -4,6 +4,15 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.2.5 (2026-11)
+
+### 追加
+
+- 設定に `diagrams` を足した。ER 図・TM 図が、設定の `diagrams.er.grid`・`diagrams.tm.grid` を、d3.er・d3.ter の `new Rectum({ ... })` の `grid` に、そのまま渡す。(例: `diagrams: { er: { grid: { draw: false } }, tm: { grid: { draw: false } } }` でグリッド線を消す。`size`・`span` も、d3 の `grid` の設定として渡せる) ER 図・TM 図は、別々に設定できる。
+  - 設定が無いときは、いままでどおり、`grid` を渡さない。(グリッド線が出る)
+  - コピー版で、`panels/ER.js`・`TM.js` に `grid: { draw: false }` を足してグリッド線を消していたアプリ (Bokasafn など) が、パネルを差し替えずに移せる。([コピー版からの移行](https://github.com/yanqirenshi/iHub/blob/main/docs/src/content/migrate.md) の手順 6 の表)
+  - 書き方は、[カスタマイズ](https://github.com/yanqirenshi/iHub/blob/main/docs/src/content/customize.md) の「図のグリッド線を消す」と、この README の「図のグリッド線を消す」
+
 ## 0.2.4 (2026-11)
 
 ### 追加

@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.2.5 (2026-11)
+
+- `@yanqirenshi/ihub.core`: 設定の `diagrams` で、ER 図・TM 図の `grid` (d3.er・d3.ter の設定) を渡せるようにした。(`diagrams: { er: { grid: { draw: false } } }` でグリッド線を消す。設定が無いときは、変わらない)
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(版をそろえるだけ)
+
 ## 0.2.4 (2026-11)
 
 - `@yanqirenshi/ihub.core`: Help の `Slide` を、`HelpSlide` として export した。(Help を書き換えるアプリが、`help.sections` で使える) 「コピー版からの移行」の手順書を、iwo.Studio の移行で分かったことに合わせて直した。
