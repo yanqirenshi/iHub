@@ -10,7 +10,7 @@ iHub は、GitHub の Issue や Projects を表示したり、Issue を追加し
 1. GitHub の Settings → Developer settings → OAuth Apps で、OAuth App を登録します。
    Authorization callback URL は `http://localhost:3000/api/github/oauth/callback` にします。
    (開発サーバーのポートを変えているときは、そのポートにします。`npm run serve` で開くときは `http://localhost:4000/api/github/oauth/callback` です)
-2. `.env.local` に、OAuth App の Client ID と Client secret を書きます。
+2. `.env.local` に、OAuth App の Client ID と Client secret を書きます。(雛形の `.env.local.template` に、この 2 つの変数の欄があります)
 
 ```
 GITHUB_OAUTH_CLIENT_ID=Ov23xxxxxxxxxxxxxxxx
