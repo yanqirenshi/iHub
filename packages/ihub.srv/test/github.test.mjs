@@ -46,6 +46,29 @@ test('戻り先は、この画面の中のパスだけを許す', ()=> {
     assert.equal(safeReturnTo(undefined), '/');
 });
 
+test('戻り先に ?tab= などのクエリがあっても、そのまま許す', ()=> {
+    assert.equal(safeReturnTo('/scrum?tab=account'), '/scrum?tab=account');
+    assert.equal(safeReturnTo('/scrum?tab=account&x=1'), '/scrum?tab=account&x=1');
+    // クエリがあっても、ほかのサイトへは戻さない。
+    assert.equal(safeReturnTo('//evil.example.com/?tab=account'), '/');
+});
+
+test('callback は、クエリ付きの戻り先 (/scrum?tab=account) に、クエリごと戻す', async ()=> {
+    const { app } = makeApp();
+    const state = (await login(app, '/scrum?tab=account&x=1')).searchParams.get('state');
+    const res = await get(app, `/api/github/oauth/callback?code=abc&state=${state}`);
+
+    assert.equal(res.status, 302);
+    assert.equal(res.headers.get('location'), '/scrum?tab=account&x=1');
+
+    // 認可画面でキャンセルしたときも、同じ。
+    const state2 = (await login(app, '/scrum?tab=account')).searchParams.get('state');
+    const res2 = await get(app, `/api/github/oauth/callback?error=access_denied&state=${state2}`);
+
+    assert.equal(res2.status, 302);
+    assert.equal(res2.headers.get('location'), '/scrum?tab=account');
+});
+
 test('設定が無ければ、login は 503 で、token は configured: false', async ()=> {
     const { app } = makeApp({ configured: false });
 

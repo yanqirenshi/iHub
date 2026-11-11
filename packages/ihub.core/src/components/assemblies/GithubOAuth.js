@@ -15,14 +15,14 @@ const SOURCE_LABEL = {
 };
 
 // GitHub の OAuth の状態と、認証・切断のボタン。
-// 認証は API サーバー (@yanqirenshi/ihub.srv の github.mjs) が行い、終わるとこの画面 (今の URL) に戻る。
+// 認証は API サーバー (@yanqirenshi/ihub.srv の github.mjs) が行い、終わるとこの画面 (今の URL。?tab= などのクエリも含む) に戻る。
 export default function GithubOAuth () {
     const location = useLocation();
     const { value, avatarUrl, login, source, configured } = useSelector(s=> s.githubAuth);
     const [error, setError] = React.useState(null);
 
     const authorize = ()=> {
-        window.location.href = `/api/github/oauth/login?return_to=${encodeURIComponent(location.pathname)}`;
+        window.location.href = `/api/github/oauth/login?return_to=${encodeURIComponent(location.pathname + location.search)}`;
     };
 
     // OAuth のトークンを捨てて、読み込み直す。(個人用アクセストークンがあれば、そちらでつなぎ直す)
