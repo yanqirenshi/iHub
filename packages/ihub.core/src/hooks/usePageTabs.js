@@ -152,10 +152,6 @@ const TAB_DEFS = {
     PAGE_SCRUM: {
         selected: 'projects',
         list: [
-            { code: 'timeline',      label: 'Timeline' },
-            { code: 'gantt-chart',   label: 'Gantt Chart' },
-            { code: 'issues',        label: 'Issues' },
-            { code: 'pull-requests', label: 'Pull Requests' },
             { code: 'repositories',  label: 'Repositories' },
             { code: 'projects',      label: 'Projects' },
             { code: 'account',       label: 'Account' },
