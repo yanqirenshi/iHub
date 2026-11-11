@@ -35,6 +35,7 @@ const TAB_DEFS = {
         list: [
             { code: 'cockpit',  label: 'Cockpit' },
             { code: 'overview', label: 'Overview' },
+            { code: 'schedule', label: 'Schedule' },
         ],
     },
     PAGE_BUSINESS: {

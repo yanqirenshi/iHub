@@ -4,10 +4,28 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
-## 0.3.2 (2026-11)
+## 0.4.0 (2026-11)
 
-`@yanqirenshi/menubook` を `^0.1.1` に上げました。(yanqirenshi/iHub#140)
-サイドメニューの見た目と開閉の不具合の修正です。iHub のコードの変更はありません。
+艦橋に **Schedule タブ**を足し、WBS のワークパッケージに、予定の期間 (`plan`) を書けるようにしました。(yanqirenshi/iHub#133)
+あわせて、`@yanqirenshi/menubook` を `^0.1.1` に上げました。(サイドメニューの見た目と開閉の不具合の修正。yanqirenshi/iHub#140。0.3.2 として出す予定だった分を、この版にまとめた)
+
+### 追加
+
+- 艦橋 (`pages.Bridge`) のタブの最後に、Schedule (code `schedule`) を足した。(Cockpit・Overview・Schedule。初めに開くのは Cockpit のまま。`?tab=schedule` で開ける) パネルは `panels.bridge.Schedule` として公開した。
+  - 予定の期間 (`plan`) のあるワークパッケージを、矢羽根 ([@yanqirenshi/d3.yabane](https://github.com/Foolsgolds/Assholes/tree/main/packages/d3.yabane)) で並べる。見るだけ。(期間は、JSON を直接書く)
+  - 行になるのは、`plan` のあるワークパッケージを直接持つ WBS。d3.yabane の行は入れ子にできないので、入れ子の WBS は 1 段の行に直し、行の名前に、上の WBS の名前を `/` でつないで入れる。(例: 「開発 / 画面」。長いときは、上の WBS の名前を左から省く。行が 2 つ以上のプロジェクトにあるときは、先頭にプロジェクトの名前) 並びは、WBS の木を上から順にたどった順。
+  - 表示する期間は、`plan` の一番早い `from` から、一番遅い `to` まで。前後に 1 週の余白を付ける。目盛りは週。図の幅は、期間に比例する。(最小は 15 週分)
+  - 矢羽根 (と、名前の文字) を押すと、そのワークパッケージのページ (`/wbs/{id}`) へ移る。
+  - 図の位置と拡大の度合いは、ほかの図と同じく、ブラウザに覚える。(図の code は `schedule`。`useDiagramView('schedule')`)
+  - `plan` のあるワークパッケージが 1 つも無いときは、図の代わりに、書き方の知らせを出す。使えない `plan` (`to` が `from` より前・実在しない日) は、描かない。
+  - ほかからデータが変わったときは、図を作り直す。(位置と拡大は、覚えた値で戻る)
+  - **制限 (d3.yabane 0.1.15)**: 同じ WBS の中で、期間が重なる矢羽根は、同じ高さに重なって描かれる。(d3.yabane 側の制限。d3.yabane が直れば、更新で直る)
+- データの形: `data/wbs/workpackages.json` の各レコードに、任意の `plan: { from, to }` (`'YYYY-MM-DD'`) を書けるようにした。(`@yanqirenshi/ihub.srv` 0.4.0 のスキーマとルール)
+
+### 変更
+
+- `dependencies` に `@yanqirenshi/d3.yabane` の `^0.1.15` を足した。(`package-lock.json` では、`dayjs` が 1.11.10 から 1.11.23 に上がる。d3.yabane が `^1.11.11` を求めるため)
+- `dependencies` の `@yanqirenshi/menubook` を、`^0.1.0` から `^0.1.1` にした。(下の「修正 (menubook 0.1.1)」)
 
 ### 修正 (menubook 0.1.1)
 
@@ -23,13 +41,25 @@
 
 ### 利用側への影響
 
-- `npm update @yanqirenshi/ihub.core @yanqirenshi/ihub.srv` で、menubook も 0.1.1 になる。(`package-lock.json` が menubook 0.1.0 のままのアプリも、ihub.core の下限が `^0.1.1` になったので、更新で 0.1.1 になる)
+- `plan` を書かなければ、データも画面も変わらない。(Schedule タブが増えて、「予定の期間 (plan) のあるワークパッケージがありません」と出る) `plan` を書いたワークパッケージが、Schedule タブに出る。
+- Schedule タブは、既定のタブとして増える。設定の `tabs.PAGE_BRIDGE` で、タブの一覧 (`list`) を足している・差し替えているアプリでも、増える。出したくないときは、`tabs.PAGE_BRIDGE.list` に `{ code: 'schedule', hidden: true }` を書く。
+- アプリの `package.json` に、d3.yabane を足す必要はない。(ihub.core の `dependencies` に入る)
+- `npm update` @yanqirenshi/ihub.core @yanqirenshi/ihub.srv` で、menubook も 0.1.1 になる。(`package-lock.json` が menubook 0.1.0 のままのアプリも、ihub.core の下限が `^0.1.1` になったので、更新で 0.1.1 になる)
 - アプリのコードの変更は要らない。サイドメニューの配色の設定 (`menuColors` の `background`・`text`・`avatar`) は、これまでどおり効く。
 - `Frame.js` の、menubook を上書きする書き方 (`menuColors` の `text`・`avatar` のための CSS) は、3 つの不具合をよけるものではなく、0.1.1 でも使う作り (クラス `pair-color1`・文字の色・アイコンの反転) が変わっていないので、そのまま残した。
 
 ### 確かめた
 
-- 参照アプリを、別のポートで起動し、menubook 0.1.0 と 0.1.1 で見比べた。(`package-lock.json` を直す前と、直したあと)
+- Schedule タブ: 参照アプリを、別のポートで起動し、入れ子の WBS (プロジェクト → WBS → WBS → ワークパッケージ。WBS が、WBS とワークパッケージの両方を直接持つものも入れた)・plan の無いワークパッケージ・使えない plan・長い名前の行・期間の重なる矢羽根を置いて確かめた。(確かめたあと、データは消した。見本のデータは、変えていない)
+  - 行が、WBS の木を上から順にたどった順で、「開発」「開発 / 画面」「開発 / API」「… / とても長い名前の WBS…」と出た。plan の無いワークパッケージは、出なかった。
+  - `?tab=schedule` で Schedule タブが開いた。Cockpit・Overview タブは、これまでどおりだった。
+  - 矢羽根の図形と、名前の文字の、どちらを押しても、`/wbs/{id}` へ移った。
+  - ホイールで拡大し、ドラッグして動かした位置が、`localStorage` (`ihub:iHub:view:schedule`) に入り、読み込み直すと、同じ位置と拡大で戻った。
+  - API を通して plan を変えたとき、図が作り直され (矢羽根が動き)、位置と拡大は、そのままだった。
+  - plan をすべて消すと、知らせが出た。(サイドメニューにかからない位置) 戻すと、図に戻った。
+  - 画面を行き来する間、コンソールのエラーと警告は、出なかった。
+- 日付の検査: `to` が `from` より前・実在しない日・形の誤りの plan を、API の書き込みが 400 で断り、理由を日本語で返した。
+- menubook 0.1.0 と 0.1.1 を、参照アプリで見比べた。(`package-lock.json` を直す前と、直したあと)
   - アバター: 0.1.0 は、メニューの上端の枠の中心から、右下に (5, 5) ずれていた。0.1.1 は、(0, 0)。
   - 開閉: 0.1.0 は、アバターにホバー → メニューへ移動 → メニューの外へ出ても、開いたまま (アイコン 17 個のまま)。アバターにホバーしたあと、メニューを通らずに外へ出ても、開いたまま。0.1.1 は、どちらも閉じた (17 個 → 0 個)。
   - 選択中の項目の、白い枠の左の余白: 0.1.0 は 2px (枠の幅 78px)。0.1.1 は、指定どおりの 11px (枠の幅 96px)。ホバー中の項目も、11px。

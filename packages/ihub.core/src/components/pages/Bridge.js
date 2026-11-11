@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 import TabbedPage from '../assemblies/TabbedPage.js';
-import { Monitor, Card, Overview } from '../panels/bridge/index.js';
+import { Monitor, Card, Overview, Schedule } from '../panels/bridge/index.js';
 import Loading from '../panels/Loading.js';
 import GithubNotice, { hasGithubNotice } from '../panels/sogh/GithubNotice.js';
 
@@ -15,6 +15,7 @@ import sogh from '../../manegers/sogh.js';
 const PANELS = {
     cockpit: CockpitCards,
     overview: Overview,
+    schedule: Schedule,
 };
 
 // 艦橋のページ。(古い名前は pages.Cockpit。pages/index.js)
