@@ -4,9 +4,26 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
-## 0.3.2 (2026-11)
+## 0.4.0 (2026-11)
 
-- コードの変更は無い。(`@yanqirenshi/ihub.core` 0.3.2 と、版をそろえるだけ)
+### 追加
+
+- データのフォーマット: `data/wbs/workpackages.json` の各レコードに、任意の `plan: { from, to }` (予定の期間) を書けるようにした。(yanqirenshi/iHub#133。艦橋の Schedule タブが、矢羽根で描く)
+  - スキーマ (`schemas/wbs/workpackages.schema.json`): `from`・`to` は、どちらも必須の、`'YYYY-MM-DD'` の形 (`^[0-9]{4}-[0-9]{2}-[0-9]{2}# 更新履歴 (@yanqirenshi/ihub.srv)
+
+`@yanqirenshi/ihub.core` と同じ版にそろえて出します。
+版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
+(リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
+
+) の文字列。知らない項目は、書けない。
+  - ルール (`validation/rules.mjs` の WBS の検査): `plan` の日付が、実在する日付であること (例: `2026-02-30` は誤り) と、`to` が `from` より前でないこと (同じ日はよい) を検査する。誤りは、`ihub-srv check` と、API の書き込み (400) で、理由を日本語で知らせる。(例: `wbs/workpackages: plan.to が plan.from より前です。(id=21, from=2026-11-30, to=2026-11-01)`)
+  - `plan` の無いワークパッケージは、これまでどおり正しい。
+- テストを足した。(`plan` があるときと無いとき・同じ日・形の誤り・実在しない日・`to` が `from` より前)
+
+### 利用側への影響
+
+- データは、書き換えなくてよい。(`plan` は任意)
+- `plan` を書くときは、日付の形と順序を守る。(守らないと、`ihub-srv check` が知らせ、API の書き込みが 400 になる)
 
 ## 0.3.1 (2026-11)
 

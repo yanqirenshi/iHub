@@ -214,7 +214,7 @@ export default function Section01 ({ size }) {
 | `PAGE_API` | `pages.Api` (参照アプリでは `/api`) | `wbs`・`help` | `wbs` |
 | `PAGE_BATCHS` | `pages.Batchs` (参照アプリでは `/batchs`) | `wbs`・`help` | `wbs` |
 | `PAGE_BPMN` | `docPages.BPMN` (参照アプリでは `/bpmn`) | `palettes`・`styles`・`methods`・`overview` | `palettes` |
-| `PAGE_BRIDGE` | `pages.Bridge` (参照アプリでは `/`。0.3.0 以降) | `cockpit`・`overview` | `cockpit` |
+| `PAGE_BRIDGE` | `pages.Bridge` (参照アプリでは `/`。0.3.0 以降) | `cockpit`・`overview`・`schedule` | `cockpit` |
 | `PAGE_BUSINESS` | `pages.Business` (参照アプリでは `/business`) | `systemic-design`・`tm`・`procedures`・`wbs`・`help` | `tm` |
 | `PAGE_CLASSES` | `pages.Classes` (参照アプリでは `/classes`) | `class-diagram`・`wbs`・`help` | `class-diagram` |
 | `PAGE_DATA` | `pages.Data` (参照アプリでは `/data`) | `er-diagram`・`wbs`・`help` | `er-diagram` |
@@ -235,6 +235,23 @@ export default function Section01 ({ size }) {
 
 - 艦橋のページは、0.2.x まで「コックピット」でした。古い名前の `pages.Cockpit`・`panels.cockpit`・設定の `tabs.PAGE_COCKPIT`・`panels.PAGE_COCKPIT` は、別名として、そのまま使えます。(`PAGE_BRIDGE` と両方あるときは、`PAGE_BRIDGE` を優先して重ねます。古い名前は、将来の minor で消すことがあります)
 - 艦橋のページの中の、自分が担当している Issue をカードで並べるタブの名前 (code `cockpit`・表示 `Cockpit`) は、変わっていません。
+
+## 艦橋の Schedule タブ
+
+艦橋 (`/`) の Schedule タブは、予定の期間 (`plan`) のあるワークパッケージを、矢羽根 ([@yanqirenshi/d3.yabane](https://github.com/Foolsgolds/Assholes/tree/main/packages/d3.yabane)) で並べます。(0.4.0 以降。見るだけです)
+予定の期間は、`data/wbs/workpackages.json` の、ワークパッケージのレコードに書きます。(任意)
+
+```json
+{ "id": 1000001, "parent": 1001, "name": "設計", "plan": { "from": "2026-11-01", "to": "2026-11-30" } }
+```
+
+- `from`・`to` は、`'YYYY-MM-DD'` の日付で、どちらも書きます。`to` は、`from` と同じ日か、あとの日です。(`ihub-srv check` が、形と日付の誤りを知らせます)
+- `plan` を書かないワークパッケージは、これまでどおりで、Schedule タブには出ません。
+- 行になるのは、`plan` のあるワークパッケージを持つ WBS です。上の WBS の名前を `/` でつないだものが、行の名前になります。(長いときは、上の WBS の名前を、左から省きます)
+- 表示する期間は、`plan` の一番早い `from` から、一番遅い `to` までです。(前後に 1 週の余白を付けます)
+- 矢羽根を押すと、そのワークパッケージのページ (`/wbs/{id}`) へ移ります。
+- 図の位置と拡大の度合いは、ほかの図と同じように、覚えます。(図の code は `schedule`)
+- `plan` のあるワークパッケージが 1 つも無いときは、図の代わりに、書き方の知らせを出します。
 
 ## 図のグリッド線を消す
 
@@ -262,8 +279,8 @@ const config = {
 
 ## 図の位置を覚える
 
-ER 図・TM・画面遷移図・システム構成図・Overview は、動かした位置と拡大の度合いを、ブラウザの `localStorage` に自動で覚えて、次に開いたときに戻します。(0.2.7 以降)
-人ごと・ブラウザごとの記憶で、`data/` は変わりません。鍵は `ihub:{app.name}:view:{図の code}` です。(図の code: `er`・`tm`・`std`・`scd`・`overview`)
+ER 図・TM・画面遷移図・システム構成図・Overview・Schedule は、動かした位置と拡大の度合いを、ブラウザの `localStorage` に自動で覚えて、次に開いたときに戻します。(0.2.7 以降)
+人ごと・ブラウザごとの記憶で、`data/` は変わりません。鍵は `ihub:{app.name}:view:{図の code}` です。(図の code: `er`・`tm`・`std`・`scd`・`overview`・`schedule`)
 
 アプリが足した図のパネルでも、`useDiagramView(code)` で覚えられます。
 

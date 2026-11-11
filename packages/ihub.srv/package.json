@@ -1,6 +1,6 @@
 {
   "name": "@yanqirenshi/ihub.srv",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "iHub の API サーバー。data/ の JSON を、スキーマとルールで検証しながら読み書きする。",
   "keywords": [
     "ihub",

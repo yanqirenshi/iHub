@@ -27,6 +27,18 @@ export function flatten (nodes) {
     return nodes.flatMap(node=> [node, ...flatten(node.children || [])]);
 }
 
+// 'YYYY-MM-DD' が、実在する日付か。(2026-02-30 のような日付は、null)
+function parseDate (text) {
+    const m = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.exec(text);
+
+    if (!m)
+        return null;
+
+    const time = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+
+    return new Date(time).toISOString().slice(0, 10)===text ? time : null;
+}
+
 function checkWbs ({ projects, wbs, workpackages }) {
     const errors = [];
 
@@ -44,6 +56,24 @@ function checkWbs ({ projects, wbs, workpackages }) {
     for (const d of workpackages)
         if (!wbs_ids.has(d.parent))
             errors.push(`wbs/workpackages: parent の WBS が見つかりません。(id=${d.id}, parent=${d.parent})`);
+
+    // plan (予定の期間) は、日付として正しく、to が from より前でないこと。
+    for (const d of workpackages) {
+        if (!d.plan)
+            continue;
+
+        const from = parseDate(d.plan.from);
+        const to = parseDate(d.plan.to);
+
+        if (from===null)
+            errors.push(`wbs/workpackages: plan.from が日付として正しくありません。(id=${d.id}, from=${d.plan.from})`);
+
+        if (to===null)
+            errors.push(`wbs/workpackages: plan.to が日付として正しくありません。(id=${d.id}, to=${d.plan.to})`);
+
+        if (from!==null && to!==null && to < from)
+            errors.push(`wbs/workpackages: plan.to が plan.from より前です。(id=${d.id}, from=${d.plan.from}, to=${d.plan.to})`);
+    }
 
     return errors;
 }

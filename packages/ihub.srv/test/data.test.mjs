@@ -110,6 +110,64 @@ test('WBS の id の重複と、parent の無いノードを見つける', ()=> 
     ]);
 });
 
+// plan (予定の期間) のあるワークパッケージと、無いワークパッケージ。
+function wbsData (workpackages) {
+    const data = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
+
+    data['wbs/projects'] = [{ id: 1, name: 'P' }];
+    data['wbs/wbs'] = [{ id: 10, parent: 1, name: 'A' }];
+    data['wbs/workpackages'] = workpackages;
+
+    return data;
+}
+
+test('ワークパッケージの plan (予定の期間) は任意で、あってもなくても正しい', ()=> {
+    assert.deepEqual(validateData(wbsData([{ id: 20, parent: 10, name: 'W' }])), []);
+    assert.deepEqual(validateData(wbsData([{ id: 20, parent: 10, name: 'W', plan: { from: '2026-11-01', to: '2026-11-30' } }])), []);
+    assert.deepEqual(validateData(wbsData([
+        { id: 20, parent: 10, name: 'W1', plan: { from: '2026-11-01', to: '2026-11-30' } },
+        { id: 21, parent: 10, name: 'W2' },
+    ])), []);
+});
+
+test('plan の from と to が同じ日でもよい', ()=> {
+    assert.deepEqual(validateData(wbsData([{ id: 20, parent: 10, name: 'W', plan: { from: '2026-11-11', to: '2026-11-11' } }])), []);
+});
+
+test('plan の形の誤りを見つける (to が無い・日付の形でない・知らない項目・オブジェクトでない)', ()=> {
+    const check = (plan)=> validateData(wbsData([{ id: 20, parent: 10, name: 'W', plan }]));
+
+    const no_to = check({ from: '2026-11-01' });
+    assert.ok(no_to.some(e=> e.startsWith('wbs/workpackages/0/plan') && e.includes('to')), no_to.join('\n'));
+
+    const bad_form = check({ from: '2026/11/01', to: '2026-11-30' });
+    assert.ok(bad_form.some(e=> e.startsWith('wbs/workpackages/0/plan/from')), bad_form.join('\n'));
+
+    const not_string = check({ from: 20261101, to: '2026-11-30' });
+    assert.ok(not_string.some(e=> e.startsWith('wbs/workpackages/0/plan/from')), not_string.join('\n'));
+
+    const unknown = check({ from: '2026-11-01', to: '2026-11-30', start: '2026-11-01' });
+    assert.ok(unknown.some(e=> e.startsWith('wbs/workpackages/0/plan') && e.endsWith('(start)')), unknown.join('\n'));
+
+    const not_object = check('2026-11-01');
+    assert.ok(not_object.some(e=> e.startsWith('wbs/workpackages/0/plan')), not_object.join('\n'));
+});
+
+test('plan の日付が実在しないときと、to が from より前のときを見つける (ルール)', ()=> {
+    const errors = validateData(wbsData([
+        { id: 20, parent: 10, name: 'W1', plan: { from: '2026-02-30', to: '2026-03-31' } },
+        { id: 21, parent: 10, name: 'W2', plan: { from: '2026-11-30', to: '2026-11-01' } },
+        { id: 22, parent: 10, name: 'W3', plan: { from: '2026-11-01', to: '2026-13-01' } },
+        { id: 23, parent: 10, name: 'W4', plan: { from: '2026-11-01', to: '2026-11-30' } },
+    ]));
+
+    assert.deepEqual(errors, [
+        'wbs/workpackages: plan.from が日付として正しくありません。(id=20, from=2026-02-30)',
+        'wbs/workpackages: plan.to が plan.from より前です。(id=21, from=2026-11-30, to=2026-11-01)',
+        'wbs/workpackages: plan.to が日付として正しくありません。(id=22, to=2026-13-01)',
+    ]);
+});
+
 test('TM の relationships で、エンティティの参照が欠けているものを見つける', ()=> {
     // 233fe72 で直した不具合 (relationships の entity の参照が欠けて、TM の画面が落ちた) と同じ形。
     const entity = (id, identifier_id)=> ({
