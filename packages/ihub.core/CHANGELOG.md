@@ -6,10 +6,10 @@
 
 ## 0.3.1 (2026-11)
 
-動きの不具合を 4 つ直しました。(yanqirenshi/iHub#124・#125・#126・#127)
+動きの不具合を 4 つと、見た目とエラーの扱いを 3 つ直しました。(yanqirenshi/iHub#124・#125・#126・#127・#129・#130・#131)
 どれも、部品に渡す値を、いままでどおりにしているアプリは、そのまま動きます。
 
-### 修正
+### 修正 (動き)
 
 - `FrameTabs`: `onChangeTabs` を渡さずにタブを押すと、`TypeError` になっていたのを、何も起きないようにした。(#124)
 - `FrameWbsNodeTabs`: ノードのページ (`pages.WbsNode`) が渡す `wbs_node` (データのレコードそのままで、`_id` と `_class` が無い) を、そのまま渡しても、WBS の表がノードの下だけになり、見出しに種類 (`_class`) も出るようにした。(#125)
@@ -22,6 +22,20 @@
 - `GithubOAuth`: 認証から戻ったときに、`?tab=` などのクエリが消えていたのを、戻るようにした。(`return_to` に、`location.pathname + location.search` を渡す) 例: `/scrum?tab=account` で認証すると、Account タブに戻る。(0.3.0 までは `/scrum` に戻り、既定の Projects タブが開いた) (#127)
   - API サーバー (`@yanqirenshi/ihub.srv` の `safeReturnTo`) は、クエリ付きの戻り先を、もともと受け付けて、そのまま戻す。サーバーの変更は要らない。(テストを足して確かめた)
 
+### 修正 (見た目とエラーの扱い)
+
+- `panels.DesignAssemblies`・`DesignParts`・`DesignEvents`: 長い WBS の表の下が見えなかったのを、見えるようにした。(外側の Box に `height: '100%'`・`overflow: 'auto'` と、下の余白 `pb: 22` を付けた。`DesignPanels` と同じ) (#129)
+  - 0.3.0 までは、表が窓より長いと、スクロールできず、下の行が見えなかった。
+- `panels.Loading`: 大きさを、`width`・`height` の props で決められるようにした。(既定は、いままでどおり窓の全体 (`100vw`・`100vh`)) タブの中で使っているところ (Scrum の Repositories・Projects タブ、艦橋の Cockpit タブ) は、`'100%'` を渡して、親の大きさに合わせる。(#130)
+  - 0.3.0 までは、タブの中でも窓の全体の大きさで、タブの見出しの分だけ、下にはみ出していた。
+  - 窓の全体に出すところ (ページの読み込み中: `pages.WbsNode`・`ScrumProject`・`ScrumProjectItem`) は、変えていない。
+- Scrum の Repositories・Projects タブと、艦橋の Cockpit タブ: GitHub に接続していないときと、読み込みに失敗したときに、知らせを出すようにした。(#131)
+  - 接続していないとき: 「GitHub に接続していません。Account タブから、GitHub に接続してください。」(Account タブ `/scrum?tab=account` へのリンク付き。この URL は、参照アプリのもの)
+  - 読み込みに失敗したとき (status が `failed`): 「Repositories を GitHub から読み込めませんでした。(エラーの文章)」と、Account タブへのリンク。
+  - `ErrorBoundary` の文を、「取得・表示でエラー」から「表示でエラー」に直した。(読み込み (thunk) の失敗は、`ErrorBoundary` では受け止めないため)
+  - **利用側への影響**: GitHub に接続していないとき、3 つのタブの表示が、空の一覧 (Cockpit は、空のカード置き場) から、知らせの文章になる。
+  - 知らせの部品 (`panels/sogh/GithubNotice.js`) は、内部のもので、公開していない。
+
 ### 確かめた
 
 - 参照アプリを、別のポートで起動し、一時的な確認用のページ (`FrameTabs`・`FrameWbsNodeTabs` を使うもの) で、直す前と後を比べた。(確かめたあと、ページは消した)
@@ -30,6 +44,11 @@
   - #126: 直す前は、「Cannot update a component」の警告が出て、`?tab=b` で開いても、タブ A が選ばれた。直したあとは、警告が出ず、`?tab=b` で B が選ばれた。`?tab=` が無いときと、`tabs` に無い値 (`?tab=zzz`) のときは、先頭の A。タブを押すと、URL の `?tab=` が変わる。
   - #127: 直す前は、`/scrum?tab=account` の認証ボタンが、`return_to=/scrum` で API サーバーを呼んだ。直したあとは、`return_to=/scrum?tab=account`。
 - `@yanqirenshi/ihub.srv` のテスト (60 件。クエリ付きの戻り先の 2 件を足した) と、参照アプリのビルド (`react-scripts build`) が通った。
+- (#129・#130・#131) 別のポートの参照アプリで、直す前と後を比べた。(一時的な確認用のページ・データは、確かめたあとに消した)
+  - #129: 60 行の WBS で、直す前は、中間組立品・部品・UI イベントの 3 つのタブで、最後の行が画面の下 (2218px。窓の高さは 768px) にあり、スクロールできなかった。直したあとは、4 つのタブ (パネルを含む) とも、スクロールして、最後の行が見えた。
+  - #130: タブの中の Loading は、直す前は、親より 48px (タブの見出しの分) 高く、はみ出した。直したあとは、Repositories・Projects・Cockpit の 3 つで、親とぴったり (はみ出し 0)。props を渡さない Loading は、これまでどおり窓の全体の大きさ。
+  - #131: GitHub の状態 (読み込み中・失敗・未接続・成功) を固定して、3 つのタブを確かめた。直す前は、失敗と未接続で、空の一覧 (Cockpit は何も無し) だけだった。直したあとは、失敗と未接続で、上の文章 (Account タブへのリンク付き) が出る。成功 (空) は、これまでどおり。Account タブのリンクを押すと、`/scrum?tab=account` が開き、Account タブが選ばれた。GitHub につながない実際の状態でも、3 つのタブに「GitHub に接続していません。…」が出た。エラーは出なかった。
+- 確かめていない: GitHub の実際の接続での読み込みの失敗。(トークンが無いため。Redux の状態を固定して確かめた)
 - 確かめていない: GitHub での実際の認証 (OAuth App が無いため)。クライアントが送る `return_to` と、サーバーが戻す先 (テスト) を、別々に確かめた。
 
 ## 0.3.0 (2026-11)
