@@ -48,7 +48,11 @@ REACT_APP_GITHU_PARSONAL_TOKEN=ghp_xxxxxxxxxxxxxxxx
 
 ## 艦橋 (`/`)
 
-自分が担当している (assignee が自分の) GitHub の Issue を、カードで並べます。
+自分が担当している (assignee が自分の) GitHub の Issue を、カードで並べます。(「Cockpit」タブ)
+
+GitHub に接続していないときや、GitHub からの読み込みに失敗したときは、艦橋の「Cockpit」タブと、Scrum の「Repositories」「Projects」タブに、知らせの文章を出します。
+知らせの中の「Account タブ」のリンクから、Scrum の Account タブ (`/scrum?tab=account`) へ移って、接続できます。
+(0.3.0 までは、知らせを出さず、空の一覧やカード置き場を出すだけでした)
 
 ## Scrum (`/scrum`)
 

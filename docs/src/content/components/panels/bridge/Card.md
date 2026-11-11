@@ -13,6 +13,7 @@
 
 艦橋 (`/`) の「Cockpit」タブで、[Monitor](#/components/panels/bridge/Monitor) の中に並べています。
 ページ (`pages/Bridge.js`) が、自分が担当している (assignee が自分の) Issue を GitHub から読み込み、1 件ずつカードにします。([GitHub との連携](#/github))
+GitHub に接続していないときや、読み込みに失敗したときは、ページがカードの代わりに知らせの文章を出します。(0.3.1 以降。文章は [Repositories](#/components/panels/sogh/Repositories) の注意と同じ形です)
 
 Issue のカードには、次のものを出します。
 

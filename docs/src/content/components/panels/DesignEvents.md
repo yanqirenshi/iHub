@@ -58,7 +58,7 @@ panels: { PAGE_DESIGN: { 'ui-events': withStartId(panels.DesignEvents, '1007') }
 - `<IHub>` の中で使います。
 API サーバーから読み込んだ WBS のデータを使うためと、Code の列のリンクが react-router を使うためです。
 - `start_id` に、どのノードにも無い id を渡すと、表に行が出ません。(エラーにはなりません)
-- パネルの中でスクロールしません。
-iHub の画面 (`html`) はスクロールしないので、表が窓より長いと、下が見えません。
-(同じ表を出す [DesignPanels](#/components/panels/DesignPanels) と [Wbs](#/components/panels/Wbs) は、パネルの中でスクロールします)
+- パネルの中で縦にスクロールします。(高さ `100%`・`overflow: auto`)
+表が窓より長いときも、スクロールして下まで見られます。
+0.3.0 までは、パネルの中でスクロールせず、表が窓より長いと、下が見えませんでした。(0.3.1 で直しました)
 - タブのパネルにしたとき、[TabbedPage](#/components/assemblies/TabbedPage) が渡す `tab` は使いません。
