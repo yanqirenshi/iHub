@@ -19,7 +19,7 @@
   - 図の位置と拡大の度合いは、ほかの図と同じく、ブラウザに覚える。(図の code は `schedule`。`useDiagramView('schedule')`)
   - `plan` のあるワークパッケージが 1 つも無いときは、図の代わりに、書き方の知らせを出す。使えない `plan` (`to` が `from` より前・実在しない日) は、描かない。
   - ほかからデータが変わったときは、図を作り直す。(位置と拡大は、覚えた値で戻る)
-  - **制限 (d3.yabane 0.1.15)**: 同じ WBS の中で、期間が重なる矢羽根は、同じ高さに重なって描かれる。(d3.yabane 側の制限。d3.yabane が直れば、更新で直る)
+  - **制限 (d3.yabane 0.1.15)**: 同じ WBS の中で、期間が重なる矢羽根は、同じ高さに重なって描かれる。(d3.yabane 側の制限。[Foolsgolds/Assholes#173](https://github.com/Foolsgolds/Assholes/issues/173) に、issue を立てた。直す時期は、決まっていない。d3.yabane が直れば、更新で直る)
 - データの形: `data/wbs/workpackages.json` の各レコードに、任意の `plan: { from, to }` (`'YYYY-MM-DD'`) を書けるようにした。(`@yanqirenshi/ihub.srv` 0.4.0 のスキーマとルール)
 
 ### 変更

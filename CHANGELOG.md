@@ -12,7 +12,7 @@
 
 ## 0.4.0 (2026-11)
 
-- `@yanqirenshi/ihub.core`: 艦橋に、Schedule タブを足した。(`panels.bridge.Schedule`。予定の期間 `plan` のあるワークパッケージを、矢羽根 (@yanqirenshi/d3.yabane) で並べる。見るだけ。矢羽根を押すと `/wbs/{id}` へ移る。図の位置と拡大を覚える。`plan` が 1 つも無いときは、書き方の知らせを出す。制限: 同じ WBS の中で期間が重なる矢羽根は、重なって描かれる) `dependencies` に `@yanqirenshi/d3.yabane` を足した。(`plan` を書かなければ、何も変わらない)
+- `@yanqirenshi/ihub.core`: 艦橋に、Schedule タブを足した。(`panels.bridge.Schedule`。予定の期間 `plan` のあるワークパッケージを、矢羽根 (@yanqirenshi/d3.yabane) で並べる。見るだけ。矢羽根を押すと `/wbs/{id}` へ移る。図の位置と拡大を覚える。`plan` が 1 つも無いときは、書き方の知らせを出す。制限: 同じ WBS の中で期間が重なる矢羽根は、重なって描かれる。d3.yabane 側の件で、[Foolsgolds/Assholes#173](https://github.com/Foolsgolds/Assholes/issues/173)) `dependencies` に `@yanqirenshi/d3.yabane` を足した。(`plan` を書かなければ、何も変わらない)
 - `@yanqirenshi/ihub.srv`: ワークパッケージに、任意の `plan: { from, to }` (`'YYYY-MM-DD'`) を書けるようにした。(スキーマと、日付・順序のルール。`ihub-srv check` と API が、誤りを知らせる)
 - `@yanqirenshi/ihub.core`: `@yanqirenshi/menubook` を `^0.1.1` に上げた。サイドメニューの見た目と開閉の不具合の修正。アバターが、メニューの上端の枠の中央から右下に 5px ずれていた。メニューの外へマウスを出しても、メニューが閉じないことがあった。選択中・ホバー中の項目の、白い枠の左右の余白が狭くなっていた。(アプリのコードの変更は要らない。`npm update` で menubook も 0.1.1 になる。0.3.2 として出す予定だった分を、この版にまとめた)
 
