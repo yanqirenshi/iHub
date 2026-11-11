@@ -71,6 +71,18 @@ a {
     font-weight: bold;
 }
 
+/* セクションの中の小見出し。(コンポーネントの assemblies・panels など) */
+.nav-group {
+    margin-top: 6px;
+}
+
+.nav-group-label {
+    padding: 4px 20px 2px 28px;
+    color: var(--muted);
+    font-size: 12px;
+    font-family: monospace;
+}
+
 .nav-link {
     display: block;
     padding: 4px 20px 4px 28px;
@@ -115,6 +127,19 @@ a {
     }
 
     .nav-label {
+        width: 100%;
+        padding: 0;
+    }
+
+    .nav-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        width: 100%;
+        margin-top: 4px;
+    }
+
+    .nav-group-label {
         width: 100%;
         padding: 0;
     }
@@ -201,6 +226,16 @@ a {
 .page pre code {
     padding: 0;
     background: none;
+}
+
+/* ファイルのパスや部品の名前のような長い英字も、画面が狭いときは折り返す。
+   (コードブロックは折り返さず、横に送る) */
+.page {
+    overflow-wrap: anywhere;
+}
+
+.page pre {
+    overflow-wrap: normal;
 }
 
 .page blockquote {

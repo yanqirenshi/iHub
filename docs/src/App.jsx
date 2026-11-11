@@ -24,10 +24,13 @@ export default function App () {
                 <div key={section.label} className="nav-section">
                   <div className="nav-label">{section.label}</div>
 
-                  {section.pages.map(page=> (
-                      <NavLink key={page.path} to={page.path} end className="nav-link">
-                        {page.title}
-                      </NavLink>
+                  <NavLinks pages={section.pages}/>
+
+                  {(section.groups || []).map(group=> (
+                      <div key={group.label} className="nav-group">
+                        <div className="nav-group-label">{group.label}</div>
+                        <NavLinks pages={group.pages}/>
+                      </div>
                   ))}
                 </div>
             ))}
@@ -46,6 +49,16 @@ export default function App () {
           </main>
         </div>
     );
+}
+
+function NavLinks (props) {
+    const { pages = [] } = props;
+
+    return pages.map(page=> (
+        <NavLink key={page.path} to={page.path} end className="nav-link">
+          {page.title}
+        </NavLink>
+    ));
 }
 
 function NotFound () {
