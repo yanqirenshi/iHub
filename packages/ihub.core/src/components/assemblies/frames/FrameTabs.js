@@ -19,8 +19,9 @@ export default function FrameTabs (props) {
             onResize={rect => setBounds(rect.bounds)}>
             {({ measureRef }) => (
                 <Box ref={measureRef}>
+                  {/* onChangeTabs が無いときは、Tabs が何もしない。(parts/Tabs.js) */}
                   <Tabs data={tabs}
-                        onChange={(new_tabs)=>onChangeTabs(new_tabs)}/>
+                        onChange={onChangeTabs}/>
                 </Box>
             )}
           </Measure>

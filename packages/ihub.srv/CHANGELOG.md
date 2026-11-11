@@ -4,6 +4,11 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.3.1 (2026-11)
+
+- コードの変更は無い。(`@yanqirenshi/ihub.core` 0.3.1 と、版をそろえる)
+- テストを足した。GitHub の OAuth の戻り先に、`?tab=` などのクエリがあっても、そのまま戻る (`safeReturnTo`・callback)。ほかのサイトへは、戻さない。(yanqirenshi/iHub#127)
+
 ## 0.3.0 (2026-11)
 
 - スキーマの説明文 (`schemas/overview/nodes.schema.json`) の「コックピット」を、「艦橋」に直した。(動きは変わらない。`@yanqirenshi/ihub.core` 0.3.0 と、版をそろえる)

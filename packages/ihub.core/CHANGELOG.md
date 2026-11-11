@@ -4,6 +4,34 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.3.1 (2026-11)
+
+動きの不具合を 4 つ直しました。(yanqirenshi/iHub#124・#125・#126・#127)
+どれも、部品に渡す値を、いままでどおりにしているアプリは、そのまま動きます。
+
+### 修正
+
+- `FrameTabs`: `onChangeTabs` を渡さずにタブを押すと、`TypeError` になっていたのを、何も起きないようにした。(#124)
+- `FrameWbsNodeTabs`: ノードのページ (`pages.WbsNode`) が渡す `wbs_node` (データのレコードそのままで、`_id` と `_class` が無い) を、そのまま渡しても、WBS の表がノードの下だけになり、見出しに種類 (`_class`) も出るようにした。(#125)
+  - 0.3.0 までは、`_id` が無いため、表がノードの下ではなく、プロジェクト全体になり、見出しの `_class` の欄が空だった。
+  - 中で、`useWbs().get(id)` で、`_id` を持つノードを引き直す。`_id` を持つノードを渡していたアプリは、そのまま動く。(引けないときは、渡されたものを使う)
+- `TabsSearchParam`: 初めのタブを、描画の途中ではなく、描画のあと (`useEffect`) に `onChange` で知らせるようにした。(React の「Cannot update a component while rendering a different component」の警告が、出なくなる) (#126)
+  - `value` が空のときの初めのタブは、URL の `?tab=` (`tabs` にあるもの)。無い・`tabs` に無い値のときは、先頭のタブにした。(`usePageTabs` と同じ動き)
+  - **利用側への影響**: `value` が空で、URL に `?tab=` があるとき、これまでは先頭のタブが選ばれていた。いまは、URL のタブが選ばれる。
+  - `onChange` を渡さなくても、`TypeError` にならない。
+- `GithubOAuth`: 認証から戻ったときに、`?tab=` などのクエリが消えていたのを、戻るようにした。(`return_to` に、`location.pathname + location.search` を渡す) 例: `/scrum?tab=account` で認証すると、Account タブに戻る。(0.3.0 までは `/scrum` に戻り、既定の Projects タブが開いた) (#127)
+  - API サーバー (`@yanqirenshi/ihub.srv` の `safeReturnTo`) は、クエリ付きの戻り先を、もともと受け付けて、そのまま戻す。サーバーの変更は要らない。(テストを足して確かめた)
+
+### 確かめた
+
+- 参照アプリを、別のポートで起動し、一時的な確認用のページ (`FrameTabs`・`FrameWbsNodeTabs` を使うもの) で、直す前と後を比べた。(確かめたあと、ページは消した)
+  - #124: 直す前は、タブを押すと `onChangeTabs is not a function`。直したあとは、エラーが出ない。
+  - #125: 直す前は、表の最初の行が、プロジェクト (`1 iHub`) で、見出しに `WBS` が出なかった。直したあとは、表が、そのノード (`1001 W-A`) とその下だけで、見出しに `WBS` が出た。
+  - #126: 直す前は、「Cannot update a component」の警告が出て、`?tab=b` で開いても、タブ A が選ばれた。直したあとは、警告が出ず、`?tab=b` で B が選ばれた。`?tab=` が無いときと、`tabs` に無い値 (`?tab=zzz`) のときは、先頭の A。タブを押すと、URL の `?tab=` が変わる。
+  - #127: 直す前は、`/scrum?tab=account` の認証ボタンが、`return_to=/scrum` で API サーバーを呼んだ。直したあとは、`return_to=/scrum?tab=account`。
+- `@yanqirenshi/ihub.srv` のテスト (60 件。クエリ付きの戻り先の 2 件を足した) と、参照アプリのビルド (`react-scripts build`) が通った。
+- 確かめていない: GitHub での実際の認証 (OAuth App が無いため)。クライアントが送る `return_to` と、サーバーが戻す先 (テスト) を、別々に確かめた。
+
 ## 0.3.0 (2026-11)
 
 「コックピット」のページを、「艦橋 (Bridge)」に改めました。(yanqirenshi/iHub#122)
