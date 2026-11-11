@@ -12,7 +12,7 @@
 
 ## 0.3.1 (2026-11)
 
-- `@yanqirenshi/ihub.core`: 動きの不具合を 4 つ直した。`FrameTabs` が `onChangeTabs` 無しで `TypeError` になる (#124)。`FrameWbsNodeTabs` の WBS の表が、ノードの下ではなく、プロジェクト全体になる (#125)。`TabsSearchParam` が、描画の途中で親の `setState` を呼び、URL の `?tab=` を読まない (#126)。`GithubOAuth` で認証から戻ると、`?tab=` が消える (#127)。
+- `@yanqirenshi/ihub.core`: 動きの不具合を 4 つ直した。`FrameTabs` が `onChangeTabs` 無しで `TypeError` になる (#124)。`FrameWbsNodeTabs` の WBS の表が、ノードの下ではなく、プロジェクト全体になる (#125)。`TabsSearchParam` が、描画の途中で親の `setState` を呼び、URL の `?tab=` を読まない (#126)。`GithubOAuth` で認証から戻ると、`?tab=` が消える (#127)。見た目とエラーの扱いも 3 つ直した。設計の 3 つのパネルの長い表の下が見えない (#129)。`panels.Loading` が、タブの中でもはみ出す (`width`・`height` の props を足した) (#130)。Scrum の Repositories・Projects と艦橋の Cockpit タブが、GitHub への未接続・読み込みの失敗を知らせない (#131)。
 - `@yanqirenshi/ihub.srv`: コードの変更は無い。(版をそろえる。戻り先のクエリのテストを足した)
 
 ## 0.3.0 (2026-11)
