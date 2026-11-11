@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.3.1 (2026-11)
+
+- `@yanqirenshi/ihub.core`: 動きの不具合を 4 つ直した。`FrameTabs` が `onChangeTabs` 無しで `TypeError` になる (#124)。`FrameWbsNodeTabs` の WBS の表が、ノードの下ではなく、プロジェクト全体になる (#125)。`TabsSearchParam` が、描画の途中で親の `setState` を呼び、URL の `?tab=` を読まない (#126)。`GithubOAuth` で認証から戻ると、`?tab=` が消える (#127)。
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(版をそろえる。戻り先のクエリのテストを足した)
+
 ## 0.3.0 (2026-11)
 
 - `@yanqirenshi/ihub.core`: 「コックピット」のページを、「艦橋 (Bridge)」に改めた。(`pages.Bridge`・`panels.bridge`・設定のページの id `PAGE_BRIDGE`。古い名前の `pages.Cockpit`・`panels.cockpit`・`PAGE_COCKPIT` は、別名として残していて、古い書き方のアプリは、そのまま動く。古い名前は、将来の minor で消すことがある) ページの中の「Cockpit」タブは、名前を変えていない。hub が新しい名前に移るときの書き換え (Router.js の `page.Bridge`・メニューの表示) は、パッケージの CHANGELOG の「利用側への影響」にある。

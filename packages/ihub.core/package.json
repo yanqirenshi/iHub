@@ -1,6 +1,6 @@
 {
   "name": "@yanqirenshi/ihub.core",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "iHub のコア (画面の部品)。設計データを、図や表で見て、編集する。",
   "keywords": [
     "ihub",
