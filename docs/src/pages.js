@@ -16,6 +16,10 @@ import migrate         from './content/migrate.md?raw';
 import api             from './content/api.md?raw';
 import troubleshooting from './content/troubleshooting.md?raw';
 
+import { COMPONENT_SECTION } from './componentPages.js';
+
+// セクションは、pages (ページの一覧) と、groups (小見出しごとのページの一覧) を持てる。
+// サイドメニューは、pages を先に、groups をそのあとに並べる。
 export const SECTIONS = [
     {
         label: 'はじめに',
@@ -45,6 +49,7 @@ export const SECTIONS = [
             { path: '/api',       title: 'API サーバー',   content: api },
         ],
     },
+    COMPONENT_SECTION,
     {
         label: 'そのほか',
         pages: [
@@ -53,4 +58,7 @@ export const SECTIONS = [
     },
 ];
 
-export const PAGES = SECTIONS.flatMap(section=> section.pages);
+export const PAGES = SECTIONS.flatMap(section=> [
+    ...(section.pages || []),
+    ...(section.groups || []).flatMap(group=> group.pages),
+]);
