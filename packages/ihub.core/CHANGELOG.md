@@ -4,6 +4,48 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.3.0 (2026-11)
+
+「コックピット」のページを、「艦橋 (Bridge)」に改めました。(yanqirenshi/iHub#122)
+**古い名前も、別名として残しているので、古い書き方のアプリは、そのまま動きます。**
+
+### 変更
+
+- 公開している名前を、cockpit から bridge に改めた。
+
+| 新しい名前 | 古い名前 (別名。そのまま使える) |
+|---|---|
+| `pages.Bridge` | `pages.Cockpit` (同じ部品) |
+| `panels.bridge` (`Monitor`・`Card`・`Overview`) | `panels.cockpit` (同じもの) |
+| 設定のページの id `PAGE_BRIDGE` | `PAGE_COCKPIT` |
+
+- 設定の `tabs.PAGE_COCKPIT`・`panels.PAGE_COCKPIT` を書いているアプリも、そのまま効く。`PAGE_BRIDGE` と両方あるときは、`PAGE_BRIDGE` を優先して重ねる。(`tabs` は、古い id の `list` のあとに、新しい id の `list` を重ねる。`selected` は `PAGE_BRIDGE` を優先。`panels` は、同じ code を `PAGE_BRIDGE` が上書きする)
+- **古い名前は、将来の minor で消すことがある。** 新しい名前に移しておくとよい。
+- 艦橋のページの中の「Cockpit」タブ (自分が担当している GitHub の Issue をカードで並べる) は、名前を変えていない。(code `cockpit`・表示 `Cockpit`)
+- 中だけの名前も、bridge に改めた。(ファイル・フォルダ・Redux のスライス。`components/pages/Bridge.js`・`components/panels/bridge/`・`Monitor.js`・`redux/slices/bridgeSlice.js`)
+  - Redux のストアのキーは `cockpit` から `bridge` に、アクションの型は `cockpit/fetchIssues` から `bridge/fetchIssues` になった。(ストアは内部のもので、公開している名前ではない。アプリのパネルが `useSelector(s=> s.cockpit)` と読んでいたときだけ、`s.bridge` に直す)
+- README の「公開しているもの」の表で、`HelpSlide` の行が 2 回出ていたのを、1 つにした。説明の「コックピット」も、「艦橋」に直した。
+- 見本データ (`examples/data/overview/nodes.json`) の、Overview のノードの文字「Cockpit」を、「Bridge」にした。(データの形は変わらない)
+- 参照アプリ (雛形のもと): サイドメニューの表示を「コックピット」から「艦橋」に、`src/Router.js` を `<page.Bridge/>` に、`src/config/ICONS.js` のアイコンの名前を `bridge` にした。(アイコンの形は同じ)
+  - サイドメニューの項目の code は、`cockpit` のままにした。code は、ドックの Z から切り替えた on/off を保存する個人の設定 (`data/local/account_menus.json`) の鍵なので、変えると、保存した設定が効かなくなるため。
+
+### 利用側への影響 (hub が新しい名前に移るとき)
+
+どれも、しなくても動く。(古い名前は別名として残している)
+
+1. `src/Router.js`: `<page.Cockpit/>` を `<page.Bridge/>` にする。
+2. サイドメニューの表示 (`label`): 「コックピット」を「艦橋」にする。項目の `code` (`cockpit`) は、変えないほうがよい。(個人の設定の鍵。変えると、保存した on/off が効かなくなる)
+3. 設定の `tabs`・`panels` で `PAGE_COCKPIT` を使っているときは、`PAGE_BRIDGE` にする。`panels.cockpit` を使っているときは、`panels.bridge` にする。
+4. Overview のノードの文字「Cockpit」は、アプリのデータ (`data/overview/nodes.json`) のものなので、変えたいときだけ直す。
+
+### 確かめた
+
+- 参照アプリで、`/` に艦橋のページが出て、サイドメニューに「艦橋」と出た。Cockpit・Overview タブが、これまでどおり動いた。(Overview には、ノード「Bridge」が出た。タブを切り替えると、`?tab=` が変わる)
+- 参照アプリを、一時的に古い名前 (`<page.Cockpit/>`・設定の `tabs.PAGE_COCKPIT`・`panels.PAGE_COCKPIT`・`panels.cockpit.Card`・`Monitor`) にして、そのまま動いた。(タブの追加・既定のタブを消す・パネルの差し替えも効いた)
+- ビルドした `dist` で、`PAGE_COCKPIT` だけ・`PAGE_BRIDGE` だけ・両方・どちらも無い・ほかのページの設定の 5 つの場合に、`tabs`・`panels` が、上の説明どおりに重なることを確かめた。
+- `npm run build`・`ihub-srv check` (参照アプリの `data/` と、`examples/data/`)・`@yanqirenshi/ihub.srv` のテスト (58 件) が通った。
+- 確かめていない: GitHub に接続した状態の Cockpit タブ (Issue のカード)。トークンが無いため。(Redux のスライスの改名は、ストアのキー `bridge` を、ページが読めることまで確かめた)
+
 ## 0.2.7 (2026-11)
 
 ### 追加

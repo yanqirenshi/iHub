@@ -1,4 +1,4 @@
-// コックピットの Overview (d3.unchi のポンチ絵) に使うコレクション。
+// 艦橋 (Bridge) の Overview (d3.unchi のポンチ絵) に使うコレクション。
 export const OVERVIEW_COLLECTIONS = [
     'overview/nodes',
     'overview/edges',

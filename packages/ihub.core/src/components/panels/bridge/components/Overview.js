@@ -22,7 +22,7 @@ const collectionName = (collection)=> `overview/${collection}`;
 const EDGE_LIVE_KEYS = new Set(['from', 'to', 'label']);
 const isLiveEdgePatch = (change)=> change.collection==='edges' && Object.keys(change.patch).every(key=> EDGE_LIVE_KEYS.has(key));
 
-// Cockpit の Overview タブ: d3.unchi (ポンチ絵) をコンテンツエリア一杯に表示する。
+// 艦橋 (Bridge) の Overview タブ: d3.unchi (ポンチ絵) をコンテンツエリア一杯に表示する。
 // 図のデータは data/overview/ にあり、ノードをドラッグすると、動かした位置を overview/nodes に保存する。
 // ノードや線を右クリックすると、右端にインスペクタを出し、項目を書き換えられる。
 //

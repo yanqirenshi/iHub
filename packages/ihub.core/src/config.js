@@ -22,6 +22,7 @@ import Section03 from './components/pages/Help/Section03.js';
 //   wbs:        { page, NotFoundData, NotFoundComponent }   WBS のノードのページ。(必須)
 //                 page       … (path)=> import(...)。動的 import は、ページのあるアプリ側に置く
 //   tabs:       { PAGE_DATA: { selected, list } }     ページのタブ。既定 (hooks/usePageTabs.js の TAB_DEFS) に重ねる。(既定 {})
+//                 (古い名前の PAGE_COCKPIT は、PAGE_BRIDGE の別名として効く。両方あるときは PAGE_BRIDGE を優先して重ねる)
 //                 selected   … 上書きする
 //                 list       … code が同じものは差し替え、無いものは末尾に足す。{ code, hidden: true } は消す
 //   panels:     { PAGE_DATA: { dfd: Dfd } }           タブの code → パネルの部品。既定に重ねる。({ tab })=> 部品。(既定 {})
@@ -52,6 +53,32 @@ function required (value, path) {
     return value;
 }
 
+// 古い名前のページ id。(新しい id → 古い id)
+// 古い id で tabs・panels を書いているアプリが、そのまま効くようにする。
+export const PAGE_ID_ALIASES = {
+    PAGE_BRIDGE: 'PAGE_COCKPIT',
+};
+
+// 古い id の tabs・panels を、新しい id に重ねる。両方あるときは、新しい id を優先する。
+//   tabs   … list は、古い id の list のあとに、新しい id の list を重ねる。selected は新しい id を優先
+//   panels … code が同じものは、新しい id が上書きする
+function withPageAliases (tabs, panels) {
+    const t = { ...tabs };
+    const p = { ...panels };
+
+    for (const [id, old] of Object.entries(PAGE_ID_ALIASES)) {
+        if (tabs[old])
+            t[id] = tabs[id]
+                ? { ...tabs[old], ...tabs[id], selected: tabs[id].selected ?? tabs[old].selected, list: [...(tabs[old].list || []), ...(tabs[id].list || [])] }
+                : tabs[old];
+
+        if (panels[old])
+            p[id] = { ...panels[old], ...panels[id] };
+    }
+
+    return { tabs: t, panels: p };
+}
+
 // 設定の無い項目を、既定で埋める。必須の項目が無いときは、どれが無いかを示して止まる。
 export function resolveConfig (config = {}) {
     required(config.menus?.pages,                'menus.pages');
@@ -64,13 +91,16 @@ export function resolveConfig (config = {}) {
     required(config.wbs?.NotFoundData,           'wbs.NotFoundData');
     required(config.wbs?.NotFoundComponent,      'wbs.NotFoundComponent');
 
+    const { tabs, panels } = withPageAliases({ ...DEFAULT_CONFIG.tabs, ...config.tabs },
+                                             { ...DEFAULT_CONFIG.panels, ...config.panels });
+
     return {
         ...config,
         app:        { ...DEFAULT_CONFIG.app,        ...config.app },
         menuColors: { ...DEFAULT_CONFIG.menuColors, ...config.menuColors },
         colors:     { ...DEFAULT_CONFIG.colors,     ...config.colors },
-        tabs:       { ...DEFAULT_CONFIG.tabs,       ...config.tabs },
-        panels:     { ...DEFAULT_CONFIG.panels,     ...config.panels },
+        tabs,
+        panels,
         help:       { ...DEFAULT_CONFIG.help,       ...config.help },
         github:     { ...DEFAULT_CONFIG.github,     ...config.github },
         diagrams:   {

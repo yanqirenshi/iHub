@@ -1,23 +1,24 @@
 import React, { useEffect } from 'react';
 
 import TabbedPage from '../assemblies/TabbedPage.js';
-import { Monitor, Card, Overview } from '../panels/cockpit/index.js';
+import { Monitor, Card, Overview } from '../panels/bridge/index.js';
 import Loading from '../panels/Loading.js';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchIssues } from '../../redux/slices/cockpitSlice.js';
+import { fetchIssues } from '../../redux/slices/bridgeSlice.js';
 
 import sogh from '../../manegers/sogh.js';
 
-// タブの code → パネルの部品。(設定の panels.PAGE_COCKPIT が重なる)
+// タブの code → パネルの部品。(設定の panels.PAGE_BRIDGE が重なる。古い名前の panels.PAGE_COCKPIT も効く。config.js)
 // CockpitCards は、下にある。(関数の宣言は先に使える)
 const PANELS = {
     cockpit: CockpitCards,
     overview: Overview,
 };
 
-export default function Cockpit () {
-    return <TabbedPage pageId="PAGE_COCKPIT" panels={PANELS}/>;
+// 艦橋のページ。(古い名前は pages.Cockpit。pages/index.js)
+export default function Bridge () {
+    return <TabbedPage pageId="PAGE_BRIDGE" panels={PANELS}/>;
 }
 
 // Cockpit タブ: 自分が担当している Github のイシューをカードで並べる。
@@ -25,7 +26,7 @@ function CockpitCards () {
     const dispatch = useDispatch();
 
     const authed = useSelector(s=> s.githubAuth.value);
-    const { status, issueIds } = useSelector(s=> s.cockpit);
+    const { status, issueIds } = useSelector(s=> s.bridge);
 
     useEffect(()=> {
         if (authed===true && status==='idle')

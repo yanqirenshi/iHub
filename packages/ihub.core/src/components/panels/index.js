@@ -10,6 +10,8 @@ export { default as SystemDynamics } from './SystemDynamics.js';
 export { default as TM             } from './TM.js';
 export { default as Wbs            } from './Wbs.js';
 
-export * as cockpit from './cockpit/index.js';
+export * as bridge from './bridge/index.js';
+// 古い名前。panels.bridge のほうを使う。(同じもの)
+export * as cockpit from './bridge/index.js';
 export * as sogh from './sogh/index.js';
 export * as systemic_design from './systemic_design/index.js';

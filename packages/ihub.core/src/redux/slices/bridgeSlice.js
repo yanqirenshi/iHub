@@ -2,12 +2,12 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import sogh from '../../manegers/sogh.js';
 
-export const fetchIssues = createAsyncThunk('cockpit/fetchIssues', ()=> {
+export const fetchIssues = createAsyncThunk('bridge/fetchIssues', ()=> {
     return sogh.asyncFetchIssueByViewer();
 });
 
-const cockpitSlice = createSlice({
-    name: 'cockpit',
+const bridgeSlice = createSlice({
+    name: 'bridge',
     initialState: {
         status: 'idle', // idle | loading | succeeded | failed
         error: null,
@@ -30,4 +30,4 @@ const cockpitSlice = createSlice({
     },
 });
 
-export default cockpitSlice.reducer;
+export default bridgeSlice.reducer;
