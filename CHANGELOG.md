@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.3.0 (2026-11)
+
+- `@yanqirenshi/ihub.core`: 「コックピット」のページを、「艦橋 (Bridge)」に改めた。(`pages.Bridge`・`panels.bridge`・設定のページの id `PAGE_BRIDGE`。古い名前の `pages.Cockpit`・`panels.cockpit`・`PAGE_COCKPIT` は、別名として残していて、古い書き方のアプリは、そのまま動く。古い名前は、将来の minor で消すことがある) ページの中の「Cockpit」タブは、名前を変えていない。hub が新しい名前に移るときの書き換え (Router.js の `page.Bridge`・メニューの表示) は、パッケージの CHANGELOG の「利用側への影響」にある。
+- `@yanqirenshi/ihub.srv`: スキーマの説明文の「コックピット」を、「艦橋」に直した。(動きは変わらない。版をそろえる)
+
 ## 0.2.7 (2026-11)
 
 - `@yanqirenshi/ihub.core`: 図の位置と拡大を、ブラウザ (`localStorage`) に自動で覚えて、次に開いたときに戻すようにした。(ER 図・TM・画面遷移図・システム構成図・Overview。人ごと・ブラウザごとの記憶で、`data/` は変わらない。覚えたものが無いときは、これまでと同じ初めの位置。ほかからデータが変わって図を描き直したときは、初めの位置に戻らず、覚えた位置で描き直す) `useDiagramView` を export した。アプリが足したパネルの図でも使える。`dependencies` に `@yanqirenshi/assh0le` の `^0.5.9` を足した。

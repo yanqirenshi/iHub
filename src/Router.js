@@ -7,7 +7,7 @@ export default function Router () {
     return (
         <Routes>
           {/* == iHub ================================================================ */}
-          <Route path='/' element={<page.Cockpit/>} />
+          <Route path='/' element={<page.Bridge/>} />
           <Route path='/help'                      element={<page.Help/>} />
           <Route path='/markets'                   element={<page.Markets/>} />
           <Route path='/business'                  element={<page.Business/>} />

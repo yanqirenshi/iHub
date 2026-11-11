@@ -1,7 +1,8 @@
 import ICONS from './ICONS.js';
 
 const MAIN = [
-    { code: 'cockpit',               url: '/',                      label: 'コックピット', icon: ICONS.cockpit },
+    // 艦橋のページ。code は、ドックの Z から切り替えた on/off (data/local/account_menus.json) の鍵なので、cockpit のまま。(変えると、保存した設定が効かなくなる)
+    { code: 'cockpit',               url: '/',                      label: '艦橋',         icon: ICONS.bridge },
     { code: 'markets',               url: '/markets',               label: '市場',         icon: ICONS.markets },
     { code: 'business',              url: '/business',              label: 'ビジネス',     icon: ICONS.business },
     { code: 'design',                url: '/design',                label: 'デザイン',     icon: ICONS.design },

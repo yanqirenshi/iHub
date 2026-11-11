@@ -68,7 +68,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
       <IHub config={config}>
         <Routes>
-          <Route path='/'     element={<pages.Cockpit/>} />
+          <Route path='/'     element={<pages.Bridge/>} />
           <Route path='/data' element={<pages.Data/>} />
           <Route path='/wbs/:wbs_id' element={<pages.WbsNode/>} />
         </Routes>
@@ -214,8 +214,8 @@ export default function Section01 ({ size }) {
 | `PAGE_API` | `pages.Api` (参照アプリでは `/api`) | `wbs`・`help` | `wbs` |
 | `PAGE_BATCHS` | `pages.Batchs` (参照アプリでは `/batchs`) | `wbs`・`help` | `wbs` |
 | `PAGE_BPMN` | `docPages.BPMN` (参照アプリでは `/bpmn`) | `palettes`・`styles`・`methods`・`overview` | `palettes` |
+| `PAGE_BRIDGE` | `pages.Bridge` (参照アプリでは `/`。0.3.0 以降) | `cockpit`・`overview` | `cockpit` |
 | `PAGE_BUSINESS` | `pages.Business` (参照アプリでは `/business`) | `systemic-design`・`tm`・`procedures`・`wbs`・`help` | `tm` |
-| `PAGE_COCKPIT` | `pages.Cockpit` (参照アプリでは `/`) | `cockpit`・`overview` | `cockpit` |
 | `PAGE_CLASSES` | `pages.Classes` (参照アプリでは `/classes`) | `class-diagram`・`wbs`・`help` | `class-diagram` |
 | `PAGE_DATA` | `pages.Data` (参照アプリでは `/data`) | `er-diagram`・`wbs`・`help` | `er-diagram` |
 | `PAGE_DDD` | `pages.DDD` (参照アプリでは `/ddd`) | `ubiquitous-language`・`model-driven-design`・`hands-on-modeler`・`declarative-design`・`layer-architecture`・`overview` | `layer-architecture` |
@@ -232,6 +232,9 @@ export default function Section01 ({ size }) {
 
 タブの名前 (label) は、`hooks/usePageTabs.js` の `TAB_DEFS` にあります。
 `TabbedPage` で作った自分のページは、`pageId` に、好きな id (`PAGE_MY` など) を付けられます。
+
+- 艦橋のページは、0.2.x まで「コックピット」でした。古い名前の `pages.Cockpit`・`panels.cockpit`・設定の `tabs.PAGE_COCKPIT`・`panels.PAGE_COCKPIT` は、別名として、そのまま使えます。(`PAGE_BRIDGE` と両方あるときは、`PAGE_BRIDGE` を優先して重ねます。古い名前は、将来の minor で消すことがあります)
+- 艦橋のページの中の、自分が担当している Issue をカードで並べるタブの名前 (code `cockpit`・表示 `Cockpit`) は、変わっていません。
 
 ## 図のグリッド線を消す
 
@@ -278,7 +281,7 @@ rectum.data(data);
 
 ## GitHub との接続
 
-画面は、GitHub (Scrum・コックピット・Issue の追加) に、次のどちらかのトークンで接続します。
+画面は、GitHub (Scrum・艦橋・Issue の追加) に、次のどちらかのトークンで接続します。
 両方あるときは、OAuth のトークンを先に使います。
 
 1. OAuth で得たトークン。API サーバー ([@yanqirenshi/ihub.srv](../ihub.srv/README.md)) に OAuth App の Client ID と Client secret を設定すると使えます。(環境変数 `GITHUB_OAUTH_CLIENT_ID`・`GITHUB_OAUTH_CLIENT_SECRET`、または `createApp({ github })`)
@@ -300,12 +303,11 @@ import { IHub, pages, Frame } from '@yanqirenshi/ihub.core';
 | `IHub` | 画面全体。テーマ・全体のスタイル・Redux のストア・ルーター・データの読み込み・GitHub の接続をまとめて、`children` を描く |
 | `ConfigProvider`・`useConfig`・`resolveConfig`・`DEFAULT_CONFIG`・`clientHeaderName` | 設定 |
 | `createStore` | 設定からストアを作る (`IHub` が使う) |
-| `pages` | ページ (`pages.Cockpit`・`pages.Data`・`pages.WbsNode` など) |
+| `pages` | ページ (`pages.Bridge`・`pages.Data`・`pages.WbsNode` など) |
 | `docPages` | ドキュメントのページ (`docPages.ER`・`docPages.TM` など) |
 | `panels` | ページの中身 (`panels.ER`・`panels.TM` など) |
 | `GithubOAuth`・`Frame`・`FrameTabs`・`FrameWbsNode`・`FrameWbsNodeTabs`・`TabbedPage`・`Link`・`TableTMRelationships` など | 中間の部品 (`components/assemblies/index.js`) |
 | `ItemWbsNode`・`LinkWBS`・`Tabs` など | 小さな部品 (`components/parts/index.js`) |
-| `HelpSlide` | Help のセクションで使う、1 枚のスライド (0.2.4 以降。[Help を差し替える](#help-を差し替える)) | 
 | `HelpSlide` | Help のセクションで使う、1 枚のスライド (0.2.4 以降。[Help を差し替える](#help-を差し替える)) |
 | `usePageTabs`・`mergeTabs` | ページのタブ |
 | `manegers`・`wbs`・`useWbs`・`sogh` | データのマネージャ |

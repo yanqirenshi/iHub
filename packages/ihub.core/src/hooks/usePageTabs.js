@@ -30,6 +30,13 @@ const TAB_DEFS = {
             { code: 'overview', label: 'Overview' },
         ],
     },
+    PAGE_BRIDGE: {
+        selected: 'cockpit',
+        list: [
+            { code: 'cockpit',  label: 'Cockpit' },
+            { code: 'overview', label: 'Overview' },
+        ],
+    },
     PAGE_BUSINESS: {
         selected: 'tm',
         list: [
@@ -38,13 +45,6 @@ const TAB_DEFS = {
             { code: 'procedures',      label: '機能一覧' },
             { code: 'wbs',             label: 'WBS' },
             { code: 'help',            label: 'Help' },
-        ],
-    },
-    PAGE_COCKPIT: {
-        selected: 'cockpit',
-        list: [
-            { code: 'cockpit',  label: 'Cockpit' },
-            { code: 'overview', label: 'Overview' },
         ],
     },
     PAGE_CLASSES: {

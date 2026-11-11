@@ -4,10 +4,12 @@ export { default as Api                     } from './Api.js';
 export { default as Assemblies              } from './Assemblies.js';
 export { default as Auth                    } from './Auth.js';
 export { default as Batchs                  } from './Batchs.js';
+export { default as Bridge                  } from './Bridge.js';
 export { default as Business                } from './Business.js';
 export { default as ClassDiagram            } from './ClassDiagram.js';
 export { default as Classes                 } from './Classes.js';
-export { default as Cockpit                 } from './Cockpit.js';
+// 古い名前。pages.Bridge のほうを使う。(同じ部品)
+export { default as Cockpit                 } from './Bridge.js';
 export { default as DDD                     } from './DDD.js';
 export { default as Data                    } from './Data.js';
 export { default as Design                  } from './Design.js';

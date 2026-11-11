@@ -9,7 +9,7 @@ const MASONRY_OPTIONS = {
 
 // カードを masonry (石積み) レイアウトで並べる。
 // 列数は Masonry が親の幅から決める。
-export default function Cockpit (props) {
+export default function Monitor (props) {
     const children = props.children;
 
     return (

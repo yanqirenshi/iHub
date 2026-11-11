@@ -4,7 +4,7 @@ import windowReducer from './slices/windowSlice.js';
 import operatorsReducer, { initialOperators } from './slices/operatorsSlice.js';
 import githubAuthReducer from './slices/githubAuthSlice.js';
 import accountMenuReducer, { initialAccountMenu } from './slices/accountMenuSlice.js';
-import cockpitReducer from './slices/cockpitSlice.js';
+import bridgeReducer from './slices/bridgeSlice.js';
 import scrumReducer from './slices/scrumSlice.js';
 import scrumProjectReducer from './slices/scrumProjectSlice.js';
 import scrumProjectItemReducer from './slices/scrumProjectItemSlice.js';
@@ -19,7 +19,7 @@ export function createStore (config) {
             operators: operatorsReducer,
             githubAuth: githubAuthReducer,
             accountMenu: accountMenuReducer,
-            cockpit: cockpitReducer,
+            bridge: bridgeReducer,
             scrum: scrumReducer,
             scrumProject: scrumProjectReducer,
             scrumProjectItem: scrumProjectItemReducer,
