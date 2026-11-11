@@ -61,7 +61,7 @@ npx --yes --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ih
 
 **消すもの**
 
-- iHub 本体が持つパッケージ: `@yanqirenshi/colonoscope`・`d3.deployment`・`d3.er`・`d3.sitemap`・`d3.ter`・`d3.unchi`・`menubook`・`model.*`・`react-masonry-component`・`table.wbs`・`beach`、`@splidejs/react-splide`・`@uiw/react-md-editor`・`bulma`・`react-measure`・`sogh`・`tion`、サーバーの `hono`・`@hono/node-server`・`ajv`・`ajv-i18n`
+- iHub 本体が持つパッケージ: `@yanqirenshi/colonoscope`・`d3.deployment`・`d3.er`・`d3.sitemap`・`d3.ter`・`d3.unchi`・`d3.yabane` (0.4.0 以降)・`menubook`・`model.*`・`react-masonry-component`・`table.wbs`・`beach`、`@splidejs/react-splide`・`@uiw/react-md-editor`・`bulma`・`react-measure`・`sogh`・`tion`、サーバーの `hono`・`@hono/node-server`・`ajv`・`ajv-i18n`
 - `react-router`。(`react-router-dom` が、必要な `react-router` を持ってきます。アプリの `package.json` に `react-router` も書いていると、`react-router-dom` の中の版とずれて 2 つ入り、`/wbs/{id}` のページが空になることがあります。[困ったとき](#/troubleshooting) を見てください)
 - `overrides` の、`tion` の `react-router-dom` の項目。(`tion` 0.1.3 以降では、要りません。`tion` は消すので、`overrides` ごと消します)
 
