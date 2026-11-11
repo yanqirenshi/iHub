@@ -8,6 +8,7 @@
 
 「コックピット」のページを、「艦橋 (Bridge)」に改めました。(yanqirenshi/iHub#122)
 **古い名前も、別名として残しているので、古い書き方のアプリは、そのまま動きます。**
+あわせて、使われていない部品と、中身の無いタブを外しました。(yanqirenshi/iHub#128・#132)
 
 ### 変更
 
@@ -29,6 +30,19 @@
 - 参照アプリ (雛形のもと): サイドメニューの表示を「コックピット」から「艦橋」に、`src/Router.js` を `<page.Bridge/>` に、`src/config/ICONS.js` のアイコンの名前を `bridge` にした。(アイコンの形は同じ)
   - サイドメニューの項目の code は、`cockpit` のままにした。code は、ドックの Z から切り替えた on/off を保存する個人の設定 (`data/local/account_menus.json`) の鍵なので、変えると、保存した設定が効かなくなるため。
 
+### 削除
+
+- assemblies の `Account` の公開をやめた。ファイル (`components/assemblies/Account.js`・`Account/`) も消した。(使われていない作りかけの部品。yanqirenshi/iHub#128)
+  - `pages.Account` (参照アプリの `/account`) と `panels.sogh.Account` (Scrum の Account タブ) は、別のものなので、残している。
+  - 3 つの hub (UkiyoSnow・iwo.Studio・Bokasafn) が、この部品を使っていないことは、確かめてある。
+- Scrum のページの、中身の無い 4 つのタブ (`timeline`・`gantt-chart`・`issues`・`pull-requests`) を外した。(中身ができるまで。yanqirenshi/iHub#132) タブは、`repositories`・`projects`・`account`・`help` の 4 つになった。初めに開くタブ (`projects`) は、同じ。
+  - **利用側への影響**: 設定の `tabs.PAGE_SCRUM` で、この 4 つの code を指していたアプリは、次のようになる。
+    1. `list` に書いていたときは、アプリが足したタブとして出る。(パネルは、設定の `panels.PAGE_SCRUM` で足さないと、中身は空。これまでも、既定のタブの中身は空だった)
+    2. `hidden: true` で消していたときは、何も起きない。
+    3. `selected` に指していて、`list` に書いていないときは、先頭のタブ (`repositories`) になる。
+    4. URL の `?tab=issues` などは、初めに開くタブ (`projects`) になる。
+  - 設定に書いていないアプリは、4 つのタブが出なくなるだけで、ほかは変わらない。
+
 ### 利用側への影響 (hub が新しい名前に移るとき)
 
 どれも、しなくても動く。(古い名前は別名として残している)
@@ -44,6 +58,9 @@
 - 参照アプリを、一時的に古い名前 (`<page.Cockpit/>`・設定の `tabs.PAGE_COCKPIT`・`panels.PAGE_COCKPIT`・`panels.cockpit.Card`・`Monitor`) にして、そのまま動いた。(タブの追加・既定のタブを消す・パネルの差し替えも効いた)
 - ビルドした `dist` で、`PAGE_COCKPIT` だけ・`PAGE_BRIDGE` だけ・両方・どちらも無い・ほかのページの設定の 5 つの場合に、`tabs`・`panels` が、上の説明どおりに重なることを確かめた。
 - `npm run build`・`ihub-srv check` (参照アプリの `data/` と、`examples/data/`)・`@yanqirenshi/ihub.srv` のテスト (58 件) が通った。
+- 参照アプリで、Scrum (`/scrum`) のタブが 4 つ (Repositories・Projects・Account・Help) で、Projects が初めに開く。Account タブの GitHub 接続の部品と、`/account` のページ (`pages.Account`) は、これまでどおり動いた。`?tab=issues` は、Projects になった。
+- 外した 4 つの code を設定で指していたときの 4 つの場合 (上の 1. から 4.) を、ビルドした `dist` の `mergeTabs` で確かめた。
+- `assemblies/Account` を import しているファイルが、ほかに無いことと、参照アプリのビルド (`react-scripts build`) が通ることを確かめた。
 - 確かめていない: GitHub に接続した状態の Cockpit タブ (Issue のカード)。トークンが無いため。(Redux のスライスの改名は、ストアのキー `bridge` を、ページが読めることまで確かめた)
 
 ## 0.2.7 (2026-11)

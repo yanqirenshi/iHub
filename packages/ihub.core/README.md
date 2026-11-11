@@ -228,7 +228,7 @@ export default function Section01 ({ size }) {
 | `PAGE_SYSTEMS` | `pages.SystemEnvironment` (参照アプリでは `/system-environment`) | `system-configuration-diagram`・`wbs`・`help` | `system-configuration-diagram` |
 | `PAGE_ACCOUNT` | `pages.Account` (参照アプリでは `/account`) | `menus`・`operators`・`pages` | `menus` |
 | `PAGE_EXTERNAL_RESOURCES` | `pages.ExternalResources` (参照アプリでは `/external-resources`) | `wbs` | `wbs` |
-| `PAGE_SCRUM` | `pages.Scrum` (参照アプリでは `/scrum`) | `timeline`・`gantt-chart`・`issues`・`pull-requests`・`repositories`・`projects`・`account`・`help` | `projects` |
+| `PAGE_SCRUM` | `pages.Scrum` (参照アプリでは `/scrum`) | `repositories`・`projects`・`account`・`help` | `projects` |
 
 タブの名前 (label) は、`hooks/usePageTabs.js` の `TAB_DEFS` にあります。
 `TabbedPage` で作った自分のページは、`pageId` に、好きな id (`PAGE_MY` など) を付けられます。

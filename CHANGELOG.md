@@ -13,6 +13,7 @@
 ## 0.3.0 (2026-11)
 
 - `@yanqirenshi/ihub.core`: 「コックピット」のページを、「艦橋 (Bridge)」に改めた。(`pages.Bridge`・`panels.bridge`・設定のページの id `PAGE_BRIDGE`。古い名前の `pages.Cockpit`・`panels.cockpit`・`PAGE_COCKPIT` は、別名として残していて、古い書き方のアプリは、そのまま動く。古い名前は、将来の minor で消すことがある) ページの中の「Cockpit」タブは、名前を変えていない。hub が新しい名前に移るときの書き換え (Router.js の `page.Bridge`・メニューの表示) は、パッケージの CHANGELOG の「利用側への影響」にある。
+- `@yanqirenshi/ihub.core`: assemblies の `Account` (使われていない作りかけの部品) の公開をやめて、ファイルも消した。Scrum のページの、中身の無い 4 つのタブ (`timeline`・`gantt-chart`・`issues`・`pull-requests`) を外した。(`pages.Account`・`panels.sogh.Account` は、残している。設定の `tabs.PAGE_SCRUM` でこの 4 つの code を指していたアプリへの影響は、パッケージの CHANGELOG にある)
 - `@yanqirenshi/ihub.srv`: スキーマの説明文の「コックピット」を、「艦橋」に直した。(動きは変わらない。版をそろえる)
 
 ## 0.2.7 (2026-11)
