@@ -10,11 +10,11 @@ iHub 本体 (`@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`) は `node_modul
 npm update @yanqirenshi/ihub.core @yanqirenshi/ihub.srv
 ```
 
-- `package.json` の範囲 (例: `^0.1.0`) の中で、新しい版に上がります。
-- 0.x の間は、`^0.1.0` は 0.1.x だけを指します。minor (0.2.0 など) に上げるときは、範囲を書き換えます。
+- `package.json` の範囲 (例: `^0.3.0`) の中で、新しい版に上がります。
+- 0.x の間は、`^0.3.0` は 0.3.x だけを指します。minor (0.4.0 など) に上げるときは、範囲を書き換えます。
 
 ```
-npm install @yanqirenshi/ihub.core@^0.2.0 @yanqirenshi/ihub.srv@^0.2.0
+npm install @yanqirenshi/ihub.core@^0.3.0 @yanqirenshi/ihub.srv@^0.3.0
 ```
 
 - 2 つのパッケージは、同じ版にそろえてください。
@@ -27,12 +27,12 @@ npm ls @yanqirenshi/ihub.core @yanqirenshi/ihub.srv
 ```
 
 ```
-+-- @yanqirenshi/ihub.core@0.2.7
-`-- @yanqirenshi/ihub.srv@0.2.7
++-- @yanqirenshi/ihub.core@0.3.0
+`-- @yanqirenshi/ihub.srv@0.3.0
 ```
 
 - 出力の最初の行には、アプリの名前と場所が出ます。
-その下の 2 行の `@` のあとの版が、同じになっていれば大丈夫です。(上は 0.2.7 の例です)
+その下の 2 行の `@` のあとの版が、同じになっていれば大丈夫です。(上は 0.3.0 の例です)
 - 版が違うときは、片方に、`package.json` の範囲に合わない版として `invalid` が付くことがあります。
 上の `npm install` で、同じ版を指定して、入れ直してください。
 

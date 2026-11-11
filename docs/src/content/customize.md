@@ -56,6 +56,7 @@ root.render(
 タブのあるページ (`pages.Data`・`pages.Batchs`・`pages.Business` など) は、タブの一覧と、タブごとのパネルの表で描いています。
 アプリは、コアの中を触らずに、`config.tabs` でタブを、`config.panels` でパネルを重ねられます。
 (ページの id は、`PAGE_DATA`・`PAGE_BATCHS`・`PAGE_BUSINESS`・`PAGE_DESIGN` などです。一覧は、`@yanqirenshi/ihub.core` の README の「ページの id」にあります)
+(艦橋のページの id は `PAGE_BRIDGE` です。0.2.x までの `PAGE_COCKPIT` も、別名として効きます。両方あるときは `PAGE_BRIDGE` を優先して重ねます)
 
 例: Batchs のページに、DFD のタブを足します。(UkiyoSnow/hub が、`usePageTabs.js` と `pages/Batchs.js` を書き換えて足していたものです)
 

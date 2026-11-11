@@ -15,7 +15,7 @@
 | `parts` | 小さな部品 | `import { LinkWBS } from '@yanqirenshi/ihub.core';` |
 
 - `panels` は、`panels.ER` のように、`panels` を通して使います。
-- `panels` の中の `cockpit`・`sogh`・`systemic_design` は、もう 1 段深く、`panels.sogh.Repositories` のように使います。
+- `panels` の中の `bridge`・`sogh`・`systemic_design` は、もう 1 段深く、`panels.sogh.Repositories` のように使います。
 - 部品の多くは、`<IHub>` の中で動かすことを前提にしています。(設定・redux の store・react-router を使うため)
 
 ## assemblies
@@ -29,7 +29,6 @@
 | [Link](#/components/assemblies/Link) | リンクを描きます。 |
 | [TabbedPage](#/components/assemblies/TabbedPage) | タブのあるページを描きます。 |
 | [TabsSearchParam](#/components/assemblies/TabsSearchParam) | タブの並びを描きます。 |
-| [Account](#/components/assemblies/Account) | アカウントの丸いアイコンと、アイコンから開くメニューを描きます。 |
 | [GithubOAuth](#/components/assemblies/GithubOAuth) | GitHub との接続の状態と、認証と切断のボタンを描きます。 |
 | [AddWbsNode](#/components/assemblies/AddWbsNode) | WBS のノード (`parent`) の下に、子のノードを追加するフォームを描きます。 |
 | [WBSTable](#/components/assemblies/WBSTable) | WBS の表を描きます。 |
@@ -51,13 +50,13 @@
 | [DesignParts](#/components/panels/DesignParts) | 設計 (`/design`) の「部品」タブ (code は `ui-parts`) のパネルです。 |
 | [DesignEvents](#/components/panels/DesignEvents) | 設計 (`/design`) の「UI イベント」タブ (code は `ui-events`) のパネルです。 |
 
-## panels.cockpit
+## panels.bridge
 
 | 部品 | 内容 |
 |---|---|
-| [Monitor](#/components/panels/cockpit/Monitor) | カードを、石積み (masonry) のレイアウトで並べます。 |
-| [Overview](#/components/panels/cockpit/Overview) | ポンチ絵 (なんでもありの概念図) を、@yanqirenshi/d3.unchi で、パネル一杯に描きます。 |
-| [Card](#/components/panels/cockpit/Card) | コックピットの 1 枚のカードを描きます。 |
+| [Monitor](#/components/panels/bridge/Monitor) | カードを、石積み (masonry) のレイアウトで並べます。 |
+| [Overview](#/components/panels/bridge/Overview) | ポンチ絵 (なんでもありの概念図) を、@yanqirenshi/d3.unchi で、パネル一杯に描きます。 |
+| [Card](#/components/panels/bridge/Card) | 艦橋の 1 枚のカードを描きます。 |
 
 ## panels.sogh
 

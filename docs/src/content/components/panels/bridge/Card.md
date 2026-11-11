@@ -1,6 +1,6 @@
 # Card
 
-コックピットの 1 枚のカードを描きます。
+艦橋の 1 枚のカードを描きます。
 `data.type` で、描き方を変えます。
 
 | `data.type` | 描くもの |
@@ -8,11 +8,12 @@
 | `'GITHUB ISSUE'` | GitHub の Issue のカード (下の説明) |
 | それ以外 | 中身の無いカード。真ん中に `data.type` を出します (`type` が無いときは `?`) |
 
-- ソース: `packages/ihub.core/src/components/panels/cockpit/components/Card.js`
-- Issue のカード: `packages/ihub.core/src/components/panels/cockpit/components/cards/GithubIssue.js`
+- ソース: `packages/ihub.core/src/components/panels/bridge/components/Card.js`
+- Issue のカード: `packages/ihub.core/src/components/panels/bridge/components/cards/GithubIssue.js`
 
-コックピット (`/`) の「Cockpit」タブで、[Monitor](#/components/panels/cockpit/Monitor) の中に並べています。
-ページ (`pages/Cockpit.js`) が、自分が担当している (assignee が自分の) Issue を GitHub から読み込み、1 件ずつカードにします。([GitHub との連携](#/github))
+艦橋 (`/`) の「Cockpit」タブで、[Monitor](#/components/panels/bridge/Monitor) の中に並べています。
+ページ (`pages/Bridge.js`) が、自分が担当している (assignee が自分の) Issue を GitHub から読み込み、1 件ずつカードにします。([GitHub との連携](#/github))
+GitHub に接続していないときや、読み込みに失敗したときは、ページがカードの代わりに知らせの文章を出します。(0.3.1 以降。文章は [Repositories](#/components/panels/sogh/Repositories) の注意と同じ形です)
 
 Issue のカードには、次のものを出します。
 
@@ -27,8 +28,11 @@ Issue のカードには、次のものを出します。
 ```jsx
 import { panels } from '@yanqirenshi/ihub.core';
 
-// <panels.cockpit.Card data={...}/>
+// <panels.bridge.Card data={...}/>
 ```
+
+0.2.x までの名前 `panels.cockpit.Card` も、同じ部品の別名として使えます。
+(0.3.0 で `panels.bridge` に改めました。古い名前は、将来の minor で消すことがあるので、新しい名前に移しておくと安心です)
 
 ## props
 
@@ -43,7 +47,7 @@ import { panels } from '@yanqirenshi/ihub.core';
 | `type` | カードの種類。`'GITHUB ISSUE'` のときは Issue のカードを描きます |
 | `data` | `type` が `'GITHUB ISSUE'` のときの Issue。sogh の Issue のオブジェクト (`sogh.issue(id)` で引いたもの) です |
 
-`pages/Cockpit.js` は、`id` (Issue の id) も入れて、`key` に使っています。
+`pages/Bridge.js` は、`id` (Issue の id) も入れて、`key` に使っています。
 カードの部品は、`id` を読みません。
 
 ## 使い方の例
@@ -58,9 +62,9 @@ const cards = issue_ids.map(id=> ({
     data: sogh.issue(id),
 }));
 
-<panels.cockpit.Monitor>
-  {cards.map(card=> <panels.cockpit.Card key={card.id} data={card}/>)}
-</panels.cockpit.Monitor>
+<panels.bridge.Monitor>
+  {cards.map(card=> <panels.bridge.Card key={card.id} data={card}/>)}
+</panels.bridge.Monitor>
 ```
 
 ## 注意

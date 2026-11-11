@@ -9,13 +9,15 @@ Scrum を開いたときに、初めに出るタブです。
 次の順に動きます。
 
 1. GitHub に接続できたら (redux の `githubAuth.value` が `true`)、Projects を GitHub から読み込みます。(`fetchProjectsV2`)
-2. 読み込んでいる間は、[Loading](#/components/panels/Loading) を出します。
-3. 読み込んだ Projects を、sogh の `ProjectsV2` の部品で出します。(MUI の `Container` の `lg` の幅)
+2. 読み込んでいる間は、[Loading](#/components/panels/Loading) を、パネルの大きさで出します。
+3. GitHub に接続していないときや、読み込みに失敗したときは、一覧の代わりに、知らせの文章を出します。(下の「注意」)
+4. 読み込んだ Projects を、sogh の `ProjectsV2` の部品で出します。(MUI の `Container` の `lg` の幅)
 
 - 読み込んだ Projects の id は、redux の store の `scrum.projectsV2` (`{ status, error, ids }`) に入ります。
 - Projects は、一度読み込んだら、画面を読み込み直すまで読み込みません。
 - 一覧は [ErrorBoundary](#/components/parts/ErrorBoundary) で囲んでいます。
-  表示でエラーが起きたときは、「Projects の取得・表示でエラーが発生しました。」を出します。
+  表示でエラーが起きたときは、「Projects の表示でエラーが発生しました。」を出します。
+  (GitHub からの読み込みの失敗は、ErrorBoundary ではなく、下の知らせで出します)
 
 ## import のしかた
 
@@ -48,6 +50,12 @@ const config = {
   redux の store の `githubAuth` と `scrum` を使います。
 - GitHub に接続している必要があります。([GitHub との連携](#/github))
   トークンには `project` の権限が要ります。
-  接続していないときは、何も読み込まず、空の一覧になります。
-- GitHub からの読み込みに失敗したときも、空の一覧になります。
-  エラーの文章は出しません。(失敗の理由は、store の `scrum.projectsV2.error` に入ります)
+- 接続していないときと、読み込みに失敗したときは、一覧の代わりに、次の知らせを出します。
+
+| とき | 出す文章 |
+|---|---|
+| 接続していない (`githubAuth.value` が `false`) | 「GitHub に接続していません。Account タブから、GitHub に接続してください。」 |
+| 読み込みに失敗した (`scrum.projectsV2.status` が `failed`) | 「Projects を GitHub から読み込めませんでした。(失敗の理由)」と、Account タブで接続の状態を確かめられる旨 |
+
+- 知らせの「Account タブ」は、`/scrum?tab=account` へのリンクです。(参照アプリの URL です。Scrum のページをほかの URL に置いているアプリでは、リンク先がずれます)
+- 0.3.0 までは、接続していないときも、読み込みに失敗したときも、空の一覧を出すだけでした。(0.3.1 で直しました)

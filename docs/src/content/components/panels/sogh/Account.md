@@ -6,9 +6,9 @@ Scrum (`/scrum`) の「Account」タブのパネルです。
 
 - ソース: `packages/ihub.core/src/components/panels/sogh/Account.js`
 
-assemblies の [Account](#/components/assemblies/Account) とは、別の部品です。
-名前が同じなので、取り違えないでください。
+アカウントのページ (`pages.Account`。参照アプリの `/account`) とは、別の部品です。
 GitHub との接続を出すのは、この `panels.sogh.Account` です。
+(0.2.x までは、assemblies にも `Account` という部品がありましたが、使われていなかったため、0.3.0 で外しました)
 
 認証の手順は、[GitHub との連携](#/github) の「OAuth で認証する」にあります。
 

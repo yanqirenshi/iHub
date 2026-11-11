@@ -7,7 +7,7 @@ MUI の `Link` で描き、文字は黒で、下線は薄い灰色の点線で�
 - ソース: `packages/ihub.core/src/components/parts/LinkOutSite.js`
 
 ふつうは、`href` の形でこの部品を選んでくれる [Link](#/components/assemblies/Link) を使います。
-iHub の中では、コックピットの [Card](#/components/panels/cockpit/Card) が、GitHub の Issue へのリンクに使っています。
+iHub の中では、艦橋の [Card](#/components/panels/bridge/Card) が、GitHub の Issue へのリンクに使っています。
 
 ## import のしかた
 

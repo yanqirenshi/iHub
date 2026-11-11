@@ -9,7 +9,7 @@
 | TM | ビジネス (`/business`) の「TM」タブ | エンティティの見出し (名前の部分) | `tm/entities.json` の `position` |
 | 画面遷移図 | 画面 (`/screens`) の「画面遷移図」タブ | 画面のノード | `sitemap/nodes.json` の `position` |
 | システム構成図 | システム構成 (`/system-environment`) の「システム構成図」タブ | ノード | `deployment/nodes.json` の `position` |
-| Overview (ポンチ絵) | コックピット (`/`) の「Overview」タブ | ノード | `overview/nodes.json` の `position` |
+| Overview (ポンチ絵) | 艦橋 (`/`) の「Overview」タブ | ノード | `overview/nodes.json` の `position` |
 
 ## 要素の中身を見る (インスペクタ)
 

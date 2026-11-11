@@ -49,7 +49,7 @@ import { Frame, pages, panels } from '@yanqirenshi/ihub.core';
 
 | 名前 | 内容 |
 |---|---|
-| `pages` | ページ (`pages.Data`・`pages.Cockpit` など) |
+| `pages` | ページ (`pages.Data`・`pages.Bridge` など) |
 | `docPages` | ドキュメントのページ (`docPages.ER`・`docPages.TM` など) |
 | `panels` | ページの中身 (ER 図・TM など) |
 | `Frame`・`FrameTabs`・`FrameWbsNode`・`TabbedPage` など | 中間の部品 (枠・タブのあるページ) |

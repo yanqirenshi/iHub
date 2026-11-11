@@ -27,13 +27,12 @@ import { TabsSearchParam } from '@yanqirenshi/ihub.core';
 |---|---|---|---|
 | `tabs` | array | - | タブの配列。1 つのタブは `{ code, label }`。無いか空のときは、何も描きません |
 | `value` | string | - | 選んでいるタブの `code` |
-| `onChange` | function | `tabs` を渡すとき | タブが変わったときに呼ぶ関数。引数は、選んだタブの `code` |
+| `onChange` | function | - | タブが変わったときに呼ぶ関数。引数は、選んだタブの `code`。渡さないときは、URL の `?tab=` だけを変えます |
 
 ## 使い方の例
 
 ```jsx
 import React from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { TabsSearchParam } from '@yanqirenshi/ihub.core';
 
 const TABS = [
@@ -42,8 +41,8 @@ const TABS = [
 ];
 
 function MyTabs () {
-    const [searchParams] = useSearchParams();
-    const [tab, setTab] = React.useState(searchParams.get('tab'));
+    // 初めは空にしておくと、URL の ?tab= (無ければ先頭のタブ) で onChange が呼ばれる。
+    const [tab, setTab] = React.useState(null);
 
     return (
         <>
@@ -60,9 +59,13 @@ function MyTabs () {
 
 - react-router の中 (`<IHub>` の中) で使ってください。
   `useSearchParams()` を使うためです。
-- 開いたときの URL の `?tab=` は読みません。
-  URL のタブで開くときは、例のように、使う側で `?tab=` を読んで `value` に渡してください。
-- `value` が無いときは、描くときに、先頭のタブの `code` で `onChange` を呼びます。
+- `value` が無いときは、初めのタブを、次の順で決めます。([TabbedPage](#/components/assemblies/TabbedPage) の `usePageTabs` と同じ動きです)
+  1. 開いたときの URL の `?tab=` (`tabs` にある `code` のとき)
+  2. 先頭のタブ (`?tab=` が無いときや、`tabs` に無い値のとき)
+- 初めのタブは、描画のあとに `onChange` で知らせます。
   このときは、URL の `?tab=` は変えません。
+- 0.3.0 までは、次の 2 つが違いました。(0.3.1 で直しました)
+  1. URL の `?tab=` を読まず、いつも先頭のタブを選んでいた
+  2. 描画の途中で `onChange` を呼んでいたため、React の「Cannot update a component while rendering a different component」の警告が出ていた
 - `value` は、`tabs` のどれかの `code` にしてください。
   無い `code` のときは、MUI が警告を出します。

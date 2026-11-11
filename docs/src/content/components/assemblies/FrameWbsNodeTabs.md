@@ -31,7 +31,7 @@ import { FrameWbsNodeTabs } from '@yanqirenshi/ihub.core';
 
 | 名前 | 型 | 必須 | 内容 |
 |---|---|---|---|
-| `wbs_node` | object | 必須 | WBS のノード。`useWbs().get(id)` で引いたものを渡します。無いときは、何も描きません |
+| `wbs_node` | object | 必須 | WBS のノード。ノードのページが受け取る `props.wbs_node` を、そのまま渡せます。無いときは、何も描きません |
 | `tabs` | array | - | タブの配列。1 つのタブは `{ code, label }`。無いか空のときは、タブの並びを出しません |
 | `tab` | string | - | 選んでいるタブの `code` |
 | `onChangeTab` | function | `tabs` を渡すとき | タブが変わったときに呼ぶ関数。引数は、選んだタブの `code` |
@@ -44,10 +44,9 @@ import { FrameWbsNodeTabs } from '@yanqirenshi/ihub.core';
 
 ```jsx
 import React from 'react';
-import { useSearchParams } from 'react-router-dom';
 import Container from '@mui/material/Container';
 
-import { FrameWbsNodeTabs, useWbs } from '@yanqirenshi/ihub.core';
+import { FrameWbsNodeTabs } from '@yanqirenshi/ihub.core';
 
 const TABS = [
     { code: 'overview', label: '概要' },
@@ -55,13 +54,11 @@ const TABS = [
 ];
 
 export default function P1000 (props) {
-    const wbs_node = useWbs().get(props.wbs_node.id);
-
-    const [searchParams] = useSearchParams();
-    const [tab, setTab] = React.useState(searchParams.get('tab'));
+    // 初めは空にしておくと、URL の ?tab= (無ければ先頭のタブ) で onChangeTab が呼ばれる。
+    const [tab, setTab] = React.useState(null);
 
     return (
-        <FrameWbsNodeTabs wbs_node={wbs_node}
+        <FrameWbsNodeTabs wbs_node={props.wbs_node}
                           tabs={TABS}
                           tab={tab}
                           onChangeTab={setTab}>
@@ -80,11 +77,11 @@ export default function P1000 (props) {
   次の 2 つを使うためです。
   1. [Frame](#/components/assemblies/Frame) (設定と redux の store と react-router を読みます)
   2. API サーバーから読み込んだ WBS のデータ (WBS の表)
-- `wbs_node` には、`useWbs().get(id)` で引いたノードを渡します。
-  ノードのページが受け取る `props.wbs_node` (`data/wbs/` の JSON のレコード) をそのまま渡すと、`_id` が無いため、WBS の表がノードから下ではなく全体になります。
-  プロジェクトと WBS のノードでは、見出しのノードの種類 (`_class`) も出ません。
-- `tab` が無いときは、先頭のタブの `code` で `onChangeTab` を呼びます。
-  開いたときの URL の `?tab=` を使うときは、例のように、ページの側で読んでください。
+- `wbs_node` は、中で `useWbs().get(id)` で WBS のノードを引き直して使います。
+  このため、ノードのページが受け取る `props.wbs_node` (`data/wbs/` の JSON のレコード。`_id` と `_class` が無い) をそのまま渡しても、WBS の表はノードから下だけになり、見出しにノードの種類 (`_class`) も出ます。
+  `useWbs().get(id)` で引いたノードを渡しても、同じように動きます。
+  0.3.0 までは、レコードをそのまま渡すと、WBS の表が全体になり、見出しの種類も出ませんでした。(0.3.1 で直しました)
+- `tab` が無いときは、開いたときの URL の `?tab=` (`tabs` にあるもの) で、無ければ先頭のタブの `code` で、`onChangeTab` を呼びます。
   ([TabsSearchParam](#/components/assemblies/TabsSearchParam) の注意も見てください)
 - `maxWidth` は、タブの並びと WBS の表にだけ効きます。
   見出しの幅は `'lg'` のままです。
