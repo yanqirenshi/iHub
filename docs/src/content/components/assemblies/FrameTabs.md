@@ -23,7 +23,7 @@ import { FrameTabs } from '@yanqirenshi/ihub.core';
 | 名前 | 型 | 必須 | 内容 |
 |---|---|---|---|
 | `tabs` | object | 必須 | タブの一覧と、選んでいるタブ。`{ selected, list }` の形 (下の表) |
-| `onChangeTabs` | function | 必須 | タブを押したときに呼ぶ関数。`selected` を押したタブの `code` にした `tabs` の複製を、引数に渡します |
+| `onChangeTabs` | function | - | タブを押したときに呼ぶ関数。`selected` を押したタブの `code` にした `tabs` の複製を、引数に渡します |
 | `children` | node | - | ページの内容 |
 
 `tabs` の形:
@@ -61,4 +61,5 @@ export default function MyPage () {
 
 - `<IHub>` の中で使ってください。
   中で [Frame](#/components/assemblies/Frame) を使うためです。(Frame の注意を見てください)
-- `onChangeTabs` を渡さないと、タブを押したときにエラーになります。
+- `onChangeTabs` を渡さないと、タブを押しても何も起きません。(選んでいるタブは変わりません)
+  0.3.0 までは、渡さないとタブを押したときに `TypeError` になりました。(0.3.1 で直しました)

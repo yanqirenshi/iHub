@@ -12,7 +12,7 @@ const GROUPS = [
         names: [
             'Frame', 'FrameTabs', 'FrameWbsNode', 'FrameWbsNodeTabs',
             'Link', 'TabbedPage', 'TabsSearchParam',
-            'Account', 'GithubOAuth',
+            'GithubOAuth',
             'AddWbsNode', 'WBSTable', 'TableTMRelationships',
         ],
     },
@@ -26,8 +26,8 @@ const GROUPS = [
         ],
     },
     {
-        label: 'panels.cockpit',
-        dir: 'panels/cockpit',
+        label: 'panels.bridge',
+        dir: 'panels/bridge',
         names: ['Monitor', 'Overview', 'Card'],
     },
     {

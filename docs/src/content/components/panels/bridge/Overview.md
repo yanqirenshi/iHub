@@ -1,9 +1,9 @@
 # Overview
 
 ポンチ絵 (なんでもありの概念図) を、@yanqirenshi/d3.unchi で、パネル一杯に描きます。
-コックピット (`/`) の「Overview」タブのパネルです。
+艦橋 (`/`) の「Overview」タブのパネルです。
 
-- ソース: `packages/ihub.core/src/components/panels/cockpit/components/Overview.js`
+- ソース: `packages/ihub.core/src/components/panels/bridge/components/Overview.js`
 
 図のデータは、API サーバーから読み込んだ次のコレクションです。([Overview のデータ](#/diagrams))
 
@@ -28,8 +28,11 @@
 ```jsx
 import { panels } from '@yanqirenshi/ihub.core';
 
-// <panels.cockpit.Overview/>
+// <panels.bridge.Overview/>
 ```
+
+0.2.x までの名前 `panels.cockpit.Overview` も、同じ部品の別名として使えます。
+(0.3.0 で `panels.bridge` に改めました。古い名前は、将来の minor で消すことがあるので、新しい名前に移しておくと安心です)
 
 ## props
 
@@ -46,7 +49,7 @@ import { panels } from '@yanqirenshi/ihub.core';
 const config = {
     // (省略)
     tabs:   { PAGE_DATA: { list: [{ code: 'overview', label: 'Overview' }] } },
-    panels: { PAGE_DATA: { overview: panels.cockpit.Overview } },
+    panels: { PAGE_DATA: { overview: panels.bridge.Overview } },
 };
 ```
 

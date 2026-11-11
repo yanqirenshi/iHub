@@ -227,7 +227,7 @@ npx ihub-srv check data
 
 **コレクションのファイルが無いとき** (データの形式が古くなくても、確かめます)
 
-コピーした時期より後に、iHub に増えたコレクション (例: `data/overview/`。コックピットの Overview タブのデータ) のファイルが、コピー版の `data/` に無いと、`npx ihub-srv check data` が、次のように止まります。
+コピーした時期より後に、iHub に増えたコレクション (例: `data/overview/`。艦橋の Overview タブのデータ) のファイルが、コピー版の `data/` に無いと、`npx ihub-srv check data` が、次のように止まります。
 
 ```
 NG: data (2 件)

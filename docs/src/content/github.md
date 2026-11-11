@@ -46,13 +46,14 @@ REACT_APP_GITHU_PARSONAL_TOKEN=ghp_xxxxxxxxxxxxxxxx
 - 画面の設定では、`github: { token: process.env.REACT_APP_GITHU_PARSONAL_TOKEN }` として渡します。([設定の渡し方](#/customize))
 - トークンを設定すると、サイドメニューに GitHub のアカウントの画像が表示されます。
 
-## コックピット (`/`)
+## 艦橋 (`/`)
 
 自分が担当している (assignee が自分の) GitHub の Issue を、カードで並べます。
 
 ## Scrum (`/scrum`)
 
 GitHub の Projects やリポジトリの情報を見るページです。
+タブは、Repositories・Projects・Account・Help の 4 つです。(初めに開くのは Projects)
 
 | URL | 内容 |
 |---|---|

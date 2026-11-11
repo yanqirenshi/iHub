@@ -14,7 +14,7 @@
 
 | ページ | 主な項目 |
 |---|---|
-| iHub | コックピット・市場・ビジネス・デザイン・画面・API・バッチ・データ・クラス・外部リソース・システム構成・メッセージ・*Ops・Scrum・組織・WBS・Help |
+| iHub | 艦橋・市場・ビジネス・デザイン・画面・API・バッチ・データ・クラス・外部リソース・システム構成・メッセージ・*Ops・Scrum・組織・WBS・Help |
 | Docs | ユーザーシナリオ・カスタマージャーニーマップ・ユースケース・Systemic Design・BPMN・UI Design・画面遷移図・Class図・機能一覧・TM・ER図・UML・PAD |
 | Etc | System Dynamics・DDD・WBS・アカウント・認証・Next.js |
 
@@ -27,14 +27,17 @@ Docs のページは、モデリングの手法などの参考資料をまとめ
 
 | ページ | URL | 内容 |
 |---|---|---|
-| コックピット | `/` | タブ: Cockpit (自分が担当している GitHub の Issue を、カードで並べる)・Overview (ポンチ絵。ノードをドラッグすると位置を保存する) |
+| 艦橋 | `/` | タブ: Cockpit (自分が担当している GitHub の Issue を、カードで並べる)・Overview (ポンチ絵。ノードをドラッグすると位置を保存する) |
 | ビジネス | `/business` | タブ: SYSTEMIC DESIGN・TM・機能一覧・WBS・HELP |
 | 画面 | `/screens` | タブ: 画面遷移図・画面・WBS・Help |
 | データ | `/data` | タブ: ER図・WBS・HELP |
 | システム構成 | `/system-environment` | タブ: システム構成図・WBS・Help |
-| Scrum | `/scrum` | GitHub の Projects・リポジトリ・Issue などを見ます。 |
+| Scrum | `/scrum` | タブ: Repositories・Projects・Account (GitHub との接続)・Help。GitHub の Projects・リポジトリ・Issue などを見ます。 |
 | WBS | `/wbs` | WBS の一覧です。ノードのページは `/wbs/{id}` です。 |
 | Systemic Design | `/systemic-design` | Systemic Design のツールキットのカードを並べます。 |
+
+- 艦橋のページは、0.2.x まで「コックピット」という名前でした。(0.3.0 で改めました。中のタブの「Cockpit」は、名前が変わっていません)
+- Scrum の Timeline・Gantt Chart・Issues・Pull Requests のタブは、中身が無かったため、0.3.0 で外しました。
 
 図の編集のしかたは [図の編集](#/diagrams)、WBS は [WBS](#/wbs) を見てください。
 図の要素を右クリックすると、要素の中身を見られます。([図の編集](#/diagrams) の「要素の中身を見る」)

@@ -8,7 +8,7 @@ iHub の中では、次のところで使っています。
 | 使っているところ | 出すとき |
 |---|---|
 | `<IHub>` の中のデータの読み込み (`DataGate`) | API サーバーからデータ (`GET /api/data`) を読み終えるまで |
-| コックピット (`/`) の「Cockpit」タブ | GitHub につながっていて、Issue を読み終えるまで |
+| 艦橋 (`/`) の「Cockpit」タブ | GitHub につながっていて、Issue を読み終えるまで |
 | Scrum (`/scrum`) の「Repositories」タブ ([Repositories](#/components/panels/sogh/Repositories)) | GitHub につながっていて、リポジトリの一覧を読み終えるまで |
 | Scrum (`/scrum`) の「Projects」タブ ([Projects](#/components/panels/sogh/Projects)) | GitHub につながっていて、Projects の一覧を読み終えるまで |
 | Scrum のプロジェクトのページ (`/scrum/users/:login/projects/:number`) | Project とそのアイテムを読み終えるまで (GitHub につながっていないときは、出したままになります) |
