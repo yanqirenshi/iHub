@@ -369,7 +369,7 @@ const config = {
 
 ## アプリが足した図の位置を覚える
 
-iHub の 5 つの図は、動かした位置と拡大の度合いを、ブラウザに覚えます。([図の編集](#/diagrams) の「図の位置と拡大を覚える」)
+iHub の 6 つの図 (0.3.x までは 5 つ) は、動かした位置と拡大の度合いを、ブラウザに覚えます。([図の編集](#/diagrams) の「図の位置と拡大を覚える」)
 アプリが足したパネルの図 (d3.* の `Rectum`) でも、`useDiagramView` で同じように覚えられます。(0.2.7 以降)
 
 ```jsx
@@ -380,7 +380,7 @@ import { useDiagramView } from '@yanqirenshi/ihub.core';
 const INITIAL_VIEW = { k: 1.0, x: 0.0, y: 0.0 };
 
 function Diagram ({ data }) {
-    // 図の code。アプリの図ごとに、ほかと重ならない名前にする。(iHub の図は er・tm・std・scd・overview)
+    // 図の code。アプリの図ごとに、ほかと重ならない名前にする。(iHub の図は er・tm・std・scd・overview・schedule)
     const bindView = useDiagramView('dfd');
     const [rectum, setRectum] = React.useState(null);
 

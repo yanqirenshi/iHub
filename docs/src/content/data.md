@@ -9,7 +9,7 @@
 |---|---|---|
 | `wbs/projects.json` | WBS のプロジェクト | WBS |
 | `wbs/wbs.json` | WBS のノード | WBS |
-| `wbs/workpackages.json` | ワークパッケージ | WBS |
+| `wbs/workpackages.json` | ワークパッケージ | WBS・艦橋の Schedule |
 | `er/schemas.json` | テーブルの名前空間 (スキーマ) のマスタ | ER 図 |
 | `er/identifiers.json` | 識別子 (主キー) のマスタ | ER 図 |
 | `er/attributes.json` | 属性 (カラム) のマスタ | ER 図 |
@@ -42,6 +42,26 @@
     "name": "デザイン"
 }
 ```
+
+### ワークパッケージの予定の期間 (`plan`)
+
+`wbs/workpackages.json` のワークパッケージには、任意で、予定の期間 (`plan`) を書けます。(0.4.0 以降)
+書いたワークパッケージは、艦橋 (`/`) の「Schedule」タブに、矢羽根で出ます。
+
+```json
+{
+    "id": 1000001,
+    "parent": 1001,
+    "name": "設計",
+    "plan": { "from": "2026-11-01", "to": "2026-11-30" }
+}
+```
+
+- `from` (始まりの日) と `to` (終わりの日) は、`'YYYY-MM-DD'` の日付で、どちらも書きます。
+- `to` は、`from` と同じ日か、あとの日にします。
+- 形の誤り・実在しない日・`to` が `from` より前のときは、`npx ihub-srv check data` と API サーバーの書き込みが、誤りを知らせます。
+- `plan` を書かないワークパッケージは、これまでどおりです。(Schedule タブには出ません)
+- 期間は、画面からは書き換えられません。JSON を直接書きます。
 
 ## id と参照のきまり
 

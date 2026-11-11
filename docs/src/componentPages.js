@@ -28,7 +28,7 @@ const GROUPS = [
     {
         label: 'panels.bridge',
         dir: 'panels/bridge',
-        names: ['Monitor', 'Overview', 'Card'],
+        names: ['Monitor', 'Overview', 'Card', 'Schedule'],
     },
     {
         label: 'panels.sogh',
