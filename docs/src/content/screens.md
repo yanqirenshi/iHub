@@ -27,7 +27,7 @@ Docs のページは、モデリングの手法などの参考資料をまとめ
 
 | ページ | URL | 内容 |
 |---|---|---|
-| 艦橋 | `/` | タブ: Cockpit (自分が担当している GitHub の Issue を、カードで並べる)・Overview (ポンチ絵。ノードをドラッグすると位置を保存する)・Schedule (予定の期間のあるワークパッケージを、矢羽根で並べる。見るだけ) |
+| 艦橋 | `/` | タブ: Cockpit (自分が担当している GitHub の Issue のうち、今日が Plan の期間に入っているものと、NextAction.Date が入っているものを、NextAction.Date の近い順にカードで並べる)・Overview (ポンチ絵。ノードをドラッグすると位置を保存する)・Schedule (予定の期間のあるワークパッケージを、矢羽根で並べる。見るだけ) |
 | ビジネス | `/business` | タブ: SYSTEMIC DESIGN・TM・機能一覧・WBS・HELP |
 | 画面 | `/screens` | タブ: 画面遷移図・画面・WBS・Help |
 | データ | `/data` | タブ: ER図・WBS・HELP |
@@ -37,6 +37,7 @@ Docs のページは、モデリングの手法などの参考資料をまとめ
 | Systemic Design | `/systemic-design` | Systemic Design のツールキットのカードを並べます。 |
 
 - 艦橋のページは、0.2.x まで「コックピット」という名前でした。(0.3.0 で改めました。中のタブの「Cockpit」は、名前が変わっていません)
+- 艦橋の Cockpit タブの絞り込みと並びは、0.5.0 からです。(0.4.x までは、担当の Issue を全部、読み込んだ順に出していました) カードには、NextAction の日付を出し、過ぎた日付は赤で出します。決まりは [GitHub との連携](#/github) の「Cockpit タブに出す Issue」にあります。
 - 艦橋の Schedule タブは、0.4.0 で足しました。(予定の期間の書き方は [データの管理](#/data) の「ワークパッケージの予定の期間」)
 - Scrum の Timeline・Gantt Chart・Issues・Pull Requests のタブは、中身が無かったため、0.3.0 で外しました。
 

@@ -50,6 +50,39 @@ REACT_APP_GITHU_PARSONAL_TOKEN=ghp_xxxxxxxxxxxxxxxx
 
 自分が担当している (assignee が自分の) GitHub の Issue を、カードで並べます。(「Cockpit」タブ)
 
+### Cockpit タブに出す Issue (0.5.0 以降)
+
+自分が担当していて、閉じていない Issue のうち、次のどちらかに当てはまるものだけを出します。
+Issue が入っている Project の、日付の項目で決めます。
+
+1. 今日が、Project の Plan の期間に入っている
+   - 期間は、始まり (`Plan.Start` か `Plan.From`) から、終わり (`Plan.End` か `Plan.To`) までです。(始まりの日と終わりの日も含みます)
+   - 始まりと終わりの両方が入っている Project だけを見ます。
+2. 1 に当てはまらなくても、`NextAction.` で始まる日付の項目 (`NextAction.Date` など) が入っている
+   - 過ぎた日付でも、先の日付でも出します。
+
+Issue が 2 つ以上の Project に入っているときは、どれか 1 つで当てはまれば出します。
+Plan も NextAction も入っていない Issue は、出ません。(0.4.x までは、担当の Issue を全部出していました。すべてを出す切り替えはありません)
+
+Cockpit タブに出したい Issue は、Project で、Plan の期間か `NextAction.Date` を入れてください。
+(ドックの「Issue の追加」で Issue を作るときに、日付も入れられます。下の「Issue を作って Project に追加する」)
+
+### 並びと、カードの日付 (0.5.0 以降)
+
+- カードは、`NextAction.` の日付の近い (早い) 順に並べます。
+  Project によって日付が違うときは、一番近い日付で並べます。
+  日付の無い Issue は、最後に、読み込んだ順で並べます。
+- カードには、`Next: 2026-11-24` のように、NextAction の日付を出します。
+  過ぎた日付 (今日より前) は、赤い太字で出します。
+
+### 出ないとき
+
+| 画面に出るもの | わけ |
+|---|---|
+| 「今日が Plan の期間に入っている Issue と、NextAction.Date が入っている Issue がありません。」 | 担当の Issue はあるが、上の 1・2 に当てはまるものが無い |
+| カードの上に「日付を読み込めなかったので、Issue を絞らずに、読み込んだ順に出しています。」 | Project の日付を読み込めなかった。このときは、担当の Issue を全部、読み込んだ順に出します |
+| 「GitHub に接続していません。…」などの知らせ | GitHub に接続していない・読み込みに失敗した (下の段落) |
+
 GitHub に接続していないときや、GitHub からの読み込みに失敗したときは、艦橋の「Cockpit」タブと、Scrum の「Repositories」「Projects」タブに、知らせの文章を出します。
 知らせの中の「Account タブ」のリンクから、Scrum の Account タブ (`/scrum?tab=account`) へ移って、接続できます。
 (0.3.0 までは、知らせを出さず、空の一覧やカード置き場を出すだけでした)
