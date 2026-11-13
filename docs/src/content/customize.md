@@ -254,6 +254,7 @@ const ICONS = {
 ボタンを足すときは、3 つを合わせて変えてください。
 この 3 つは、`src/index.js` の設定の `operators` で iHub に渡しています。
 アイコンの色には、ドックの色 (`src/operators/dockColor.js`。配色の主の色) を使います。
+GitHub のボタンの吹き出し (Issue の追加) は、ihub.core の部品 [ProjectItemForm](#/components/assemblies/ProjectItemForm) を使います。(0.5.0 以降の雛形。`Operators.js` が `<ProjectItemForm root={root}/>` を描きます)
 
 ## 見た目を変える
 
