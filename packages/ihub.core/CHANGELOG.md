@@ -8,6 +8,19 @@
 
 ドックの「Issue の追加」を、ihub.core の部品 **`ProjectItemForm`** にして公開し、Issue を作るときに、**日付と担当を指定できる**ようにしました。(yanqirenshi/iHub#149)
 
+### 変更 (d3.* などのライブラリを、最新の版にする。yanqirenshi/iHub#164)
+
+- `dependencies` の下限を、最新の版に上げた。(直った版を、必ず使うようにする)
+  - `@yanqirenshi/d3.yabane` `^0.1.15` → `^0.1.17`
+  - `@yanqirenshi/d3.deployment` `^0.11.0` → `^0.11.1`
+  - `@yanqirenshi/d3.ter` `^0.4.0` → `^0.4.1`
+  - `@yanqirenshi/model.deployment`・`model.sitemap`・`model.tm` `^0.1.0` → `^0.1.1`
+  - `@yanqirenshi/d3.er` `^0.6.1` → `^0.6.2`・`d3.sitemap` `^0.9.0` → `^0.9.1`・`colonoscope` `^0.5.0` → `^0.5.1`・`model.unchi` `^0.1.0` → `^0.1.1`
+- **Schedule タブ: 同じ WBS の中で、期間が重なる矢羽根が、重ならなくなった。** (d3.yabane 0.1.17。0.4.0 の「制限 (d3.yabane 0.1.15)」が直った。[Foolsgolds/Assholes#173](https://github.com/Foolsgolds/Assholes/issues/173)) 重なる矢羽根は、重ならない段に分かれて描かれ、行の高さも、段の数に合う。
+- d3.yabane 0.1.17 では、`plan` の無いワークパッケージを渡しても、TypeError にならなくなった。([Foolsgolds/Assholes#174](https://github.com/Foolsgolds/Assholes/issues/174)) iHub の Schedule タブは、これまでどおり、`plan` の無いワークパッケージを渡さない。
+- システム構成図 (d3.deployment 0.11.1) で、線の矢印が描かれる。([Foolsgolds/Assholes#175](https://github.com/Foolsgolds/Assholes/issues/175))
+- 0.4.0 の節の制限の記述は、そのときの記録なので、そのまま残す。
+
 ### 追加 (FrameWbsNodeTabs・TabsSearchParam: タブの中央寄せ。yanqirenshi/iHub#145)
 
 - `TabsSearchParam` に、props `centered` (省略したときは `false` = 左寄せ) と `tabsProps` (MUI の `Tabs` に渡す props。例: `{ variant: 'scrollable' }`) を足した。

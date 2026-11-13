@@ -12,6 +12,7 @@
 
 ## 0.5.0 (2026-11)
 
+- `@yanqirenshi/ihub.core`: `dependencies` の d3.* などの下限を、最新の版に上げた。(d3.yabane 0.1.17: Schedule タブで、同じ WBS の中で期間が重なる矢羽根が、重ならなくなった。d3.deployment 0.11.1: システム構成図で、線の矢印が描かれる。d3.ter 0.4.1・model.deployment/sitemap/tm 0.1.1・d3.er 0.6.2・d3.sitemap 0.9.1・colonoscope 0.5.1・model.unchi 0.1.1) 参照アプリ (ルートの `package.json`) の `@yanqirenshi/d3.network` も、`^0.10.0` にした。
 - `@yanqirenshi/ihub.core`: `FrameWbsNodeTabs` と `TabsSearchParam` に、タブを中央寄せにする props `centered` (省略したときは左寄せ) と、MUI の `Tabs` に渡す props `tabsProps` を足した。(`TabsSearchParam` が決める `value`・`onChange` は、`tabsProps` で上書きできない。`centered` と `tabsProps.centered` の両方があるときは `centered` が優先)
 - `@yanqirenshi/ihub.core`: 艦橋の Cockpit タブに出す Issue を、自分が担当の Issue のうち、今日が Project の Plan の期間 (`Plan.Start`〜`Plan.End`・`Plan.From`〜`Plan.To`。当日を含む) に入っているものと、`NextAction.` の日付が入っているものだけに絞るようにした。(Project に Plan も NextAction も書いていない Issue は、出なくなる。複数の Project のどれか 1 つが当てはまれば出す。0 件のときは、わけを出す。日付を読み込めなかったときは、絞らずに全部を出す。Plan の日付は、NextAction と同じ 1 回の呼び出しで読む)
 - `@yanqirenshi/ihub.core`: 艦橋の Cockpit タブのカードを、Project の `NextAction.Date` の近い順に並べ、カードに日付を出すようにした。(日付の無い Issue は最後で、元の順。複数の Project で違うときは一番近い日付。過ぎた日付は赤で太字。日付は、自分が担当の Issue だけ、100 件ずつまとめて読む。読み込めなかったときは、これまでの並びで出す。Project に `NextAction.` の日付を書いていなければ、並びは変わらない)
