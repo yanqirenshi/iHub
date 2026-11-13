@@ -12,6 +12,7 @@
 
 ## 0.5.0 (2026-11)
 
+- `@yanqirenshi/ihub.core`: `FrameWbsNodeTabs` と `TabsSearchParam` に、タブを中央寄せにする props `centered` (省略したときは左寄せ) と、MUI の `Tabs` に渡す props `tabsProps` を足した。(`TabsSearchParam` が決める `value`・`onChange` は、`tabsProps` で上書きできない。`centered` と `tabsProps.centered` の両方があるときは `centered` が優先)
 - `@yanqirenshi/ihub.core`: 艦橋の Cockpit タブに出す Issue を、自分が担当の Issue のうち、今日が Project の Plan の期間 (`Plan.Start`〜`Plan.End`・`Plan.From`〜`Plan.To`。当日を含む) に入っているものと、`NextAction.` の日付が入っているものだけに絞るようにした。(Project に Plan も NextAction も書いていない Issue は、出なくなる。複数の Project のどれか 1 つが当てはまれば出す。0 件のときは、わけを出す。日付を読み込めなかったときは、絞らずに全部を出す。Plan の日付は、NextAction と同じ 1 回の呼び出しで読む)
 - `@yanqirenshi/ihub.core`: 艦橋の Cockpit タブのカードを、Project の `NextAction.Date` の近い順に並べ、カードに日付を出すようにした。(日付の無い Issue は最後で、元の順。複数の Project で違うときは一番近い日付。過ぎた日付は赤で太字。日付は、自分が担当の Issue だけ、100 件ずつまとめて読む。読み込めなかったときは、これまでの並びで出す。Project に `NextAction.` の日付を書いていなければ、並びは変わらない)
 - `@yanqirenshi/ihub.core`: ドックの「Issue の追加」を、ihub.core の部品 `ProjectItemForm` にして公開し、Issue を作るときに、日付と担当を指定できるようにした。(日付: 選んだ Project の `Plan.*`・`NextAction.*` の日付の項目。空は設定しない。担当: 作成先のリポジトリの `assignableUsers` から複数選べ、初めは自分。雛形の `src/operators/ProjectItemForm.js` は消し、ihub.core の部品を使う形に変わった。移らなくても、今のコピーは、そのまま動く) `dependencies` に `@yanqirenshi/markdown.sitter` を移した。

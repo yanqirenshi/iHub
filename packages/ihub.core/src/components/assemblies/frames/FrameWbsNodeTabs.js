@@ -10,6 +10,11 @@ import TabsSearchParam from '../../assemblies/TabsSearchParam.js';
 
 import { useWbs } from '../../../manegers/wbs.js';
 
+// props:
+//   tabs・tab・onChangeTab … タブ (TabsSearchParam に渡す。tab が選んでいるタブの code)
+//   centered   … タブを中央寄せにする。(省略したときは、左寄せ)
+//   tabsProps  … タブ (MUI の Tabs) に渡す props。(TabsSearchParam を参照)
+//   maxWidth   … 内容の幅。(省略したときは "lg")
 export default function FrameWbsNodeTabs (props) {
     const tabs = props.tabs;
     const tab  = props.tab;
@@ -32,7 +37,8 @@ export default function FrameWbsNodeTabs (props) {
             <HeadWbsPage value={wbs_node}/>
 
             <Container maxWidth={maxWidth}>
-              <TabsSearchParam tabs={tabs} value={tab} onChange={onChangeTab}/>
+              <TabsSearchParam tabs={tabs} value={tab} onChange={onChangeTab}
+                               centered={props.centered} tabsProps={props.tabsProps}/>
             </Container>
 
             {children}
