@@ -12,6 +12,7 @@
 
 ## 0.5.0 (2026-11)
 
+- `@yanqirenshi/ihub.core`: 艦橋の Cockpit タブのカードを、Project の `NextAction.Date` の近い順に並べ、カードに日付を出すようにした。(日付の無い Issue は最後で、元の順。複数の Project で違うときは一番近い日付。過ぎた日付は赤で太字。日付は、自分が担当の Issue だけ、100 件ずつまとめて読む。読み込めなかったときは、これまでの並びで出す。Project に `NextAction.` の日付を書いていなければ、並びは変わらない)
 - `@yanqirenshi/ihub.core`: ドックの「Issue の追加」を、ihub.core の部品 `ProjectItemForm` にして公開し、Issue を作るときに、日付と担当を指定できるようにした。(日付: 選んだ Project の `Plan.*`・`NextAction.*` の日付の項目。空は設定しない。担当: 作成先のリポジトリの `assignableUsers` から複数選べ、初めは自分。雛形の `src/operators/ProjectItemForm.js` は消し、ihub.core の部品を使う形に変わった。移らなくても、今のコピーは、そのまま動く) `dependencies` に `@yanqirenshi/markdown.sitter` を移した。
 - `@yanqirenshi/ihub.srv`: コードの変更は無い。(版をそろえるだけ)
 

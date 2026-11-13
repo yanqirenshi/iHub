@@ -8,7 +8,18 @@
 
 ドックの「Issue の追加」を、ihub.core の部品 **`ProjectItemForm`** にして公開し、Issue を作るときに、**日付と担当を指定できる**ようにしました。(yanqirenshi/iHub#149)
 
-### 追加
+### 追加 (艦橋の Cockpit タブ: NextAction.Date で並べる。yanqirenshi/iHub#150)
+
+- 艦橋の Cockpit タブの Issue のカードを、Project の `NextAction.Date` の**近い (早い) 順**に並べるようにした。
+  - 日付の無い Issue は、最後で、その中は、これまでの並び (GitHub から読み込んだ順) のまま。同じ日付のものも、これまでの並びのまま。
+  - 1 つの Issue が複数の Project に入っていて、日付が違うときは、一番近い (早い) 日付を使う。名前が `NextAction.` で始まる日付の項目 (`NextAction.Date` など) の値を使う。(#149 の日付の欄と同じ考え)
+  - カードに、「Next: 2026-11-24」のように、日付を出す。過ぎた日付 (今日より前) は、赤で太字にする。(今日は、過ぎていない)
+  - 日付は、Issue を読んだあと、**自分が担当の Issue (カードになるもの) だけ**を、GitHub の GraphQL (`nodes(ids:)`) で、100 件ずつまとめて読む。(Issue の数だけは呼ばない。sogh は変えていない)
+  - 日付の読み込みに失敗しても、カードは、これまでの並びで出し、「NextAction の日付を読み込めなかったので、カードは、読み込んだ順に並べています。(理由)」と、カードの上に控えめに出す。
+  - Project の項目の値を読む部分 (`manegers/githubProject.js` の `fetchIssueDateValues`・`valuesByFieldPrefix`) は、項目の名前の頭で選ぶ作りにした。(Project の `Plan.*` で Issue を絞る iHub#148 でも使える) 並べ替えと過ぎた日付の判定は、`manegers/nextAction.js`。GraphQL を呼ぶ共通の部分は `manegers/githubGraphql.js` (`githubIssue.js` も、これを使う)
+  - `panels.bridge.Monitor` に、カードの上に出す知らせの props `notice` (省略できる) を足した。
+
+### 追加 (Issue の追加: 日付と担当。yanqirenshi/iHub#149)
 
 - 日付: 選んだ Project の日付 (`DATE`) の項目のうち、名前が `Plan.` で始まるもの (`Plan.Start`・`Plan.End`・`Plan.From`・`Plan.To` など) と、`NextAction.` で始まるもの (`NextAction.Date`) を、日付の欄にして出す。(並びは、Project の項目の順。実績の `Result.*` と、それ以外の日付の項目 (`Start date` など) は、出さない) Project に足したあと、入れた日付を `updateProjectV2ItemFieldValue` で設定する。空の欄は、設定しない。当てはまる項目が無い Project では、日付の欄を出さない。
 - 担当: 作成先のリポジトリで担当にできる人 (`assignableUsers`) から、複数選べる。初めは、ログイン中の自分が選ばれている。(自分が担当にできないリポジトリなら、空) 外すと、担当なしで作る。`createIssue` の `assigneeIds` で渡す。
@@ -25,6 +36,7 @@
 
 ### 利用側への影響
 
+- Cockpit タブの並び: Project に `NextAction.` の日付を書いている Issue があると、並びが、日付の近い順に変わる。書いていなければ、これまでと同じ並び。(カードに、日付が出るだけ)
 - **移らなくても、アプリの今のコピー (`src/operators/ProjectItemForm.js`) は、そのまま動く。** (日付と担当の欄は、出ない。アプリの `package.json` の `@yanqirenshi/markdown.sitter` は、残す)
 - 日付と担当を使うには、アプリを、ihub.core の部品を使う形に移す。
   1. `src/operators/ProjectItemForm.js` を消す。
@@ -35,7 +47,12 @@
 
 ### 確かめた
 
-- GitHub の GraphQL の問い合わせを、**実際の GitHub に対して、読み取りだけで**確かめた。
+- Cockpit タブの NextAction の並び (#150):
+  - 実際の GitHub に対して、**読み取りだけで**、実装と同じ問い合わせ (`nodes(ids:)` で、Issue の `projectItems` の日付の値) を、自分が担当の open の Issue 16 件に、1 回の呼び出しで流して、16 件ぶんの値が返ることを確かめた。(iHub の Project 50 (71 件) には、いまは `NextAction` の日付が 1 つも無く、実データでは、並びを確かめられなかった。`Plan.*` の値は、自分が担当の 9 件に入っていて、読めた)
+  - 偽の `fetch` で、純粋な関数と読み込みを、25 項目確かめた。(複数の Project で違うときは一番近い日付・`Plan.`・`Result.` は NextAction に使わない・近い順で、日付なしは最後で元の順・同じ日付も元の順・今日は過ぎていない・250 件は 100 件ずつ 3 回・失敗は例外・#149 の Issue の作成が、共通の GraphQL の部分でも動く)
+  - 参照アプリを、別のポートで起動し、GitHub の応答を偽物にした確認用のページ (確かめたあと消した) で、本物の艦橋のページを動かした。7 件の Issue (日付なし 2・過ぎた日付・今日・先の日付・2 つの Project に別の日付・他の人の担当) で、自分が担当の 6 件の日付が、1 回の呼び出しで読まれ、「過ぎた日付 (赤・太字) → 今日 → 2 つの Project の早い方 → 先の日付 → 日付なし 2 件 (元の順)」に並んだ。他の人の担当は、出なかった。
+  - 日付の読み込みを失敗させると、カードは、読み込んだ順に出て、知らせが出た。GitHub に未接続のときの知らせ (0.3.1 の #131) は、これまでどおり。
+- GitHub の GraphQL の問い合わせ (#149) を、**実際の GitHub に対して、読み取りだけで**確かめた。
   - スキーマ: `CreateIssueInput.assigneeIds` は `[ID!]`。`UpdateProjectV2ItemFieldValueInput` は `projectId`・`itemId`・`fieldId`・`value`。`ProjectV2FieldValue.date` は `Date`。`ProjectV2FieldCommon` (`id`・`name`・`dataType`) は、各項目の型が実装する。
   - iHub の Project の日付の項目は、`Result.Start`・`Result.End`・`Plan.Start`・`Plan.End`・`NextAction.Date`。作成先は `yanqirenshi/iHub`。担当にできる人と、ログイン中の自分も、取れた。
   - 別の Project では、`Start date`・`Target date` (名前が `Plan.` で始まらない日付) もあり、日付の欄から除かれることを、判定の関数で確かめた。

@@ -1,7 +1,7 @@
 // GitHub の Issue を作って、Project に足す。(ドックの「Issue の追加」。assemblies/ProjectItemForm.js)
 // sogh には、Issue の作成・Project への追加・項目の設定がないため、GraphQL API を直接呼ぶ。
 
-import sogh from './sogh.js';
+import { graphql } from './githubGraphql.js';
 
 // 日付の欄にする、Project の項目の名前の頭。(型が DATE のもの)
 //   Plan.      … 予定の期間 (Plan.Start・Plan.End・Plan.From・Plan.To など。Project ごとに名前が違う)
@@ -59,24 +59,6 @@ mutation ($projectId: ID!, $itemId: ID!, $fieldId: ID!, $date: Date!) {
     projectV2Item { id }
   }
 }`;
-
-async function graphql (query, variables) {
-    const response = await fetch(sogh.endpoint(), {
-        method: 'POST',
-        headers: sogh.makeHeader(),
-        body: JSON.stringify({ query, variables }),
-    });
-
-    const json = await response.json().catch(()=> null);
-
-    if (!response.ok)
-        throw new Error(json?.message || `HTTP ${response.status}`);
-
-    if (json?.errors?.length)
-        throw new Error(json.errors.map(e=> e.message).join('\n'));
-
-    return json.data;
-}
 
 // Project に紐づいた先頭のリポジトリを、Issue の作成先にする。
 // (GitHub の API に Project の Default repository の項目がないため)

@@ -9,8 +9,10 @@ const MASONRY_OPTIONS = {
 
 // カードを masonry (石積み) レイアウトで並べる。
 // 列数は Masonry が親の幅から決める。
+//   notice … カードの上に出す短い知らせ (省略できる)
 export default function Monitor (props) {
     const children = props.children;
+    const notice = props.notice;
 
     return (
         <Box sx={{
@@ -21,6 +23,8 @@ export default function Monitor (props) {
             px: '111px', // サイドメニューとドックにカードが隠れないようにする
             boxSizing: 'border-box',
         }}>
+          {notice}
+
           {/* enableResizableChildren: 表示後にカードの高さが変わっても (フォントの読み込みなど) 並び直す */}
           <Masonry options={MASONRY_OPTIONS}
                    enableResizableChildren
