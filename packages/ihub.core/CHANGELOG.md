@@ -8,6 +8,14 @@
 
 ドックの「Issue の追加」を、ihub.core の部品 **`ProjectItemForm`** にして公開し、Issue を作るときに、**日付と担当を指定できる**ようにしました。(yanqirenshi/iHub#149)
 
+### 追加 (FrameWbsNodeTabs・TabsSearchParam: タブの中央寄せ。yanqirenshi/iHub#145)
+
+- `TabsSearchParam` に、props `centered` (省略したときは `false` = 左寄せ) と `tabsProps` (MUI の `Tabs` に渡す props。例: `{ variant: 'scrollable' }`) を足した。
+  - `value`・`onChange` は `TabsSearchParam` が決めるので、`tabsProps` に入っていても無視する。
+  - `centered` と `tabsProps.centered` の両方があるときは、`centered` を優先する。
+- `FrameWbsNodeTabs` も `centered`・`tabsProps` を受け取り、そのまま `TabsSearchParam` に渡す。省略したときは、今までどおり左寄せ。
+- これまで必要だった、`FrameWbsNodeTabs` を `Box` で囲んで MUI のクラス名 (`.MuiTabs-flexContainer`) に CSS を当てる方法は、要らなくなる。(`children` の中のタブには効かない)
+
 ### 変更 (艦橋の Cockpit タブ: 出す Issue を絞る。yanqirenshi/iHub#148)
 
 - 艦橋の Cockpit タブに出す Issue を、自分が担当の Issue のうち、次のどちらかに当てはまるものだけに絞るようにした。**Project に Plan も NextAction も書いていない Issue は、出なくなる。**

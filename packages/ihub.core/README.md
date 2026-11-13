@@ -367,6 +367,25 @@ import { IHub, pages, Frame } from '@yanqirenshi/ihub.core';
 | `dataApi`・`useGetDataQuery`・`usePatchCollectionMutation`・`useAddRecordMutation`・`usePatchRecordMutation`・`useCollections`・`errorMessage` | API サーバーからのデータの読み書き |
 | `fetchRepositories`・`fetchProjectsV2` | GitHub (Scrum) |
 
+## タブの寄せ (FrameWbsNodeTabs・TabsSearchParam)
+
+`FrameWbsNodeTabs` と、その中で使っている `TabsSearchParam` (URL の `?tab=` を使うタブ) は、タブの出し方を、props で変えられます。(0.5.0 以降)
+
+| props | 内容 |
+|---|---|
+| `centered` | `true` で、タブを中央寄せにします。省略したときは `false` (左寄せ) |
+| `tabsProps` | MUI の `Tabs` に渡す props です。(例: `{ variant: 'scrollable' }`) |
+
+- `value`・`onChange` は、タブを選ぶ仕組みが決めるので、`tabsProps` に入れても無視します。
+- `centered` と `tabsProps.centered` の両方があるときは、`centered` を使います。
+- `FrameWbsNodeTabs` に渡した `centered`・`tabsProps` は、そのまま `TabsSearchParam` に渡ります。`children` の中のタブには、効きません。
+
+```jsx
+<FrameWbsNodeTabs tabs={TABS} tab={tab} onChangeTab={setTab} wbs_node={wbs_node} centered>
+  …
+</FrameWbsNodeTabs>
+```
+
 ## CSS
 
 `<IHub>` が、bulma と iHub の CSS (`index.css`) を読みます。

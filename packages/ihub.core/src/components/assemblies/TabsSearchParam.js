@@ -8,12 +8,18 @@ import Tab from '@mui/material/Tab';
 //   tabs:     [{ code, label }]
 //   value:    選んでいるタブの code
 //   onChange: (code)=> ...
+//   centered: タブを中央寄せにする。(省略したときは false = 左寄せ)
+//   tabsProps: MUI の Tabs に渡す props。(例: { variant: 'scrollable' })
+//     value・onChange は、ここで決めるので、tabsProps に入っていても無視する。
+//     centered と tabsProps.centered の両方があるときは、centered を優先する。
 // value が空のときの初めのタブは、URL の ?tab= (tabs にあるもの)。無ければ先頭のタブ。(usePageTabs と同じ)
 // 初めのタブは、描画のあとに (useEffect で) onChange に知らせる。(描画の途中で、親の setState を呼ばない)
 export default function TabsSearchParam (props) {
     const tabs = props.tabs || [];
     const tab = props.value;
     const onChange = props.onChange;
+    const tabsProps = props.tabsProps || {};
+    const centered = props.centered ?? tabsProps.centered ?? false;
 
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -36,7 +42,7 @@ export default function TabsSearchParam (props) {
     };
 
     return (
-        <Tabs value={tab || initial} onChange={changeTab}>
+        <Tabs {...tabsProps} centered={centered} value={tab || initial} onChange={changeTab}>
           {tabs.map((tab) => (
             <Tab key={tab.code}
                  label={tab.label}
