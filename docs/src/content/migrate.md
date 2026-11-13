@@ -61,16 +61,16 @@ npx --yes --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ih
 
 **消すもの**
 
-- iHub 本体が持つパッケージ: `@yanqirenshi/colonoscope`・`d3.deployment`・`d3.er`・`d3.sitemap`・`d3.ter`・`d3.unchi`・`d3.yabane` (0.4.0 以降)・`menubook`・`model.*`・`react-masonry-component`・`table.wbs`・`beach`、`@splidejs/react-splide`・`@uiw/react-md-editor`・`bulma`・`react-measure`・`sogh`・`tion`、サーバーの `hono`・`@hono/node-server`・`ajv`・`ajv-i18n`
+- iHub 本体が持つパッケージ: `@yanqirenshi/colonoscope`・`d3.deployment`・`d3.er`・`d3.sitemap`・`d3.ter`・`d3.unchi`・`d3.yabane` (0.4.0 以降)・`markdown.sitter` (0.5.0 以降)・`menubook`・`model.*`・`react-masonry-component`・`table.wbs`・`beach`、`@splidejs/react-splide`・`@uiw/react-md-editor`・`bulma`・`react-measure`・`sogh`・`tion`、サーバーの `hono`・`@hono/node-server`・`ajv`・`ajv-i18n`
 - `react-router`。(`react-router-dom` が、必要な `react-router` を持ってきます。アプリの `package.json` に `react-router` も書いていると、`react-router-dom` の中の版とずれて 2 つ入り、`/wbs/{id}` のページが空になることがあります。[困ったとき](#/troubleshooting) を見てください)
 - `overrides` の、`tion` の `react-router-dom` の項目。(`tion` 0.1.3 以降では、要りません。`tion` は消すので、`overrides` ごと消します)
 
 **残すもの**
 
-アプリが直接使うパッケージです。(例: `@yanqirenshi/manipulater`・`@yanqirenshi/markdown.sitter`・`react`・`react-redux`・`react-router-dom`・`@mui/*`・`@emotion/*`、DFD などを足していたときの `@yanqirenshi/d3.dfd`)
+アプリが直接使うパッケージです。(例: `@yanqirenshi/manipulater`・`react`・`react-redux`・`react-router-dom`・`@mui/*`・`@emotion/*`、DFD などを足していたときの `@yanqirenshi/d3.dfd`)
 
 上の「消すもの」に挙げたパッケージでも、**アプリの `src/` が `import` しているものは、消さずに残します。**
-(iHub 本体が持っていても、アプリが直接 `import` するときは、アプリの `dependencies` に要ります。例: `src/wbs/` のページが `tion` を使う・Help のセクションが `@splidejs/react-splide` を使う)
+(iHub 本体が持っていても、アプリが直接 `import` するときは、アプリの `dependencies` に要ります。例: `src/wbs/` のページが `tion` を使う・Help のセクションが `@splidejs/react-splide` を使う・0.4.x までの雛形の `src/operators/ProjectItemForm.js` を使い続けるときの `@yanqirenshi/markdown.sitter`)
 消す前に、`src/` で `import` されていないかを、確かめてください。
 
 ```

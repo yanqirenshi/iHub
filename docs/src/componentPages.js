@@ -12,7 +12,7 @@ const GROUPS = [
         names: [
             'Frame', 'FrameTabs', 'FrameWbsNode', 'FrameWbsNodeTabs',
             'Link', 'TabbedPage', 'TabsSearchParam',
-            'GithubOAuth',
+            'GithubOAuth', 'ProjectItemForm',
             'AddWbsNode', 'WBSTable', 'TableTMRelationships',
         ],
     },

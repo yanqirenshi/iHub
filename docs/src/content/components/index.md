@@ -30,6 +30,7 @@
 | [TabbedPage](#/components/assemblies/TabbedPage) | タブのあるページを描きます。 |
 | [TabsSearchParam](#/components/assemblies/TabsSearchParam) | タブの並びを描きます。 |
 | [GithubOAuth](#/components/assemblies/GithubOAuth) | GitHub との接続の状態と、認証と切断のボタンを描きます。 |
+| [ProjectItemForm](#/components/assemblies/ProjectItemForm) | ドックの「Project にイシューを追加」の吹き出しを描きます。担当と日付も指定できます。(0.5.0 以降) |
 | [AddWbsNode](#/components/assemblies/AddWbsNode) | WBS のノード (`parent`) の下に、子のノードを追加するフォームを描きます。 |
 | [WBSTable](#/components/assemblies/WBSTable) | WBS の表を描きます。 |
 | [TableTMRelationships](#/components/assemblies/TableTMRelationships) | TM (T 字形 ER) の、関係の種類と、その形 (パターン) の早見表を描きます。 |
