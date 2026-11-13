@@ -83,7 +83,7 @@ test('login は GitHub の認可画面へ送り出す', async ()=> {
     assert.equal(url.origin + url.pathname, 'https://github.com/login/oauth/authorize');
     assert.equal(url.searchParams.get('client_id'), 'cid');
     assert.equal(url.searchParams.get('redirect_uri'), `http://${HOST}/api/github/oauth/callback`);
-    assert.equal(url.searchParams.get('scope'), 'repo project read:org');
+    assert.equal(url.searchParams.get('scope'), 'repo project read:org read:user');
     assert.match(url.searchParams.get('state'), /^[0-9a-f]{32}$/);
 });
 
