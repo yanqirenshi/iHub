@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.5.0 (2026-11)
+
+- `@yanqirenshi/ihub.core`: ドックの「Issue の追加」を、ihub.core の部品 `ProjectItemForm` にして公開し、Issue を作るときに、日付と担当を指定できるようにした。(日付: 選んだ Project の `Plan.*`・`NextAction.*` の日付の項目。空は設定しない。担当: 作成先のリポジトリの `assignableUsers` から複数選べ、初めは自分。雛形の `src/operators/ProjectItemForm.js` は消し、ihub.core の部品を使う形に変わった。移らなくても、今のコピーは、そのまま動く) `dependencies` に `@yanqirenshi/markdown.sitter` を移した。
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(版をそろえるだけ)
+
 ## 0.4.0 (2026-11)
 
 - `@yanqirenshi/ihub.core`: 艦橋に、Schedule タブを足した。(`panels.bridge.Schedule`。予定の期間 `plan` のあるワークパッケージを、矢羽根 (@yanqirenshi/d3.yabane) で並べる。見るだけ。矢羽根を押すと `/wbs/{id}` へ移る。図の位置と拡大を覚える。`plan` が 1 つも無いときは、書き方の知らせを出す。制限: 同じ WBS の中で期間が重なる矢羽根は、重なって描かれる。d3.yabane 側の件で、[Foolsgolds/Assholes#173](https://github.com/Foolsgolds/Assholes/issues/173)) `dependencies` に `@yanqirenshi/d3.yabane` を足した。(`plan` を書かなければ、何も変わらない)

@@ -4,6 +4,51 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.5.0 (2026-11)
+
+ドックの「Issue の追加」を、ihub.core の部品 **`ProjectItemForm`** にして公開し、Issue を作るときに、**日付と担当を指定できる**ようにしました。(yanqirenshi/iHub#149)
+
+### 追加
+
+- 日付: 選んだ Project の日付 (`DATE`) の項目のうち、名前が `Plan.` で始まるもの (`Plan.Start`・`Plan.End`・`Plan.From`・`Plan.To` など) と、`NextAction.` で始まるもの (`NextAction.Date`) を、日付の欄にして出す。(並びは、Project の項目の順。実績の `Result.*` と、それ以外の日付の項目 (`Start date` など) は、出さない) Project に足したあと、入れた日付を `updateProjectV2ItemFieldValue` で設定する。空の欄は、設定しない。当てはまる項目が無い Project では、日付の欄を出さない。
+- 担当: 作成先のリポジトリで担当にできる人 (`assignableUsers`) から、複数選べる。初めは、ログイン中の自分が選ばれている。(自分が担当にできないリポジトリなら、空) 外すと、担当なしで作る。`createIssue` の `assigneeIds` で渡す。
+- 失敗の知らせ: Issue は作れたが、Project に足せなかったとき・日付を設定できなかったときは、どの Issue かが分かるリンクと、理由 (日付は、設定できなかった項目の名前) を出す。(日付は、1 つが失敗しても、残りを設定する) 項目や担当を読み込めなかったときは、その旨を出して、日付なし・担当なしで作れる。
+
+### 変更
+
+- ドックの「Issue の追加」の吹き出しの中身を、雛形 (`src/operators/ProjectItemForm.js`) から、ihub.core の `assemblies` に移して、`ProjectItemForm` として公開した。(`import { ProjectItemForm } from '@yanqirenshi/ihub.core'`) GitHub の呼び出し (Issue の作成・Project への追加・項目の設定・担当の取得) は、`manegers/githubIssue.js` にある。
+  - 吹き出しの位置 (`root`) は、これまでどおり、使う側 (雛形の `src/operators/Operators.js`) から渡す。
+  - 吹き出しの枠の色は、雛形の `dockColor.js` ではなく、設定の `colors` (配色の主の色。ドックのボタンと同じ) から決める。
+  - 作成先のリポジトリの決め方 (Project に紐づいた先頭のリポジトリ) は、そのまま。
+- `dependencies` に `@yanqirenshi/markdown.sitter` の `^0.1.5` を足した。(本文の Markdown の編集。雛形の `package.template.json` と、参照アプリの `package.json` からは、外した)
+- 雛形の `src/operators/ProjectItemForm.js` を消し、`src/operators/Operators.js` は、ihub.core の `ProjectItemForm` を使う。
+
+### 利用側への影響
+
+- **移らなくても、アプリの今のコピー (`src/operators/ProjectItemForm.js`) は、そのまま動く。** (日付と担当の欄は、出ない。アプリの `package.json` の `@yanqirenshi/markdown.sitter` は、残す)
+- 日付と担当を使うには、アプリを、ihub.core の部品を使う形に移す。
+  1. `src/operators/ProjectItemForm.js` を消す。
+  2. `src/operators/Operators.js` の `import ProjectItemForm from './ProjectItemForm.js'` を、`import { ProjectItemForm } from '@yanqirenshi/ihub.core'` にする。(`<ProjectItemForm root={root}/>` の書き方は、そのまま)
+  3. `src/operators/dockColor.js` は、ほかの吹き出し (`Other.js`・`AccountMenuSettings.js`・`labels.js`) が使っていれば、残す。
+  4. `package.json` の `@yanqirenshi/markdown.sitter` は、アプリのほかのところで使っていなければ、消せる。
+- 日付の項目の名前 (`Plan.`・`NextAction.`) は、iHub の Project の決まりに合わせてある。この名前の日付の項目が無い Project では、日付の欄は出ない。
+
+### 確かめた
+
+- GitHub の GraphQL の問い合わせを、**実際の GitHub に対して、読み取りだけで**確かめた。
+  - スキーマ: `CreateIssueInput.assigneeIds` は `[ID!]`。`UpdateProjectV2ItemFieldValueInput` は `projectId`・`itemId`・`fieldId`・`value`。`ProjectV2FieldValue.date` は `Date`。`ProjectV2FieldCommon` (`id`・`name`・`dataType`) は、各項目の型が実装する。
+  - iHub の Project の日付の項目は、`Result.Start`・`Result.End`・`Plan.Start`・`Plan.End`・`NextAction.Date`。作成先は `yanqirenshi/iHub`。担当にできる人と、ログイン中の自分も、取れた。
+  - 別の Project では、`Start date`・`Target date` (名前が `Plan.` で始まらない日付) もあり、日付の欄から除かれることを、判定の関数で確かめた。
+- 偽の `fetch` (GitHub の応答だけ偽物) で、GitHub への呼び出しの順序と中身を確かめた。(26 項目): 日付の項目の判定 (`Plan.*`・`NextAction.*` だけ。`Result.*`・`DATE` でないもの・`Plan.` で始まらないものは、除く)・Project の順の並び・担当の初めの選び方・`createIssue` に `assigneeIds` が渡る・空の日付は設定しない・担当なしは `[]`・Project に足せないとき・日付の 1 つが失敗しても残りを設定する・Issue を作れないとき。
+- 参照アプリを、別のポートで起動し、GitHub の応答を偽物にした確認用のページで、本物の `ProjectItemForm` を動かして確かめた。(確認用のページは、確かめたあとに消した)
+  - 日付の欄: iHub 型の Project は `Plan.Start`・`Plan.End`・`NextAction.Date` (`Result.*` は出ない)。Assholes 型は `Plan.From`・`Plan.To`。日付の項目が無い Project は、欄なし。
+  - 担当: 初めは自分。複数選べ、外すと `assigneeIds: []`。
+  - 日付 2 つ + 担当 2 人で作ると、`createIssue` → `addProjectV2ItemById` → 日付 2 回の順で呼ばれ、空の `Plan.End` は設定されなかった。作ったあと、タイトル・日付が空に戻り、担当が初めの選び方に戻った。
+  - 日付の設定の失敗・Project への追加の失敗・Issue の作成の失敗の、どれも、リンクと理由が出た。(日付の失敗では、残りの日付は設定された)
+- ドックの GitHub のボタンから、雛形の `Operators.js` を通して、ihub.core の `ProjectItemForm` が開いた。(未接続のときは「Github に接続していません。」) 枠の色は、ドックのボタンと同じ。
+- `npm run build` が通った。
+- 確かめていない: **本物の GitHub に、Issue を作ること** (Issue の作成・Project への書き込みは、確認を取ってからにするため、していない)。hub が使う個人用アクセストークン・OAuth のトークンの権限での動き。
+
 ## 0.4.0 (2026-11)
 
 艦橋に **Schedule タブ**を足し、WBS のワークパッケージに、予定の期間 (`plan`) を書けるようにしました。(yanqirenshi/iHub#133)

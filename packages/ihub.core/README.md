@@ -253,6 +253,24 @@ export default function Section01 ({ size }) {
 - 図の位置と拡大の度合いは、ほかの図と同じように、覚えます。(図の code は `schedule`)
 - `plan` のあるワークパッケージが 1 つも無いときは、図の代わりに、書き方の知らせを出します。
 
+## ドックの「Issue の追加」
+
+ドックの GitHub のボタンは、「Project にイシューを追加」の吹き出しを開きます。(0.5.0 以降は、`ProjectItemForm` として、ihub.core が持っています)
+Project を選び、タイトルと本文 (Markdown) を書いて、Project に紐づいた先頭のリポジトリに、Issue を作り、Project に足します。
+
+- **日付**: 選んだ Project の日付の項目のうち、名前が `Plan.` で始まるもの (`Plan.Start`・`Plan.End`・`Plan.From`・`Plan.To` など) と、`NextAction.` で始まるもの (`NextAction.Date`) が、日付の欄になります。(並びは、Project の項目の順。実績の `Result.*` は、出しません) 空の欄は、設定しません。当てはまる項目が無い Project では、日付の欄は出ません。
+- **担当**: 作成先のリポジトリで担当にできる人 (`assignableUsers`) から、複数選べます。初めは、ログイン中の自分が選ばれます。(自分が担当にできないリポジトリなら、空) 外すと、担当なしで作ります。
+- Issue は作れたが、Project に足せなかったとき・日付を設定できなかったときは、どの Issue かが分かるリンクと、理由を出します。
+- 吹き出しの枠の色は、設定の `colors` (配色の主の色。ドックのボタンと同じ) から決まります。吹き出しの位置は、使う側 (雛形の `src/operators/Operators.js`) が、ドックのボタン `root` を渡して決めます。
+
+```jsx
+import { ProjectItemForm } from '@yanqirenshi/ihub.core';
+
+// src/operators/Operators.js (ドックのボタンの code ごとに、吹き出しの中身を選ぶ)
+if ('b'===root.code)
+    return <ProjectItemForm root={root}/>;
+```
+
 ## 図のグリッド線を消す
 
 ER 図・TM 図は、背景にグリッド線を描きます。
@@ -323,7 +341,7 @@ import { IHub, pages, Frame } from '@yanqirenshi/ihub.core';
 | `pages` | ページ (`pages.Bridge`・`pages.Data`・`pages.WbsNode` など) |
 | `docPages` | ドキュメントのページ (`docPages.ER`・`docPages.TM` など) |
 | `panels` | ページの中身 (`panels.ER`・`panels.TM` など) |
-| `GithubOAuth`・`Frame`・`FrameTabs`・`FrameWbsNode`・`FrameWbsNodeTabs`・`TabbedPage`・`Link`・`TableTMRelationships` など | 中間の部品 (`components/assemblies/index.js`) |
+| `GithubOAuth`・`ProjectItemForm`・`Frame`・`FrameTabs`・`FrameWbsNode`・`FrameWbsNodeTabs`・`TabbedPage`・`Link`・`TableTMRelationships` など | 中間の部品 (`components/assemblies/index.js`) |
 | `ItemWbsNode`・`LinkWBS`・`Tabs` など | 小さな部品 (`components/parts/index.js`) |
 | `HelpSlide` | Help のセクションで使う、1 枚のスライド (0.2.4 以降。[Help を差し替える](#help-を差し替える)) |
 | `usePageTabs`・`mergeTabs` | ページのタブ |

@@ -1,7 +1,8 @@
 import React from 'react';
 
+import { ProjectItemForm } from '@yanqirenshi/ihub.core';
+
 import Other from './Other.js';
-import ProjectItemForm from './ProjectItemForm.js';
 import AccountMenuSettings from './AccountMenuSettings.js';
 
 export default function Operators (props) {
