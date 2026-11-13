@@ -37,6 +37,10 @@ import { FrameWbsNodeTabs } from '@yanqirenshi/ihub.core';
 | `onChangeTab` | function | `tabs` を渡すとき | タブが変わったときに呼ぶ関数。引数は、選んだタブの `code` |
 | `children` | node | - | ページの内容。タブの並びと、WBS の表の間に描きます |
 | `maxWidth` | string | - | タブの並びと WBS の表の幅。MUI の `Container` の `maxWidth` の値 (`'md'` など)。既定は `'lg'` |
+| `centered` | boolean | - | `true` のとき、タブを中央に寄せます。既定は左寄せ。(0.5.0 以降) |
+| `tabsProps` | object | - | タブ (MUI の `Tabs`) に渡す props。([TabsSearchParam](#/components/assemblies/TabsSearchParam) の `tabsProps` と同じ) (0.5.0 以降) |
+
+`centered` と `tabsProps` は、そのまま [TabsSearchParam](#/components/assemblies/TabsSearchParam) に渡します。
 
 ## 使い方の例
 
@@ -71,6 +75,18 @@ export default function P1000 (props) {
 }
 ```
 
+タブを中央に寄せるときは、`centered` を付けます。
+
+```jsx
+<FrameWbsNodeTabs wbs_node={props.wbs_node}
+                  tabs={TABS}
+                  tab={tab}
+                  onChangeTab={setTab}
+                  centered>
+  ...
+</FrameWbsNodeTabs>
+```
+
 ## 注意
 
 - `<IHub>` の中で使ってください。
@@ -83,6 +99,9 @@ export default function P1000 (props) {
   0.3.0 までは、レコードをそのまま渡すと、WBS の表が全体になり、見出しの種類も出ませんでした。(0.3.1 で直しました)
 - `tab` が無いときは、開いたときの URL の `?tab=` (`tabs` にあるもの) で、無ければ先頭のタブの `code` で、`onChangeTab` を呼びます。
   ([TabsSearchParam](#/components/assemblies/TabsSearchParam) の注意も見てください)
+- `centered`・`tabsProps` は、この部品が描くタブの並びにだけ効きます。
+  `children` の中に描いたタブには、効きません。
+  0.4.x までは、中央に寄せるには、この部品を `Box` で囲んで、MUI のクラス名 (`.MuiTabs-flexContainer`) に CSS を当てる必要がありました。0.5.0 からは、`centered` を使ってください。
 - `maxWidth` は、タブの並びと WBS の表にだけ効きます。
   見出しの幅は `'lg'` のままです。
   `children` の幅は、`children` の側で決めてください。

@@ -28,6 +28,11 @@ import { TabsSearchParam } from '@yanqirenshi/ihub.core';
 | `tabs` | array | - | タブの配列。1 つのタブは `{ code, label }`。無いか空のときは、何も描きません |
 | `value` | string | - | 選んでいるタブの `code` |
 | `onChange` | function | - | タブが変わったときに呼ぶ関数。引数は、選んだタブの `code`。渡さないときは、URL の `?tab=` だけを変えます |
+| `centered` | boolean | - | `true` のとき、タブを中央に寄せます。既定は `false` (左寄せ)。(0.5.0 以降) |
+| `tabsProps` | object | - | MUI の `Tabs` に、そのまま渡す props。(例: `{ variant: 'scrollable' }`) (0.5.0 以降) |
+
+- `tabsProps` の `value`・`onChange` は、無視します。(この部品が決めるため)
+- `centered` と `tabsProps.centered` の両方を渡したときは、`centered` を使います。
 
 ## 使い方の例
 
@@ -53,6 +58,17 @@ function MyTabs () {
         </>
     );
 }
+```
+
+タブを中央に寄せるときや、MUI の `Tabs` の props を渡すときは、次のようにします。
+
+```jsx
+// 中央寄せ
+<TabsSearchParam tabs={TABS} value={tab} onChange={setTab} centered/>
+
+// タブが多いときに、横にスクロールできるようにする
+<TabsSearchParam tabs={TABS} value={tab} onChange={setTab}
+                 tabsProps={{ variant: 'scrollable', scrollButtons: 'auto' }}/>
 ```
 
 ## 注意
