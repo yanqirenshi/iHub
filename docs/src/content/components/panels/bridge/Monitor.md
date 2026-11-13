@@ -7,7 +7,7 @@
 - ソース: `packages/ihub.core/src/components/panels/bridge/components/Monitor.js`
 
 艦橋 (`/`) の「Cockpit」タブで、自分が担当している GitHub の Issue のカード ([Card](#/components/panels/bridge/Card)) を並べるのに使っています。
-Issue を読み込むのはページ (`pages/Bridge.js`) で、この部品は並べるだけです。
+Issue を読み込み、絞り込み、並べる順を決めるのはページ (`pages/Bridge.js`) で、この部品は、渡された順に並べるだけです。
 
 ## import のしかた
 
@@ -25,6 +25,9 @@ import { panels } from '@yanqirenshi/ihub.core';
 | 名前 | 型 | 必須 | 内容 |
 |---|---|---|---|
 | `children` | node | - | 並べるカード |
+| `notice` | node | - | カードの上に出す、短い知らせ。省略できます (0.5.0 以降) |
+
+艦橋の Cockpit タブは、Project の日付を読み込めなかったときに、`notice` に「日付を読み込めなかったので、Issue を絞らずに、読み込んだ順に出しています。」を渡します。
 
 ## 使い方の例
 
@@ -37,6 +40,11 @@ const cards = [
 ];
 
 <panels.bridge.Monitor>
+  {cards.map(card=> <panels.bridge.Card key={card.id} data={card}/>)}
+</panels.bridge.Monitor>
+
+// カードの上に、知らせを出す
+<panels.bridge.Monitor notice={<p>2 件のカードを出しています。</p>}>
   {cards.map(card=> <panels.bridge.Card key={card.id} data={card}/>)}
 </panels.bridge.Monitor>
 ```
