@@ -81,8 +81,7 @@ const config = {
   3. 設定の `app.name` (覚えた位置の鍵 `ihub:{app.name}:view:schedule`)
 - 大きさは親の大きさ一杯 (`width: 100%`・`height: 100%`) です。
   親に高さを付けてください。
-- 同じ WBS の中で期間が重なる矢羽根は、同じ高さに重なって描かれます。
-  d3.yabane (0.1.15) の制限です。([Foolsgolds/Assholes#173](https://github.com/Foolsgolds/Assholes/issues/173))
-  d3.yabane が直れば、iHub の更新で直ります。
+- 同じ WBS の中で期間が重なる矢羽根は、重ならない段に分けて描きます。行の高さも、段の数に合わせます。(0.5.0 以降。d3.yabane 0.1.17)
+  0.4.x (d3.yabane 0.1.15) では、同じ高さに重なって描かれていました。([Foolsgolds/Assholes#173](https://github.com/Foolsgolds/Assholes/issues/173))
 - 図は 1 つだけです。
   2 つの場所に出しても、同じ `data/wbs/` を描き、覚える位置も同じです。

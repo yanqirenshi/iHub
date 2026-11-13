@@ -144,6 +144,8 @@ TM のインスペクタでは、次の項目を書き換えられます。
 保存するのは、変えた項目だけです。
 - 接続位置の角度は、ノードの中心から見た向きです。
 0 が真下で、時計回りに 90 が左、180 が真上、270 が右です。
+- 終点の矢印は、0.5.0 (d3.deployment 0.11.1) から描かれます。
+0.4.x (d3.deployment 0.11.0) では、矢印の設定にかかわらず、どの線にも矢印が描かれていませんでした。([Foolsgolds/Assholes#175](https://github.com/Foolsgolds/Assholes/issues/175))
 - 始点の矢印は d3.deployment が描かないので、項目にありません。
 終点の矢印を変えると、`stroke.marker` は始点側も含めて書き込まれます。(d3.deployment が `marker` を丸ごと置き換えるため)
 - ラベルの位置や文字の大きさ・色 (`label.position`・`label.font`)・余白 (`padding`) は、`data/` の JSON で変えます。
