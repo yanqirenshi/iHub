@@ -8,6 +8,17 @@
 
 ドックの「Issue の追加」を、ihub.core の部品 **`ProjectItemForm`** にして公開し、Issue を作るときに、**日付と担当を指定できる**ようにしました。(yanqirenshi/iHub#149)
 
+### 変更 (艦橋の Cockpit タブ: 出す Issue を絞る。yanqirenshi/iHub#148)
+
+- 艦橋の Cockpit タブに出す Issue を、自分が担当の Issue のうち、次のどちらかに当てはまるものだけに絞るようにした。**Project に Plan も NextAction も書いていない Issue は、出なくなる。**
+  1. 今日が、Issue が入っている Project の Plan の期間に入っている。(始まりは `Plan.Start` か `Plan.From`、終わりは `Plan.End` か `Plan.To`。日の単位で比べ、始まりの日と終わりの日の当日も含む。始まりと終わりの両方が入っている Project だけを見る)
+  2. 1 に当てはまらなくても、`NextAction.` で始まる日付の項目が入っている。(過ぎていても、先でもよい)
+  - 複数の Project に入っている Issue は、どれか 1 つの Project が当てはまれば、出す。並びは、#150 のまま。(NextAction の日付の近い順。日付の無いものは、最後で、元の順)
+  - 絞った結果が 0 件のときは、「今日が Plan の期間に入っている Issue と、NextAction.Date が入っている Issue がありません。」と出す。(絞らずに全部を出す切り替えは、付けていない)
+  - 日付を読み込めなかったときは、絞らずに、自分が担当の Issue を全部、読み込んだ順で出し、「日付を読み込めなかったので、Issue を絞らずに、読み込んだ順に出しています。(理由)」と、カードの上に控えめに出す。(#150 の「NextAction の日付を読み込めなかったので…」の文を、これに替えた)
+  - Plan の日付は、#150 の NextAction の日付と**同じ 1 回の呼び出し**で読む。(呼び出しは増えない) 判定は、純粋な関数 `manegers/cockpitFilter.js` (`planRangesOf`・`isInPlan`・`isCockpitTarget`・`filterForCockpit`)。
+  - `bridge` の state の `nextActionsError` を、`datesError` に改め、`plans` (Issue の id → Plan の期間) を足した。(ihub.core の内部。公開の API ではない)
+
 ### 追加 (艦橋の Cockpit タブ: NextAction.Date で並べる。yanqirenshi/iHub#150)
 
 - 艦橋の Cockpit タブの Issue のカードを、Project の `NextAction.Date` の**近い (早い) 順**に並べるようにした。
@@ -15,7 +26,7 @@
   - 1 つの Issue が複数の Project に入っていて、日付が違うときは、一番近い (早い) 日付を使う。名前が `NextAction.` で始まる日付の項目 (`NextAction.Date` など) の値を使う。(#149 の日付の欄と同じ考え)
   - カードに、「Next: 2026-11-24」のように、日付を出す。過ぎた日付 (今日より前) は、赤で太字にする。(今日は、過ぎていない)
   - 日付は、Issue を読んだあと、**自分が担当の Issue (カードになるもの) だけ**を、GitHub の GraphQL (`nodes(ids:)`) で、100 件ずつまとめて読む。(Issue の数だけは呼ばない。sogh は変えていない)
-  - 日付の読み込みに失敗しても、カードは、これまでの並びで出し、「NextAction の日付を読み込めなかったので、カードは、読み込んだ順に並べています。(理由)」と、カードの上に控えめに出す。
+  - 日付の読み込みに失敗しても、カードは、これまでの並びで出し、その旨を、カードの上に控えめに出す。(#148 の絞り込みでは、絞らずに全部を出す)
   - Project の項目の値を読む部分 (`manegers/githubProject.js` の `fetchIssueDateValues`・`valuesByFieldPrefix`) は、項目の名前の頭で選ぶ作りにした。(Project の `Plan.*` で Issue を絞る iHub#148 でも使える) 並べ替えと過ぎた日付の判定は、`manegers/nextAction.js`。GraphQL を呼ぶ共通の部分は `manegers/githubGraphql.js` (`githubIssue.js` も、これを使う)
   - `panels.bridge.Monitor` に、カードの上に出す知らせの props `notice` (省略できる) を足した。
 

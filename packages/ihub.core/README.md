@@ -255,12 +255,20 @@ export default function Section01 ({ size }) {
 
 ## 艦橋の Cockpit タブの並び
 
-艦橋 (`/`) の Cockpit タブは、自分が担当している GitHub の Issue を、カードで並べます。(0.5.0 以降は、Project の `NextAction` の日付の順)
+艦橋 (`/`) の Cockpit タブは、自分が担当している GitHub の Issue のうち、次のどちらかに当てはまるものだけを、カードで並べます。(0.5.0 以降は、この絞り込みと、Project の `NextAction` の日付の順)
+
+1. 今日が、Issue が入っている Project の、Plan の期間に入っている。(始まりは `Plan.Start` か `Plan.From`、終わりは `Plan.End` か `Plan.To`。始まりの日と終わりの日の当日も含みます)
+2. 1 に当てはまらなくても、`NextAction.` で始まる日付の項目 (`NextAction.Date` など) が入っている。(日付は、過ぎていても、先でも構いません)
+
+- Plan の期間は、始まりと終わりの**両方**が入っている Project だけを見ます。(片方だけの Project は、期間とは見ません) 日付は、日の単位で比べます。
+- 1 つの Issue が複数の Project に入っているときは、どれか 1 つの Project が当てはまれば、出します。
+- どちらにも当てはまらない Issue (Project に入っていない Issue・日付を書いていない Issue・Plan の期間が今日を含まず、`NextAction` も無い Issue) は、出しません。
+- 絞った結果が 0 件のときは、「今日が Plan の期間に入っている Issue と、NextAction.Date が入っている Issue がありません。」と出します。(絞らずに全部を出す切り替えは、ありません)
 
 - 並びは、Issue が入っている Project の、`NextAction.` で始まる日付の項目 (`NextAction.Date` など) の、近い (早い) 順です。日付の無い Issue は、最後で、その中は、GitHub から読み込んだ順です。
 - 1 つの Issue が複数の Project に入っていて、日付が違うときは、一番近い (早い) 日付を使います。
 - カードに、「Next: 2026-11-24」のように日付を出します。過ぎた日付 (今日より前) は、赤で太字になります。
-- 日付の読み込みに失敗したときは、カードを、読み込んだ順で出し、その旨を、カードの上に出します。
+- 日付の読み込みに失敗したときは、絞らずに、自分が担当の Issue を全部、読み込んだ順で出し、その旨を、カードの上に出します。
 
 ## ドックの「Issue の追加」
 
