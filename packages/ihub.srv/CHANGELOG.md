@@ -6,7 +6,13 @@
 
 ## 0.5.0 (2026-11)
 
-- コードの変更は無い。(`@yanqirenshi/ihub.core` 0.5.0 と、版をそろえるだけ)
+### 修正
+
+- GitHub の OAuth で認証しても、画面が「GitHub に接続していません。」のままになる不具合を直した。(yanqirenshi/iHub#156) 求める権限に `read:user` を足した。(`repo project read:org read:user`)
+  - 原因: 画面が接続の確認に使う sogh の viewer の問い合わせは、`email` を読む。`email` を読むには、`read:user` か `user:email` の権限が要るが、これまでの 3 つの権限 (`repo`・`project`・`read:org`) には無く、GitHub が `INSUFFICIENT_SCOPES` を返して、`viewer` が `null` になっていた。(sogh の問い合わせは、変えていない)
+  - **利用側への影響**: すでに OAuth で認証している人は、この版にしたあとで、認証し直す。(得ているトークンには `read:user` が無く、直らない。Account タブで、「GitHub で認証する」(または「認証し直す」) を押す) 個人用アクセストークンを使っている人は、トークンに `read:user` の権限を足す。(トークンの権限は、`repo`・`project`・`read:org`・`read:user` の 4 つ)
+  - テスト (`test/github.test.mjs`) の、認可画面へ送るときの `scope` の確認も、合わせた。
+- `@yanqirenshi/ihub.core` 0.5.0 と、版をそろえる。(この修正のほかに、ihub.srv のコードの変更は無い)
 
 ## 0.4.0 (2026-11)
 

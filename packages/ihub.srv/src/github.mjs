@@ -6,7 +6,9 @@ import { randomBytes } from 'node:crypto';
 const AUTHORIZE_URL = 'https://github.com/login/oauth/authorize';
 const ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token';
 // 個人用アクセストークンと同じ権限 (docs/src/content/github.md)
-const SCOPE = 'repo project read:org';
+// read:user は、画面が接続の確認に使う sogh の viewer の問い合わせが、email を読むため。
+// (email を読むには、read:user か user:email が要る。無いと INSUFFICIENT_SCOPES になり、画面は「接続していません。」のままになる)
+const SCOPE = 'repo project read:org read:user';
 // 認可画面へ送り出してから、戻ってくるまでの期限
 const STATE_TTL = 10 * 60 * 1000;
 

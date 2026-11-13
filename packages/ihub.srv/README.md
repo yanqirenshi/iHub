@@ -190,7 +190,7 @@ GitHub の OAuth App (Web アプリケーションフロー) で、画面が Git
 
 - OAuth App の Client ID と Client secret は、`createApp` の `github` か、環境変数 `GITHUB_OAUTH_CLIENT_ID`・`GITHUB_OAUTH_CLIENT_SECRET` で渡します。どちらも無いときは、`configured: false` を返すだけで、ほかは変わりません。
 - OAuth App の Authorization callback URL は、画面を開く URL の `/api/github/oauth/callback` にします。(例: 開発サーバーなら `http://localhost:3000/api/github/oauth/callback`、`ihub-srv --static` なら `http://localhost:4000/api/github/oauth/callback`)
-- 求める権限は `repo`・`project`・`read:org` です。
+- 求める権限は `repo`・`project`・`read:org`・`read:user` です。(`read:user` は、画面が接続の確認に使う viewer の問い合わせが、`email` を読むために要ります。無いと、認証できても「GitHub に接続していません。」のままになります)
 - `/api/{domain}/{collection}` より先に登録するので、`/api/github/token` がコレクションと見なされることはありません。
 - `/api/github/token` が、トークンを画面に返せるのは、API サーバーが、`guard` (`Host`・`Origin` の確認) で、このパソコンの中からの要求だけを受け付けているためです。この確認を外して公開しないでください。
 - callback URL は、要求の `Host` から、`http://` 固定で作ります。`https` の後ろ (リバースプロキシなど) に置く構成は、想定していません。
