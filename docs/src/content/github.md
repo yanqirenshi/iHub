@@ -8,20 +8,37 @@ iHub は、GitHub の Issue や Projects を表示したり、Issue を追加し
 ## OAuth で認証する
 
 1. GitHub の Settings → Developer settings → OAuth Apps で、OAuth App を登録します。
-   Authorization callback URL は `http://localhost:3000/api/github/oauth/callback` にします。
-   (開発サーバーのポートを変えているときは、そのポートにします。`npm run serve` で開くときは `http://localhost:4000/api/github/oauth/callback` です)
-2. `.env.local` に、OAuth App の Client ID と Client secret を書きます。(雛形の `.env.local.template` に、この 2 つの変数の欄があります)
+   登録の画面では、次のように入れます。
+
+| 欄 | 入れるもの |
+|---|---|
+| Application name | 好きな名前 (例: `iHub (localhost)`) |
+| Homepage URL | 画面を開く URL (例: `http://localhost:3000`) |
+| Redirect URIs | `http://localhost:3000/api/github/oauth/callback` |
+| Expire user access tokens | **外します。** (下の注意) |
+| Enable Device Flow | 外したままにします |
+| Allow wildcard matching | 外したままにします |
+
+   - Redirect URIs は、「Add redirect URI」で複数足せます。
+     開発サーバーのポートを変えているときは、そのポートにします。
+     `npm run serve` で開くときは、`http://localhost:4000/api/github/oauth/callback` も足します。
+   - 「Expire user access tokens」を入れたままにすると、認証してから 8 時間ほどで、GitHub からの読み込みに失敗するようになります。
+     API サーバー (ihub.srv) は、トークンを取り直さない (refresh token を使わない) ためです。
+2. 登録した OAuth App の画面で、Client ID を控え、「Generate a new client secret」で Client secret を作ります。
+3. `.env.local` に、OAuth App の Client ID と Client secret を書きます。(雛形の `.env.local.template` に、この 2 つの変数の欄があります)
 
 ```
 GITHUB_OAUTH_CLIENT_ID=Ov23xxxxxxxxxxxxxxxx
 GITHUB_OAUTH_CLIENT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-3. `npm start` をやり直します。(API サーバーが起動したときに読み込むため)
-4. Scrum (`/scrum`) の Account タブの「GitHub で認証する」を押します。
+4. `npm start` をやり直します。(API サーバーが起動したときに読み込むため)
+5. Scrum (`/scrum`) の Account タブの「GitHub で認証する」を押します。
    GitHub の認可画面で許可すると、元の画面に戻り、アカウントが表示されます。
 
-- 権限は `repo`・`project`・`read:org` を求めます。
+- 権限は `repo`・`project`・`read:org`・`read:user` の 4 つを求めます。
+  `read:user` は、画面が接続を確かめるときに、アカウントのメールアドレスを読むために要ります。(0.5.0 以降。0.4.x までは 3 つでしたが、`read:user` が無いと「GitHub に接続していません。」のままになる不具合がありました)
+- **0.4.x までに OAuth で認証した人は、`@yanqirenshi/ihub.srv` を 0.5.0 にしたあとで、認証し直してください。** (それまでに得たトークンには `read:user` が無いため、そのままでは直りません。Account タブで「GitHub で認証する」を押します)
 - client secret は API サーバーだけが読みます。(`REACT_APP_` で始まらないので、画面の JavaScript には入りません)
 - トークンは API サーバーのメモリにだけ持ちます。API サーバーを起動し直したら、認証し直してください。
 - 「接続を切る」を押すと、OAuth のトークンを捨てます。個人用アクセストークンがあれば、そちらでつなぎ直します。
@@ -41,7 +58,8 @@ OAuth App を用意したときに、上の手順で、認証できることを�
 REACT_APP_GITHU_PARSONAL_TOKEN=ghp_xxxxxxxxxxxxxxxx
 ```
 
-- トークンには、`repo`・`project`・`read:org` の権限を付けてください。
+- トークンには、`repo`・`project`・`read:org`・`read:user` の 4 つの権限を付けてください。
+  (`read:user` が無いと、画面が接続を確かめられず、「GitHub に接続していません。」のままになります。0.4.x までの docs の 3 つの権限で作ったトークンは、`read:user` を足してください)
 - 書いたあとは、`npm start` をやり直してください。(起動したときに読み込むため)
 - 画面の設定では、`github: { token: process.env.REACT_APP_GITHU_PARSONAL_TOKEN }` として渡します。([設定の渡し方](#/customize))
 - トークンを設定すると、サイドメニューに GitHub のアカウントの画像が表示されます。

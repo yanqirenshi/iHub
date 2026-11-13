@@ -101,7 +101,7 @@ iHub のリポジトリの参照アプリと、同じ画面が開きます。
 REACT_APP_GITHU_PARSONAL_TOKEN=ghp_xxxxxxxxxxxxxxxx
 ```
 
-- トークンには、`repo`・`project`・`read:org` の権限を付けてください。
+- トークンには、`repo`・`project`・`read:org`・`read:user` の 4 つの権限を付けてください。(`read:user` が無いと、「GitHub に接続していません。」のままになります)
 - `.env.local` は git で共有しません。(`.gitignore` の対象です)
 - 変数の名前は綴りが少し変わっていますが (`GITHU`・`PARSONAL`)、このままの名前で書きます。
 - 書いたあとは、`npm start` をやり直してください。
