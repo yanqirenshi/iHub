@@ -7,8 +7,11 @@ import { PAGES, SECTIONS } from './pages.js';
 export default function App () {
     const location = useLocation();
 
-    // 今のページがあるセクション。小見出し (groups) を持つときは、本文の左にその一覧を出す。
-    const current = SECTIONS.find(section=> sectionPages(section).some(page=> page.path===location.pathname));
+    // 今のページがある小見出し。(コンポーネントの assemblies・panels など)
+    // 小見出しのページを開いているときは、本文の左にその小見出しのページの一覧を出す。
+    const currentGroup = SECTIONS
+          .flatMap(section=> section.groups || [])
+          .find(group=> group.pages.some(page=> page.path===location.pathname));
 
     // ページを移ったら、先頭から表示する。
     // (scrollTo は Promise を返すブラウザがあるので、戻り値を返さないように {} で囲む)
@@ -27,15 +30,22 @@ export default function App () {
                 <div key={section.label} className="nav-section">
                   <div className="nav-label">{section.label}</div>
 
-                  {/* 小見出しのページを開いているあいだも、セクションの入口を選んだままにする。 */}
-                  <NavLinks pages={section.pages}
-                            active={section.groups && section===current ? section.pages[0].path : null}/>
+                  <NavLinks pages={section.pages}/>
+
+                  {/* 小見出しは、その最初のページを開く。 */}
+                  {(section.groups || []).map(group=> (
+                      <Link key={group.label}
+                            to={group.pages[0].path}
+                            className={group===currentGroup ? 'nav-link nav-sublink active' : 'nav-link nav-sublink'}>
+                        {group.label}
+                      </Link>
+                  ))}
                 </div>
             ))}
           </nav>
 
           <main className="main">
-            {current?.groups && <SubNav groups={current.groups}/>}
+            {currentGroup && <SubNav group={currentGroup}/>}
 
             <div className="main-body">
               <Routes>
@@ -53,37 +63,23 @@ export default function App () {
     );
 }
 
-function sectionPages (section) {
-    return [
-        ...(section.pages || []),
-        ...(section.groups || []).flatMap(group=> group.pages),
-    ];
-}
-
-// 本文の左に出す、小見出しごとのページの一覧。
+// 本文の左に出す、小見出しのページの一覧。
 function SubNav (props) {
-    const { groups } = props;
+    const { group } = props;
 
     return (
         <nav className="subnav">
-          {groups.map(group=> (
-              <div key={group.label} className="nav-group">
-                <div className="nav-group-label">{group.label}</div>
-                <NavLinks pages={group.pages}/>
-              </div>
-          ))}
+          <div className="nav-group-label">{group.label}</div>
+          <NavLinks pages={group.pages}/>
         </nav>
     );
 }
 
 function NavLinks (props) {
-    const { pages = [], active = null } = props;
+    const { pages = [] } = props;
 
     return pages.map(page=> (
-        <NavLink key={page.path}
-                 to={page.path}
-                 end
-                 className={({ isActive })=> (isActive || page.path===active) ? 'nav-link active' : 'nav-link'}>
+        <NavLink key={page.path} to={page.path} end className="nav-link">
           {page.title}
         </NavLink>
     ));
