@@ -19,6 +19,8 @@
 | `tm/attributes.json` | 属性のマスタ | TM |
 | `tm/entities.json` | エンティティ | TM |
 | `tm/relationships.json` | リレーションシップ | TM |
+| `classes/classes.json` | クラス (d3.classes の形で書く。無くてもよい) | クラス図 |
+| `classes/relationships.json` | クラスの間の関係 (無くてもよい) | クラス図 |
 | `sitemap/nodes.json` | 画面のノード | 画面遷移図 |
 | `sitemap/edges.json` | 画面の遷移 | 画面遷移図 |
 | `deployment/nodes.json` | ノード (入れ子にでき、リンクを付けられる) | システム構成図 |
