@@ -19,7 +19,8 @@ import troubleshooting from './content/troubleshooting.md?raw';
 import { COMPONENT_SECTION } from './componentPages.js';
 
 // セクションは、pages (ページの一覧) と、groups (小見出しごとのページの一覧) を持てる。
-// サイドメニューは、pages を先に、groups をそのあとに並べる。
+// サイドメニューには pages を並べる。groups は、そのセクションのページを開いたときに、本文の左に並べる。
+// 「前へ・次へ」は、pages を先に、groups をそのあとにたどる。
 export const SECTIONS = [
     {
         label: 'はじめに',
