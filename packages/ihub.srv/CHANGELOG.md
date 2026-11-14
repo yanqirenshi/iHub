@@ -4,6 +4,28 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.6.0 (2026-11)
+
+### 追加 (クラス図: yanqirenshi/iHub#171)
+
+- データのフォーマット: クラス図のドメイン `classes` を足した。(ihub.core 0.6.0 のクラス図のタブが描く)
+  - `schemas/classes/classes.schema.json` (クラス) と `schemas/classes/relationships.schema.json` (関係)。項目は、d3.classes の入力 (`ClassInput`・`RelationshipInput`) の形のまま。
+  - クラス: `id` (文字列)・`name` (文字列か `{ logical, physical, description }`。どちらかの名前は要る)・`position` (`{ x, y }`) が必須。`stereotype`・`attributes`・`methods` (文字列か、`name`・`type`・`visibility`・`kind`・`parameters`・`returnType`・`description` を持つオブジェクト)・`size`・`radius`・`header`・`description` (文字列の配列) を書ける。
+  - 関係: `id` (文字列)・`type` (`association`・`inheritance`・`realization`・`aggregation`・`composition`・`dependency`)・`from`・`to` が必須。端は、クラス (`{ classId, point }`。`point` は `top` / `bottom` / `left` / `right` か角度の数) か座標 (`{ x, y }`)。`label`・`fromMultiplicity`・`toMultiplicity`・`fromRole`・`toRole`・`description` を書ける。
+  - アプリ固有の項目 (`layer`・`group`・`section`・`filePath`・`notes` など) は、そのまま書ける。(`additionalProperties` を閉じていない)
+  - ルール (`validation/rules.mjs`): クラスの id の重複・関係の id の重複・関係の端の `classId` のクラスが無いもの。(d3.classes は、id が重複すると例外にする) 例: `classes/relationships: to.classId のクラスが見つかりません。(id=A->B, classId=B)`
+- スキーマに `default` があるコレクションは、ファイルが無くてもよいようにした。(これまでは、domain が `local` のコレクションだけ) ファイルが無いときは `default` を返し、ルールも `default` のデータで検査する。最初に書き込んだときに、ファイルを作る。クラス図の 2 つのコレクションは `default: []`。
+
+### 変更
+
+- レコードの PATCH・DELETE (`/api/{domain}/{collection}/{id}`) で、URL の id が数字だけのとき、数値で見つからなければ、文字列としても探すようにした。(id が `"123"` のような文字列のレコードのため。数の id のレコードは、これまでどおり)
+
+### 利用側への影響
+
+- **`data/classes/` が無いアプリも、そのまま起動できる。** (クラス図の 2 つのコレクションは、空の配列として扱う。`ihub-srv check` も通る) ihub.core と ihub.srv は、どちらも 0.6.0 にする。
+- クラス図を使うときは、`data/classes/classes.json`・`relationships.json` を作る。(雛形は `@yanqirenshi/ihub.core` の `examples/data/classes/`)
+- 記号を含む文字列の id は、URL で `encodeURIComponent` して送る。(ihub.core 0.6.0 の画面は、そうしている)
+
 ## 0.5.0 (2026-11)
 
 ### 修正

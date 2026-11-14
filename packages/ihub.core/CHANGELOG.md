@@ -4,6 +4,39 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.6.0 (2026-11)
+
+### 修正 (クラス図: yanqirenshi/iHub#171)
+
+- クラス (`/classes`) のページの「クラス図」タブ (`?tab=class-diagram`) に、何も描かれない不具合を直した。
+  - 原因: `PAGE_CLASSES` のタブには `class-diagram` があり、初めに選ばれるタブもこれだが、Classes ページのパネルの表には `wbs` と `help` しか無かった。`TabbedPage` は、表に無い code のタブを選ぶと、何も描かない。(エラーも出ない) そもそも、クラス図を描くもの (データのコレクション・描画のライブラリ・パネル) が、iHub 本体に無かった。
+  - Classes ページのパネルの表に、`class-diagram` → クラス図のパネル (`panels.Classes`) を足した。
+
+### 追加 (クラス図)
+
+- クラス図のパネル `panels.Classes` を足した。`data/classes/` のデータを、`@yanqirenshi/d3.classes` で描く。(TM と同じ流儀)
+  - 箱をドラッグすると、動かした位置を `classes/classes` の `position` に PATCH で保存する。(整数に丸める)
+  - 箱を右クリックするとクラスを、線をクリック (か右クリック) すると関係を、右端のインスペクタ (colonoscope の `ModelInspector`) に出し、書き換えられる。(クラス: 名前・ステレオタイプ・位置・幅・説明。関係: 種類・端のクラスと位置 (辺か角度)・ラベル・多重度・端名・説明) 線は細いので、線から 6px の内のクリックも、その線と見なす。
+  - 図の知識 (図に渡す形・編集できる項目・patch への変換) は、`manegers/classes.js` に置いた。(TM の model.tm に当たるもの。クラス図の model.* パッケージは無い)
+  - 初めて開いたときは、クラスが全部見えるように描く。そのあとは、ほかの図と同じく、動かした位置と拡大の度合いを `localStorage` に覚える。(図の code は `classes`。d3.classes にはカメラを読み書きする口が無いので、d3-zoom の現在値と `g.viewport` の `transform` を使う)
+  - 端のクラスが見つからない関係は描かずに、上に知らせる。(エディタで直接変えたファイルは、起動のときには検証しないため) id の重複などで描けないときは、理由を出す。
+  - クラスが無いときは、「クラスがありません。data/classes/classes.json に書くと、ここに描きます。」と出す。
+- 設定 `diagrams.classes` を足した。
+  - `grid`: d3.classes の `grid` の設定を、そのまま渡す。(例: `{ draw: false }`)
+  - `header`: クラスの箱のヘッダー (クラス名の行) の色。`{ by: 'layer', colors: { domain: '#fde68a', ... } }` の形で、`by` はクラスのレコードの項目のパス、`colors` は項目の値 → 色 (文字列は背景の色。d3.classes の `header` の形 `{ background, font }` でもよい)。レコードに `header` があれば、設定の色に重ねる。(レコードを優先する)
+- 雛形のデータ (`examples/data/classes/classes.json`・`relationships.json`) を足した。(iHub の WBS とデータの読み書きを例にした 8 クラス・6 関係) 雛形のアプリ (参照アプリの `src/index.js`) に、`diagrams.classes.header` で `layer` ごとに塗り分ける設定を足した。
+- `dependencies` に `@yanqirenshi/d3.classes` (`^0.13.0`) と `@yanqirenshi/model.core` (`^0.1.0`。入力の読み取りと patch の道具) を足した。
+
+### 変更
+
+- レコードの PATCH (`patchRecord`) で、URL の id を `encodeURIComponent` で符号化するようにした。(クラス図の `Plan->Workpackage` のような、記号を含む文字列の id のため。数の id は、これまでと同じ URL になる)
+
+### 利用側への影響
+
+- `data/classes/` が無いアプリも、そのまま動く。(クラス図のタブは、空の図になる。ihub.srv 0.6.0 が、ファイルの無いクラス図のコレクションを空の配列として扱う) ihub.core と ihub.srv は、どちらも 0.6.0 にする。
+- クラス図を使うときは、`data/classes/classes.json`・`relationships.json` を作る。(雛形は `examples/data/classes/`。`ihub-srv check` で確かめられる)
+- `pages.ClassDiagram` (「ClassDiagram」の文字を出すだけの、使われていない仮のページ) は、公開しているので、そのまま残した。
+
 ## 0.5.0 (2026-11)
 
 ドックの「Issue の追加」を、ihub.core の部品 **`ProjectItemForm`** にして公開し、Issue を作るときに、**日付と担当を指定できる**ようにしました。(yanqirenshi/iHub#149)

@@ -78,8 +78,29 @@ function checkWbs ({ projects, wbs, workpackages }) {
     return errors;
 }
 
+// クラス図: クラスと関係の id の重複 (d3.classes は重複すると例外にする) と、関係の端のクラスがあること。
+function checkClasses ({ classes, relationships }) {
+    const errors = [];
+
+    const ids = checkUnique(errors, 'classes/classes', classes);
+
+    checkUnique(errors, 'classes/relationships', relationships);
+
+    for (const d of relationships) {
+        for (const end of ['from', 'to']) {
+            const class_id = d[end].classId;
+
+            if (class_id!==undefined && !ids.has(class_id))
+                errors.push(`classes/relationships: ${end}.classId のクラスが見つかりません。(id=${d.id}, classId=${class_id})`);
+        }
+    }
+
+    return errors;
+}
+
 export const RULES = {
     wbs:        checkWbs,
+    classes:    checkClasses,
     // 図の検査は、図ごとの model.* パッケージが持つ。(文言は、もとここにあった検査と同じ)
     er:         (data)=> checkEr(data, 'er/'),
     tm:         (data)=> checkTm(data, 'tm/'),

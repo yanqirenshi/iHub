@@ -1,7 +1,7 @@
 # @yanqirenshi/ihub.core
 
 iHub のコア (画面の部品) です。
-アプリの設計データ (ER 図・TM・画面遷移図・システム構成図・Systemic Design・WBS など) を、図や表で見て、編集する画面を作ります。
+アプリの設計データ (ER 図・TM・クラス図・画面遷移図・システム構成図・Systemic Design・WBS など) を、図や表で見て、編集する画面を作ります。
 データは、API サーバー ([@yanqirenshi/ihub.srv](../ihub.srv/README.md)) から読み書きします。
 
 親の issue: [#65](https://github.com/yanqirenshi/iHub/issues/65)
@@ -91,7 +91,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 | `panels` | タブの code → パネルの部品。`{ ページの id: { code: 部品 } }`。既定に重ねる | `{}` |
 | `help` | Help の内容 (`sections`。部品の配列) | iHub の 3 つ |
 | `github` | GitHub の個人用アクセストークン (`token`) | 無し |
-| `diagrams` | ER 図・TM 図の設定。`{ er: { grid }, tm: { grid } }`。`grid` は、d3.er・d3.ter の `grid` の設定を、そのまま渡す ([図のグリッド線](#図のグリッド線を消す)) | 渡さない |
+| `diagrams` | ER 図・TM 図・クラス図の設定。`{ er: { grid }, tm: { grid }, classes: { grid, header } }`。`grid` は、d3.er・d3.ter・d3.classes の `grid` の設定を、そのまま渡す ([図のグリッド線](#図のグリッド線を消す))。`classes.header` は、クラスの箱のヘッダーの色 ([クラス図](#クラス図)) | 渡さない |
 
 - 動的 `import()` (`wbs.page`) は、ページのあるアプリ側に書きます。(webpack がアプリのフォルダを束ねるため)
 - 必須の項目が無いときは、起動したときに、どの項目が無いかを示すエラーになります。
@@ -289,17 +289,59 @@ if ('b'===root.code)
     return <ProjectItemForm root={root}/>;
 ```
 
-## 図のグリッド線を消す
+## クラス図
 
-ER 図・TM 図は、背景にグリッド線を描きます。
-設定の `diagrams` で、図ごとに、d3.er・d3.ter の `grid` の設定を渡せます。(値は、iHub では解釈せずに、そのまま渡します。0.2.5 以降)
+クラス (`/classes`) のページの「クラス図」タブは、`data/classes/` のデータを、[d3.classes](https://www.npmjs.com/package/@yanqirenshi/d3.classes) で描きます。(0.6.0 以降。yanqirenshi/iHub#171)
+
+| ファイル | 内容 |
+|---|---|
+| `data/classes/classes.json` | クラス (箱) の配列 |
+| `data/classes/relationships.json` | 関係 (線) の配列 |
+
+- 項目は、d3.classes の入力 (`ClassInput`・`RelationshipInput`) の形のままです。形は、ihub.srv のスキーマ (`schemas/classes/`) にあります。
+  - クラス: `id` (文字列。図全体で一意)・`name` (文字列か `{ logical, physical, description }`。箱には論理名を出す)・`stereotype`・`attributes`・`methods`・`position` (箱の左上)・`size.w` (箱の幅)・`description` (説明。1 行 1 要素。図には描かない)
+  - 関係: `id` (文字列)・`type` (`association`・`inheritance`・`realization`・`aggregation`・`composition`・`dependency`)・`from` / `to` (`{ classId, point }` か `{ x, y }`)・`label`・`fromMultiplicity` / `toMultiplicity`・`fromRole` / `toRole`・`description`
+  - `point` は、線を取り付ける位置です。辺 (`top`・`bottom`・`left`・`right` の中点) か、角度 (0=真下・時計回り。90=左 / 180=真上 / 270=右)。
+  - アプリ固有の項目 (`layer`・`group`・`notes` など) も、そのまま書けます。(図には渡しません)
+- ファイルが無いアプリでは、空の図として動きます。(ほかの画面も、今までどおり動きます)
+- 箱をドラッグすると、動かした位置を `classes[].position` に保存します。
+- 箱を右クリックするとクラスを、線をクリック (か右クリック) すると関係を、右端のインスペクタに出し、名前・ステレオタイプ・位置・幅・説明、関係の種類・端のクラスと位置・ラベル・多重度・端名・説明を書き換えられます。(属性とメソッドは、ファイルで書き換えます)
+- 初めて開いたときは、クラスが全部見えるように描きます。そのあとは、動かした位置と拡大の度合いを覚えます。([図の位置を覚える](#図の位置を覚える))
+
+箱のヘッダー (クラス名の行) は、設定の `diagrams.classes.header` で、クラスの項目の値ごとに塗り分けられます。
 
 ```jsx
 const config = {
     // (省略)
     diagrams: {
-        er: { grid: { draw: false } },    // ER 図のグリッド線を描かない
-        tm: { grid: { draw: false } },    // TM 図のグリッド線を描かない
+        classes: {
+            header: {
+                by: 'layer',                    // クラスのレコードの項目 (ドット区切りのパス)
+                colors: {                       // 項目の値 → 色
+                    domain:      '#fde68a',     // 文字列は、背景の色
+                    application: { background: { color: '#1e3a8a' }, font: { color: '#ffffff' } },   // d3.classes の header の形でもよい
+                },
+            },
+        },
+    },
+};
+```
+
+- `colors` に無い値のクラスと、`by` の項目が無いクラスは、塗りません。
+- クラスのレコードに `header` (d3.classes の形) を書くと、設定の色に重ねます。(レコードのほうを優先します)
+
+## 図のグリッド線を消す
+
+ER 図・TM 図・クラス図は、背景にグリッド線を描きます。
+設定の `diagrams` で、図ごとに、d3.er・d3.ter・d3.classes の `grid` の設定を渡せます。(値は、iHub では解釈せずに、そのまま渡します。0.2.5 以降。クラス図は 0.6.0 以降)
+
+```jsx
+const config = {
+    // (省略)
+    diagrams: {
+        er: { grid: { draw: false } },         // ER 図のグリッド線を描かない
+        tm: { grid: { draw: false } },         // TM 図のグリッド線を描かない
+        classes: { grid: { draw: false } },    // クラス図のグリッド線を描かない (d3.classes は draw だけを読む)
     },
 };
 ```
@@ -311,12 +353,12 @@ const config = {
 | `span` | グリッドの間隔 | `100` |
 
 - 渡さないときは、これまでどおり、グリッド線が出ます。
-- ER 図・TM 図は、別々に設定できます。ER 図・TM 図以外の図 (Overview・画面遷移図など) は、対象外です。
+- ER 図・TM 図・クラス図は、別々に設定できます。それ以外の図 (Overview・画面遷移図など) は、対象外です。
 
 ## 図の位置を覚える
 
-ER 図・TM・画面遷移図・システム構成図・Overview・Schedule は、動かした位置と拡大の度合いを、ブラウザの `localStorage` に自動で覚えて、次に開いたときに戻します。(0.2.7 以降)
-人ごと・ブラウザごとの記憶で、`data/` は変わりません。鍵は `ihub:{app.name}:view:{図の code}` です。(図の code: `er`・`tm`・`std`・`scd`・`overview`・`schedule`)
+ER 図・TM・クラス図・画面遷移図・システム構成図・Overview・Schedule は、動かした位置と拡大の度合いを、ブラウザの `localStorage` に自動で覚えて、次に開いたときに戻します。(0.2.7 以降。クラス図は 0.6.0 以降)
+人ごと・ブラウザごとの記憶で、`data/` は変わりません。鍵は `ihub:{app.name}:view:{図の code}` です。(図の code: `er`・`tm`・`classes`・`std`・`scd`・`overview`・`schedule`)
 
 アプリが足した図のパネルでも、`useDiagramView(code)` で覚えられます。
 

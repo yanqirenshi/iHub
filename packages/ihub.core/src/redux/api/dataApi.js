@@ -62,8 +62,9 @@ export const dataApi = createApi({
             onQueryStarted: onWritten,
         }),
         // レコードを、JSON Merge Patch で部分的に書き換える。
+        // id は、記号を含む文字列 (クラス図の 'A->B#x' など) でも送れるように、符号化する。
         patchRecord: build.mutation({
-            query: ({ name, id, patch })=> ({ url: `${name}/${id}`, method: 'PATCH', body: patch }),
+            query: ({ name, id, patch })=> ({ url: `${name}/${encodeURIComponent(id)}`, method: 'PATCH', body: patch }),
             onQueryStarted: onWritten,
         }),
     }),

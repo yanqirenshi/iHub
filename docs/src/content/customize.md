@@ -45,7 +45,7 @@ root.render(
 | `panels` | タブの code → パネルの部品。`{ ページの id: { code: 部品 } }`。既定に重ねる | `{}` |
 | `help` | Help の内容 (`sections`。部品の配列) | iHub の 3 つ |
 | `github` | GitHub の個人用アクセストークン (`token`) | 無し |
-| `diagrams` | ER 図・TM 図の設定。`{ er: { grid }, tm: { grid } }`。`grid` は、d3.er・d3.ter の `grid` の設定を、そのまま渡す ([図のグリッド線](#/customize)) | 渡さない |
+| `diagrams` | ER 図・TM 図・クラス図の設定。`{ er: { grid }, tm: { grid }, classes: { grid, header } }`。`grid` は、d3.er・d3.ter・d3.classes の `grid` の設定を、そのまま渡す ([図のグリッド線](#/customize))。`classes.header` は、クラス図の見出しの色 ([クラス図の見出しの色](#/customize)) | 渡さない |
 
 - WBS のページを読み込む動的 `import()` は、ページのあるアプリ側 (`src/index.js`) に書きます。(webpack が、アプリのフォルダを束ねるため)
 - 必須の項目が無いときは、起動したときに、どの項目が無いかを示すエラーになります。
@@ -338,15 +338,16 @@ function icon (d, fillRule) {
 
 ### 図のグリッド線を消す
 
-ER 図・TM 図は、背景にグリッド線を描きます。
-設定の `diagrams` で、図ごとに、d3.er・d3.ter の `grid` の設定を渡せます。(値は、iHub では解釈せずに、そのまま渡します)
+ER 図・TM 図・クラス図は、背景にグリッド線を描きます。
+設定の `diagrams` で、図ごとに、d3.er・d3.ter・d3.classes の `grid` の設定を渡せます。(値は、iHub では解釈せずに、そのまま渡します)
 
 ```jsx
 const config = {
     // (省略)
     diagrams: {
-        er: { grid: { draw: false } },    // ER 図のグリッド線を描かない
-        tm: { grid: { draw: false } },    // TM 図のグリッド線を描かない
+        er: { grid: { draw: false } },         // ER 図のグリッド線を描かない
+        tm: { grid: { draw: false } },         // TM 図のグリッド線を描かない
+        classes: { grid: { draw: false } },    // クラス図のグリッド線を描かない (0.6.0 以降。d3.classes は draw だけを読む)
     },
 };
 ```
@@ -358,9 +359,37 @@ const config = {
 | `span` | グリッドの間隔 | `100` |
 
 - `diagrams` を渡さないとき (または `grid` を渡さないとき) は、これまでどおり、グリッド線が出ます。
-- ER 図・TM 図は、それぞれ別に設定できます。(片方だけ消すと、もう片方は出ます)
-- ER 図・TM 図以外の図 (Overview・画面遷移図など) は、対象外です。
-- (0.2.5 以降)
+- ER 図・TM 図・クラス図は、それぞれ別に設定できます。(1 つだけ消すと、ほかは出ます)
+- それ以外の図 (Overview・画面遷移図など) は、対象外です。
+- (0.2.5 以降。クラス図は 0.6.0 以降)
+
+### クラス図の見出しの色
+
+クラス図の箱の見出し (クラス名の行) は、設定の `diagrams.classes.header` で、クラスの項目の値ごとに塗り分けられます。(0.6.0 以降)
+雛形のアプリは、`layer` の値で塗り分けます。
+
+```jsx
+const config = {
+    // (省略)
+    diagrams: {
+        classes: {
+            header: {
+                by: 'layer',                    // クラスのレコード (classes/classes.json) の項目。ドット区切りのパスでもよい
+                colors: {                       // 項目の値 → 色
+                    domain:      '#fde68a',     // 文字列は、見出しの背景の色
+                    application: '#fecaca',
+                    adapter:     '#bbf7d0',
+                    framework:   { background: { color: '#1e3a8a' }, font: { color: '#ffffff' } },   // d3.classes の header の形でもよい
+                },
+            },
+        },
+    },
+};
+```
+
+- `colors` に無い値のクラスと、`by` の項目が無いクラスは、塗りません。(白のまま)
+- クラスのレコードに `header` (d3.classes の形。`{ background: { color }, font: { color } }`) を書くと、設定の色に重ねます。(レコードのほうを優先します)
+- 色は、データには書きません。(色を変えるときに、データを書き換えなくて済むように)
 
 ### そのほかの見た目
 
@@ -370,7 +399,7 @@ const config = {
 
 ## アプリが足した図の位置を覚える
 
-iHub の 6 つの図 (0.3.x までは 5 つ) は、動かした位置と拡大の度合いを、ブラウザに覚えます。([図の編集](#/diagrams) の「図の位置と拡大を覚える」)
+iHub の 7 つの図 (0.3.x までは 5 つ、0.5.x までは 6 つ) は、動かした位置と拡大の度合いを、ブラウザに覚えます。([図の編集](#/diagrams) の「図の位置と拡大を覚える」)
 アプリが足したパネルの図 (d3.* の `Rectum`) でも、`useDiagramView` で同じように覚えられます。(0.2.7 以降)
 
 ```jsx

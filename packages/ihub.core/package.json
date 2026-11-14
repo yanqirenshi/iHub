@@ -1,6 +1,6 @@
 {
   "name": "@yanqirenshi/ihub.core",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "iHub のコア (画面の部品)。設計データを、図や表で見て、編集する。",
   "keywords": [
     "ihub",
@@ -49,6 +49,7 @@
     "@yanqirenshi/assh0le": "^0.5.9",
     "@yanqirenshi/beach": "^0.0.1",
     "@yanqirenshi/colonoscope": "^0.5.1",
+    "@yanqirenshi/d3.classes": "^0.13.0",
     "@yanqirenshi/d3.deployment": "^0.11.1",
     "@yanqirenshi/d3.er": "^0.6.2",
     "@yanqirenshi/d3.sitemap": "^0.9.1",
@@ -58,6 +59,7 @@
     "@yanqirenshi/manipulater": "^0.1.0",
     "@yanqirenshi/markdown.sitter": "^0.1.5",
     "@yanqirenshi/menubook": "^0.1.1",
+    "@yanqirenshi/model.core": "^0.1.0",
     "@yanqirenshi/model.deployment": "^0.1.1",
     "@yanqirenshi/model.er": "^0.2.0",
     "@yanqirenshi/model.sitemap": "^0.1.1",

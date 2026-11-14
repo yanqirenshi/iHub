@@ -1,6 +1,6 @@
 import { test, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -307,4 +307,51 @@ test('ファイルを直接変えたときも、検証してから知らせる',
     } finally {
         await events.close();
     }
+});
+
+test('クラス図: 文字列の id のレコードを PATCH する (記号は URL で符号化する)', async ()=> {
+    const moved = await request('/api/classes/classes/Plan', { method: 'PATCH', body: { position: { x: 300, y: 420 } } });
+
+    assert.equal(moved.status, 200);
+    assert.deepEqual(readData('classes/classes').find(d=> d.id==='Plan').position, { x: 300, y: 420 });
+
+    // id の記号 (- > # など) は、encodeURIComponent で送る。
+    const id = 'Plan->Workpackage';
+    const angle = await request(`/api/classes/relationships/${encodeURIComponent(id)}`, { method: 'PATCH', body: { from: { point: 10 } } });
+
+    assert.equal(angle.status, 200);
+    assert.deepEqual(readData('classes/relationships').find(d=> d.id===id).from, { classId: 'Plan', point: 10 });
+
+    // 関係の端のクラスが無いときは、書かない。
+    const broken = await request(`/api/classes/relationships/${encodeURIComponent(id)}`, { method: 'PATCH', body: { to: { classId: 'Nothing' } } });
+
+    assert.equal(broken.status, 400);
+    assert.deepEqual((await broken.json()).errors, [`classes/relationships: to.classId のクラスが見つかりません。(id=${id}, classId=Nothing)`]);
+});
+
+test('クラス図: id が数字だけの文字列のレコードも、PATCH で引ける', async ()=> {
+    const classes = readData('classes/classes');
+
+    classes.push({ id: '123', name: 'N', position: { x: 0, y: 0 } });
+    writeFileSync(join(dir, 'classes/classes.json'), JSON.stringify(classes));
+
+    const res = await request('/api/classes/classes/123', { method: 'PATCH', body: { id: '123', position: { x: 5, y: 6 } } });
+
+    assert.equal(res.status, 200);
+    assert.deepEqual(readData('classes/classes').find(d=> d.id==='123').position, { x: 5, y: 6 });
+});
+
+test('クラス図のファイルが無いアプリでも、空の図として読み、最初の書き込みでファイルを作る', async ()=> {
+    rmSync(join(dir, 'classes'), { recursive: true });
+
+    const all = await (await request('/api/data')).json();
+
+    assert.deepEqual(all.collections['classes/classes'], []);
+    assert.deepEqual(all.collections['classes/relationships'], []);
+
+    const added = await request('/api/classes/classes', { method: 'POST', body: { id: 'A', name: 'A', position: { x: 0, y: 0 } } });
+
+    assert.equal(added.status, 201);
+    assert.deepEqual(readData('classes/classes'), [{ id: 'A', name: 'A', position: { x: 0, y: 0 } }]);
+    assert.equal(existsSync(join(dir, 'classes/relationships.json')), false);
 });

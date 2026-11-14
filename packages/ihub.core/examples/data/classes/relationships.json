@@ -1,0 +1,43 @@
+[
+    {
+        "id": "Project->WbsNode",
+        "type": "inheritance",
+        "from": { "classId": "Project", "point": "top" },
+        "to": { "classId": "WbsNode", "point": 40 }
+    },
+    {
+        "id": "Wbs->WbsNode",
+        "type": "inheritance",
+        "from": { "classId": "Wbs", "point": "top" },
+        "to": { "classId": "WbsNode", "point": "bottom" }
+    },
+    {
+        "id": "Workpackage->WbsNode",
+        "type": "inheritance",
+        "from": { "classId": "Workpackage", "point": "top" },
+        "to": { "classId": "WbsNode", "point": 320 }
+    },
+    {
+        "id": "Plan->Workpackage",
+        "type": "composition",
+        "from": { "classId": "Plan", "point": "top" },
+        "to": { "classId": "Workpackage", "point": "bottom" },
+        "label": "plan",
+        "fromMultiplicity": "0..1",
+        "description": ["部分 (Plan) から全体 (Workpackage) へ引く。◆ は全体の側に付く。"]
+    },
+    {
+        "id": "DataService->Store",
+        "type": "association",
+        "from": { "classId": "DataService", "point": "bottom" },
+        "to": { "classId": "Store", "point": "top" },
+        "label": "store",
+        "toMultiplicity": "1"
+    },
+    {
+        "id": "FileStore->Store",
+        "type": "realization",
+        "from": { "classId": "FileStore", "point": "top" },
+        "to": { "classId": "Store", "point": "bottom" }
+    }
+]

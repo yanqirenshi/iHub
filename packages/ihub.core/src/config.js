@@ -28,8 +28,11 @@ import Section03 from './components/pages/Help/Section03.js';
 //   panels:     { PAGE_DATA: { dfd: Dfd } }           タブの code → パネルの部品。既定に重ねる。({ tab })=> 部品。(既定 {})
 //   help:       { sections }                          Help の内容。(部品の配列。各部品は { size } を受け取る。既定 いまの 3 つ)
 //   github:     { token }                             個人用アクセストークン
-//   diagrams:   { er: { grid }, tm: { grid } }        ER 図・TM 図の設定。grid は d3.er・d3.ter の grid の設定を、そのまま渡す。
+//   diagrams:   { er: { grid }, tm: { grid }, classes: { grid, header } }
+//                                                     ER 図・TM 図・クラス図の設定。grid は d3.er・d3.ter・d3.classes の grid の設定を、そのまま渡す。
 //                 (例: { draw: false } でグリッド線を描かない。{ size, span } でグリッドの範囲と間隔。既定 渡さない)
+//                 classes.header … クラスの箱のヘッダーの色。{ by: 'layer', colors: { domain: '#fde68a', ... } }
+//                                  by はクラスのレコードの項目のパス、colors は項目の値 → 色 (文字列) か d3.classes の header ({ background, font })。(既定 塗らない)
 // }
 //
 // 設定は作り直さずに、モジュールの中で 1 つだけ作って渡す。(作り直すと、ストアも作り直される)
@@ -43,7 +46,7 @@ export const DEFAULT_CONFIG = {
     panels: {},
     help: { sections: [Section01, Section02, Section03] },
     github: { token: undefined },
-    diagrams: { er: {}, tm: {} },
+    diagrams: { er: {}, tm: {}, classes: {} },
 };
 
 function required (value, path) {
@@ -106,6 +109,7 @@ export function resolveConfig (config = {}) {
         diagrams:   {
             er: { ...DEFAULT_CONFIG.diagrams.er, ...config.diagrams?.er },
             tm: { ...DEFAULT_CONFIG.diagrams.tm, ...config.diagrams?.tm },
+            classes: { ...DEFAULT_CONFIG.diagrams.classes, ...config.diagrams?.classes },
         },
     };
 }

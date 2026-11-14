@@ -174,6 +174,8 @@ serve(app, { port: 4000, app_name: 'iHub' });
 - If-Match に ETag を指定すると、読み込んだあとにほかで変更されていたときは 412 を返します。
 - 書き込みは 1 つずつ順に行い、一時ファイルに書いてから置き換えます。
 - 書き込むときに `X-{app_name}-Client` ヘッダー (既定は X-iHub-Client) で画面 (タブ) の id を送ると、変更の通知にその id が付きます。
+- `{id}` が記号を含む文字列のとき (クラス図の `Plan->Workpackage` など) は、`encodeURIComponent` で符号化して送ります。
+- URL の `{id}` は、数字だけなら数値として探します。見つからないときは、文字列としても探します。(id が `"123"` のような文字列のレコードも引けます。0.6.0 以降)
 
 ## GitHub の OAuth
 
@@ -218,6 +220,15 @@ domain が local のコレクション (例: local/account_menus) は、個人�
 data/local/ に保存し、git では共有しません。
 ファイルが無いときは、スキーマの default を返します。
 
+## ファイルが無くてもよいコレクション
+
+スキーマに `default` があるコレクションは、ファイルが無くても起動できます。(0.6.0 以降)
+ファイルが無いときは、`default` を返し、`default` のデータとしてルールも検査します。
+最初に書き込んだときに、ファイルを作ります。
+
+いまは、local のコレクションと、クラス図 (`classes/classes`・`classes/relationships`。`default` は `[]`) が当てはまります。
+クラス図は 0.6.0 で足したので、`data/classes/` の無いアプリでも、今までどおり動くようにしています。
+
 ## テスト
 
 ```
@@ -231,6 +242,7 @@ iHub のリポジトリのルートで `npm run test:data` を実行すると、
 パッケージのコレクション (iHub 本体のもの) を足すとき:
 
 1. `src/schemas/{domain}/{collection}.schema.json` を作ります。
+   - すでにあるアプリが、ファイルを足さなくても動くようにするときは、スキーマに `default` を書きます。([ファイルが無くてもよいコレクション](#ファイルが無くてもよいコレクション))
 2. `data/{domain}/{collection}.json` と、雛形のデータ (`packages/ihub.core/examples/data/{domain}/{collection}.json`) を作ります。
 3. コレクションをまたぐ検査が必要なときは、`src/validation/rules.mjs` に書きます。
 
