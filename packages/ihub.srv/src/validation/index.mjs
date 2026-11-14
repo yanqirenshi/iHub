@@ -3,6 +3,8 @@
 // data フォルダの {domain}/{collection}.json の組で、スキーマのファイルから一覧を作る。
 // スキーマとルールは、パッケージのものに、アプリが足したもの (extensions.schemas_dir・extensions.rules) を加えて使う。
 // domain が local のコレクションは個人の設定なので、ファイルが無くてもよい。(無いときはスキーマの default を使う)
+// ほかのドメインでも、スキーマに default があるコレクションは、ファイルが無くてもよい。(あとから足したドメイン (classes など) を、
+// ファイルを作っていないアプリでも、default (空の配列など) として扱うため)
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -45,7 +47,7 @@ function readCollections (dir) {
             domain,
             collection,
             schema,
-            optional: domain==='local',
+            optional: domain==='local' || schema.default!==undefined,
             // レコードの id のプロパティ。(id の無いコレクションは null)
             idKey: '_id' in properties ? '_id' : ('id' in properties ? 'id' : null),
             // コレクションが空のときに、最初に振る id。
@@ -152,7 +154,8 @@ export function createValidation ({ schemas_dir = null, rules = {} } = {}) {
             if (members.some(c=> invalid.has(c.name)))
                 continue;
 
-            const domain_data = Object.fromEntries(members.map(c=> [c.collection, data[c.name]]));
+            // ファイルが無くてもよいコレクションは、無いときに default で検査する。
+            const domain_data = Object.fromEntries(members.map(c=> [c.collection, c.name in data ? data[c.name] : defaultData(c)]));
 
             for (const check of checks)
                 errors.push(...check(domain_data));

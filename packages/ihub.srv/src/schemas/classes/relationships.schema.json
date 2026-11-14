@@ -1,0 +1,114 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "クラス図の関係",
+    "description": "クラス図 (d3.classes) の線。項目は d3.classes の RelationshipInput の形のまま。id は文字列で、関係の中で一意。from / to は、クラス ({ classId, point }) か座標 ({ x, y })。classId はクラスの id。point は取り付ける位置で、辺 (top / bottom / left / right の中点) か角度 (0=真下・時計回り。90=左 / 180=真上 / 270=右)。fromMultiplicity / toMultiplicity は多重度、fromRole / toRole は端名。description は説明 (1 行 1 要素。図には描かない)。アプリ固有の項目 (notes など) は、そのまま書いてよい (図には渡さない)。ファイルが無いときは、空の図として扱う。",
+    "type": "array",
+    "default": [],
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string",
+                "minLength": 1
+            },
+            "type": {
+                "enum": [
+                    "association",
+                    "inheritance",
+                    "realization",
+                    "aggregation",
+                    "composition",
+                    "dependency"
+                ]
+            },
+            "from": {
+                "$ref": "#/$defs/end"
+            },
+            "to": {
+                "$ref": "#/$defs/end"
+            },
+            "label": {
+                "type": "string"
+            },
+            "fromMultiplicity": {
+                "type": "string"
+            },
+            "toMultiplicity": {
+                "type": "string"
+            },
+            "fromRole": {
+                "type": "string"
+            },
+            "toRole": {
+                "type": "string"
+            },
+            "description": {
+                "type": "array",
+                "description": "説明 (1 行 1 要素)",
+                "items": {
+                    "type": "string"
+                }
+            }
+        },
+        "required": [
+            "id",
+            "type",
+            "from",
+            "to"
+        ],
+        "additionalProperties": true
+    },
+    "$defs": {
+        "end": {
+            "anyOf": [
+                {
+                    "type": "object",
+                    "description": "クラスに取り付ける",
+                    "properties": {
+                        "classId": {
+                            "type": "string",
+                            "minLength": 1
+                        },
+                        "point": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "top",
+                                        "bottom",
+                                        "left",
+                                        "right"
+                                    ]
+                                },
+                                {
+                                    "type": "number"
+                                }
+                            ]
+                        }
+                    },
+                    "required": [
+                        "classId",
+                        "point"
+                    ],
+                    "additionalProperties": true
+                },
+                {
+                    "type": "object",
+                    "description": "座標に取り付ける",
+                    "properties": {
+                        "x": {
+                            "type": "number"
+                        },
+                        "y": {
+                            "type": "number"
+                        }
+                    },
+                    "required": [
+                        "x",
+                        "y"
+                    ],
+                    "additionalProperties": true
+                }
+            ]
+        }
+    }
+}

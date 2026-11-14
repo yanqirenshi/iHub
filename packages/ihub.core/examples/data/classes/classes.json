@@ -1,0 +1,99 @@
+[
+    {
+        "id": "WbsNode",
+        "name": { "logical": "WBS のノード", "physical": "WbsNode" },
+        "stereotype": "abstract",
+        "layer": "domain",
+        "description": ["プロジェクト・WBS・ワークパッケージに共通の項目。", "id は、3 つをまたいで一意。"],
+        "attributes": [
+            { "name": { "logical": "id", "physical": "id" }, "type": "number", "visibility": "public" },
+            { "name": { "logical": "name", "physical": "name" }, "type": "string", "visibility": "public" }
+        ],
+        "position": { "x": 0, "y": 0 },
+        "size": { "w": 200 }
+    },
+    {
+        "id": "Project",
+        "name": { "logical": "プロジェクト", "physical": "Project" },
+        "layer": "domain",
+        "attributes": [
+            { "name": { "logical": "description", "physical": "description" }, "type": "string", "visibility": "public" }
+        ],
+        "position": { "x": -260, "y": 200 },
+        "size": { "w": 200 }
+    },
+    {
+        "id": "Wbs",
+        "name": { "logical": "WBS", "physical": "Wbs" },
+        "layer": "domain",
+        "attributes": [
+            { "name": { "logical": "parent", "physical": "parent" }, "type": "number", "visibility": "public" }
+        ],
+        "position": { "x": 0, "y": 200 },
+        "size": { "w": 200 }
+    },
+    {
+        "id": "Workpackage",
+        "name": { "logical": "ワークパッケージ", "physical": "Workpackage" },
+        "layer": "domain",
+        "attributes": [
+            { "name": { "logical": "parent", "physical": "parent" }, "type": "number", "visibility": "public" },
+            { "name": { "logical": "plan", "physical": "plan" }, "type": "Plan", "visibility": "public" }
+        ],
+        "position": { "x": 260, "y": 200 },
+        "size": { "w": 220 }
+    },
+    {
+        "id": "Plan",
+        "name": { "logical": "予定の期間", "physical": "Plan" },
+        "layer": "domain",
+        "description": ["to は from より前にしない。"],
+        "attributes": [
+            { "name": { "logical": "from", "physical": "from" }, "type": "string", "visibility": "public" },
+            { "name": { "logical": "to", "physical": "to" }, "type": "string", "visibility": "public" }
+        ],
+        "position": { "x": 270, "y": 400 },
+        "size": { "w": 200 }
+    },
+    {
+        "id": "DataService",
+        "name": { "logical": "DataService", "physical": "DataService" },
+        "layer": "application",
+        "description": ["コレクションの読み書きの手順。", "書く前に、ドメインのデータ全体を検証する。"],
+        "attributes": [
+            { "name": { "logical": "store", "physical": "store" }, "type": "Store", "visibility": "private" }
+        ],
+        "methods": [
+            { "name": { "logical": "read", "physical": "read" }, "parameters": ["name"], "returnType": "Result", "visibility": "public" },
+            { "name": { "logical": "patchRecord", "physical": "patchRecord" }, "parameters": ["name", "id", "patch"], "returnType": "Result", "visibility": "public" }
+        ],
+        "position": { "x": 700, "y": -60 },
+        "size": { "w": 280 }
+    },
+    {
+        "id": "Store",
+        "name": { "logical": "Store", "physical": "Store" },
+        "stereotype": "interface",
+        "layer": "adapter",
+        "methods": [
+            { "name": { "logical": "read", "physical": "read" }, "parameters": ["name"], "returnType": "Json", "visibility": "public" },
+            { "name": { "logical": "write", "physical": "write" }, "parameters": ["name", "data"], "returnType": "void", "visibility": "public" }
+        ],
+        "position": { "x": 720, "y": 180 },
+        "size": { "w": 240 }
+    },
+    {
+        "id": "FileStore",
+        "name": { "logical": "FileStore", "physical": "FileStore" },
+        "layer": "framework",
+        "attributes": [
+            { "name": { "logical": "dir", "physical": "dir" }, "type": "string", "visibility": "private" }
+        ],
+        "methods": [
+            { "name": { "logical": "read", "physical": "read" }, "parameters": ["name"], "returnType": "Json", "visibility": "public" },
+            { "name": { "logical": "write", "physical": "write" }, "parameters": ["name", "data"], "returnType": "void", "visibility": "public" }
+        ],
+        "position": { "x": 720, "y": 400 },
+        "size": { "w": 240 }
+    }
+]

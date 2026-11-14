@@ -46,6 +46,22 @@ const config = {
 
     // GitHub の個人用アクセストークン
     github: { token: process.env.REACT_APP_GITHU_PARSONAL_TOKEN },
+
+    // 図の設定
+    diagrams: {
+        // クラス図: 箱のヘッダーを、クラスの layer の値で塗り分ける。(data/classes/classes.json の layer)
+        classes: {
+            header: {
+                by: 'layer',
+                colors: {
+                    domain:      '#fde68a',
+                    application: '#fecaca',
+                    adapter:     '#bbf7d0',
+                    framework:   '#bfdbfe',
+                },
+            },
+        },
+    },
 };
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

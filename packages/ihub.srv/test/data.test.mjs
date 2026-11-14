@@ -220,3 +220,65 @@ test('図の線で、ノードの見つからないものを見つける', ()=> 
         'deployment/edges: to.id のノードが見つかりません。(id=100, to.id=3)',
     ]);
 });
+
+test('クラス図 (classes) のファイルは無くてもよく、無いときは空の図として検査する', ()=> {
+    const data = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
+
+    delete data['classes/classes'];
+    delete data['classes/relationships'];
+
+    assert.deepEqual(validateData(data), []);
+
+    // 関係だけがあるときは、端のクラスが見つからない。(クラスは空として検査する)
+    data['classes/relationships'] = [{ id: 'A->B', type: 'association', from: { classId: 'A', point: 'top' }, to: { x: 0, y: 0 } }];
+
+    assert.deepEqual(validateData(data), ['classes/relationships: from.classId のクラスが見つかりません。(id=A->B, classId=A)']);
+});
+
+test('クラス図は、d3.classes の入力の形と、アプリ固有の項目を書ける', ()=> {
+    const data = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
+
+    data['classes/classes'] = [
+        // 名前は文字列でもよい。属性・メソッドも文字列でよい。知らない項目 (layer など) は、そのまま書ける
+        { id: 'A', name: 'A', attributes: ['x'], methods: ['run'], position: { x: 0, y: 0 }, layer: 'domain', notes: ['メモ'] },
+        { id: 'B', name: { physical: 'B' }, stereotype: 'interface', position: { x: 1.5, y: -2 }, size: { w: 300, h: 0 },
+          header: { background: { color: '#89c3eb' }, font: { color: '#fff' } }, description: ['説明'] },
+    ];
+    data['classes/relationships'] = [
+        { id: 'A->B', type: 'realization', from: { classId: 'A', point: 250 }, to: { classId: 'B', point: 'bottom' }, notes: ['メモ'] },
+        { id: 'B->pt', type: 'dependency', from: { classId: 'B', point: 'right' }, to: { x: 10, y: 20 }, label: 'l', fromMultiplicity: '1', toMultiplicity: '0..*', fromRole: '- a', toRole: '+ b' },
+    ];
+
+    assert.deepEqual(validateData(data), []);
+});
+
+test('クラス図の形の誤りを見つける (id・位置・名前・関係の種類・取り付ける辺)', ()=> {
+    const data = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
+
+    data['classes/classes'].push({ id: 1, name: {}, position: { x: 0 } });
+    data['classes/relationships'].push({ id: 'X', type: 'uses', from: { classId: 'Plan', point: 'middle' }, to: { classId: 'Plan', point: 'top' } });
+
+    const errors = validateData(data);
+
+    assert.ok(errors.some(e=> e.startsWith('classes/classes/8/id: ')), errors.join('\n'));
+    assert.ok(errors.some(e=> e.startsWith('classes/classes/8/position: ')), errors.join('\n'));
+    assert.ok(errors.some(e=> e.startsWith('classes/classes/8/name')), errors.join('\n'));
+    assert.ok(errors.some(e=> e.startsWith('classes/relationships/6/type: ')), errors.join('\n'));
+    assert.ok(errors.some(e=> e.startsWith('classes/relationships/6/from')), errors.join('\n'));
+});
+
+test('クラス図の id の重複と、関係の端のクラスが無いものを見つける', ()=> {
+    const errors = RULES.classes({
+        classes:       [{ id: 'A' }, { id: 'A' }, { id: 'B' }],
+        relationships: [
+            { id: 'r1', from: { classId: 'A', point: 'top' }, to: { classId: 'C', point: 'top' } },
+            { id: 'r1', from: { x: 0, y: 0 }, to: { classId: 'B', point: 0 } },
+        ],
+    });
+
+    assert.deepEqual(errors, [
+        'classes/classes: id が重複しています。(id=A)',
+        'classes/relationships: id が重複しています。(id=r1)',
+        'classes/relationships: to.classId のクラスが見つかりません。(id=r1, classId=C)',
+    ]);
+});

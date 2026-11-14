@@ -1,0 +1,243 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "クラス図のクラス",
+    "description": "クラス図 (d3.classes) の箱。項目は d3.classes の ClassInput の形のまま。id は文字列 (物理名など) で、図全体で一意 (関係の端の classId がこれを指す)。name は文字列か論理名・物理名の組で、箱には論理名 (無ければ物理名) を出す。position は箱の左上で、ドラッグで書き換わる。size.w は箱の幅 (高さは内容から決まる)。description は説明 (1 行 1 要素。図には描かない)。アプリ固有の項目 (group・layer・filePath・notes など) は、そのまま書いてよい (図には渡さない)。ファイルが無いときは、空の図として扱う。",
+    "type": "array",
+    "default": [],
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string",
+                "minLength": 1
+            },
+            "name": {
+                "$ref": "#/$defs/name"
+            },
+            "stereotype": {
+                "type": "string",
+                "description": "箱の上に «» で出す。(例: abstract / interface / enumeration)"
+            },
+            "attributes": {
+                "type": "array",
+                "items": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "$ref": "#/$defs/attribute"
+                        }
+                    ]
+                }
+            },
+            "methods": {
+                "type": "array",
+                "items": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "$ref": "#/$defs/method"
+                        }
+                    ]
+                }
+            },
+            "position": {
+                "type": "object",
+                "properties": {
+                    "x": {
+                        "type": "number"
+                    },
+                    "y": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "x",
+                    "y"
+                ],
+                "additionalProperties": false
+            },
+            "size": {
+                "type": "object",
+                "description": "w は箱の幅 (無いか 0 のときは 200)。h は使わない (高さは内容から決まる)",
+                "properties": {
+                    "w": {
+                        "type": "number",
+                        "minimum": 0
+                    },
+                    "h": {
+                        "type": "number",
+                        "minimum": 0
+                    }
+                },
+                "additionalProperties": false
+            },
+            "radius": {
+                "type": "number",
+                "minimum": 0,
+                "description": "角丸の半径 (px)。無いときは 4、0 で直角"
+            },
+            "header": {
+                "type": "object",
+                "description": "ヘッダー (クラス名の行) の見た目。d3.classes にそのまま渡す。(設定の diagrams.classes.header の色より優先する)",
+                "properties": {
+                    "background": {
+                        "type": "object",
+                        "properties": {
+                            "color": {
+                                "type": "string"
+                            },
+                            "opacity": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 1
+                            }
+                        },
+                        "additionalProperties": true
+                    },
+                    "font": {
+                        "type": "object",
+                        "properties": {
+                            "color": {
+                                "type": "string"
+                            },
+                            "size": {
+                                "type": [
+                                    "string",
+                                    "number"
+                                ]
+                            },
+                            "weight": {
+                                "type": [
+                                    "string",
+                                    "number"
+                                ]
+                            }
+                        },
+                        "additionalProperties": true
+                    }
+                },
+                "additionalProperties": true
+            },
+            "description": {
+                "$ref": "#/$defs/lines"
+            }
+        },
+        "required": [
+            "id",
+            "name",
+            "position"
+        ],
+        "additionalProperties": true
+    },
+    "$defs": {
+        "name": {
+            "description": "文字列、または論理名と物理名の組 (どちらか 1 つは要る)",
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "logical": {
+                            "type": "string"
+                        },
+                        "physical": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        }
+                    },
+                    "anyOf": [
+                        {
+                            "required": [
+                                "logical"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "physical"
+                            ]
+                        }
+                    ],
+                    "additionalProperties": true
+                }
+            ]
+        },
+        "lines": {
+            "type": "array",
+            "description": "説明 (1 行 1 要素)",
+            "items": {
+                "type": "string"
+            }
+        },
+        "visibility": {
+            "enum": [
+                "public",
+                "private",
+                "protected",
+                "package"
+            ]
+        },
+        "attribute": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "$ref": "#/$defs/name"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "visibility": {
+                    "$ref": "#/$defs/visibility"
+                },
+                "kind": {
+                    "enum": [
+                        "attribute",
+                        "label"
+                    ],
+                    "description": "label は、可視性と型を出さずに名前だけを出す (enum のバリアントなど)"
+                },
+                "description": {
+                    "$ref": "#/$defs/lines"
+                }
+            },
+            "required": [
+                "name"
+            ],
+            "additionalProperties": true
+        },
+        "method": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "$ref": "#/$defs/name"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "returnType": {
+                    "type": "string"
+                },
+                "visibility": {
+                    "$ref": "#/$defs/visibility"
+                },
+                "description": {
+                    "$ref": "#/$defs/lines"
+                }
+            },
+            "required": [
+                "name"
+            ],
+            "additionalProperties": true
+        }
+    }
+}

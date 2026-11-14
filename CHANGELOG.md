@@ -10,6 +10,12 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.6.0 (2026-11)
+
+- `@yanqirenshi/ihub.core`: クラス (`/classes`) のページの「クラス図」タブに、何も描かれない不具合を直した。(yanqirenshi/iHub#171。タブはあるが、パネルの表に `class-diagram` が無く、`TabbedPage` が何も描いていなかった) クラス図のパネル `panels.Classes` を足し、`data/classes/` のデータを `@yanqirenshi/d3.classes` で描く。(箱のドラッグで位置を保存し、右クリック・クリックで、インスペクタからクラスと関係を書き換えられる。TM と同じ流儀) 設定 `diagrams.classes` (`grid`・`header`。ヘッダーを、クラスの項目の値ごとに塗り分ける) を足した。PATCH の URL の id を符号化するようにした。
+- `@yanqirenshi/ihub.srv`: クラス図のドメイン `classes` (`classes/classes`・`classes/relationships`) のスキーマとルールを足した。(項目は d3.classes の入力の形のまま。アプリ固有の項目も書ける) スキーマに `default` があるコレクションは、ファイルが無くてもよいようにした。(`data/classes/` の無いアプリも、そのまま動く) URL の id が数字だけで、数値で見つからないときは、文字列としても探す。
+- 参照アプリ: `data/classes/` (雛形と同じ見本) と、`diagrams.classes.header` で `layer` ごとに塗り分ける設定を足した。
+
 ## 0.5.0 (2026-11)
 
 - `@yanqirenshi/ihub.core`: `dependencies` の d3.* などの下限を、最新の版に上げた。(d3.yabane 0.1.17: Schedule タブで、同じ WBS の中で期間が重なる矢羽根が、重ならなくなった。d3.deployment 0.11.1: システム構成図で、線の矢印が描かれる。d3.ter 0.4.1・model.deployment/sitemap/tm 0.1.1・d3.er 0.6.2・d3.sitemap 0.9.1・colonoscope 0.5.1・model.unchi 0.1.1) 参照アプリ (ルートの `package.json`) の `@yanqirenshi/d3.network` も、`^0.10.0` にした。

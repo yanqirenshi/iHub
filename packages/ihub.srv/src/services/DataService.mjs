@@ -34,6 +34,12 @@ function mergePatch (target, patch) {
 }
 
 // レコードを id で探す。入れ子のノード (children) の中も探す。
+// URL の id は、数字だけなら数値になる (app.mjs の recordId)。id が数字だけの文字列のレコードも引けるように、
+// 数値で見つからないときは、文字列でも探す。
+function locateRecord (list, key, id) {
+    return findRecord(list, key, id) || (typeof id==='number' ? findRecord(list, key, String(id)) : null);
+}
+
 function findRecord (list, key, id) {
     for (let index = 0; index < list.length; index++) {
         if (list[index][key]===id)
@@ -276,10 +282,10 @@ export default class DataService {
 
             assertObject(patch, '変更する内容');
 
-            if (key in patch && patch[key]!==id)
-                throw new HttpError(400, `${key} は変更できません。`);
+            const found = locateRecord(current, key, id);
 
-            const found = findRecord(current, key, id);
+            if (key in patch && patch[key]!==(found ? found.list[found.index][key] : id))
+                throw new HttpError(400, `${key} は変更できません。`);
 
             if (!found)
                 throw new HttpError(404, `レコードがありません。(${collection.name}, ${key}=${id})`);
@@ -296,7 +302,7 @@ export default class DataService {
     deleteRecord (name, id, options = {}) {
         return this.update(name, options, false, (collection, current)=> {
             const key = recordKey(collection);
-            const found = findRecord(current, key, id);
+            const found = locateRecord(current, key, id);
 
             if (!found)
                 throw new HttpError(404, `レコードがありません。(${collection.name}, ${key}=${id})`);
