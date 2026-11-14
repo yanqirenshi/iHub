@@ -72,11 +72,18 @@ a {
     font-weight: bold;
 }
 
-/* 本文の左の一覧の小見出し。(コンポーネントの assemblies・panels など) */
-.nav-group {
-    margin-bottom: 12px;
+/* セクションの入口の下に並べる小見出し。(コンポーネントの assemblies・panels など) */
+.nav-sublink {
+    padding-left: 44px;
+    font-family: monospace;
+    font-size: 14px;
 }
 
+.nav-sublink.active {
+    padding-left: 41px;
+}
+
+/* 本文の左の一覧の見出し。 */
 .nav-group-label {
     padding: 4px 20px 2px;
     color: var(--muted);
@@ -163,14 +170,6 @@ a {
         padding: 0;
     }
 
-    .nav-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        width: 100%;
-        margin-top: 4px;
-    }
-
     .nav-group-label {
         width: 100%;
         padding: 0;
@@ -196,6 +195,9 @@ a {
 
     .subnav {
         position: static;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
         width: auto;
         max-height: none;
         margin-bottom: 24px;
