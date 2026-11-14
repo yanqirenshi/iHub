@@ -6,6 +6,7 @@
     --border: #e2dde6;
     --code-bg: #f6f5f8;
     --nav-width: 240px;
+    --subnav-width: 220px;
     --header-height: 52px;
 }
 
@@ -71,13 +72,13 @@ a {
     font-weight: bold;
 }
 
-/* セクションの中の小見出し。(コンポーネントの assemblies・panels など) */
+/* 本文の左の一覧の小見出し。(コンポーネントの assemblies・panels など) */
 .nav-group {
-    margin-top: 6px;
+    margin-bottom: 12px;
 }
 
 .nav-group-label {
-    padding: 4px 20px 2px 28px;
+    padding: 4px 20px 2px;
     color: var(--muted);
     font-size: 12px;
     font-family: monospace;
@@ -104,8 +105,39 @@ a {
 }
 
 .main {
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
     margin-left: var(--nav-width);
     padding: calc(var(--header-height) + 24px) 40px 80px;
+}
+
+.main-body {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 本文の左の一覧。スクロールしても、画面に残す。 */
+.subnav {
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+    flex: none;
+    width: var(--subnav-width);
+    max-height: calc(100vh - var(--header-height) - 48px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+}
+
+/* 長い部品の名前 (TheoryOfSystemsChangeAndAction など) は折り返す。 */
+.subnav .nav-link {
+    padding-left: 20px;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.subnav .nav-link.active {
+    padding-left: 17px;
 }
 
 /* 画面が狭いときは、メニューを本文の上に置き、項目を横に並べる。 */
@@ -157,8 +189,24 @@ a {
     }
 
     .main {
+        display: block;
         margin-left: 0;
         padding: 24px 20px 60px;
+    }
+
+    .subnav {
+        position: static;
+        width: auto;
+        max-height: none;
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .subnav .nav-link,
+    .subnav .nav-link.active {
+        padding: 2px 10px;
     }
 }
 

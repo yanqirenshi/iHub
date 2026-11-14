@@ -1,5 +1,5 @@
 // 「コンポーネント」のセクションのページ。(@yanqirenshi/ihub.core の部品を、1 つ 1 ページで説明する)
-// 小見出し (groups) ごとに、部品の名前を並べる。並び順が、サイドメニューと「前へ・次へ」の順になる。
+// 小見出し (groups) ごとに、部品の名前を並べる。並び順が、本文の左の一覧と「前へ・次へ」の順になる。
 // 本文は src/content/components/{dir}/{部品の名前}.md に書く。
 import overview from './content/components/index.md?raw';
 
