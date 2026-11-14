@@ -22,6 +22,12 @@ npm run build
 `docs/dist/` にできます。
 パスを相対にしているので、どのフォルダに置いても開けます。(`npm run preview` で確かめられます)
 
+### 公開する
+
+main の `docs/` が変わると、GitHub Actions (`.github/workflows/docs.yml`) がビルドして GitHub Pages に公開します。
+https://yanqirenshi.github.io/iHub/ で開きます。
+Actions の画面から、手で実行することもできます。
+
 ### ページを書く
 
 |   |                |                                                   |
