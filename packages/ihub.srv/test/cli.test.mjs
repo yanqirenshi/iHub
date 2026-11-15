@@ -43,6 +43,11 @@ test('init --app は、アプリのファイルを作り、package.json が無�
     assert.ok(existsSync(join(dir, 'src', 'index.js')));
     assert.ok(existsSync(join(dir, 'src', 'config', 'ACCOUNT_MENUS.js')));
     assert.ok(existsSync(join(dir, 'src', 'wbs', 'NotFoundWbsNodeData.js')));
+
+    // 自分で作る部品を置くフォルダ。(中身は README.md だけ)
+    for (const sub of ['assemblies', 'pages', 'panels', 'parts'])
+        assert.ok(existsSync(join(dir, 'src', 'components', sub, 'README.md')), `src/components/${sub}/`);
+
     assert.ok(existsSync(join(dir, 'public', 'index.html')));
     assert.ok(existsSync(join(dir, '.gitignore')));
 
