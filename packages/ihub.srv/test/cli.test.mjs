@@ -48,6 +48,9 @@ test('init --app は、アプリのファイルを作り、package.json が無�
     for (const sub of ['assemblies', 'pages', 'panels', 'parts'])
         assert.ok(existsSync(join(dir, 'src', 'components', sub, 'README.md')), `src/components/${sub}/`);
 
+    // 自分で作るデータのマネージャを置くフォルダ。(中身は README.md だけ)
+    assert.ok(existsSync(join(dir, 'src', 'manegers', 'README.md')));
+
     assert.ok(existsSync(join(dir, 'public', 'index.html')));
     assert.ok(existsSync(join(dir, '.gitignore')));
 
