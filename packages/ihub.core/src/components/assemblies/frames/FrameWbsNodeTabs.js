@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 
 import Frame from '../../assemblies/frames/Frame.js';
-import HeadWbsPage from '../../parts/HeadWbsPage.js';
+import HeadWbsPage, { headAlignOf } from '../../parts/HeadWbsPage.js';
 import WBSTable from '../../assemblies/WBSTable.js';
 import TabsSearchParam from '../../assemblies/TabsSearchParam.js';
 
@@ -16,6 +16,7 @@ import { useWbs } from '../../../manegers/wbs.js';
 //   tabsProps  … タブ (MUI の Tabs) に渡す props。(TabsSearchParam を参照)
 //   maxWidth   … 内容の幅。(省略したときは "lg")
 //   showWbsTable … false のとき、WBS の表 (WBSTable) を出さない。(省略したときは、出す)
+//   headAlign    … 見出し (HeadWbsPage) の寄せ。'left'・'center'・'right' のどれか。(省略したときと、ほかの値のときは 'center')
 export default function FrameWbsNodeTabs (props) {
     const tabs = props.tabs;
     const tab  = props.tab;
@@ -24,6 +25,7 @@ export default function FrameWbsNodeTabs (props) {
     const children = props.children;
     const maxWidth = props.maxWidth || "lg";
     const showWbsTable = props.showWbsTable ?? true;
+    const headAlign = headAlignOf(props.headAlign, 'center');
 
     const wbs = useWbs();
 
@@ -36,7 +38,7 @@ export default function FrameWbsNodeTabs (props) {
     return (
         <Frame>
           <Box sx={{height:'100%', overflow:'auto'}}>
-            <HeadWbsPage value={wbs_node}/>
+            <HeadWbsPage value={wbs_node} align={headAlign}/>
 
             <Container maxWidth={maxWidth}>
               <TabsSearchParam tabs={tabs} value={tab} onChange={onChangeTab}

@@ -25,6 +25,7 @@ import { HeadWbsPage } from '@yanqirenshi/ihub.core';
 | 名前 | 型 | 必須 | 内容 |
 |---|---|---|---|
 | `value` | object | 必須 | WBS のノード。`_class`・`name`・`description` を読みます |
+| `align` | string | - | 見出しの寄せ。`'left'` (左寄せ)・`'center'` (中央寄せ)・`'right'` (右寄せ) のどれか。既定は `'left'` |
 
 ## 使い方の例
 
@@ -48,3 +49,6 @@ function MyWbsHead () {
   `data/wbs/` の JSON のレコードそのものには、`_class` がありません。
 - `value` が無いとエラーになります。
   ノードが見つからないときは、この部品を描かないでください。
+- `align` に `'left'`・`'center'`・`'right'` 以外の値を渡したときは、左寄せになります。
+- この部品だけを使うときの既定は、これまでどおり左寄せです。
+  [FrameWbsNode](#/components/assemblies/FrameWbsNode)・[FrameWbsNodeTabs](#/components/assemblies/FrameWbsNodeTabs) の中の見出しは、既定で中央寄せです。(枠の `headAlign` で変えられます)
