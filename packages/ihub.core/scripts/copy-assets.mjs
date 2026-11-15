@@ -34,9 +34,10 @@ console.log(`Copied ${count} CSS file(s) to dist.`);
 
 // 2. 雛形のアプリ
 // 参照アプリの src/ のうち、アプリに固有のもの。(service worker と setupTests は、CRA の雛形のものなので、入れない)
+// components は、自分で作る部品を置くフォルダ (assemblies・pages・panels・parts)。中身は README.md だけ。
 const REF_SRC = [
     'index.js', 'index.css', 'Router.js', 'setupProxy.js',
-    'config', 'operators', 'wbs',
+    'components', 'config', 'operators', 'wbs',
     'js/serviceWorkerRegistration.js', 'js/reportWebVitals.js',
 ];
 
