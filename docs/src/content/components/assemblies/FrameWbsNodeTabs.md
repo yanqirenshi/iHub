@@ -6,7 +6,7 @@
 1. ノードの見出し ([HeadWbsPage](#/components/parts/HeadWbsPage))
 2. タブの並び ([TabsSearchParam](#/components/assemblies/TabsSearchParam))
 3. `children` (ページの内容)
-4. このノードから下の WBS の表 ([WBSTable](#/components/assemblies/WBSTable))
+4. このノードから下の WBS の表 ([WBSTable](#/components/assemblies/WBSTable))。`showWbsTable={false}` のときは出しません
 
 - ソース: `packages/ihub.core/src/components/assemblies/frames/FrameWbsNodeTabs.js`
 
@@ -39,6 +39,7 @@ import { FrameWbsNodeTabs } from '@yanqirenshi/ihub.core';
 | `maxWidth` | string | - | タブの並びと WBS の表の幅。MUI の `Container` の `maxWidth` の値 (`'md'` など)。既定は `'lg'` |
 | `centered` | boolean | - | `true` のとき、タブを中央に寄せます。既定は左寄せ。(0.5.0 以降) |
 | `tabsProps` | object | - | タブ (MUI の `Tabs`) に渡す props。([TabsSearchParam](#/components/assemblies/TabsSearchParam) の `tabsProps` と同じ) (0.5.0 以降) |
+| `showWbsTable` | boolean | - | `false` のとき、WBS の表を出しません。既定は `true` (出す) |
 
 `centered` と `tabsProps` は、そのまま [TabsSearchParam](#/components/assemblies/TabsSearchParam) に渡します。
 
@@ -87,6 +88,18 @@ export default function P1000 (props) {
 </FrameWbsNodeTabs>
 ```
 
+WBS の表を出さないときは、`showWbsTable={false}` を付けます。
+
+```jsx
+<FrameWbsNodeTabs wbs_node={props.wbs_node}
+                  tabs={TABS}
+                  tab={tab}
+                  onChangeTab={setTab}
+                  showWbsTable={false}>
+  ...
+</FrameWbsNodeTabs>
+```
+
 ## 注意
 
 - `<IHub>` の中で使ってください。
@@ -102,6 +115,7 @@ export default function P1000 (props) {
 - `centered`・`tabsProps` は、この部品が描くタブの並びにだけ効きます。
   `children` の中に描いたタブには、効きません。
   0.4.x までは、中央に寄せるには、この部品を `Box` で囲んで、MUI のクラス名 (`.MuiTabs-flexContainer`) に CSS を当てる必要がありました。0.5.0 からは、`centered` を使ってください。
+- タブによって WBS の表を出し分けるときは、`showWbsTable={tab==='overview'}` のように、`tab` から決めて渡します。
 - `maxWidth` は、タブの並びと WBS の表にだけ効きます。
   見出しの幅は `'lg'` のままです。
   `children` の幅は、`children` の側で決めてください。

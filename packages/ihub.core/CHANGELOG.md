@@ -11,6 +11,11 @@
 - 雛形のアプリ (`examples/app/`。`ihub-srv init --app` がコピーする) に、自分で作る部品を置くフォルダ `src/components/` (`assemblies/`・`pages/`・`panels/`・`parts/`) を入れた。中身は、それぞれの `README.md` だけ。
   - これまでは、参照アプリにはあるが、雛形にコピーするものの一覧 (`scripts/copy-assets.mjs` の `REF_SRC`) に無かったので、雛形から作ったアプリには無かった。
 
+### 追加 (FrameWbsNode・FrameWbsNodeTabs: WBS の表の表示/非表示)
+
+- `FrameWbsNode` と `FrameWbsNodeTabs` に、props `showWbsTable` を足した。`false` のとき、ノードから下の WBS の表 (`WBSTable`) を出さない。省略したときは、今までどおり出す。
+  - `FrameWbsNode` では、消えるのは WBS の表だけで、子のノードを追加するフォーム (`AddWbsNode`) は、そのまま出る。
+
 ## 0.6.0 (2026-11)
 
 ### 修正 (クラス図: yanqirenshi/iHub#171)
