@@ -6,6 +6,15 @@
 
 ## 未リリース
 
+### 修正 (サイドメニュー: yanqirenshi/iHub#177)
+
+- サイドメニューで、選択中 (とホバー中) の項目の白い枠の上下の余白が、ほぼ無かった不具合を直した。(文字とアイコンが、白い枠の上下の端に付いて見えていた)
+  - 原因: サイドメニューの部品 (@yanqirenshi/menubook 0.1.1) の項目は、外の枠が高さ 33px・余白 4px で、`box-sizing` を指定していなかった。iHub が読み込む bulma がページ全体を `box-sizing: border-box` にするため、外の枠の 33px に余白が含まれ、白い枠が 25px に縮んでいた。(文字の行の高さは 24px)
+  - menubook 0.1.3 で直った。(`box-sizing` を明示し、選択中・ホバー中は、白い枠を 33px にして、外の枠を 41px・上下の margin -4px にする。白い枠の周りに 4px の縁取りが一周し、1 行の高さは 33px のまま) `dependencies` の `@yanqirenshi/menubook` の下限を、`^0.1.1` から `^0.1.3` に上げた。(直った版を、必ず使うようにする)
+  - menubook 0.1.2 は、上下の余白は付くが、白い枠の上下の縁取りが消えるので、使わない。
+  - 1 行の高さ (33px)・メニュー全体の高さ・未選択の項目の見た目は、変わらない。ホバーしても、項目の並びは動かない。iHub のコードの変更は無い。
+  - **利用側への影響**: ihub.core の次の版を待たずに直したいときは、アプリで `npm update @yanqirenshi/menubook` を実行して、menubook を 0.1.3 にする。(`^0.1.1` の範囲に入るので、`package.json` は変えなくてよい)
+
 ### 追加 (雛形のアプリ: `src/components/`)
 
 - 雛形のアプリ (`examples/app/`。`ihub-srv init --app` がコピーする) に、自分で作る部品を置くフォルダ `src/components/` (`assemblies/`・`pages/`・`panels/`・`parts/`) を入れた。中身は、それぞれの `README.md` だけ。
