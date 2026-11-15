@@ -58,7 +58,7 @@
     "@yanqirenshi/d3.yabane": "^0.1.17",
     "@yanqirenshi/manipulater": "^0.1.0",
     "@yanqirenshi/markdown.sitter": "^0.1.5",
-    "@yanqirenshi/menubook": "^0.1.1",
+    "@yanqirenshi/menubook": "^0.1.3",
     "@yanqirenshi/model.core": "^0.1.0",
     "@yanqirenshi/model.deployment": "^0.1.1",
     "@yanqirenshi/model.er": "^0.2.0",
