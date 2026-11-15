@@ -10,6 +10,12 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.6.1 (2026-11)
+
+- `@yanqirenshi/ihub.core`: サイドメニューで、選択中 (とホバー中) の項目の白い枠の上下の余白が、ほぼ無かった不具合を直した。(yanqirenshi/iHub#177。bulma の `box-sizing: border-box` で、menubook の白い枠が 33px から 25px に縮んでいた) `dependencies` の `@yanqirenshi/menubook` を `^0.1.3` にした。(白い枠 33px の周りに 4px の縁取りが一周し、1 行の高さは 33px のまま。iHub のコードの変更は無い)
+- `@yanqirenshi/ihub.core`: 雛形のアプリ (`examples/app/`) に、自分で作る部品を置くフォルダ `src/components/` (`assemblies/`・`pages/`・`panels/`・`parts/`。中身は `README.md` だけ) を入れた。
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(ihub.core 0.6.1 と、版をそろえるだけ)
+
 ## 0.6.0 (2026-11)
 
 - `@yanqirenshi/ihub.core`: クラス (`/classes`) のページの「クラス図」タブに、何も描かれない不具合を直した。(yanqirenshi/iHub#171。タブはあるが、パネルの表に `class-diagram` が無く、`TabbedPage` が何も描いていなかった) クラス図のパネル `panels.Classes` を足し、`data/classes/` のデータを `@yanqirenshi/d3.classes` で描く。(箱のドラッグで位置を保存し、右クリック・クリックで、インスペクタからクラスと関係を書き換えられる。TM と同じ流儀) 設定 `diagrams.classes` (`grid`・`header`。ヘッダーを、クラスの項目の値ごとに塗り分ける) を足した。PATCH の URL の id を符号化するようにした。
