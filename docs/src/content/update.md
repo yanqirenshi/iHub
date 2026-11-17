@@ -10,11 +10,11 @@ iHub 本体 (`@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`) は `node_modul
 npm update @yanqirenshi/ihub.core @yanqirenshi/ihub.srv
 ```
 
-- `package.json` の範囲 (例: `^0.5.0`) の中で、新しい版に上がります。
-- 0.x の間は、`^0.5.0` は 0.5.x だけを指します。minor (0.6.0 など) に上げるときは、範囲を書き換えます。
+- `package.json` の範囲 (例: `^0.8.0`) の中で、新しい版に上がります。
+- 0.x の間は、`^0.8.0` は 0.8.x だけを指します。minor (0.9.0 など) に上げるときは、範囲を書き換えます。
 
 ```
-npm install @yanqirenshi/ihub.core@^0.5.0 @yanqirenshi/ihub.srv@^0.5.0
+npm install @yanqirenshi/ihub.core@^0.8.0 @yanqirenshi/ihub.srv@^0.8.0
 ```
 
 - 2 つのパッケージは、同じ版にそろえてください。
@@ -27,12 +27,12 @@ npm ls @yanqirenshi/ihub.core @yanqirenshi/ihub.srv
 ```
 
 ```
-+-- @yanqirenshi/ihub.core@0.5.0
-`-- @yanqirenshi/ihub.srv@0.5.0
++-- @yanqirenshi/ihub.core@0.8.1
+`-- @yanqirenshi/ihub.srv@0.8.1
 ```
 
 - 出力の最初の行には、アプリの名前と場所が出ます。
-その下の 2 行の `@` のあとの版が、同じになっていれば大丈夫です。(上は 0.5.0 の例です)
+その下の 2 行の `@` のあとの版が、同じになっていれば大丈夫です。(上は 0.8.1 の例です)
 - 版が違うときは、片方に、`package.json` の範囲に合わない版として `invalid` が付くことがあります。
 上の `npm install` で、同じ版を指定して、入れ直してください。
 
@@ -97,3 +97,35 @@ npx ihub-srv init --app --only src/operators --only src/wbs
 ## 古いデータの形式から移すとき
 
 古い形式 (`src/data/*.js`・ER のフラット形式) のデータを持つアプリは、[コピー版からの移行](#/migrate) の「データを新しい形式にする」を見てください。
+
+## 0.6.x から 0.7.0 以降に上げるとき
+
+0.7.0・0.8.0 では、データのフォーマットと、図の既定の見た目が変わりました。
+`@yanqirenshi/ihub.core` と `@yanqirenshi/ihub.srv` を、同じ版 (0.8.x) にそろえてから、次のものを直します。
+
+### ワークパッケージの `plan` を書いていたとき
+
+艦橋の Schedule タブの予定は、0.7.0 から、`data/wbs/workpackages.json` の `plan` ではなく、`data/master_schedule/` に書きます。
+ワークパッケージの `plan` は使えなくなり、書いてあると `npx ihub-srv check data` が誤りにします。
+
+1. Schedule の行になっていた WBS (`plan` のあるワークパッケージを持つ WBS) を、`data/master_schedule/wbs.json` に書きます。(`id`・`name`)
+2. ワークパッケージの `name`・`plan` を、`data/master_schedule/workpackages.json` に書きます。`parent` には、1 の WBS の `id` を書きます。
+3. 矢羽根を押したときに、これまでどおり、ワークパッケージのページへ移したいときは、`wbs` に `data/wbs/` のワークパッケージの `id` を書きます。
+4. `data/wbs/workpackages.json` から、`plan` を消します。
+5. `npx ihub-srv check data` で確かめます。
+
+書き方は、[データの管理](#/data) の「Schedule の予定 (`master_schedule`)」にあります。
+0.7.0 で `data/master_schedule/rows.json`・`items.json` を作っていたときは、0.8.0 から、`wbs.json`・`workpackages.json` に名前を変えます。(中身は、そのまま使えます。古い名前のファイルがあると、`ihub-srv check` が知らせます)
+
+### 図のグリッド線を出していたとき
+
+d3.* で描く 7 つの図は、0.7.0 から、既定ではグリッド線を描きません。
+これまでどおり出したい図は、設定の `diagrams` に `{ grid: { draw: true } }` を書きます。([カスタマイズ](#/customize) の「図のグリッド線を描く」)
+グリッド線を消すために `{ draw: false }` を書いていたアプリは、そのままで構いません。
+
+### 見え方が変わるところ (直さなくてよいもの)
+
+- Schedule タブは、図の右上の「日・週・月」のボタンで、目盛りのサイクルを切り替えられます。(0.7.0) 初めは、これまでと同じ週です。
+- Schedule タブは、「−」「＋」のボタンで、1 目盛りの幅を変えられます。(0.8.1)
+- Schedule タブの名前の列の幅が、名前に合うようになります。(0.8.1)
+- Schedule タブの図の位置は、0.6.x で覚えたものを使わず、初めの位置で開きます。(図の code が、サイクルごとに分かれたため)

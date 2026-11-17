@@ -45,7 +45,7 @@ root.render(
 | `panels` | タブの code → パネルの部品。`{ ページの id: { code: 部品 } }`。既定に重ねる | `{}` |
 | `help` | Help の内容 (`sections`。部品の配列) | iHub の 3 つ |
 | `github` | GitHub の個人用アクセストークン (`token`) | 無し |
-| `diagrams` | ER 図・TM 図・クラス図の設定。`{ er: { grid }, tm: { grid }, classes: { grid, header } }`。`grid` は、d3.er・d3.ter・d3.classes の `grid` の設定を、そのまま渡す ([図のグリッド線](#/customize))。`classes.header` は、クラス図の見出しの色 ([クラス図の見出しの色](#/customize)) | 渡さない |
+| `diagrams` | d3.* で描く 7 つの図の設定。`{ er, tm, classes, std, scd, overview, schedule }` のそれぞれに `{ grid }`。`grid` は、グリッド線の設定 (下の「図のグリッド線を描く」。既定では描かない)。`classes.header` は、クラス図の見出しの色 ([クラス図の見出しの色](#/customize)) | 渡さない |
 
 - WBS のページを読み込む動的 `import()` は、ページのあるアプリ側 (`src/index.js`) に書きます。(webpack が、アプリのフォルダを束ねるため)
 - 必須の項目が無いときは、起動したときに、どの項目が無いかを示すエラーになります。
@@ -336,32 +336,42 @@ function icon (d, fillRule) {
 }
 ```
 
-### 図のグリッド線を消す
+### 図のグリッド線を描く
 
-ER 図・TM 図・クラス図は、背景にグリッド線を描きます。
-設定の `diagrams` で、図ごとに、d3.er・d3.ter・d3.classes の `grid` の設定を渡せます。(値は、iHub では解釈せずに、そのまま渡します)
+d3.* で描く 7 つの図は、**既定では、背景にグリッド線を描きません。** (0.7.0 以降。0.6.x までは、ER 図・TM 図・クラス図などに、グリッド線を描いていました)
+描きたい図は、設定の `diagrams` で、図ごとに `grid: { draw: true }` を書きます。
 
 ```jsx
 const config = {
     // (省略)
     diagrams: {
-        er: { grid: { draw: false } },         // ER 図のグリッド線を描かない
-        tm: { grid: { draw: false } },         // TM 図のグリッド線を描かない
-        classes: { grid: { draw: false } },    // クラス図のグリッド線を描かない (0.6.0 以降。d3.classes は draw だけを読む)
+        er: { grid: { draw: true } },                  // ER 図だけ、グリッド線を描く
+        std: { grid: { draw: true, span: 50 } },       // 画面遷移図は、間隔 50 で描く
     },
 };
 ```
 
-| `grid` の項目 | 内容 | 既定 |
+| 図 | `diagrams` の名前 | 描くライブラリ |
 |---|---|---|
-| `draw` | `false` にすると、グリッド線を描かない | `true` |
-| `size` | グリッドを描く範囲 (原点から上下左右に、この大きさまで) | `10000` |
-| `span` | グリッドの間隔 | `100` |
+| ER 図 | `er` | d3.er |
+| TM | `tm` | d3.ter |
+| クラス図 | `classes` | d3.classes (`draw` だけを読む) |
+| 画面遷移図 | `std` | d3.sitemap |
+| システム構成図 | `scd` | d3.deployment |
+| 艦橋の Overview | `overview` | d3.unchi |
+| 艦橋の Schedule | `schedule` | d3.yabane |
 
-- `diagrams` を渡さないとき (または `grid` を渡さないとき) は、これまでどおり、グリッド線が出ます。
-- ER 図・TM 図・クラス図は、それぞれ別に設定できます。(1 つだけ消すと、ほかは出ます)
-- それ以外の図 (Overview・画面遷移図など) は、対象外です。
-- (0.2.5 以降。クラス図は 0.6.0 以降)
+| `grid` の項目 | 内容 | iHub の既定 |
+|---|---|---|
+| `draw` | `true` にすると、グリッド線を描く | `false` |
+| `size` | グリッドを描く範囲 (原点から上下左右に、この大きさまで) | d3.* の既定 (`10000`) |
+| `span` | グリッドの間隔 | d3.* の既定 (`100`) |
+
+- 既定の `{ draw: false }` に、設定の `grid` を重ねて、d3.* に渡します。`{ size, span }` だけを書いたときは、描かないままです。
+- 図ごとに、別々に設定できます。(1 つだけ描くと、ほかは描きません)
+- 0.6.x までに `{ draw: false }` を書いてグリッド線を消していたアプリは、そのままで構いません。(消しても同じです)
+- 0.6.x までグリッド線を出していて、これからも出したいアプリは、`{ draw: true }` を書きます。
+- (設定で `grid` を渡せるのは、ER 図・TM 図が 0.2.5 以降、クラス図が 0.6.0 以降、ほかの 4 つの図が 0.7.0 以降です)
 
 ### クラス図の見出しの色
 
@@ -410,7 +420,7 @@ import { useDiagramView } from '@yanqirenshi/ihub.core';
 const INITIAL_VIEW = { k: 1.0, x: 0.0, y: 0.0 };
 
 function Diagram ({ data }) {
-    // 図の code。アプリの図ごとに、ほかと重ならない名前にする。(iHub の図は er・tm・std・scd・overview・schedule)
+    // 図の code。アプリの図ごとに、ほかと重ならない名前にする。(iHub の図は er・tm・classes・std・scd・overview・schedule:d・schedule:w・schedule:M)
     const bindView = useDiagramView('dfd');
     const [rectum, setRectum] = React.useState(null);
 

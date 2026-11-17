@@ -43,10 +43,10 @@ TM (T 字形 ER) の図を描くパネルです。
 
 | 設定 | 使い方 |
 |---|---|
-| `diagrams.tm.grid` | d3.ter の `grid` の設定として、そのまま渡します。(例: `{ draw: false }` でグリッド線を消す。渡さないときは、d3.ter の既定) |
+| `diagrams.tm.grid` | グリッド線の設定。既定の `{ draw: false }` に重ねて、d3.ter に渡します。(例: `{ draw: true }` でグリッド線を描く。渡さないときは、描きません。0.7.0 以降。0.6.x までは、渡さないと d3.ter の既定で描いていました) |
 | `app.name` | 図の位置と拡大を覚える鍵 (`ihub:{app.name}:view:tm`) に使います |
 
-([カスタマイズ](#/customize) の「図のグリッド線を消す」、[図の編集](#/diagrams) の「図の位置と拡大を覚える」)
+([カスタマイズ](#/customize) の「図のグリッド線を描く」、[図の編集](#/diagrams) の「図の位置と拡大を覚える」)
 
 - ソース: `packages/ihub.core/src/components/panels/TM.js`
 
