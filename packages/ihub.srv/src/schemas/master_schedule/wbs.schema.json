@@ -1,0 +1,124 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "マスタースケジュールの WBS",
+    "description": "艦橋の Schedule タブ (d3.yabane の矢羽根) の WBS (行)。0.7.0 の master_schedule/rows の、新しい名前。(0.8.0 から) 最上位の WBS は project (任意) にプロジェクト (master_schedule/projects) の id を書くと、そのプロジェクトの直下に入る。parent (任意) に親の WBS の id を書くと、その WBS の下に入れ子になり、深さごとに列が分かれる。(parent と project の両方があるときは、parent が優先) 並びは、配列の順のまま。(同じ親の下の WBS は、配列の順) background・stroke・font (任意) は、箱の見た目。(d3.yabane の共有型) id は、WBS とワークパッケージ (master_schedule/workpackages) をまたいで一意にする。(project のプロジェクトがあること・parent の WBS があること・入れ子が輪になっていないことは、スキーマではなく、ルールで検査する) ファイルが無いときは、WBS が無いものとして扱う。",
+    "x-id-start": 1,
+    "type": "array",
+    "default": [],
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer"
+            },
+            "project": {
+                "type": "integer",
+                "description": "プロジェクト (master_schedule/projects) の id。(任意。最上位の WBS を、プロジェクトの直下に入れる)"
+            },
+            "parent": {
+                "type": "integer",
+                "description": "親の WBS の id。(任意。書かないと、最上位の WBS)"
+            },
+            "name": {
+                "type": "string"
+            },
+            "description": {
+                "$ref": "#/$defs/description"
+            },
+            "background": {
+                "$ref": "#/$defs/background"
+            },
+            "stroke": {
+                "$ref": "#/$defs/stroke"
+            },
+            "font": {
+                "$ref": "#/$defs/font"
+            }
+        },
+        "required": [
+            "id",
+            "name"
+        ],
+        "additionalProperties": false
+    },
+    "$defs": {
+        "description": {
+            "description": "文字列、または段落ごとの文字列の配列",
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            ]
+        },
+        "background": {
+            "description": "背景 (共有型 Background)。行では箱、予定では矢羽根に効く。(d3.yabane の既定: color 白)",
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string",
+                    "description": "色 (CSS の色。'#eaf4fc'・'rgb(0, 0, 0)'・'red' など)"
+                },
+                "opacity": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "不透明度 (0〜1)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "stroke": {
+            "description": "枠線 (共有型 Stroke)。行では箱、予定では矢羽根に効く。(d3.yabane の既定: color #0e9aa7・width 4・type solid)",
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string",
+                    "description": "CSS の色"
+                },
+                "width": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "太さ"
+                },
+                "type": {
+                    "enum": [
+                        "solid",
+                        "dashed",
+                        "dotted"
+                    ],
+                    "description": "線の種類。(破線・点線の間隔は、太さに比例する)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "font": {
+            "description": "名前の文字 (共有型 Font)。(d3.yabane の既定: size 33)",
+            "type": "object",
+            "properties": {
+                "size": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "description": "大きさ"
+                },
+                "color": {
+                    "type": "string",
+                    "description": "CSS の色"
+                },
+                "weight": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "太さ ('bold'・700 など)"
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

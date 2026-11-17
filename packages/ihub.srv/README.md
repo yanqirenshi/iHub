@@ -226,16 +226,16 @@ data/local/ に保存し、git では共有しません。
 ファイルが無いときは、`default` を返し、`default` のデータとしてルールも検査します。
 最初に書き込んだときに、ファイルを作ります。
 
-いまは、local のコレクションと、クラス図 (`classes/classes`・`classes/relationships`。`default` は `[]`)、マスタースケジュール (`master_schedule/rows`・`master_schedule/items`。`default` は `[]`) が当てはまります。
+いまは、local のコレクションと、クラス図 (`classes/classes`・`classes/relationships`。`default` は `[]`)、マスタースケジュール (`master_schedule/projects`・`master_schedule/wbs`・`master_schedule/workpackages`。`default` は `[]`) が当てはまります。
 クラス図は 0.6.0 で、マスタースケジュールは 0.7.0 で足したので、`data/classes/`・`data/master_schedule/` の無いアプリでも、今までどおり動くようにしています。
 
 ## マスタースケジュール (艦橋の Schedule タブ)
 
-`master_schedule/rows` (行) と `master_schedule/items` (予定) は、艦橋の Schedule タブの矢羽根のデータです。(0.7.0 以降。書き方は、ihub.core の README の「艦橋の Schedule タブ」)
-予定の `wbs` (WBS のノードの id) が WBS にあるかは、データ全体の検証 (`ihub-srv check`) だけが検査します。API サーバーは、ドメインごとに検証するので、書き込むときは、この検査を飛ばします。
+`master_schedule/projects` (プロジェクト)・`master_schedule/wbs` (WBS)・`master_schedule/workpackages` (ワークパッケージ) は、艦橋の Schedule タブの矢羽根のデータです。(0.7.0 以降。0.8.0 から、d3.yabane の入力と同じ 3 つ。書き方は、ihub.core の README の「艦橋の Schedule タブ」)
+0.7.0 の `rows`・`items` は、`wbs`・`workpackages` に名前が変わりました。古い名前のファイルがあると、`ihub-srv check` が、名前を変えるように知らせます。
+ワークパッケージの行き先の `wbs` (`data/wbs/` の WBS のノードの id) が `data/wbs/` にあるかは、データ全体の検証 (`ihub-srv check`) だけが検査します。API サーバーは、ドメインごとに検証するので、書き込むときは、この検査を飛ばします。
 (ルールの関数は、2 つ目の引数に、データ全体を受け取れます。渡らないときは、ドメインをまたぐ検査を飛ばす書き方にしてください)
-0.6.x までの、ワークパッケージの `plan` は、使えません。(書くと、スキーマに無い項目として、誤りになります)
-0.8.0 から、行の `parent` (入れ子) と、行・予定の見た目 (`background`・`stroke`・`font`。d3.yabane の共有型) を書けます。行の `parent` の行があること・入れ子が輪になっていないことは、ルールが検査します。
+0.6.x までの、ワークパッケージ (`data/wbs/workpackages`) の `plan` は、使えません。(書くと、スキーマに無い項目として、誤りになります)
 
 ## テスト
 

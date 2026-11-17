@@ -6,13 +6,23 @@
 
 ## 0.8.0 (2026-11)
 
-### 追加 (master_schedule: 行の入れ子と、見た目の指定。yanqirenshi/iHub#188)
+### 変更 (master_schedule: d3.yabane の入力と同じ形にする。yanqirenshi/iHub#188・#190)
 
-- データのフォーマット: `master_schedule/rows` に、`parent` (任意。親の行の id) と、見た目の `background`・`stroke`・`font` (任意) を足した。`master_schedule/items` にも、`background`・`stroke`・`font` (任意) を足した。
+- データのフォーマット: ドメイン `master_schedule` のコレクションを、次の 3 つにした。(0.7.0 の `rows`・`items` は無くした) d3.yabane のショーケースの 3 ファイルを、そのまま置ける。
+  - `master_schedule/projects` (新しい): `id`・`name`、任意で `description`・`background`・`stroke`・`font`。
+  - `master_schedule/wbs` (0.7.0 の `rows`): `id`・`name`、任意で `project` (プロジェクトの id)・`parent` (親の WBS の id)・`description`・`background`・`stroke`・`font`。
+  - `master_schedule/workpackages` (0.7.0 の `items`): `id`・`name`・`plan`、`parent` (WBS の id) か `project` (プロジェクトの id)、任意で行き先 (`wbs`・`url`)・`description`・`background`・`stroke`・`font`・`result` (`{ from, to }`。日付か `null`)・`progress` (数)。(`parent` は必須でなくなった)
   - 見た目は、d3.yabane の共有型 (`@yanqirenshi/types`) に合わせた。`background: { color, opacity (0〜1) }`・`stroke: { color, width (0 以上), type (solid・dashed・dotted) }`・`font: { size (0 より大きい), color, weight (文字列か数) }`。どれも、知らない項目は誤り。
-- ルール (`checkMasterSchedule`): 行の `parent` の行があること・入れ子が輪になっていないこと (自分を親にしたときも、輪) を足した。ほか (id の一意・予定の `parent`・日付・行き先) は、0.7.0 のまま。
-- テストを足した。(入れ子と見た目の正しいデータ・見た目の形の誤り・無い親・輪)
-- **利用側への影響**: 0.7.0 の形のデータは、そのまま使える。
+  - 3 つとも `default` は `[]` で、ファイルが無くてもよい。
+  - ワークパッケージの行き先の `wbs` は、`data/wbs/` のノードの id。(コレクションの名前 `master_schedule/wbs` と紛らわしいので、スキーマの説明に書いた。名前は、0.7.0 のまま)
+- ルール (`checkMasterSchedule`):
+  - プロジェクトの id は、プロジェクトの中で一意。(d3.yabane は、プロジェクトを `'project-<id>'` で引くので、WBS と同じ id でもよい) WBS とワークパッケージの id は、またいで一意。(0.7.0 のまま)
+  - WBS の `project` のプロジェクトがあること・`parent` の WBS があること・入れ子が輪になっていないこと (自分を親にしたときも、輪)。
+  - ワークパッケージは、`parent` か `project` の少なくとも 1 つがあり、その先があること。(両方があるときは `parent` が優先。誤りにはしない)
+  - 日付・行き先のルールは、0.7.0 のまま。
+- `data/` に、0.7.0 の名前のファイル (`master_schedule/rows.json`・`items.json`) があるときは、「スキーマがありません」ではなく、新しい名前 (`wbs.json`・`workpackages.json`) に変えるように知らせる。
+- テストを足した・直した。(ショーケースの 3 ファイルがそのまま通ること・古い名前の知らせ・プロジェクト・`result` と `progress`・入れ子と見た目・無い先・輪・`parent` も `project` も無いワークパッケージ)
+- **利用側への影響 (0.7.0 から)**: `data/master_schedule/rows.json` は `wbs.json` に、`items.json` は `workpackages.json` に、名前を変える。(中身は、そのまま使える)
 
 ## 0.7.0 (2026-11)
 

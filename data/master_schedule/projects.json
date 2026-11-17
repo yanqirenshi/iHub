@@ -1,0 +1,4 @@
+[
+  { "id": 10, "name": "Project 10", "background": { "color": "#eaf4fc" }, "font": { "weight": "bold" } },
+  { "id": 20, "name": "Project 20" }
+]
