@@ -112,6 +112,10 @@ function Diagram ({ data, cycle }) {
     // サイクルで図の幅が大きく変わるので、サイクルごとに分けて覚える。(図の code は schedule:d・schedule:w・schedule:M)
     const bindView = useDiagramView(`schedule:${cycle}`);
 
+    // 設定の diagrams.schedule.grid (d3 の grid の設定。既定 { draw: false } = 描かない) を、そのまま d3 に渡す。
+    const { diagrams } = useConfig();
+    const grid = diagrams.schedule.grid;
+
     React.useEffect(()=> {
         const scale = scheduleScale(data, cycle);
         const k = initialScale(box.current?.clientWidth || 1000, scale.size);
@@ -120,6 +124,7 @@ function Diagram ({ data, cycle }) {
             // 初めの位置: 左から 100px (サイドメニューの右)・上から 60px (目盛りの見出しを出す余白)。transform は、移動量に拡大の度合いを掛ける。
             // 見出しは、図の座標で、日・週が -112、月が約 -51 まで上に伸びる。(d3.yabane 0.3.0) 拡大の度合いは 0.4 までなので、60px に収まる。
             transform: { k, x: 100 / k, y: 60 / k },
+            grid,
             svg: { style: { background: '#ffffff' } },
         });
 
@@ -135,7 +140,7 @@ function Diagram ({ data, cycle }) {
         }));
 
         setRectum(r);
-    }, [bindView, data, cycle]);
+    }, [bindView, data, cycle, grid]);
 
     return (
         <Box ref={box} sx={{ width: '100%', height: '100%' }}>

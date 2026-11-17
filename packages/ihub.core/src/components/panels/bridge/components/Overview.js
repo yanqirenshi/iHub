@@ -8,6 +8,7 @@ import { ModelInspector } from '@yanqirenshi/colonoscope';
 import { ModelError, applyPatch, collectionOf, fieldsOf, mergePatch, movePatch, titleOf, withDefaults } from '@yanqirenshi/model.unchi';
 
 import { findRecord, useDiagramData, useDiagramView } from '../../../../manegers/diagram.js';
+import { useConfig } from '../../../../config.js';
 import { OVERVIEW_COLLECTIONS, buildOverviewData } from '../../../../manegers/overview.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../../../redux/api/dataApi.js';
 
@@ -153,9 +154,14 @@ function Diagram (props) {
     // カメラ (移動位置と拡大縮小) を、ブラウザに保管して、次に開いたとき・作り直したときに戻す。
     const bindView = useDiagramView('overview');
 
+    // 設定の diagrams.overview.grid (d3 の grid の設定。既定 { draw: false } = 描かない) を、そのまま d3 に渡す。
+    const { diagrams } = useConfig();
+    const grid = diagrams.overview.grid;
+
     React.useEffect(()=> {
         const r = new Rectum({
             transform: INITIAL_VIEW,
+            grid,
             callbacks: {
                 node: {
                     // ドラッグの終わり。掴んだノードについてだけ、1 回呼ばれる。
@@ -175,7 +181,7 @@ function Diagram (props) {
 
         props.rectum.current = r;
         setRectum(r);
-    }, [bindView, data]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [bindView, data, grid]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!rectum) return null;
 

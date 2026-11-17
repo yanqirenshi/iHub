@@ -8,6 +8,7 @@ import { ModelInspector } from '@yanqirenshi/colonoscope';
 import { ModelError, applyPatch, fieldsOf, findById, movePatch, titleOf, withDefaults } from '@yanqirenshi/model.deployment';
 
 import { useDiagramData, useDiagramView } from '../../../manegers/diagram.js';
+import { useConfig } from '../../../config.js';
 import { DEPLOYMENT_COLLECTIONS, buildDeploymentData } from '../../../manegers/deployment.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../../redux/api/dataApi.js';
 
@@ -125,9 +126,14 @@ function Diagram (props) {
     // カメラ (移動位置と拡大縮小) を、ブラウザに保管して、次に開いたときに戻す。
     const bindView = useDiagramView('scd');
 
+    // 設定の diagrams.scd.grid (d3 の grid の設定。既定 { draw: false } = 描かない) を、そのまま d3 に渡す。
+    const { diagrams } = useConfig();
+    const grid = diagrams.scd.grid;
+
     React.useEffect(()=> {
         const r = new Rectum({
             transform: INITIAL_VIEW,
+            grid,
             // コールバックの core は入力のレコードそのもの。(子のノードも)
             callbacks: {
                 node: {
@@ -146,7 +152,7 @@ function Diagram (props) {
         r.data(data);
 
         setRectum(r);
-    }, [bindView, data]);
+    }, [bindView, data, grid]);
 
     if (!rectum) return null;
 
