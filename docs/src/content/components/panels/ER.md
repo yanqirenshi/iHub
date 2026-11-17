@@ -41,10 +41,10 @@ ER 図を描くパネルです。
 
 | 設定 | 使い方 |
 |---|---|
-| `diagrams.er.grid` | d3.er の `grid` の設定として、そのまま渡します。(例: `{ draw: false }` でグリッド線を消す。渡さないときは、d3.er の既定) |
+| `diagrams.er.grid` | グリッド線の設定。既定の `{ draw: false }` に重ねて、d3.er に渡します。(例: `{ draw: true }` でグリッド線を描く。渡さないときは、描きません。0.7.0 以降。0.6.x までは、渡さないと d3.er の既定で描いていました) |
 | `app.name` | 図の位置と拡大を覚える鍵 (`ihub:{app.name}:view:er`) に使います |
 
-([カスタマイズ](#/customize) の「図のグリッド線を消す」、[図の編集](#/diagrams) の「図の位置と拡大を覚える」)
+([カスタマイズ](#/customize) の「図のグリッド線を描く」、[図の編集](#/diagrams) の「図の位置と拡大を覚える」)
 
 - ソース: `packages/ihub.core/src/components/panels/ER.js`
 
