@@ -34,9 +34,11 @@ export const UNIT_WIDTH = 111;
 // 図の目盛りの、最小の数。(予定の期間が短くても、図が小さくなりすぎないように、表示する期間を右へ延ばす)
 const MIN_UNITS = { d: 28, w: 15, M: 12 };
 
-// 行の名前の幅 (図の座標)。時間の目盛りは、行の名前の列の右から始まる。
-//   入れ子が無いとき (列が 1 つ) は ROW_WIDTH。(0.7.0 と同じ)
-//   入れ子があるとき (深さごとに列が分かれる。0.8.0 から) は、1 列を NESTED_ROW_WIDTH にして、列が増えても、時間軸が右へ行きすぎないようにする。
+// 名前の列 (プロジェクト・WBS) の幅は、d3.yabane (0.5.0 から) が、描いた名前の幅に合わせて、列ごとに決める。(左の余白 33 + 名前の幅 + 右の余白 33)
+// 時間の目盛りは、名前の列の右 (ROW_MARGIN の先) から始まる。描いたあとの位置は、rectum.scale().range()[0]。(timeAxisOf)
+//
+// 1 列の幅 (style.body.row.w)。名前を測れなかった列 (画面に出ていない・文字の幅が 0) と、描く前の見積もりにだけ使う。
+//   列が 1 つのときは ROW_WIDTH、2 つ以上のときは NESTED_ROW_WIDTH。(0.8.0 と同じ値。列が増えても、時間軸が右へ行きすぎないように)
 export const ROW_WIDTH = 555;
 export const NESTED_ROW_WIDTH = 333;
 export const ROW_MARGIN = 33;
@@ -44,27 +46,17 @@ export const ROW_MARGIN = 33;
 // 列どうしの間 (d3.yabane の style.body.yabane.margin と同じ値)
 export const COLUMN_GAP = 33;
 
-// 行の名前の文字の大きさ (d3.yabane の既定)
-const ROW_FONT_SIZE = 33;
+// 名前に出せる文字の数の上限。(全角 1・半角 0.55 として数える。極端に長い名前で、列が広がりすぎないように。0.8.1 から)
+export const LABEL_MAX_UNITS = 30;
 
-// 行の名前に出せる文字の数。(全角 1・半角 0.55 として数える。行の幅 555 から、左の余白 33 を引いた分)
-const LABEL_MAX_UNITS = 14;
-
-// 列の数 (入れ子の深さの最大 + 1) に合わせた、1 列の幅。
+// 列の数 (入れ子の深さの最大 + 1) に合わせた、1 列の幅。(style.body.row.w)
 export function rowColumnWidth (columns = 1) {
     return columns > 1 ? NESTED_ROW_WIDTH : ROW_WIDTH;
 }
 
-// 行の名前の列の、全体の幅。(d3.yabane の Branch.columnsWidth と同じ式。時間軸は、この右 (ROW_MARGIN の先) から始まる)
-//   span … 幅を求める列の数 (既定は、全部の列)
-export function columnsWidth (columns = 1, span = columns) {
-    return span * rowColumnWidth(columns) + (span - 1) * COLUMN_GAP;
-}
-
-// 幅 width の箱に出せる、行の名前の文字の数。(全角 1・半角 0.55 として数える。左の余白 ROW_MARGIN を引き、1 文字ぶん余らせる)
-// 入れ子の無い既定 (幅 555・文字 33) では LABEL_MAX_UNITS (14)。
-export function labelUnits (width, font_size = ROW_FONT_SIZE) {
-    return Math.max(1, Math.floor((width - ROW_MARGIN) / font_size) - 1);
+// 名前の列の全体の幅の、描く前の見積もり。(どの列も rowColumnWidth のとき。d3.yabane の名前を測れなかったときと同じ)
+export function columnsWidth (columns = 1) {
+    return columns * rowColumnWidth(columns) + (columns - 1) * COLUMN_GAP;
 }
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -194,12 +186,12 @@ const wbsNode = (id)=> `w:${id}`;
 //   count        … 矢羽根の数。(0 のとき、図は描かず、知らせを出す)
 //   first・last  … ワークパッケージの一番早い from と、一番遅い to。('YYYY-MM-DD')
 //
-// 並び: d3.yabane 0.4.0 は、兄弟を order の順 (無ければ開始日の順) に並べるので、プロジェクトと WBS には、配列の順を order に書く。
+// 並び: d3.yabane (0.4.0 以降) は、兄弟を order の順 (無ければ開始日の順) に並べるので、プロジェクトと WBS には、配列の順を order に書く。
 //   (同じ親の下の WBS は wbs.json の順。子の WBS を持つ節の直下のワークパッケージは、子の WBS のあとに、開始日の順で並ぶ)
 // 親: WBS とワークパッケージは、parent (WBS) があれば parent、無ければ project の下に入る。(d3.yabane と同じ)
 //   無い先を指すもの・輪になった入れ子は、ihub-srv check が知らせる誤り。描くときは、d3.yabane に渡す前に直す。
 //   (WBS は、parent の先が無い・輪のときは最上位、project の先が無いときも最上位。ワークパッケージは、描かない)
-// 名前: 箱の幅に収まるように、長いと末尾を … にする。(入れ子では、箱の幅が列ごとに違う)
+// 名前: 省略せずに渡す。(d3.yabane 0.5.0 が、名前に合わせて列の幅を決める) LABEL_MAX_UNITS を超える名前だけ、末尾を … にする。
 // 予定が無いとき (ファイルが無いときも) は、count が 0。使えない plan (to が from より前・実在しない日) は、描かない。
 export function buildScheduleData (collections) {
     const projects = collections['master_schedule/projects'] || [];
@@ -254,17 +246,6 @@ export function buildScheduleData (collections) {
     ]);
     const columns = Math.max(0, ...depths.values()) + 1;
 
-    // 子の WBS を持つ節。(その箱は 1 列。持たない箱は、右端の列まで伸びる。d3.yabane の Branch.calW と同じ)
-    const has_children = new Set([...parent_node.values()].filter(Boolean));
-
-    const label = (node, d)=> {
-        const width = has_children.has(node)
-              ? columnsWidth(columns, 1)
-              : columnsWidth(columns, columns - depths.get(node));
-
-        return rowLabel(d.name, labelUnits(width, d.font?.size || ROW_FONT_SIZE));
-    };
-
     // d3.yabane に渡す、親の項目。(parent か project の、どちらか 1 つ)
     const parentFields = (node)=> {
         if (!node)
@@ -278,13 +259,13 @@ export function buildScheduleData (collections) {
     return {
         projects: projects.map((d, i)=> ({
             id: d.id,
-            name: label(projectNode(d.id), d),
+            name: rowLabel(d.name),
             order: i,
             ...lookOf(d),
         })),
         wbs: wbs.map((d, i)=> ({
             id: d.id,
-            name: label(wbsNode(d.id), d),
+            name: rowLabel(d.name),
             order: i,
             ...parentFields(wbsParentNode(d)),
             ...lookOf(d),
@@ -460,7 +441,7 @@ export function headOfWidth (width = DEFAULT_WIDTH) {
 // 幅を変えたときの、図の位置。(画面の中央にあった日付が、変えたあとも中央に残るように、横の位置だけを合わせる)
 //   view    … 保管した位置 { k, x, y }。(d3.svg の view。画面の x = 図の x × k + view.x)
 //   from・to … 変える前と後の幅の段
-//   start_x … 時間軸の左端 (図の座標)。(columnsWidth(columns) + ROW_MARGIN。d3.yabane の Rectum.makeScale と同じ)
+//   start_x … 時間軸の左端 (図の座標)。(画面に出している図の rectum.scale().range()[0]。列の幅は名前で変わるので、見積もらない)
 //   screen  … 図を出している箱の幅 (画面の px)
 // 時間軸は、左端 start_x から右へ、幅の段に比例して伸び縮みする。(表示する期間は変わらない)
 // 中央が時間軸より左 (行の名前の列) のときは、時間軸が動いても見え方が変わらないので、位置はそのまま。

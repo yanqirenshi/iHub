@@ -20,7 +20,7 @@ import {
 } from '../../../../manegers/schedule.js';
 
 // 図のスタイル (d3.yabane のスタイル)。stage.w は、時間の目盛りの全体の幅。(表示する期間に比例させる)
-// row.w は、行の名前の 1 列の幅。入れ子で列が増えるときは、細くする。(manegers/schedule.js の rowColumnWidth)
+// row.w は、名前を測れなかった列の幅。(d3.yabane 0.5.0 は、名前の列の幅を、描いた名前の幅に合わせる。manegers/schedule.js の rowColumnWidth)
 // head は、目盛りの見出し。100% より狭い幅の段では、見出しの文字を小さくする。(manegers/schedule.js の headOfWidth)
 const graphStyle = (size, columns = 1, width = 100)=> ({
     stage: { w: size },
@@ -34,12 +34,18 @@ const graphStyle = (size, columns = 1, width = 100)=> ({
     foot: { h: 33 },
 });
 
-// 初めの拡大の度合い。図の全体 (行の名前の列と、時間の目盛り) の幅が、表示している幅に収まる度合い。(小さくしすぎない・大きくしすぎない)
-function initialScale (width, size, columns = 1) {
-    const k = (width * 0.95) / (columnsWidth(columns) + ROW_MARGIN + size);
+// 初めの拡大の度合い。図の全体 (名前の列と、時間の目盛り) の幅 total が、表示している幅 width に収まる度合い。(小さくしすぎない・大きくしすぎない)
+// total は、時間軸の右端 (図の座標)。描く前は見積もり (columnsWidth)、描いたあとは実際の値 (timeAxisOf) を使う。
+function initialScale (width, total) {
+    const k = (width * 0.95) / total;
 
     return Math.min(0.4, Math.max(0.1, k));
 }
+
+// 初めの位置: 左から 100px (サイドメニューの右)・上から 60px (目盛りの見出しを出す余白)。(画面の px。d3.svg の view)
+// 見出しは、図の座標で、日・週が -112、月が約 -51 まで上に伸びる。(d3.yabane 0.3.0) 拡大の度合いは 0.4 までなので、60px に収まる。
+const INITIAL_LEFT = 100;
+const INITIAL_TOP = 60;
 
 // 艦橋 (Bridge) の Schedule タブ: data/master_schedule/ のプロジェクト・WBS・ワークパッケージを、d3.yabane の矢羽根で並べる。(0.7.0 以降)
 // プロジェクトは、いちばん左の列。(0.8.0 から) その右に、WBS が入れ子の列で並び、ワークパッケージが矢羽根になる。
@@ -81,14 +87,16 @@ export default function Schedule () {
         // 図を作り直す前に、位置を合わせ直して保管する。(画面の中央にあった日付が、中央に残るように。拡大の度合いは、そのまま)
         // 位置をまだ保管していない (開いてから動かしていない) ときは、今、画面に出ている位置と拡大の度合いを元にする。
         // (保管しないまま作り直すと、初めの拡大の度合いが、広がった図の全体を画面に収め直すので、1 目盛りの画面の幅が、ほとんど変わらない)
+        // 時間軸の左端は、画面に出している図の実際の値。(d3.yabane 0.5.0 は、名前の列の幅を、名前に合わせて決めるので、見積もらない)
         const code = `schedule:${cycle}`;
         const view = readDiagramView(app.name, code) || currentView(rectum.current);
+        const axis = timeAxisOf(rectum.current);
 
-        if (view)
+        if (view && axis)
             writeDiagramView(app.name, code, viewForWidth(view, {
                 from: width,
                 to: next,
-                start_x: columnsWidth(data.columns) + ROW_MARGIN,
+                start_x: axis.start,
                 screen: box.current?.clientWidth || 1000,
             }));
 
@@ -166,6 +174,35 @@ function currentView (rectum) {
     return rectum.view();
 }
 
+// 画面に出している図の、時間軸の左端と右端 { start, end } (図の座標)。図をまだ描いていないときは、null。
+// (d3.yabane 0.5.0 は、描いた名前を測って列の幅を決め、描き直す。描いたあとの scale が、実際の位置)
+function timeAxisOf (rectum) {
+    if (!currentView(rectum) || typeof rectum.scale!=='function' || !rectum.scale())
+        return null;
+
+    const [start, end] = rectum.scale().range();
+
+    return { start, end };
+}
+
+// 図を描いたあと (d3.yabane が、名前の幅に合わせて列の幅を決め、描き直したあと) に、1 度だけ fn(rectum) を呼ぶ。
+// (d3.yabane は、描き終わりを知らせないので、Rectum の draw を包む)
+function onFirstDraw (rectum, fn) {
+    const draw = rectum.draw;
+    let done = false;
+
+    rectum.draw = function (...args) {
+        const out = draw.apply(this, args);
+
+        if (!done && timeAxisOf(this)) {
+            done = true;
+            fn(this);
+        }
+
+        return out;
+    };
+}
+
 // 予定を押したときの行き先へ移る。(行き先が無ければ、何もしない)
 function open (link, navigate) {
     if (!link)
@@ -192,20 +229,31 @@ function Diagram ({ data, cycle, width, current }) {
     const bindView = useDiagramView(`schedule:${cycle}`);
 
     // 設定の diagrams.schedule.grid (d3 の grid の設定。既定 { draw: false } = 描かない) を、そのまま d3 に渡す。
-    const { diagrams } = useConfig();
+    const { app, diagrams } = useConfig();
     const grid = diagrams.schedule.grid;
 
     React.useEffect(()=> {
         const scale = scheduleScale(data, cycle, width);
-        const k = initialScale(box.current?.clientWidth || 1000, scale.size, data.columns);
+        const screen = ()=> box.current?.clientWidth || 1000;
+
+        // 描く前の初めの拡大の度合いは、名前の列を見積もって決める。(どの列も row.w のとき)
+        const k = initialScale(screen(), columnsWidth(data.columns) + ROW_MARGIN + scale.size);
 
         const r = new Rectum({
-            // 初めの位置: 左から 100px (サイドメニューの右)・上から 60px (目盛りの見出しを出す余白)。transform は、移動量に拡大の度合いを掛ける。
-            // 見出しは、図の座標で、日・週が -112、月が約 -51 まで上に伸びる。(d3.yabane 0.3.0) 拡大の度合いは 0.4 までなので、60px に収まる。
-            transform: { k, x: 100 / k, y: 60 / k },
+            // transform は、移動量に拡大の度合いを掛ける。(画面で INITIAL_LEFT・INITIAL_TOP の位置になる)
+            transform: { k, x: INITIAL_LEFT / k, y: INITIAL_TOP / k },
             grid,
             svg: { style: { background: '#ffffff' } },
         });
+
+        // 位置を保管していないときは、描いたあとの実際の幅 (名前の列は、名前に合った幅) で、初めの拡大の度合いを決め直す。
+        // (view で動かしたものは保管しない。d3.svg は、view では onViewChange を呼ばない)
+        if (!readDiagramView(app.name, `schedule:${cycle}`))
+            onFirstDraw(r, (drawn)=> {
+                const fitted = initialScale(screen(), timeAxisOf(drawn).end);
+
+                drawn.view({ k: fitted, x: INITIAL_LEFT, y: INITIAL_TOP });
+            });
 
         bindView(r);
 
@@ -220,7 +268,7 @@ function Diagram ({ data, cycle, width, current }) {
 
         setRectum(r);
         current.current = r;
-    }, [bindView, data, cycle, width, grid, current]);
+    }, [app.name, bindView, data, cycle, width, grid, current]);
 
     return (
         <Box ref={box} sx={{ width: '100%', height: '100%' }}>
