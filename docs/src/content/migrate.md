@@ -290,7 +290,7 @@ diff -r <iHub の clone>/src/ihub <アプリ>/src/ihub
 | GitHub の OAuth を足していた (`server/github.mjs` など) | 不要。(iHub 本体に入っています。[GitHub との連携](#/github)) |
 | サーバーに、アプリ固有のコレクションを足していた (`server/schemas/`・`validation/rules.mjs`) | `createApp` の `extensions` ([API サーバー](#/api)) |
 | ER のテーブルの色分けを、描いたあとに塗り直していた (`panels/ER.js` の `paintTableColors` など)。`server/schemas/er/entities.schema.json` に `color` を足していた | 不要。(iHub 本体が、テーブルの `color` (`{ base, inner }`) で描くようになりました。スキーマにも入っています。手順 5 の `migrate-er` が、`color` をそのまま写します) |
-| ER 図・TM 図のグリッド線を消していた (`panels/ER.js`・`TM.js` で、`new Rectum({ ... })` に `grid: { draw: false }` を渡していた) | 0.7.0 以降は、何もしなくても、グリッド線を描きません。(0.2.5〜0.6.x では、設定の `diagrams` に `{ grid: { draw: false } }` を書いていました。書いたままでも構いません)[カスタマイズ](#/customize) の「図のグリッド線を描く」) |
+| ER 図・TM 図のグリッド線を消していた (`panels/ER.js`・`TM.js` で、`new Rectum({ ... })` に `grid: { draw: false }` を渡していた) | 0.7.0 以降は、何もしなくても、グリッド線を描きません。(0.2.5〜0.6.x では、設定の `diagrams` に `{ grid: { draw: false } }` を書いていました。書いたままでも構いません。[カスタマイズ](#/customize) の「図のグリッド線を描く」) |
 | コピー版の `server/index.mjs` の、起動のログに、アプリの名前を入れていた (例: `bokasafn の API サーバーを起動しました`) | 移せない。(`ihub-srv` の起動のログは、iHub の表記のままで、変えられません。動きには関係しません。画面の名前 (`app.name`) と、書き込んだ画面の id を送るヘッダー (`--app-name`) は、別です) |
 | 図の描き方など、部品の中を直していた | 設定の差し替え口が無いので、iHub のリポジトリに Issue を立てます。それまでは、そのパネルを、アプリで書いて、`panels` で差し替えます |
 
