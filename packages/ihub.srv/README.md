@@ -226,8 +226,15 @@ data/local/ に保存し、git では共有しません。
 ファイルが無いときは、`default` を返し、`default` のデータとしてルールも検査します。
 最初に書き込んだときに、ファイルを作ります。
 
-いまは、local のコレクションと、クラス図 (`classes/classes`・`classes/relationships`。`default` は `[]`) が当てはまります。
-クラス図は 0.6.0 で足したので、`data/classes/` の無いアプリでも、今までどおり動くようにしています。
+いまは、local のコレクションと、クラス図 (`classes/classes`・`classes/relationships`。`default` は `[]`)、マスタースケジュール (`master_schedule/rows`・`master_schedule/items`。`default` は `[]`) が当てはまります。
+クラス図は 0.6.0 で、マスタースケジュールは 0.7.0 で足したので、`data/classes/`・`data/master_schedule/` の無いアプリでも、今までどおり動くようにしています。
+
+## マスタースケジュール (艦橋の Schedule タブ)
+
+`master_schedule/rows` (行) と `master_schedule/items` (予定) は、艦橋の Schedule タブの矢羽根のデータです。(0.7.0 以降。書き方は、ihub.core の README の「艦橋の Schedule タブ」)
+予定の `wbs` (WBS のノードの id) が WBS にあるかは、データ全体の検証 (`ihub-srv check`) だけが検査します。API サーバーは、ドメインごとに検証するので、書き込むときは、この検査を飛ばします。
+(ルールの関数は、2 つ目の引数に、データ全体を受け取れます。渡らないときは、ドメインをまたぐ検査を飛ばす書き方にしてください)
+0.6.x までの、ワークパッケージの `plan` は、使えません。(書くと、スキーマに無い項目として、誤りになります)
 
 ## テスト
 

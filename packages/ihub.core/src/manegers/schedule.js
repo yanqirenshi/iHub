@@ -1,19 +1,15 @@
 // 艦橋 (Bridge) の Schedule (d3.yabane の矢羽根) に使うコレクションと、データの作り方。
 //
-// 矢羽根になるのは、予定の期間 plan ({ from, to }。'YYYY-MM-DD') を持つワークパッケージ。
-// (data/wbs/workpackages.json の各レコードに、任意で書く)
-// 行になるのは、plan のあるワークパッケージを、直接持つ WBS。
+// データは、WBS とは切り離して、data/master_schedule/ (0.7.0 以降) に持つ。
+//   master_schedule/rows  … 行。配列の順のまま、上から行になる。({ id, name, description? })
+//   master_schedule/items … 予定 (矢羽根)。({ id, parent (行の id), name, plan: { from, to } ('YYYY-MM-DD'), wbs? | url?, description? })
+// どちらも、ファイルが無いときは、空として扱う。(サーバーが、スキーマの default を返す)
 //
-// d3.yabane の行 (Branch) は、入れ子にできない。(WBS の下に、WBS とワークパッケージを一緒に持てない)
-// iHub の WBS は入れ子 (プロジェクト → WBS → WBS … → ワークパッケージ) なので、
-// 行を、入れ子にしない 1 段の一覧にして、行の名前に、上の WBS の名前を入れる。(例: 'W-A / W-B')
-// 並びは、WBS の木を、上から順にたどった順。(同じ親の下の行が、続く)
-// 行が、2 つ以上のプロジェクトにあるときは、行の名前の先頭に、プロジェクトの名前を付ける。
+// 矢羽根を押したときの行き先は、予定の wbs (WBS のノードの id。/wbs/{id}) か url (新しいタブ)。どちらも無ければ、何もしない。(linkOf)
 
 export const SCHEDULE_COLLECTIONS = [
-    'wbs/projects',
-    'wbs/wbs',
-    'wbs/workpackages',
+    'master_schedule/rows',
+    'master_schedule/items',
 ];
 
 // 目盛りの単位。(dayjs の単位。'w' は週)
@@ -67,8 +63,10 @@ function unitsOf (text) {
     return units;
 }
 
-// 長いときは、末尾を … にして、max に収める。
-function cut (text, max) {
+// 行の名前。長いときは、末尾を … にして、max に収める。
+export function rowLabel (name, max = LABEL_MAX_UNITS) {
+    const text = String(name ?? '');
+
     if (unitsOf(text) <= max)
         return text;
 
@@ -86,83 +84,60 @@ function cut (text, max) {
     return out + '…';
 }
 
-// 行の名前。上の WBS の名前を ' / ' でつなぐ。(parts は、上から順の名前)
-// 長いときは、上の WBS の名前を、左から減らす。(いちばん下の WBS の名前を、残す)
-export function rowLabel (parts, max = LABEL_MAX_UNITS) {
-    let rest = parts;
-    let prefix = '';
+// 予定を押したときの行き先。
+//   戻り値: { type: 'wbs', id } | { type: 'url', url } | null (行き先が無い)
+// wbs と url の両方があるときは、wbs。(ihub-srv check は、両方を書くことを誤りにする)
+// url は、http か https だけ。(javascript: などは、押したときに動いてしまうので、開かない)
+export function linkOf (item) {
+    if (Number.isInteger(item?.wbs))
+        return { type: 'wbs', id: item.wbs };
 
-    while (rest.length > 1 && unitsOf(prefix + rest.join(' / ')) > max) {
-        rest = rest.slice(1);
-        prefix = '… / ';
-    }
+    if (typeof item?.url==='string' && /^https?:\/\//.test(item.url))
+        return { type: 'url', url: item.url };
 
-    return cut(prefix + rest.join(' / '), max);
+    return null;
 }
 
 // Schedule に渡すデータを作る。
-//   rows         … d3.yabane の入力の wbs。([{ id, name }])
-//   workpackages … d3.yabane の入力の workpackages。([{ id, parent, name, plan }])
+//   rows         … d3.yabane の入力の wbs。([{ id, name }]) rows.json の順。
+//   workpackages … d3.yabane の入力の workpackages。([{ id, parent, name, plan }]) 予定。
+//   links        … { [予定の id]: linkOf の戻り値 } (行き先がある予定だけ)
 //   count        … 矢羽根の数。(0 のとき、図は描かず、知らせを出す)
 //   from・to     … 表示する期間。plan の一番早い from と、一番遅い to の、前後に 1 週の余白を付けたもの。
 //   size         … 時間の目盛りの全体の幅 (図の座標)。期間に比例する。
+// 予定が無いとき (ファイルが無いときも) は、count が 0。使えない plan (to が from より前・実在しない日) の予定と、
+// parent の行が無い予定は、描かない。
 export function buildScheduleData (collections) {
-    const projects = collections['wbs/projects'] || [];
-    const wbs = collections['wbs/wbs'] || [];
-    const workpackages = (collections['wbs/workpackages'] || []).filter(wp=> usablePlan(wp.plan));
+    const rows = collections['master_schedule/rows'] || [];
+    const items = collections['master_schedule/items'] || [];
 
-    if (workpackages.length===0)
-        return { rows: [], workpackages: [], count: 0, from: null, to: null, size: 0 };
-
-    // WBS の木。(parent は、プロジェクトか WBS の id)
-    const children = new Map();
-
-    for (const d of wbs) {
-        if (!children.has(d.parent))
-            children.set(d.parent, []);
-
-        children.get(d.parent).push(d);
-    }
-
-    const holders = new Set(workpackages.map(wp=> wp.parent));
-
-    // 上から順にたどって、plan のあるワークパッケージを持つ WBS を、行にする。
-    const rows = [];
-
-    const walk = (project, node, path)=> {
-        for (const child of children.get(node.id) || []) {
-            const parts = [...path, child.name];
-
-            if (holders.has(child.id))
-                rows.push({ id: child.id, name: parts, project });
-
-            walk(project, child, parts);
-        }
-    };
-
-    for (const project of projects)
-        walk(project, project, []);
-
-    // 木に結び付いていない WBS (parent が見つからない) は、読み込みの検査で見つかるので、ここでは描かない。
     const row_ids = new Set(rows.map(row=> row.id));
-    const drawn = workpackages.filter(wp=> row_ids.has(wp.parent));
+    const drawn = items.filter(item=> usablePlan(item.plan) && row_ids.has(item.parent));
 
     if (drawn.length===0)
-        return { rows: [], workpackages: [], count: 0, from: null, to: null, size: 0 };
+        return { rows: [], workpackages: [], links: {}, count: 0, from: null, to: null, size: 0 };
 
-    const multi = new Set(rows.map(row=> row.project.id)).size > 1;
-
-    const froms = drawn.map(wp=> parseDate(wp.plan.from));
-    const tos = drawn.map(wp=> parseDate(wp.plan.to));
+    const froms = drawn.map(item=> parseDate(item.plan.from));
+    const tos = drawn.map(item=> parseDate(item.plan.to));
 
     const from = Math.min(...froms) - 7 * DAY;
     const to = Math.max(...tos) + 7 * DAY;
 
     const weeks = Math.ceil((to - from) / (7 * DAY));
 
+    const links = {};
+
+    for (const item of drawn) {
+        const link = linkOf(item);
+
+        if (link)
+            links[item.id] = link;
+    }
+
     return {
-        rows: rows.map(row=> ({ id: row.id, name: rowLabel(multi ? [row.project.name, ...row.name] : row.name) })),
-        workpackages: drawn.map(wp=> ({ id: wp.id, parent: wp.parent, name: wp.name, plan: { from: wp.plan.from, to: wp.plan.to } })),
+        rows: rows.map(row=> ({ id: row.id, name: rowLabel(row.name) })),
+        workpackages: drawn.map(item=> ({ id: item.id, parent: item.parent, name: item.name, plan: { from: item.plan.from, to: item.plan.to } })),
+        links,
         count: drawn.length,
         from: formatDate(from),
         to: formatDate(to),

@@ -4,6 +4,19 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.7.0 (2026-11)
+
+### 変更 (艦橋の Schedule タブのデータ: master_schedule。yanqirenshi/iHub#182)
+
+- データのフォーマット: ドメイン `master_schedule` (`master_schedule/rows`・`master_schedule/items`) を足した。(ihub.core 0.7.0 の Schedule タブが読む)
+  - `schemas/master_schedule/rows.schema.json` (行: `id`・`name`・任意の `description`)・`items.schema.json` (予定: `id`・`parent` (行の id)・`name`・`plan` { `from`・`to` } は必須。行き先は任意の `wbs` (整数の id) か `url` (`http`・`https` だけ)。任意の `description`)。
+  - どちらも `default` は `[]` で、ファイルが無くてもよい。(0.6.0 のクラス図と同じ)
+  - ルール (`validation/rules.mjs` の `checkMasterSchedule`): 行と予定の `id` が、またいで重ならないこと・`parent` の行があること・`plan` の日付が実在して `to` が `from` より前でないこと (これまでの、ワークパッケージの `plan` のルールを移した)・`wbs` と `url` の両方を書かないこと・`wbs` の id が WBS のノード (プロジェクト・WBS・ワークパッケージ) にあること。
+  - `wbs` の id の検査は、データ全体の検証 (`ihub-srv check`・`validateData`) のときだけ。API サーバーは、ドメインごとに検証するので、書き込むときは、飛ばす。(ルールの関数は、2 つ目の引数に、データ全体を受け取れるようにした。渡らないときは、ドメインをまたぐ検査を飛ばす)
+- データのフォーマット: **ワークパッケージ (`wbs/workpackages`) の `plan` を、スキーマとルールから消した。** 書いてあると、スキーマに無い項目として、誤りになる。(予定は `master_schedule` に書く)
+- テストを足した・直した。(`master_schedule` の正しいデータ・形の誤り・日付の誤り・無い行・無い `wbs`・`wbs` と `url` の両方・`id` の重なり・ファイルが無いとき・ドメインごとの検証で `wbs` の検査を飛ばすこと・ワークパッケージの `plan` が誤りになること)
+- **利用側への影響**: ワークパッケージの `plan` を書いていたデータは、`data/master_schedule/` に移す。(移し方は、ihub.core の CHANGELOG)
+
 ## 0.6.1 (2026-11)
 
 - コードの変更は無い。(`@yanqirenshi/ihub.core` 0.6.1 と、版をそろえるだけ)

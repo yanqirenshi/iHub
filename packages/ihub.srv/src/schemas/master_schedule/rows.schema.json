@@ -1,0 +1,27 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "マスタースケジュールの行",
+    "description": "艦橋の Schedule タブ (d3.yabane の矢羽根) の行。WBS とは切り離して、行と予定 (master_schedule/items) を、ここで持つ。並びは、配列の順のまま、上から行になる。id は、行と予定 (items) をまたいで一意にする。ファイルが無いときは、行が無いものとして扱う。",
+    "x-id-start": 1,
+    "type": "array",
+    "default": [],
+    "items": {
+        "type": "object",
+        "properties": {
+            "id":          { "type": "integer" },
+            "name":        { "type": "string" },
+            "description": { "$ref": "#/$defs/description" }
+        },
+        "required": ["id", "name"],
+        "additionalProperties": false
+    },
+    "$defs": {
+        "description": {
+            "description": "文字列、または段落ごとの文字列の配列",
+            "oneOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ]
+        }
+    }
+}

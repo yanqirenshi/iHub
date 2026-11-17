@@ -110,62 +110,124 @@ test('WBS の id の重複と、parent の無いノードを見つける', ()=> 
     ]);
 });
 
-// plan (予定の期間) のあるワークパッケージと、無いワークパッケージ。
-function wbsData (workpackages) {
+// マスタースケジュール (艦橋の Schedule タブ) のデータ。行 (rows)・予定 (items) と、WBS を持つデータ。
+function scheduleData (rows, items) {
     const data = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
 
     data['wbs/projects'] = [{ id: 1, name: 'P' }];
     data['wbs/wbs'] = [{ id: 10, parent: 1, name: 'A' }];
-    data['wbs/workpackages'] = workpackages;
+    data['wbs/workpackages'] = [{ id: 20, parent: 10, name: 'W' }];
+    data['master_schedule/rows'] = rows;
+    data['master_schedule/items'] = items;
 
     return data;
 }
 
-test('ワークパッケージの plan (予定の期間) は任意で、あってもなくても正しい', ()=> {
-    assert.deepEqual(validateData(wbsData([{ id: 20, parent: 10, name: 'W' }])), []);
-    assert.deepEqual(validateData(wbsData([{ id: 20, parent: 10, name: 'W', plan: { from: '2026-11-01', to: '2026-11-30' } }])), []);
-    assert.deepEqual(validateData(wbsData([
-        { id: 20, parent: 10, name: 'W1', plan: { from: '2026-11-01', to: '2026-11-30' } },
-        { id: 21, parent: 10, name: 'W2' },
+const ROWS = [{ id: 1, name: '開発' }, { id: 2, name: 'リリース', description: ['説明'] }];
+const PLAN = { from: '2026-11-01', to: '2026-11-30' };
+
+test('master_schedule のファイルは無くてもよく、無いときは予定が無いものとして検査する', ()=> {
+    const data = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
+
+    assert.ok(!('master_schedule/rows' in data) && !('master_schedule/items' in data));
+    assert.deepEqual(validateData(data), []);
+});
+
+test('master_schedule: 行と予定 (行き先は wbs・url・無し) は、正しい', ()=> {
+    assert.deepEqual(validateData(scheduleData(ROWS, [
+        { id: 1001, parent: 1, name: '画面', plan: PLAN },
+        { id: 1002, parent: 1, name: 'API', plan: PLAN, wbs: 20 },
+        { id: 1003, parent: 2, name: '公開', plan: { from: '2026-12-15', to: '2026-12-15' }, url: 'https://example.com/release', description: '説明' },
+        { id: 1004, parent: 2, name: 'WBS のノード', plan: PLAN, wbs: 10 },
+        { id: 1005, parent: 2, name: 'プロジェクト', plan: PLAN, wbs: 1 },
     ])), []);
 });
 
-test('plan の from と to が同じ日でもよい', ()=> {
-    assert.deepEqual(validateData(wbsData([{ id: 20, parent: 10, name: 'W', plan: { from: '2026-11-11', to: '2026-11-11' } }])), []);
+test('master_schedule: 行だけ・予定が無くてもよい', ()=> {
+    assert.deepEqual(validateData(scheduleData(ROWS, [])), []);
+    assert.deepEqual(validateData(scheduleData([], [])), []);
 });
 
-test('plan の形の誤りを見つける (to が無い・日付の形でない・知らない項目・オブジェクトでない)', ()=> {
-    const check = (plan)=> validateData(wbsData([{ id: 20, parent: 10, name: 'W', plan }]));
+test('master_schedule: 形の誤りを見つける (name・plan が無い・plan の形・知らない項目・url の形)', ()=> {
+    const check = (item)=> validateData(scheduleData(ROWS, [{ id: 1001, parent: 1, name: 'X', plan: PLAN, ...item }]));
 
-    const no_to = check({ from: '2026-11-01' });
-    assert.ok(no_to.some(e=> e.startsWith('wbs/workpackages/0/plan') && e.includes('to')), no_to.join('\n'));
+    const no_plan = validateData(scheduleData(ROWS, [{ id: 1001, parent: 1, name: 'X' }]));
+    assert.ok(no_plan.some(e=> e.startsWith('master_schedule/items/0') && e.includes('plan')), no_plan.join('\n'));
 
-    const bad_form = check({ from: '2026/11/01', to: '2026-11-30' });
-    assert.ok(bad_form.some(e=> e.startsWith('wbs/workpackages/0/plan/from')), bad_form.join('\n'));
+    const no_name = validateData(scheduleData(ROWS, [{ id: 1001, parent: 1, plan: PLAN }]));
+    assert.ok(no_name.some(e=> e.startsWith('master_schedule/items/0') && e.includes('name')), no_name.join('\n'));
 
-    const not_string = check({ from: 20261101, to: '2026-11-30' });
-    assert.ok(not_string.some(e=> e.startsWith('wbs/workpackages/0/plan/from')), not_string.join('\n'));
+    const no_to = check({ plan: { from: '2026-11-01' } });
+    assert.ok(no_to.some(e=> e.startsWith('master_schedule/items/0/plan') && e.includes('to')), no_to.join('\n'));
 
-    const unknown = check({ from: '2026-11-01', to: '2026-11-30', start: '2026-11-01' });
-    assert.ok(unknown.some(e=> e.startsWith('wbs/workpackages/0/plan') && e.endsWith('(start)')), unknown.join('\n'));
+    const bad_form = check({ plan: { from: '2026/11/01', to: '2026-11-30' } });
+    assert.ok(bad_form.some(e=> e.startsWith('master_schedule/items/0/plan/from')), bad_form.join('\n'));
 
-    const not_object = check('2026-11-01');
-    assert.ok(not_object.some(e=> e.startsWith('wbs/workpackages/0/plan')), not_object.join('\n'));
+    const unknown = check({ group: 'x' });
+    assert.ok(unknown.some(e=> e.startsWith('master_schedule/items/0') && e.endsWith('(group)')), unknown.join('\n'));
+
+    const bad_wbs = check({ wbs: '20' });
+    assert.ok(bad_wbs.some(e=> e.startsWith('master_schedule/items/0/wbs')), bad_wbs.join('\n'));
+
+    // url は http か https だけ。(javascript: などは、押したときに動いてしまうので、書けない)
+    for (const url of ['javascript:alert(1)', 'example.com', 'ftp://example.com/'])
+        assert.ok(check({ url }).some(e=> e.startsWith('master_schedule/items/0/url')), url);
+
+    const no_row_name = validateData(scheduleData([{ id: 1 }], []));
+    assert.ok(no_row_name.some(e=> e.startsWith('master_schedule/rows/0') && e.includes('name')), no_row_name.join('\n'));
 });
 
-test('plan の日付が実在しないときと、to が from より前のときを見つける (ルール)', ()=> {
-    const errors = validateData(wbsData([
-        { id: 20, parent: 10, name: 'W1', plan: { from: '2026-02-30', to: '2026-03-31' } },
-        { id: 21, parent: 10, name: 'W2', plan: { from: '2026-11-30', to: '2026-11-01' } },
-        { id: 22, parent: 10, name: 'W3', plan: { from: '2026-11-01', to: '2026-13-01' } },
-        { id: 23, parent: 10, name: 'W4', plan: { from: '2026-11-01', to: '2026-11-30' } },
-    ]));
-
-    assert.deepEqual(errors, [
-        'wbs/workpackages: plan.from が日付として正しくありません。(id=20, from=2026-02-30)',
-        'wbs/workpackages: plan.to が plan.from より前です。(id=21, from=2026-11-30, to=2026-11-01)',
-        'wbs/workpackages: plan.to が日付として正しくありません。(id=22, to=2026-13-01)',
+test('master_schedule: plan の日付が実在しないときと、to が from より前のときを見つける (ルール)', ()=> {
+    assert.deepEqual(validateData(scheduleData(ROWS, [
+        { id: 1001, parent: 1, name: 'A', plan: { from: '2026-02-30', to: '2026-03-31' } },
+        { id: 1002, parent: 1, name: 'B', plan: { from: '2026-11-30', to: '2026-11-01' } },
+        { id: 1003, parent: 1, name: 'C', plan: { from: '2026-11-01', to: '2026-13-01' } },
+        { id: 1004, parent: 1, name: 'D', plan: PLAN },
+    ])), [
+        'master_schedule/items: plan.from が日付として正しくありません。(id=1001, from=2026-02-30)',
+        'master_schedule/items: plan.to が plan.from より前です。(id=1002, from=2026-11-30, to=2026-11-01)',
+        'master_schedule/items: plan.to が日付として正しくありません。(id=1003, to=2026-13-01)',
     ]);
+});
+
+test('master_schedule: parent の行が無いもの・wbs の無いもの・wbs と url の両方・id の重複を見つける (ルール)', ()=> {
+    assert.deepEqual(validateData(scheduleData(ROWS, [
+        { id: 1001, parent: 9, name: 'A', plan: PLAN },
+        { id: 1002, parent: 1, name: 'B', plan: PLAN, wbs: 999 },
+        { id: 1003, parent: 1, name: 'C', plan: PLAN, wbs: 20, url: 'https://example.com/' },
+        { id: 1, parent: 1, name: 'D (行と同じ id)', plan: PLAN },
+        { id: 1005, parent: 1, name: 'E', plan: PLAN },
+        { id: 1005, parent: 1, name: 'F (予定と同じ id)', plan: PLAN },
+    ])), [
+        'master_schedule: id が重複しています。(id=1)',
+        'master_schedule: id が重複しています。(id=1005)',
+        'master_schedule/items: parent の行が見つかりません。(id=1001, parent=9)',
+        'master_schedule/items: wbs の WBS のノードが見つかりません。(id=1002, wbs=999)',
+        'master_schedule/items: wbs と url は、両方は書けません。(id=1003)',
+    ]);
+});
+
+test('master_schedule: wbs の検査は、データ全体の検証のときだけ (ドメインごとの検証では、WBS が渡らないので飛ばす)', ()=> {
+    const rows = [{ id: 1, name: '開発' }];
+    const items = [{ id: 1001, parent: 1, name: 'A', plan: PLAN, wbs: 999 }];
+
+    assert.deepEqual(RULES.master_schedule({ rows, items }), []);
+    assert.deepEqual(RULES.master_schedule({ rows, items }, {}), []);
+    assert.equal(RULES.master_schedule({ rows, items }, { 'wbs/projects': [], 'wbs/wbs': [], 'wbs/workpackages': [] }).length, 1);
+});
+
+test('ワークパッケージの plan は、書けない (予定は master_schedule に書く)', ()=> {
+    const data = scheduleData([], []);
+
+    data['wbs/workpackages'] = [{ id: 20, parent: 10, name: 'W', plan: PLAN }];
+
+    const errors = validateData(data);
+
+    assert.ok(errors.some(e=> e.startsWith('wbs/workpackages/0') && e.endsWith('(plan)')), errors.join('\n'));
+
+    data['wbs/workpackages'] = [{ id: 20, parent: 10, name: 'W' }];
+
+    assert.deepEqual(validateData(data), []);
 });
 
 test('TM の relationships で、エンティティの参照が欠けているものを見つける', ()=> {

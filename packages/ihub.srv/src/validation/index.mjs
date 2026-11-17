@@ -121,7 +121,8 @@ export function createValidation ({ schemas_dir = null, rules = {} } = {}) {
     }
 
     // collections をスキーマで検証し、そろっていてスキーマに合っているドメインはルールでも検査する。
-    function validateCollections (collections, data) {
+    // all は、データ全体。ドメインをまたぐ検査のために、ルールの 2 つ目の引数に渡す。(ドメインごとの検証では、null)
+    function validateCollections (collections, data, all = null) {
         const errors = [];
         const invalid = new Set();
 
@@ -158,7 +159,7 @@ export function createValidation ({ schemas_dir = null, rules = {} } = {}) {
             const domain_data = Object.fromEntries(members.map(c=> [c.collection, c.name in data ? data[c.name] : defaultData(c)]));
 
             for (const check of checks)
-                errors.push(...check(domain_data));
+                errors.push(...check(domain_data, all));
         }
 
         return errors;
@@ -166,7 +167,7 @@ export function createValidation ({ schemas_dir = null, rules = {} } = {}) {
 
     // 読み込んだデータ全体を検証する。戻り値はエラーのメッセージの配列。(空ならエラーなし)
     function validateData (data) {
-        const errors = validateCollections(COLLECTIONS, data);
+        const errors = validateCollections(COLLECTIONS, data, data);
 
         for (const name of Object.keys(data))
             if (!findCollection(name))

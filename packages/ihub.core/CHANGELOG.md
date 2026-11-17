@@ -4,6 +4,23 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.7.0 (2026-11)
+
+### 変更 (艦橋の Schedule タブのデータを、WBS から切り離す。yanqirenshi/iHub#182)
+
+- 艦橋の Schedule タブ (d3.yabane の矢羽根) が見るデータを、WBS のワークパッケージの `plan` から、新しい **`data/master_schedule/`** に替えた。予定は WBS とは別のファイルで管理し、WBS に無い予定も書ける。
+  - `master_schedule/rows` (行) と `master_schedule/items` (予定)。どちらも、ファイルが無くてもよい。(無いときは、予定が無いものとして、知らせを出す)
+  - 行は、`rows.json` の並びのまま、上から行になる。(これまでの、WBS の入れ子を 1 段の行に直す処理は、無くなった) 予定の無い行も出す。行の名前が長いときは、末尾を `…` にする。
+  - 予定: `{ id, parent (行の id), name, plan: { from, to }, wbs?, url?, description? }`。表示する期間・目盛り・幅・段への分かれ方・図の位置と拡大を覚える作りは、これまでどおり。
+  - 矢羽根を押したとき: `wbs` があれば `/wbs/{id}` へ、`url` (`http`・`https` だけ) があれば新しいタブ (`noopener`) で開く。どちらも無ければ、何もしない。(これまでは、いつも、ワークパッケージのページへ移った)
+  - 予定が 1 つも無いときの知らせを、`data/master_schedule/rows.json`・`items.json` の書き方にした。
+  - `manegers/schedule.js`: `SCHEDULE_COLLECTIONS` を `master_schedule/rows`・`master_schedule/items` にした。`rowLabel` は、名前 1 つを受け取る形になった。`linkOf` (押したときの行き先) を足した。
+- **利用側への影響 (データの形が変わるので 0.7.0)**:
+  - ワークパッケージの `plan` は、**使えなくなる**。書いてあると、`ihub-srv check` と API の書き込みが、誤りにする。(`plan` を書いていたデータは、`data/master_schedule/` の予定に移して、ワークパッケージからは消す。2026-11-17 に確かめたところ、iHub・雛形・3 つの hub のデータには、まだ書かれていない)
+  - ワークパッケージで予定を書いていたときの移し方: 行 (これまで、行になっていた WBS) を `rows.json` に、ワークパッケージの `name`・`plan` を `items.json` に書く。(`parent` は行の `id`。押したときに、これまでどおり、ワークパッケージのページへ移したいときは、`wbs` にワークパッケージの `id` を書く)
+  - 見本の予定は、参照アプリ・雛形の `data/` には、足していない。(ファイルが無くても動く)
+- `@yanqirenshi/ihub.srv` 0.7.0 とセットで使う。(`master_schedule` のスキーマとルールは、ihub.srv にある)
+
 ## 0.6.1 (2026-11)
 
 ### 修正 (サイドメニュー: yanqirenshi/iHub#177)

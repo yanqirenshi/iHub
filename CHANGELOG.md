@@ -10,6 +10,10 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.7.0 (2026-11)
+
+- `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`: 艦橋の Schedule タブのデータを、WBS のワークパッケージの `plan` から切り離して、新しい `data/master_schedule/` (`rows.json` の行・`items.json` の予定) にした。(行は `rows.json` の順。予定は `parent` (行の id)・`name`・`plan` が必須で、行き先は任意で `wbs` (押すと `/wbs/{id}`) か `url` (新しいタブ) のどちらか 1 つ。どちらも無ければ、押しても何も起きない。ファイルが無くても動く) **データの形が変わるので 0.7.0。ワークパッケージの `plan` は、使えなくなる。(書いてあると `ihub-srv check` が誤りにする) 予定は `data/master_schedule/` に書く。**
+
 ## 0.6.1 (2026-11)
 
 - `@yanqirenshi/ihub.core`: サイドメニューで、選択中 (とホバー中) の項目の白い枠の上下の余白が、ほぼ無かった不具合を直した。(yanqirenshi/iHub#177。bulma の `box-sizing: border-box` で、menubook の白い枠が 33px から 25px に縮んでいた) `dependencies` の `@yanqirenshi/menubook` を `^0.1.3` にした。(白い枠 33px の周りに 4px の縁取りが一周し、1 行の高さは 33px のまま。iHub のコードの変更は無い)
