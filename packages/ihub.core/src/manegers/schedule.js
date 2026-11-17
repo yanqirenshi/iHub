@@ -9,7 +9,8 @@
 // 矢羽根を押したときの行き先は、ワークパッケージの wbs (data/wbs/ のノードの id。/wbs/{id}) か url (新しいタブ)。どちらも無ければ、何もしない。(linkOf)
 //
 // 時間の目盛りのサイクルは、日・週・月から選べる。(0.7.0 以降。選んだものは、ブラウザに覚える。readCycle・writeCycle)
-// 1 目盛り (1 日・1 週・1 か月) の幅は、どのサイクルでも UNIT_WIDTH にそろえる。(scheduleScale)
+// 1 目盛り (1 日・1 週・1 か月) の幅は、どのサイクルでも UNIT_WIDTH × 幅の段 にそろえる。(scheduleScale)
+// 幅の段は、画面の「−」「＋」で変えられる。(0.8.1 から。選んだものは、サイクルごとにブラウザに覚える。readWidth・writeWidth)
 
 export const SCHEDULE_COLLECTIONS = [
     'master_schedule/projects',
@@ -27,7 +28,7 @@ export const SCHEDULE_CYCLES = [
 // 覚えたものが無いときのサイクル。
 export const DEFAULT_CYCLE = 'w';
 
-// 1 目盛りの幅 (図の座標)。どのサイクルでも同じ。
+// 1 目盛りの幅 (図の座標)。どのサイクルでも同じ。(幅の段が 100% のとき。段に合わせた幅は unitWidth)
 export const UNIT_WIDTH = 111;
 
 // 図の目盛りの、最小の数。(予定の期間が短くても、図が小さくなりすぎないように、表示する期間を右へ延ばす)
@@ -350,8 +351,9 @@ export function isCycle (cycle) {
 // サイクルに合わせた、表示する期間と、時間の目盛りの全体の幅。
 //   from・to … 表示する期間 ('YYYY-MM-DD')。予定の前後に、1 目盛りずつの余白を付け、サイクルの初めと終わりにそろえる。
 //   units    … 目盛りの数。(最小は MIN_UNITS。足りないときは、右へ延ばす)
-//   size     … units × UNIT_WIDTH。(1 目盛りの幅が、どのサイクルでも UNIT_WIDTH になる。月は、月の日数で少し違う)
-export function scheduleScale (data, cycle = DEFAULT_CYCLE) {
+//   size     … units × unitWidth(width)。(1 目盛りの幅が、どのサイクルでも同じになる。月は、月の日数で少し違う)
+//   width    … 幅の段 (SCHEDULE_WIDTHS の百分率。既定の 100 = UNIT_WIDTH)。段に無い値は 100。(0.8.1 から)
+export function scheduleScale (data, cycle = DEFAULT_CYCLE, width = DEFAULT_WIDTH) {
     if (!isCycle(cycle))
         cycle = DEFAULT_CYCLE;
 
@@ -371,7 +373,7 @@ export function scheduleScale (data, cycle = DEFAULT_CYCLE) {
         from: formatDate(start),
         to: formatDate(addCycles(start, cycle, units) - DAY),
         units,
-        size: units * UNIT_WIDTH,
+        size: units * unitWidth(width),
     };
 }
 
@@ -404,6 +406,103 @@ export function writeCycle (key, cycle) {
 
     try {
         window.localStorage.setItem(key, JSON.stringify(cycle));
+    } catch (e) {
+        // 覚えられなくても、図は動く
+    }
+}
+
+// ---- 1 目盛りの幅 (0.8.1 から) -----------------------------------------------------------
+// 幅の段。UNIT_WIDTH に対する百分率。画面の「−」で 1 段狭く、「＋」で 1 段広くする。
+export const SCHEDULE_WIDTHS = [50, 75, 100, 150, 200, 300, 400];
+
+// 覚えたものが無いときの幅の段。(0.8.0 までと同じ幅)
+export const DEFAULT_WIDTH = 100;
+
+// 段にある幅か。
+export function isWidth (width) {
+    return SCHEDULE_WIDTHS.includes(width);
+}
+
+// 幅の段の、1 目盛りの幅 (図の座標)。段に無い値は、DEFAULT_WIDTH。
+export function unitWidth (width = DEFAULT_WIDTH) {
+    return UNIT_WIDTH * (isWidth(width) ? width : DEFAULT_WIDTH) / 100;
+}
+
+// 1 段となりの幅。(step は -1 か 1) いちばん端の段では、null。(段に無い値は、DEFAULT_WIDTH から数える)
+export function stepWidth (width, step) {
+    const i = SCHEDULE_WIDTHS.indexOf(isWidth(width) ? width : DEFAULT_WIDTH);
+    const next = SCHEDULE_WIDTHS[i + step];
+
+    return next===undefined ? null : next;
+}
+
+// 目盛りの見出しの既定。(d3.yabane の HEAD_DEFAULTS.cycle。幅 111 に、週の見出し 12/30 や、月のサイクルの 2024-02 が収まる大きさ)
+const HEAD_CYCLE_FONT_SIZE = 26;
+const HEAD_CYCLE_PADDING = 6;
+
+// 幅の段に合わせた、目盛りの見出し。(d3.yabane の style.head に重ねる)
+// 100% より狭い段では、見出しの文字と、線から文字までの間を、幅に合わせて小さくする。(隣の見出しと重ならないように)
+// 100% 以上の段は、d3.yabane の既定のまま。(0.8.0 と同じ見出し)
+export function headOfWidth (width = DEFAULT_WIDTH) {
+    const rate = (isWidth(width) ? width : DEFAULT_WIDTH) / 100;
+
+    if (rate >= 1)
+        return {};
+
+    return {
+        cycle: {
+            font: { size: HEAD_CYCLE_FONT_SIZE * rate },
+            padding: HEAD_CYCLE_PADDING * rate,
+        },
+    };
+}
+
+// 幅を変えたときの、図の位置。(画面の中央にあった日付が、変えたあとも中央に残るように、横の位置だけを合わせる)
+//   view    … 保管した位置 { k, x, y }。(d3.svg の view。画面の x = 図の x × k + view.x)
+//   from・to … 変える前と後の幅の段
+//   start_x … 時間軸の左端 (図の座標)。(columnsWidth(columns) + ROW_MARGIN。d3.yabane の Rectum.makeScale と同じ)
+//   screen  … 図を出している箱の幅 (画面の px)
+// 時間軸は、左端 start_x から右へ、幅の段に比例して伸び縮みする。(表示する期間は変わらない)
+// 中央が時間軸より左 (行の名前の列) のときは、時間軸が動いても見え方が変わらないので、位置はそのまま。
+export function viewForWidth (view, { from, to, start_x, screen }) {
+    const center = (screen / 2 - view.x) / view.k;
+
+    if (center <= start_x)
+        return { ...view };
+
+    const moved = start_x + (center - start_x) * unitWidth(to) / unitWidth(from);
+
+    return { ...view, x: screen / 2 - moved * view.k };
+}
+
+// ---- 選んだ幅を、ブラウザに覚える (サイクルごと) -----------------------------------------------
+export const WIDTH_KEY = (app_name, cycle)=> `ihub:${app_name}:schedule:width:${cycle}`;
+
+// localStorage が使えないときも、このページの中では、選んだものを引き継ぐ。
+const widthMemory = new Map();
+
+// 覚えた幅の段。無い・壊れている・段に無い値・localStorage が使えないときは、DEFAULT_WIDTH (100)。
+export function readWidth (key) {
+    try {
+        const v = JSON.parse(window.localStorage.getItem(key));
+
+        if (isWidth(v))
+            return v;
+    } catch (e) {
+        // 使えない・壊れた値: 黙って、控え (無ければ 100) を使う
+    }
+
+    return widthMemory.get(key) || DEFAULT_WIDTH;
+}
+
+export function writeWidth (key, width) {
+    if (!isWidth(width))
+        return;
+
+    widthMemory.set(key, width);
+
+    try {
+        window.localStorage.setItem(key, JSON.stringify(width));
     } catch (e) {
         // 覚えられなくても、図は動く
     }

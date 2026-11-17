@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.8.1 (2026-11)
+
+- `@yanqirenshi/ihub.core`: 艦橋の Schedule タブに「−」「＋」のボタンを置き、1 目盛り (1 日・1 週・1 か月) の幅を、`50%`〜`400%` の段で変えられるようにした。(yanqirenshi/iHub#192。100% = これまでの 111。選んだ段は、サイクルごとにブラウザに覚える。幅を変えても、画面の中央にあった日付は、ほぼ中央に残る。100% より狭い段では、目盛りの見出しの文字を小さくする) データの形・設定の形は、変わらない。
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(ihub.core 0.8.1 と、版をそろえるだけ)
+
 ## 0.8.0 (2026-11)
 
 - `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`: 艦橋の Schedule タブの `data/master_schedule/` を、d3.yabane の入力と同じ `projects.json`・`wbs.json`・`workpackages.json` にした。(プロジェクトをいちばん左の列に描く。WBS の入れ子・プロジェクト・WBS・ワークパッケージの見た目 (`background`・`stroke`・`font`) を書ける。ワークパッケージの `result`・`progress` は受け取るが、描かない) `@yanqirenshi/d3.yabane` を `^0.4.0` に上げた。参照アプリの `data/master_schedule/` に、d3.yabane のショーケースのサンプルを、そのまま入れた。(雛形には入れていない) **0.7.0 から: `rows.json` は `wbs.json` に、`items.json` は `workpackages.json` に、名前を変える。** (古い名前のファイルがあると、`ihub-srv check` が知らせる)
