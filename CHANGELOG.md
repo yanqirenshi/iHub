@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.8.3 (2026-11)
+
+- `@yanqirenshi/ihub.core`: `@yanqirenshi/d3.yabane` を `^0.7.0` に上げた。(yanqirenshi/iHub#202) 艦橋の Schedule タブで、行の区切り線を、入れ子の子どうし (子の WBS・直下のワークパッケージの帯) の間にも引くようになった。iHub のコードの変更は無い。
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(ihub.core 0.8.3 と、版をそろえるだけ)
+
 ## 0.8.2 (2026-11)
 
 - `@yanqirenshi/ihub.core`: `@yanqirenshi/d3.yabane` を `^0.6.0` に上げた。(yanqirenshi/iHub#198) 艦橋の Schedule タブで、今日が表示する期間の外のときは、現在線が出なくなった。サイクル・幅を変えて図を作り直すときは、前の図が測った名前の幅を引き継ぎ、1 度の描画で済む。初めの拡大の度合いは、d3.yabane の描き終わりの知らせ (`onDraw`) で決め直す。(動きは 0.8.1 と同じ)
