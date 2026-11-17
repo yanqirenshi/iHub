@@ -11,26 +11,27 @@ import D3Yabane, { Rectum, Pippala } from '@yanqirenshi/d3.yabane';
 import { useConfig } from '../../../../config.js';
 import { useDiagramData, useDiagramView } from '../../../../manegers/diagram.js';
 import {
-    CYCLE_KEY, ROW_MARGIN, ROW_WIDTH, SCHEDULE_COLLECTIONS, SCHEDULE_CYCLES, UNIT_WIDTH,
-    buildScheduleData, readCycle, scheduleScale, writeCycle,
+    COLUMN_GAP, CYCLE_KEY, ROW_MARGIN, SCHEDULE_COLLECTIONS, SCHEDULE_CYCLES, UNIT_WIDTH,
+    buildScheduleData, columnsWidth, readCycle, rowColumnWidth, scheduleScale, writeCycle,
 } from '../../../../manegers/schedule.js';
 
 // 図のスタイル (d3.yabane のスタイル)。stage.w は、時間の目盛りの全体の幅。(表示する期間に比例させる)
-const graphStyle = (size)=> ({
+// row.w は、行の名前の 1 列の幅。入れ子で列が増えるときは、細くする。(manegers/schedule.js の rowColumnWidth)
+const graphStyle = (size, columns = 1)=> ({
     stage: { w: size },
     head: { h: 33 },
     body: {
         h: null, w: null,
         columns: { h: 88, w: UNIT_WIDTH },
-        row: { w: ROW_WIDTH, h: 88, margin: ROW_MARGIN, stroke: { color: '#aaa' }, font: { size: 33 } },
-        yabane: { head: 11, h: 66, margin: 33, font: { size: 33 } },
+        row: { w: rowColumnWidth(columns), h: 88, margin: ROW_MARGIN, stroke: { color: '#aaa' }, font: { size: 33 } },
+        yabane: { head: 11, h: 66, margin: COLUMN_GAP, font: { size: 33 } },
     },
     foot: { h: 33 },
 });
 
-// 初めの拡大の度合い。図の全体の幅が、表示している幅に収まる度合い。(小さくしすぎない・大きくしすぎない)
-function initialScale (width, size) {
-    const k = (width * 0.95) / (ROW_WIDTH + ROW_MARGIN + size);
+// 初めの拡大の度合い。図の全体 (行の名前の列と、時間の目盛り) の幅が、表示している幅に収まる度合い。(小さくしすぎない・大きくしすぎない)
+function initialScale (width, size, columns = 1) {
+    const k = (width * 0.95) / (columnsWidth(columns) + ROW_MARGIN + size);
 
     return Math.min(0.4, Math.max(0.1, k));
 }
@@ -118,7 +119,7 @@ function Diagram ({ data, cycle }) {
 
     React.useEffect(()=> {
         const scale = scheduleScale(data, cycle);
-        const k = initialScale(box.current?.clientWidth || 1000, scale.size);
+        const k = initialScale(box.current?.clientWidth || 1000, scale.size, data.columns);
 
         const r = new Rectum({
             // 初めの位置: 左から 100px (サイドメニューの右)・上から 60px (目盛りの見出しを出す余白)。transform は、移動量に拡大の度合いを掛ける。
@@ -134,7 +135,7 @@ function Diagram ({ data, cycle }) {
 
         r.data(r.chewing({
             scale: { cycle: scale.cycle, from: scale.from, to: scale.to, size: scale.size },
-            style: graphStyle(scale.size),
+            style: graphStyle(scale.size, data.columns),
             tree,
             events: { reaf: { click: (reaf)=> open(data.links[reaf.id()], navigate.current) } },
         }));

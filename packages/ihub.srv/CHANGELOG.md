@@ -4,6 +4,16 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.8.0 (2026-11)
+
+### 追加 (master_schedule: 行の入れ子と、見た目の指定。yanqirenshi/iHub#188)
+
+- データのフォーマット: `master_schedule/rows` に、`parent` (任意。親の行の id) と、見た目の `background`・`stroke`・`font` (任意) を足した。`master_schedule/items` にも、`background`・`stroke`・`font` (任意) を足した。
+  - 見た目は、d3.yabane の共有型 (`@yanqirenshi/types`) に合わせた。`background: { color, opacity (0〜1) }`・`stroke: { color, width (0 以上), type (solid・dashed・dotted) }`・`font: { size (0 より大きい), color, weight (文字列か数) }`。どれも、知らない項目は誤り。
+- ルール (`checkMasterSchedule`): 行の `parent` の行があること・入れ子が輪になっていないこと (自分を親にしたときも、輪) を足した。ほか (id の一意・予定の `parent`・日付・行き先) は、0.7.0 のまま。
+- テストを足した。(入れ子と見た目の正しいデータ・見た目の形の誤り・無い親・輪)
+- **利用側への影響**: 0.7.0 の形のデータは、そのまま使える。
+
 ## 0.7.0 (2026-11)
 
 ### 変更 (艦橋の Schedule タブのデータ: master_schedule。yanqirenshi/iHub#182)

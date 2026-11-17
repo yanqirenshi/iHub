@@ -1,22 +1,54 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "マスタースケジュールの予定",
-    "description": "艦橋の Schedule タブの矢羽根になる予定。parent は行 (master_schedule/rows) の id。plan (予定の期間) は必須。行き先は任意で、wbs (WBS のノードの id。押すと /wbs/{id} へ移る) か url (押すと、そのページを新しいタブで開く) のどちらか 1 つ。どちらも書かないと、押しても何も起きない。(wbs と url を両方は書けない・wbs の id が WBS にあること・parent の行があること・日付が実在すること・to が from より前でないことは、スキーマではなく、ルールで検査する) ファイルが無いときは、予定が無いものとして扱う。",
+    "description": "艦橋の Schedule タブの矢羽根になる予定。parent は行 (master_schedule/rows) の id。plan (予定の期間) は必須。行き先は任意で、wbs (WBS のノードの id。押すと /wbs/{id} へ移る) か url (押すと、そのページを新しいタブで開く) のどちらか 1 つ。どちらも書かないと、押しても何も起きない。(wbs と url を両方は書けない・wbs の id が WBS にあること・parent の行があること・日付が実在すること・to が from より前でないことは、スキーマではなく、ルールで検査する) parent は、どの深さの行でもよい。(子の行を持つ行の直下にも置ける) background・stroke・font (任意) は、矢羽根の見た目。(d3.yabane の共有型。0.8.0 から) ファイルが無いときは、予定が無いものとして扱う。",
     "x-id-start": 1001,
     "type": "array",
     "default": [],
     "items": {
         "type": "object",
         "properties": {
-            "id":          { "type": "integer" },
-            "parent":      { "type": "integer", "description": "行 (master_schedule/rows) の id" },
-            "name":        { "type": "string" },
-            "description": { "$ref": "#/$defs/description" },
-            "plan":        { "$ref": "#/$defs/plan" },
-            "wbs":         { "type": "integer", "description": "行き先: WBS のノード (プロジェクト・WBS・ワークパッケージ) の id。押すと /wbs/{id} へ移る" },
-            "url":         { "type": "string", "pattern": "^https?://", "description": "行き先: 押すと、そのページを新しいタブで開く。(http か https)" }
+            "id": {
+                "type": "integer"
+            },
+            "parent": {
+                "type": "integer",
+                "description": "行 (master_schedule/rows) の id"
+            },
+            "name": {
+                "type": "string"
+            },
+            "description": {
+                "$ref": "#/$defs/description"
+            },
+            "plan": {
+                "$ref": "#/$defs/plan"
+            },
+            "wbs": {
+                "type": "integer",
+                "description": "行き先: WBS のノード (プロジェクト・WBS・ワークパッケージ) の id。押すと /wbs/{id} へ移る"
+            },
+            "url": {
+                "type": "string",
+                "pattern": "^https?://",
+                "description": "行き先: 押すと、そのページを新しいタブで開く。(http か https)"
+            },
+            "background": {
+                "$ref": "#/$defs/background"
+            },
+            "stroke": {
+                "$ref": "#/$defs/stroke"
+            },
+            "font": {
+                "$ref": "#/$defs/font"
+            }
         },
-        "required": ["id", "parent", "name", "plan"],
+        "required": [
+            "id",
+            "parent",
+            "name",
+            "plan"
+        ],
         "additionalProperties": false
     },
     "$defs": {
@@ -29,18 +61,98 @@
             "description": "予定の期間。from と to は、どちらも書く。to は、from と同じ日か、あと。(日付として正しいことと、to が from より前でないことは、スキーマではなく、ルールで検査する)",
             "type": "object",
             "properties": {
-                "from": { "$ref": "#/$defs/date", "description": "始まりの日" },
-                "to":   { "$ref": "#/$defs/date", "description": "終わりの日" }
+                "from": {
+                    "$ref": "#/$defs/date",
+                    "description": "始まりの日"
+                },
+                "to": {
+                    "$ref": "#/$defs/date",
+                    "description": "終わりの日"
+                }
             },
-            "required": ["from", "to"],
+            "required": [
+                "from",
+                "to"
+            ],
             "additionalProperties": false
         },
         "description": {
             "description": "文字列、または段落ごとの文字列の配列",
             "oneOf": [
-                { "type": "string" },
-                { "type": "array", "items": { "type": "string" } }
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
             ]
+        },
+        "background": {
+            "description": "背景 (共有型 Background)。行では箱、予定では矢羽根に効く。(d3.yabane の既定: color 白)",
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string",
+                    "description": "色 (CSS の色。'#eaf4fc'・'rgb(0, 0, 0)'・'red' など)"
+                },
+                "opacity": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "不透明度 (0〜1)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "stroke": {
+            "description": "枠線 (共有型 Stroke)。行では箱、予定では矢羽根に効く。(d3.yabane の既定: color #0e9aa7・width 4・type solid)",
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string",
+                    "description": "CSS の色"
+                },
+                "width": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "太さ"
+                },
+                "type": {
+                    "enum": [
+                        "solid",
+                        "dashed",
+                        "dotted"
+                    ],
+                    "description": "線の種類。(破線・点線の間隔は、太さに比例する)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "font": {
+            "description": "名前の文字 (共有型 Font)。(d3.yabane の既定: size 33)",
+            "type": "object",
+            "properties": {
+                "size": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "description": "大きさ"
+                },
+                "color": {
+                    "type": "string",
+                    "description": "CSS の色"
+                },
+                "weight": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "太さ ('bold'・700 など)"
+                }
+            },
+            "additionalProperties": false
         }
     }
 }

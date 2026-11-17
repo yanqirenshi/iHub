@@ -10,6 +10,10 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.8.0 (2026-11)
+
+- `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`: 艦橋の Schedule タブの `master_schedule` に、行の入れ子 (`rows` の `parent`) と、行・予定の見た目 (`background`・`stroke`・`font`。d3.yabane の共有型) を足した。(入れ子は、深さごとに行の名前の列が分かれる。同じ親の下の行は `rows.json` の順。`ihub-srv check` は、無い親・輪になった入れ子・見た目の形の誤りを知らせる) 参照アプリの `data/master_schedule/` に、d3.yabane のショーケースのサンプルを入れた。(雛形には入れていない) 0.7.0 の形のデータは、そのまま使える。
+
 ## 0.7.0 (2026-11)
 
 - `@yanqirenshi/ihub.core`: d3.* で描く 7 つの図 (ER 図・TM・クラス図・画面遷移図・システム構成図・Overview・Schedule) で、グリッド線を描かないのを既定にした。設定の `diagrams` に `std`・`scd`・`overview`・`schedule` を足し、7 つとも `diagrams.{図}.grid` で上書きできる。(`{ draw: true }` で描く) **グリッド線を出していたアプリは、出なくなる。**

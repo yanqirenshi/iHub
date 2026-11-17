@@ -65,12 +65,35 @@ function checkWbs ({ projects, wbs, workpackages }) {
 // マスタースケジュール (艦橋の Schedule タブ): 行と予定の id が、またいで一意なこと (矢羽根の図が、行と予定を同じ id で引くため)・
 // 予定の parent の行があること・plan の日付が実在して、to が from より前でないこと・行き先が wbs と url の両方でないこと・
 // wbs の id が WBS のノード (プロジェクト・WBS・ワークパッケージ) にあること。
+// 行の parent (入れ子。0.8.0 から) の行があること・入れ子が輪になっていないこと。
 function checkMasterSchedule ({ rows, items }, all = null) {
     const errors = [];
 
     checkUnique(errors, 'master_schedule', [...rows, ...items]);
 
     const row_ids = new Set(rows.map(d=> d.id));
+
+    for (const d of rows)
+        if (d.parent!==undefined && !row_ids.has(d.parent))
+            errors.push(`master_schedule/rows: parent の行が見つかりません。(id=${d.id}, parent=${d.parent})`);
+
+    // 入れ子の輪。(自分を親にしたときも、輪) 親をたどって、自分に戻る行を、輪の中の行として知らせる。
+    const parent_of = new Map(rows.filter(d=> d.parent!==undefined).map(d=> [d.id, d.parent]));
+
+    for (const d of rows) {
+        const seen = new Set();
+        let id = d.parent;
+
+        while (id!==undefined && row_ids.has(id) && !seen.has(id)) {
+            if (id===d.id) {
+                errors.push(`master_schedule/rows: 入れ子が輪になっています。(id=${d.id})`);
+                break;
+            }
+
+            seen.add(id);
+            id = parent_of.get(id);
+        }
+    }
 
     // wbs の id の検査は、WBS のデータが渡されたときだけ。(API サーバーのドメインごとの検証では、渡らない)
     const wbs_nodes = ['wbs/projects', 'wbs/wbs', 'wbs/workpackages'].map(name=> all?.[name]);
