@@ -126,7 +126,7 @@ function Diagram (props) {
     // カメラ (移動位置と拡大縮小) を、ブラウザに保管して、次に開いたときに戻す。
     const bindView = useDiagramView('tm');
 
-    // 設定の diagrams.tm.grid (d3 の grid の設定。例: { draw: false }) を、そのまま d3 に渡す。(無いときは、渡さない)
+    // 設定の diagrams.tm.grid (d3 の grid の設定。既定 { draw: false } = 描かない) を、そのまま d3 に渡す。
     const { diagrams } = useConfig();
     const grid = diagrams.tm.grid;
 
@@ -141,7 +141,7 @@ function Diagram (props) {
 
         const r = new Rectum({
             transform: INITIAL_VIEW,
-            ...(grid!==undefined && { grid }),
+            grid,
             svg: { style: { background: '#fff' } },
             // コールバックの d は d3.ter の内部のデータで、入力のレコードは d._core にある。
             callbacks: {

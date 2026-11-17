@@ -266,7 +266,7 @@ function Diagram (props) {
     // カメラ (移動位置と拡大縮小) を、ブラウザに保管して、次に開いたときに戻す。
     const bindView = useDiagramView('classes');
 
-    // 設定の diagrams.classes.grid (d3.classes の grid の設定。例: { draw: false }) を、そのまま渡す。
+    // 設定の diagrams.classes.grid (d3.classes の grid の設定。既定 { draw: false } = 描かない) を、そのまま渡す。
     const { diagrams } = useConfig();
     const grid = diagrams.classes.grid;
 
@@ -278,7 +278,7 @@ function Diagram (props) {
         const inputs = new Map(data.classes.map(d=> [d.id, d]));
 
         try {
-            const diagram = new ClassDiagram(root, { ...(grid!==undefined && { grid }) });
+            const diagram = new ClassDiagram(root, { grid });
 
             diagram.loadFromData({ classes: data.classes, relationships: data.relationships }).render();
 

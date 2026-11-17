@@ -6,6 +6,13 @@
 
 ## 0.7.0 (2026-11)
 
+### 変更 (図のグリッド線を、既定で描かない。yanqirenshi/iHub#186)
+
+- d3.* で描く 7 つの図 (ER 図・TM・クラス図・画面遷移図・システム構成図・艦橋の Overview・艦橋の Schedule) で、グリッド線を描かないのを既定にした。(d3.* に `grid: { draw: false }` を渡す)
+- 設定の `diagrams` に、`std` (画面遷移図)・`scd` (システム構成図)・`overview`・`schedule` を足し、7 つの図とも `diagrams.{図}.grid` で上書きできるようにした。(名前は、図の位置を覚える code と同じ) 既定の `{ draw: false }` に、設定の `grid` を重ねる。`classes.header` など、今ある設定は、そのまま。
+- `DEFAULT_CONFIG.diagrams` は、7 つの図の `{ grid: { draw: false } }` になった。`DIAGRAMS` (図の名前の一覧) を `config.js` に足した。
+- **利用側への影響**: グリッド線を出していたアプリ (設定に何も書いていないアプリ) は、出なくなる。出したいときは、設定に `diagrams: { {図}: { grid: { draw: true } } }` を書く。すでに `{ draw: false }` を書いているアプリ (Bokasafn の hub など) は、そのままでよい。(消しても同じ)
+
 ### 追加 (艦橋の Schedule タブ: サイクル (日・週・月) の切り替え。yanqirenshi/iHub#184)
 
 - Schedule タブの右上に「日・週・月」のボタンを置き、時間の目盛りのサイクルを切り替えられるようにした。(これまでは、週で固定)

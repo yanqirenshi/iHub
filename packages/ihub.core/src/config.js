@@ -28,14 +28,22 @@ import Section03 from './components/pages/Help/Section03.js';
 //   panels:     { PAGE_DATA: { dfd: Dfd } }           タブの code → パネルの部品。既定に重ねる。({ tab })=> 部品。(既定 {})
 //   help:       { sections }                          Help の内容。(部品の配列。各部品は { size } を受け取る。既定 いまの 3 つ)
 //   github:     { token }                             個人用アクセストークン
-//   diagrams:   { er: { grid }, tm: { grid }, classes: { grid, header } }
-//                                                     ER 図・TM 図・クラス図の設定。grid は d3.er・d3.ter・d3.classes の grid の設定を、そのまま渡す。
-//                 (例: { draw: false } でグリッド線を描かない。{ size, span } でグリッドの範囲と間隔。既定 渡さない)
+//   diagrams:   { er, tm, classes, std, scd, overview, schedule }
+//                                                     d3.* で描く図の設定。名前は、図の位置を覚える code (useDiagramView) と同じ。
+//                 er … ER 図・tm … TM・classes … クラス図・std … 画面遷移図・scd … システム構成図・overview … 艦橋の Overview・schedule … 艦橋の Schedule
+//                 {図}.grid … d3.* の grid の設定。既定 { draw: false } (グリッド線を描かない。0.7.0 から) に、設定の grid を重ねて、d3.* に渡す。
+//                             (例: { draw: true } でグリッド線を描く。{ size, span } だけを書いたときは、描かないまま)
 //                 classes.header … クラスの箱のヘッダーの色。{ by: 'layer', colors: { domain: '#fde68a', ... } }
 //                                  by はクラスのレコードの項目のパス、colors は項目の値 → 色 (文字列) か d3.classes の header ({ background, font })。(既定 塗らない)
 // }
 //
 // 設定は作り直さずに、モジュールの中で 1 つだけ作って渡す。(作り直すと、ストアも作り直される)
+
+// d3.* で描く図。(設定の diagrams の名前。図の位置を覚える code と同じ)
+export const DIAGRAMS = ['er', 'tm', 'classes', 'std', 'scd', 'overview', 'schedule'];
+
+// 図のグリッド線の既定。描かない。(0.7.0 から。0.6.x までは d3.* の既定で、描いていた)
+const DEFAULT_GRID = { draw: false };
 
 // いまの iHub の値。(設定に無い項目に使う)
 export const DEFAULT_CONFIG = {
@@ -46,7 +54,7 @@ export const DEFAULT_CONFIG = {
     panels: {},
     help: { sections: [Section01, Section02, Section03] },
     github: { token: undefined },
-    diagrams: { er: {}, tm: {}, classes: {} },
+    diagrams: Object.fromEntries(DIAGRAMS.map(name=> [name, { grid: DEFAULT_GRID }])),
 };
 
 function required (value, path) {
@@ -106,11 +114,12 @@ export function resolveConfig (config = {}) {
         panels,
         help:       { ...DEFAULT_CONFIG.help,       ...config.help },
         github:     { ...DEFAULT_CONFIG.github,     ...config.github },
-        diagrams:   {
-            er: { ...DEFAULT_CONFIG.diagrams.er, ...config.diagrams?.er },
-            tm: { ...DEFAULT_CONFIG.diagrams.tm, ...config.diagrams?.tm },
-            classes: { ...DEFAULT_CONFIG.diagrams.classes, ...config.diagrams?.classes },
-        },
+        // 図ごとに、既定に設定を重ねる。grid は、既定の { draw: false } に、設定の grid を重ねる。(ほかの項目 (classes.header など) は、そのまま)
+        diagrams:   Object.fromEntries(DIAGRAMS.map(name=> {
+            const own = config.diagrams?.[name] || {};
+
+            return [name, { ...own, grid: { ...DEFAULT_GRID, ...own.grid } }];
+        })),
     };
 }
 
