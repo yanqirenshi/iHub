@@ -60,6 +60,9 @@ export default function Schedule () {
 
     const box = React.useRef(null);
 
+    // 今、画面に出している図。(幅を変えるとき、位置をまだ保管していなければ、今の位置と拡大の度合いを使う)
+    const rectum = React.useRef(null);
+
     const changeCycle = (e, next)=> {
         // 選んでいるボタンをもう一度押したときは、null が来る。(選んだままにする)
         if (!next)
@@ -75,9 +78,11 @@ export default function Schedule () {
         if (next===null)
             return;
 
-        // 図を作り直す前に、保管した位置を合わせ直す。(画面の中央にあった日付が、中央に残るように。位置を保管していないときは、初めの位置)
+        // 図を作り直す前に、位置を合わせ直して保管する。(画面の中央にあった日付が、中央に残るように。拡大の度合いは、そのまま)
+        // 位置をまだ保管していない (開いてから動かしていない) ときは、今、画面に出ている位置と拡大の度合いを元にする。
+        // (保管しないまま作り直すと、初めの拡大の度合いが、広がった図の全体を画面に収め直すので、1 目盛りの画面の幅が、ほとんど変わらない)
         const code = `schedule:${cycle}`;
-        const view = readDiagramView(app.name, code);
+        const view = readDiagramView(app.name, code) || currentView(rectum.current);
 
         if (view)
             writeDiagramView(app.name, code, viewForWidth(view, {
@@ -107,7 +112,7 @@ export default function Schedule () {
     // ほかからデータが変わったとき・サイクルや幅を変えたときは、図を作り直す。(位置と拡大は、サイクルごとに保管した値で戻る)
     return (
         <Box ref={box} sx={{ position: 'relative', width: '100%', height: '100%' }}>
-          <Diagram key={`${version}:${cycle}:${width}`} data={data} cycle={cycle} width={width}/>
+          <Diagram key={`${version}:${cycle}:${width}`} data={data} cycle={cycle} width={width} current={rectum}/>
 
           {/* 図の右上。(図にかぶらないように、背景を付ける。左はサイドメニューがあるので、右に置く) */}
           <Stack direction="row" spacing={1} sx={{ position: 'absolute', top: 8, right: 16 }}>
@@ -152,6 +157,15 @@ function WidthControl ({ width, onNarrow, onWiden }) {
     );
 }
 
+// 画面に出している図の、今の位置と拡大の度合い { k, x, y }。(d3.svg の view。画面の x = 図の x × k + x)
+// 図をまだ描いていないときは、null。(描く前の Rectum は、初めの transform を、view と違う意味の値で持っている)
+function currentView (rectum) {
+    if (!rectum || typeof rectum.view!=='function' || typeof rectum.d3Element!=='function' || !rectum.d3Element())
+        return null;
+
+    return rectum.view();
+}
+
 // 予定を押したときの行き先へ移る。(行き先が無ければ、何もしない)
 function open (link, navigate) {
     if (!link)
@@ -163,7 +177,7 @@ function open (link, navigate) {
         window.open(link.url, '_blank', 'noopener,noreferrer');
 }
 
-function Diagram ({ data, cycle, width }) {
+function Diagram ({ data, cycle, width, current }) {
     const nav = useNavigate();
 
     // 矢羽根を押したときには、いつも最新の関数を呼ぶ。
@@ -205,7 +219,8 @@ function Diagram ({ data, cycle, width }) {
         }));
 
         setRectum(r);
-    }, [bindView, data, cycle, width, grid]);
+        current.current = r;
+    }, [bindView, data, cycle, width, grid, current]);
 
     return (
         <Box ref={box} sx={{ width: '100%', height: '100%' }}>
