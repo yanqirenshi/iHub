@@ -62,31 +62,41 @@ function checkWbs ({ projects, wbs, workpackages }) {
     return errors;
 }
 
-// マスタースケジュール (艦橋の Schedule タブ): 行と予定の id が、またいで一意なこと (矢羽根の図が、行と予定を同じ id で引くため)・
-// 予定の parent の行があること・plan の日付が実在して、to が from より前でないこと・行き先が wbs と url の両方でないこと・
-// wbs の id が WBS のノード (プロジェクト・WBS・ワークパッケージ) にあること。
-// 行の parent (入れ子。0.8.0 から) の行があること・入れ子が輪になっていないこと。
-function checkMasterSchedule ({ rows, items }, all = null) {
+// マスタースケジュール (艦橋の Schedule タブ。d3.yabane の入力と同じ形): プロジェクト (projects)・WBS (wbs)・ワークパッケージ (workpackages)。
+//   - プロジェクトの id は、プロジェクトの中で一意。(d3.yabane は、プロジェクトを 'project-<id>' で引くので、WBS と同じ id でもよい)
+//   - WBS とワークパッケージの id は、またいで一意。(d3.yabane が、同じ id で引くため)
+//   - WBS の project のプロジェクトがあること・parent の WBS があること・入れ子が輪になっていないこと
+//   - ワークパッケージは、parent (WBS の id) か project (プロジェクトの id) の、少なくとも 1 つがあり、その先があること
+//     (両方があるときは、parent が優先。d3.yabane と同じ。誤りにはしない)
+//   - plan の日付が実在して、to が from より前でないこと・行き先が wbs と url の両方でないこと
+//   - 行き先の wbs (data/wbs/ のノードの id) が、WBS のドメインにあること。(データ全体の検証のときだけ)
+function checkMasterSchedule ({ projects, wbs, workpackages }, all = null) {
     const errors = [];
 
-    checkUnique(errors, 'master_schedule', [...rows, ...items]);
+    const project_ids = checkUnique(errors, 'master_schedule/projects', projects);
 
-    const row_ids = new Set(rows.map(d=> d.id));
+    checkUnique(errors, 'master_schedule', [...wbs, ...workpackages]);
 
-    for (const d of rows)
-        if (d.parent!==undefined && !row_ids.has(d.parent))
-            errors.push(`master_schedule/rows: parent の行が見つかりません。(id=${d.id}, parent=${d.parent})`);
+    const wbs_ids = new Set(wbs.map(d=> d.id));
 
-    // 入れ子の輪。(自分を親にしたときも、輪) 親をたどって、自分に戻る行を、輪の中の行として知らせる。
-    const parent_of = new Map(rows.filter(d=> d.parent!==undefined).map(d=> [d.id, d.parent]));
+    for (const d of wbs) {
+        if (d.project!==undefined && !project_ids.has(d.project))
+            errors.push(`master_schedule/wbs: project のプロジェクトが見つかりません。(id=${d.id}, project=${d.project})`);
 
-    for (const d of rows) {
+        if (d.parent!==undefined && !wbs_ids.has(d.parent))
+            errors.push(`master_schedule/wbs: parent の WBS が見つかりません。(id=${d.id}, parent=${d.parent})`);
+    }
+
+    // 入れ子の輪。(自分を親にしたときも、輪) 親をたどって、自分に戻る WBS を、輪の中の WBS として知らせる。
+    const parent_of = new Map(wbs.filter(d=> d.parent!==undefined).map(d=> [d.id, d.parent]));
+
+    for (const d of wbs) {
         const seen = new Set();
         let id = d.parent;
 
-        while (id!==undefined && row_ids.has(id) && !seen.has(id)) {
+        while (id!==undefined && wbs_ids.has(id) && !seen.has(id)) {
             if (id===d.id) {
-                errors.push(`master_schedule/rows: 入れ子が輪になっています。(id=${d.id})`);
+                errors.push(`master_schedule/wbs: 入れ子が輪になっています。(id=${d.id})`);
                 break;
             }
 
@@ -95,33 +105,39 @@ function checkMasterSchedule ({ rows, items }, all = null) {
         }
     }
 
-    // wbs の id の検査は、WBS のデータが渡されたときだけ。(API サーバーのドメインごとの検証では、渡らない)
-    const wbs_nodes = ['wbs/projects', 'wbs/wbs', 'wbs/workpackages'].map(name=> all?.[name]);
-    const wbs_ids = wbs_nodes.every(Array.isArray)
-          ? new Set(wbs_nodes.flatMap(list=> list.map(d=> d.id)))
+    // 行き先の wbs の検査は、WBS のドメイン (data/wbs/) のデータが渡されたときだけ。(API サーバーのドメインごとの検証では、渡らない)
+    const nodes = ['wbs/projects', 'wbs/wbs', 'wbs/workpackages'].map(name=> all?.[name]);
+    const node_ids = nodes.every(Array.isArray)
+          ? new Set(nodes.flatMap(list=> list.map(d=> d.id)))
           : null;
 
-    for (const d of items) {
-        if (!row_ids.has(d.parent))
-            errors.push(`master_schedule/items: parent の行が見つかりません。(id=${d.id}, parent=${d.parent})`);
+    for (const d of workpackages) {
+        if (d.parent===undefined && d.project===undefined)
+            errors.push(`master_schedule/workpackages: parent (WBS の id) か project (プロジェクトの id) を書いてください。(id=${d.id})`);
+
+        if (d.parent!==undefined && !wbs_ids.has(d.parent))
+            errors.push(`master_schedule/workpackages: parent の WBS が見つかりません。(id=${d.id}, parent=${d.parent})`);
+
+        if (d.project!==undefined && !project_ids.has(d.project))
+            errors.push(`master_schedule/workpackages: project のプロジェクトが見つかりません。(id=${d.id}, project=${d.project})`);
 
         const from = parseDate(d.plan.from);
         const to = parseDate(d.plan.to);
 
         if (from===null)
-            errors.push(`master_schedule/items: plan.from が日付として正しくありません。(id=${d.id}, from=${d.plan.from})`);
+            errors.push(`master_schedule/workpackages: plan.from が日付として正しくありません。(id=${d.id}, from=${d.plan.from})`);
 
         if (to===null)
-            errors.push(`master_schedule/items: plan.to が日付として正しくありません。(id=${d.id}, to=${d.plan.to})`);
+            errors.push(`master_schedule/workpackages: plan.to が日付として正しくありません。(id=${d.id}, to=${d.plan.to})`);
 
         if (from!==null && to!==null && to < from)
-            errors.push(`master_schedule/items: plan.to が plan.from より前です。(id=${d.id}, from=${d.plan.from}, to=${d.plan.to})`);
+            errors.push(`master_schedule/workpackages: plan.to が plan.from より前です。(id=${d.id}, from=${d.plan.from}, to=${d.plan.to})`);
 
         if (d.wbs!==undefined && d.url!==undefined)
-            errors.push(`master_schedule/items: wbs と url は、両方は書けません。(id=${d.id})`);
+            errors.push(`master_schedule/workpackages: wbs と url は、両方は書けません。(id=${d.id})`);
 
-        if (d.wbs!==undefined && wbs_ids && !wbs_ids.has(d.wbs))
-            errors.push(`master_schedule/items: wbs の WBS のノードが見つかりません。(id=${d.id}, wbs=${d.wbs})`);
+        if (d.wbs!==undefined && node_ids && !node_ids.has(d.wbs))
+            errors.push(`master_schedule/workpackages: wbs (行き先) の WBS のノードが見つかりません。(id=${d.id}, wbs=${d.wbs})`);
     }
 
     return errors;

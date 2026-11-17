@@ -12,7 +12,7 @@
 
 ## 0.8.0 (2026-11)
 
-- `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`: 艦橋の Schedule タブの `master_schedule` に、行の入れ子 (`rows` の `parent`) と、行・予定の見た目 (`background`・`stroke`・`font`。d3.yabane の共有型) を足した。(入れ子は、深さごとに行の名前の列が分かれる。同じ親の下の行は `rows.json` の順。`ihub-srv check` は、無い親・輪になった入れ子・見た目の形の誤りを知らせる) 参照アプリの `data/master_schedule/` に、d3.yabane のショーケースのサンプルを入れた。(雛形には入れていない) 0.7.0 の形のデータは、そのまま使える。
+- `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`: 艦橋の Schedule タブの `data/master_schedule/` を、d3.yabane の入力と同じ `projects.json`・`wbs.json`・`workpackages.json` にした。(プロジェクトをいちばん左の列に描く。WBS の入れ子・プロジェクト・WBS・ワークパッケージの見た目 (`background`・`stroke`・`font`) を書ける。ワークパッケージの `result`・`progress` は受け取るが、描かない) `@yanqirenshi/d3.yabane` を `^0.4.0` に上げた。参照アプリの `data/master_schedule/` に、d3.yabane のショーケースのサンプルを、そのまま入れた。(雛形には入れていない) **0.7.0 から: `rows.json` は `wbs.json` に、`items.json` は `workpackages.json` に、名前を変える。** (古い名前のファイルがあると、`ihub-srv check` が知らせる)
 
 ## 0.7.0 (2026-11)
 

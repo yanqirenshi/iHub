@@ -6,16 +6,21 @@
 
 ## 0.8.0 (2026-11)
 
-### 追加 (艦橋の Schedule タブ: 行の入れ子と、見た目の指定。yanqirenshi/iHub#188)
+### 変更 (艦橋の Schedule タブ: プロジェクト・WBS の入れ子・見た目。yanqirenshi/iHub#188・#190)
 
-- `master_schedule/rows` の `parent` (親の行の id) で、行を入れ子にできるようにした。深さごとに、行の名前の列が分かれる。(d3.yabane 0.3.0 の入れ子に渡す)
-  - 同じ親の下の行は、`rows.json` の順。(0.7.0 と同じく、配列の順を `order` として渡す) 予定は、どの深さの行にも置ける。子の行を持つ行の直下の予定は、子の行のあとに、開始日の順で並ぶ。(d3.yabane のショーケースは `order` を書かず開始日の順なので、サンプルの `Task 1200` の位置は、ショーケースと違う)
-  - 入れ子があるときは、行の名前の 1 列の幅を 333 にした。(入れ子が無いときは、0.7.0 と同じ 555) 行の名前は、行の箱の幅 (子の行を持たない行は、右端の列まで伸びる) に収まるように、末尾を `…` にする。初めの拡大の度合いは、列の幅も入れて決める。
-  - 無い行を指す `parent`・輪になった入れ子は、描くときは、その行を最上位として扱う。(`ihub-srv check` が知らせる誤り。d3.yabane に輪を渡さない)
-- 行と予定の見た目 (d3.yabane の共有型 `background`・`stroke`・`font`) を、d3.yabane に渡すようにした。
-- `manegers/schedule.js`: `rowParents`・`rowColumnWidth`・`columnsWidth`・`labelUnits`・`NESTED_ROW_WIDTH`・`COLUMN_GAP` を足した。`buildScheduleData` は、`columns` (行の名前の列の数) も返す。
-- 参照アプリの `data/master_schedule/` に、d3.yabane のショーケースのサンプル (Foolsgolds/Assholes の `showcase/src/demos/data/yabane-sample.js` の `WBS`・`WORKPACKAGES`) を入れた。(`id`・`name`・`parent`・`plan`・`background`・`stroke`・`font` だけ。`result`・`progress`・`style` と行き先は入れていない。雛形 `examples/data/` には入れていない)
-- **利用側への影響**: 0.7.0 の形のデータは、そのまま使える。(入れ子と見た目を書かなければ、0.7.0 と同じ見え方) `@yanqirenshi/ihub.srv` 0.8.0 とセットで使う。
+- `dependencies` の `@yanqirenshi/d3.yabane` を `^0.4.0` に上げた。(入力の `projects` で、プロジェクトをいちばん左の列に描ける)
+- Schedule タブが読むコレクションを、d3.yabane の入力と同じ 3 つにした。`master_schedule/projects` (新しい)・`master_schedule/wbs` (0.7.0 の `rows`)・`master_schedule/workpackages` (0.7.0 の `items`)。`Pippala().build(from, to, { projects, wbs, workpackages })` で渡す。
+  - プロジェクト: いちばん左の列に描く。WBS とワークパッケージは、`project` でプロジェクトの直下に入る。(`parent` があれば、`parent` が優先。d3.yabane と同じ)
+  - WBS の入れ子 (`parent`): 深さごとに列が分かれる。ワークパッケージは、どの深さの WBS にも置ける。
+  - 見た目: プロジェクト・WBS・ワークパッケージの `background`・`stroke`・`font` (d3.yabane の共有型) を渡す。
+  - 並び: プロジェクトは `projects.json` の順、WBS は `wbs.json` の順 (配列の順を `order` として渡す)。子の WBS を持つ箱の直下のワークパッケージは、子の WBS のあとに、開始日の順で並ぶ。(d3.yabane のショーケースは `order` を書かず開始日の順なので、サンプルの `Task 1200` の位置は、ショーケースと違う)
+  - 名前の列: 名前の列が 2 つ以上になるとき (プロジェクトの下に WBS がある・WBS の入れ子がある) は、1 列の幅を 333 にした。(1 列のときは、0.7.0 と同じ 555) 名前は、箱の幅 (子の WBS を持たない箱は、右端の列まで伸びる) と `font.size` に合わせて、末尾を `…` にする。初めの拡大の度合いは、名前の列の全体の幅も入れて決める。
+  - 無い先を指す WBS・輪になった入れ子は、描くときは最上位として扱い、無い先を指すワークパッケージは描かない。(`ihub-srv check` が知らせる誤り。d3.yabane に輪を渡さない)
+  - ワークパッケージの `result`・`progress` は、d3.yabane に渡さない。(描かない)
+  - 予定が無いときの知らせを、新しいファイルの名前 (`wbs.json`・`workpackages.json`) にした。
+- `manegers/schedule.js`: `SCHEDULE_COLLECTIONS` を 3 つのコレクションにした。`buildScheduleData` は、`projects`・`wbs`・`workpackages`・`columns` (名前の列の数) を返す。(0.7.0 の `rows` は無くなった) `wbsParents`・`rowColumnWidth`・`columnsWidth`・`labelUnits`・`NESTED_ROW_WIDTH`・`COLUMN_GAP` を足した。
+- 参照アプリの `data/master_schedule/` に、d3.yabane のショーケースのサンプル (Foolsgolds/Assholes の `showcase/src/demos/data/yabane/` の `projects.json`・`wbs.json`・`workpackages.json`) を、そのまま入れた。(雛形 `examples/data/` には入れていない)
+- **利用側への影響 (0.7.0 から)**: `data/master_schedule/rows.json` は `wbs.json` に、`items.json` は `workpackages.json` に、名前を変える。(中身は、そのまま使える。古い名前のファイルがあると、`ihub-srv check` が知らせる) プロジェクト・入れ子・見た目を書かなければ、0.7.0 と同じ見え方。`@yanqirenshi/ihub.srv` 0.8.0 とセットで使う。
 
 ## 0.7.0 (2026-11)
 

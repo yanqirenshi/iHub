@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "マスタースケジュールの予定",
-    "description": "艦橋の Schedule タブの矢羽根になる予定。parent は行 (master_schedule/rows) の id。plan (予定の期間) は必須。行き先は任意で、wbs (WBS のノードの id。押すと /wbs/{id} へ移る) か url (押すと、そのページを新しいタブで開く) のどちらか 1 つ。どちらも書かないと、押しても何も起きない。(wbs と url を両方は書けない・wbs の id が WBS にあること・parent の行があること・日付が実在すること・to が from より前でないことは、スキーマではなく、ルールで検査する) parent は、どの深さの行でもよい。(子の行を持つ行の直下にも置ける) background・stroke・font (任意) は、矢羽根の見た目。(d3.yabane の共有型。0.8.0 から) ファイルが無いときは、予定が無いものとして扱う。",
+    "title": "マスタースケジュールのワークパッケージ",
+    "description": "艦橋の Schedule タブの矢羽根になるワークパッケージ。0.7.0 の master_schedule/items の、新しい名前。(0.8.0 から) parent (WBS (master_schedule/wbs) の id) か project (プロジェクト (master_schedule/projects) の id) の、少なくとも 1 つを書く。(両方があるときは、parent が優先。parent は、どの深さの WBS でもよい) plan (予定の期間) は必須。行き先は任意で、wbs (data/wbs/ の WBS のノードの id。master_schedule/wbs ではない。押すと /wbs/{id} へ移る) か url (押すと、そのページを新しいタブで開く) のどちらか 1 つ。どちらも書かないと、押しても何も起きない。background・stroke・font (任意) は、矢羽根の見た目。(d3.yabane の共有型) result (実績の期間)・progress (進捗) は、d3.yabane の入力のまま受け取るが、描かない。(parent・project の先があること・wbs と url を両方は書けない・行き先の wbs が data/wbs/ にあること・日付が実在すること・to が from より前でないことは、スキーマではなく、ルールで検査する) ファイルが無いときは、ワークパッケージが無いものとして扱う。",
     "x-id-start": 1001,
     "type": "array",
     "default": [],
@@ -13,7 +13,11 @@
             },
             "parent": {
                 "type": "integer",
-                "description": "行 (master_schedule/rows) の id"
+                "description": "WBS (master_schedule/wbs) の id"
+            },
+            "project": {
+                "type": "integer",
+                "description": "プロジェクト (master_schedule/projects) の id。(プロジェクトの直下に置く。parent があるときは、parent が優先)"
             },
             "name": {
                 "type": "string"
@@ -24,9 +28,16 @@
             "plan": {
                 "$ref": "#/$defs/plan"
             },
+            "result": {
+                "$ref": "#/$defs/result"
+            },
+            "progress": {
+                "type": "number",
+                "description": "進捗。(d3.yabane の入力のまま受け取る。描かない)"
+            },
             "wbs": {
                 "type": "integer",
-                "description": "行き先: WBS のノード (プロジェクト・WBS・ワークパッケージ) の id。押すと /wbs/{id} へ移る"
+                "description": "行き先: data/wbs/ の WBS のノード (プロジェクト・WBS・ワークパッケージ) の id。(master_schedule/wbs の id ではない) 押すと /wbs/{id} へ移る"
             },
             "url": {
                 "type": "string",
@@ -45,7 +56,6 @@
         },
         "required": [
             "id",
-            "parent",
             "name",
             "plan"
         ],
@@ -150,6 +160,35 @@
                         "number"
                     ],
                     "description": "太さ ('bold'・700 など)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "result": {
+            "description": "実績の期間。(d3.yabane の入力のまま受け取る。描かない) from・to は、日付か null。(終わっていないときは、to が null)",
+            "type": "object",
+            "properties": {
+                "from": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/$defs/date"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "始まりの日"
+                },
+                "to": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/$defs/date"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "終わりの日"
                 }
             },
             "additionalProperties": false

@@ -110,15 +110,19 @@ test('WBS の id の重複と、parent の無いノードを見つける', ()=> 
     ]);
 });
 
-// マスタースケジュール (艦橋の Schedule タブ) のデータ。行 (rows)・予定 (items) と、WBS を持つデータ。
-function scheduleData (rows, items) {
+// マスタースケジュール (艦橋の Schedule タブ) のデータ。WBS (wbs)・ワークパッケージ (workpackages)・プロジェクト (projects) と、
+// 行き先の検査に使う data/wbs/ のデータ。
+function scheduleData (wbs, workpackages, projects) {
     const data = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
 
     data['wbs/projects'] = [{ id: 1, name: 'P' }];
     data['wbs/wbs'] = [{ id: 10, parent: 1, name: 'A' }];
     data['wbs/workpackages'] = [{ id: 20, parent: 10, name: 'W' }];
-    data['master_schedule/rows'] = rows;
-    data['master_schedule/items'] = items;
+    data['master_schedule/wbs'] = wbs;
+    data['master_schedule/workpackages'] = workpackages;
+
+    if (projects)
+        data['master_schedule/projects'] = projects;
 
     return data;
 }
@@ -129,11 +133,32 @@ const PLAN = { from: '2026-11-01', to: '2026-11-30' };
 test('master_schedule のファイルは無くてもよく、無いときは予定が無いものとして検査する', ()=> {
     const data = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
 
-    assert.ok(!('master_schedule/rows' in data) && !('master_schedule/items' in data));
+    assert.ok(!Object.keys(data).some(name=> name.startsWith('master_schedule/')));
     assert.deepEqual(validateData(data), []);
 });
 
-test('master_schedule: 行と予定 (行き先は wbs・url・無し) は、正しい', ()=> {
+test('master_schedule: d3.yabane のショーケースの 3 ファイル (参照アプリの data/master_schedule/) が、そのまま通る', ()=> {
+    const data = loadDataDir(join(ROOT, 'data'));
+
+    assert.deepEqual(Object.keys(data).filter(name=> name.startsWith('master_schedule/')).sort(),
+                     ['master_schedule/projects', 'master_schedule/wbs', 'master_schedule/workpackages']);
+    assert.ok(data['master_schedule/workpackages'].some(d=> d.result && d.progress!==undefined));
+    assert.deepEqual(validateData(data), []);
+});
+
+test('master_schedule: 0.7.0 の名前のファイル (rows・items) は、名前を変えるように知らせる', ()=> {
+    const data = scheduleData([], []);
+
+    data['master_schedule/rows'] = ROWS;
+    data['master_schedule/items'] = [];
+
+    assert.deepEqual(validateData(data), [
+        'master_schedule/rows: ファイルの名前が変わりました。wbs.json に名前を変えてください。(master_schedule/rows.json → master_schedule/wbs.json)',
+        'master_schedule/items: ファイルの名前が変わりました。workpackages.json に名前を変えてください。(master_schedule/items.json → master_schedule/workpackages.json)',
+    ]);
+});
+
+test('master_schedule: WBS とワークパッケージ (行き先は wbs・url・無し) は、正しい', ()=> {
     assert.deepEqual(validateData(scheduleData(ROWS, [
         { id: 1001, parent: 1, name: '画面', plan: PLAN },
         { id: 1002, parent: 1, name: 'API', plan: PLAN, wbs: 20 },
@@ -143,38 +168,81 @@ test('master_schedule: 行と予定 (行き先は wbs・url・無し) は、正�
     ])), []);
 });
 
-test('master_schedule: 行だけ・予定が無くてもよい', ()=> {
+test('master_schedule: WBS だけ・予定が無くてもよい', ()=> {
     assert.deepEqual(validateData(scheduleData(ROWS, [])), []);
     assert.deepEqual(validateData(scheduleData([], [])), []);
+    assert.deepEqual(validateData(scheduleData([], [], [])), []);
+});
+
+test('master_schedule: プロジェクトと、その直下の WBS・ワークパッケージ (project) を書ける。プロジェクトの id は WBS と重なってよい', ()=> {
+    assert.deepEqual(validateData(scheduleData([
+        { id: 1, name: 'WBS 1', project: 10 },
+        { id: 2, name: 'WBS 2', parent: 1 },
+        { id: 10, name: 'WBS 10 (プロジェクトと同じ id)', project: 20 },
+        { id: 3, name: 'parent と project の両方 (parent が優先)', parent: 1, project: 20 },
+    ], [
+        { id: 1001, parent: 2, name: 'A', plan: PLAN },
+        { id: 1002, project: 10, name: 'プロジェクトの直下', plan: PLAN },
+        { id: 1003, parent: 1, project: 20, name: '両方', plan: PLAN },
+    ], [
+        { id: 10, name: 'Project 10', background: { color: '#eaf4fc' }, font: { weight: 'bold' } },
+        { id: 20, name: 'Project 20', description: '説明', stroke: { type: 'dashed' } },
+    ])), []);
+});
+
+test('master_schedule: ワークパッケージの result・progress を受け取る (描かない)', ()=> {
+    assert.deepEqual(validateData(scheduleData(ROWS, [
+        { id: 1001, parent: 1, name: 'A', plan: PLAN, result: { from: '2026-11-01', to: null }, progress: 50 },
+        { id: 1002, parent: 1, name: 'B', plan: PLAN, result: { from: '2026-11-01', to: '2026-11-20' }, progress: 100 },
+        { id: 1003, parent: 1, name: 'C', plan: PLAN, result: { from: null, to: null } },
+    ])), []);
+
+    const errors = validateData(scheduleData(ROWS, [
+        { id: 1001, parent: 1, name: 'A', plan: PLAN, result: { from: '2026/11/01' } },
+        { id: 1002, parent: 1, name: 'B', plan: PLAN, result: { start: '2026-11-01' } },
+        { id: 1003, parent: 1, name: 'C', plan: PLAN, progress: '50' },
+    ]));
+    assert.ok(errors.some(e=> e.startsWith('master_schedule/workpackages/0/result/from')), errors.join('\n'));
+    assert.ok(errors.some(e=> e.startsWith('master_schedule/workpackages/1/result') && e.endsWith('(start)')), errors.join('\n'));
+    assert.ok(errors.some(e=> e.startsWith('master_schedule/workpackages/2/progress')), errors.join('\n'));
 });
 
 test('master_schedule: 形の誤りを見つける (name・plan が無い・plan の形・知らない項目・url の形)', ()=> {
     const check = (item)=> validateData(scheduleData(ROWS, [{ id: 1001, parent: 1, name: 'X', plan: PLAN, ...item }]));
 
     const no_plan = validateData(scheduleData(ROWS, [{ id: 1001, parent: 1, name: 'X' }]));
-    assert.ok(no_plan.some(e=> e.startsWith('master_schedule/items/0') && e.includes('plan')), no_plan.join('\n'));
+    assert.ok(no_plan.some(e=> e.startsWith('master_schedule/workpackages/0') && e.includes('plan')), no_plan.join('\n'));
 
     const no_name = validateData(scheduleData(ROWS, [{ id: 1001, parent: 1, plan: PLAN }]));
-    assert.ok(no_name.some(e=> e.startsWith('master_schedule/items/0') && e.includes('name')), no_name.join('\n'));
+    assert.ok(no_name.some(e=> e.startsWith('master_schedule/workpackages/0') && e.includes('name')), no_name.join('\n'));
 
     const no_to = check({ plan: { from: '2026-11-01' } });
-    assert.ok(no_to.some(e=> e.startsWith('master_schedule/items/0/plan') && e.includes('to')), no_to.join('\n'));
+    assert.ok(no_to.some(e=> e.startsWith('master_schedule/workpackages/0/plan') && e.includes('to')), no_to.join('\n'));
 
     const bad_form = check({ plan: { from: '2026/11/01', to: '2026-11-30' } });
-    assert.ok(bad_form.some(e=> e.startsWith('master_schedule/items/0/plan/from')), bad_form.join('\n'));
+    assert.ok(bad_form.some(e=> e.startsWith('master_schedule/workpackages/0/plan/from')), bad_form.join('\n'));
 
     const unknown = check({ group: 'x' });
-    assert.ok(unknown.some(e=> e.startsWith('master_schedule/items/0') && e.endsWith('(group)')), unknown.join('\n'));
+    assert.ok(unknown.some(e=> e.startsWith('master_schedule/workpackages/0') && e.endsWith('(group)')), unknown.join('\n'));
 
     const bad_wbs = check({ wbs: '20' });
-    assert.ok(bad_wbs.some(e=> e.startsWith('master_schedule/items/0/wbs')), bad_wbs.join('\n'));
+    assert.ok(bad_wbs.some(e=> e.startsWith('master_schedule/workpackages/0/wbs')), bad_wbs.join('\n'));
+
+    const bad_project = check({ project: '10' });
+    assert.ok(bad_project.some(e=> e.startsWith('master_schedule/workpackages/0/project')), bad_project.join('\n'));
 
     // url は http か https だけ。(javascript: などは、押したときに動いてしまうので、書けない)
     for (const url of ['javascript:alert(1)', 'example.com', 'ftp://example.com/'])
-        assert.ok(check({ url }).some(e=> e.startsWith('master_schedule/items/0/url')), url);
+        assert.ok(check({ url }).some(e=> e.startsWith('master_schedule/workpackages/0/url')), url);
 
     const no_row_name = validateData(scheduleData([{ id: 1 }], []));
-    assert.ok(no_row_name.some(e=> e.startsWith('master_schedule/rows/0') && e.includes('name')), no_row_name.join('\n'));
+    assert.ok(no_row_name.some(e=> e.startsWith('master_schedule/wbs/0') && e.includes('name')), no_row_name.join('\n'));
+
+    const no_project_name = validateData(scheduleData([], [], [{ id: 1 }]));
+    assert.ok(no_project_name.some(e=> e.startsWith('master_schedule/projects/0') && e.includes('name')), no_project_name.join('\n'));
+
+    const project_unknown = validateData(scheduleData([], [], [{ id: 1, name: 'P', parent: 2 }]));
+    assert.ok(project_unknown.some(e=> e.startsWith('master_schedule/projects/0') && e.endsWith('(parent)')), project_unknown.join('\n'));
 });
 
 test('master_schedule: plan の日付が実在しないときと、to が from より前のときを見つける (ルール)', ()=> {
@@ -184,49 +252,55 @@ test('master_schedule: plan の日付が実在しないときと、to が from �
         { id: 1003, parent: 1, name: 'C', plan: { from: '2026-11-01', to: '2026-13-01' } },
         { id: 1004, parent: 1, name: 'D', plan: PLAN },
     ])), [
-        'master_schedule/items: plan.from が日付として正しくありません。(id=1001, from=2026-02-30)',
-        'master_schedule/items: plan.to が plan.from より前です。(id=1002, from=2026-11-30, to=2026-11-01)',
-        'master_schedule/items: plan.to が日付として正しくありません。(id=1003, to=2026-13-01)',
+        'master_schedule/workpackages: plan.from が日付として正しくありません。(id=1001, from=2026-02-30)',
+        'master_schedule/workpackages: plan.to が plan.from より前です。(id=1002, from=2026-11-30, to=2026-11-01)',
+        'master_schedule/workpackages: plan.to が日付として正しくありません。(id=1003, to=2026-13-01)',
     ]);
 });
 
-test('master_schedule: parent の行が無いもの・wbs の無いもの・wbs と url の両方・id の重複を見つける (ルール)', ()=> {
+test('master_schedule: ワークパッケージの parent・project が無いもの・行き先の wbs の無いもの・wbs と url の両方・id の重複を見つける (ルール)', ()=> {
     assert.deepEqual(validateData(scheduleData(ROWS, [
         { id: 1001, parent: 9, name: 'A', plan: PLAN },
         { id: 1002, parent: 1, name: 'B', plan: PLAN, wbs: 999 },
         { id: 1003, parent: 1, name: 'C', plan: PLAN, wbs: 20, url: 'https://example.com/' },
-        { id: 1, parent: 1, name: 'D (行と同じ id)', plan: PLAN },
+        { id: 1, parent: 1, name: 'D (WBS と同じ id)', plan: PLAN },
         { id: 1005, parent: 1, name: 'E', plan: PLAN },
-        { id: 1005, parent: 1, name: 'F (予定と同じ id)', plan: PLAN },
-    ])), [
+        { id: 1005, parent: 1, name: 'F (ワークパッケージと同じ id)', plan: PLAN },
+        { id: 1006, name: 'G (parent も project も無い)', plan: PLAN },
+        { id: 1007, project: 99, name: 'H (無いプロジェクト)', plan: PLAN },
+    ], [{ id: 10, name: 'P' }, { id: 10, name: 'P (同じ id)' }])), [
+        'master_schedule/projects: id が重複しています。(id=10)',
         'master_schedule: id が重複しています。(id=1)',
         'master_schedule: id が重複しています。(id=1005)',
-        'master_schedule/items: parent の行が見つかりません。(id=1001, parent=9)',
-        'master_schedule/items: wbs の WBS のノードが見つかりません。(id=1002, wbs=999)',
-        'master_schedule/items: wbs と url は、両方は書けません。(id=1003)',
+        'master_schedule/workpackages: parent の WBS が見つかりません。(id=1001, parent=9)',
+        'master_schedule/workpackages: wbs (行き先) の WBS のノードが見つかりません。(id=1002, wbs=999)',
+        'master_schedule/workpackages: wbs と url は、両方は書けません。(id=1003)',
+        'master_schedule/workpackages: parent (WBS の id) か project (プロジェクトの id) を書いてください。(id=1006)',
+        'master_schedule/workpackages: project のプロジェクトが見つかりません。(id=1007, project=99)',
     ]);
 });
 
-test('master_schedule: wbs の検査は、データ全体の検証のときだけ (ドメインごとの検証では、WBS が渡らないので飛ばす)', ()=> {
-    const rows = [{ id: 1, name: '開発' }];
-    const items = [{ id: 1001, parent: 1, name: 'A', plan: PLAN, wbs: 999 }];
+test('master_schedule: 行き先の wbs の検査は、データ全体の検証のときだけ (ドメインごとの検証では、data/wbs/ が渡らないので飛ばす)', ()=> {
+    const projects = [];
+    const wbs = [{ id: 1, name: '開発' }];
+    const workpackages = [{ id: 1001, parent: 1, name: 'A', plan: PLAN, wbs: 999 }];
 
-    assert.deepEqual(RULES.master_schedule({ rows, items }), []);
-    assert.deepEqual(RULES.master_schedule({ rows, items }, {}), []);
-    assert.equal(RULES.master_schedule({ rows, items }, { 'wbs/projects': [], 'wbs/wbs': [], 'wbs/workpackages': [] }).length, 1);
+    assert.deepEqual(RULES.master_schedule({ projects, wbs, workpackages }), []);
+    assert.deepEqual(RULES.master_schedule({ projects, wbs, workpackages }, {}), []);
+    assert.equal(RULES.master_schedule({ projects, wbs, workpackages }, { 'wbs/projects': [], 'wbs/wbs': [], 'wbs/workpackages': [] }).length, 1);
 });
 
-test('master_schedule: 行の入れ子 (parent) と、行・予定の見た目 (background・stroke・font) を書ける', ()=> {
-    const rows = [
+test('master_schedule: WBS の入れ子 (parent) と、WBS・ワークパッケージの見た目 (background・stroke・font) を書ける', ()=> {
+    const wbs = [
         { id: 10, name: 'WBS 10', background: { color: '#eaf4fc' }, font: { weight: 'bold' } },
         { id: 11, name: 'WBS 10-1', parent: 10 },
         { id: 111, name: 'WBS 10-1-1', parent: 11, stroke: { color: '#999999', type: 'dashed' } },
         { id: 20, name: 'WBS 20' },
     ];
 
-    assert.deepEqual(validateData(scheduleData(rows, [
+    assert.deepEqual(validateData(scheduleData(wbs, [
         { id: 1000, parent: 111, name: 'A', plan: PLAN, background: { color: '#89c3eb' }, font: { color: '#ffffff', weight: 'bold' } },
-        { id: 1200, parent: 11, name: '子の行を持つ行の直下', plan: PLAN, stroke: { type: 'dotted' } },
+        { id: 1200, parent: 11, name: '子の WBS を持つ WBS の直下', plan: PLAN, stroke: { type: 'dotted' } },
         { id: 3000, parent: 20, name: 'C', plan: PLAN, background: { color: '#fdeff2', opacity: 0.8 }, font: { size: 24, color: '#666666', weight: 700 } },
         { id: 3001, parent: 20, name: 'D', plan: PLAN, stroke: { color: '#e95464', width: 6, type: 'solid' } },
     ])), []);
@@ -235,39 +309,44 @@ test('master_schedule: 行の入れ子 (parent) と、行・予定の見た目 (
 test('master_schedule: 見た目の形の誤りを見つける (知らない項目・線の種類・不透明度・大きさ・型)', ()=> {
     const item = (look)=> validateData(scheduleData(ROWS, [{ id: 1001, parent: 1, name: 'X', plan: PLAN, ...look }]));
     const row = (look)=> validateData(scheduleData([{ id: 1, name: '開発', ...look }], []));
+    const project = (look)=> validateData(scheduleData([], [], [{ id: 1, name: 'P', ...look }]));
     const has = (errors, prefix)=> errors.some(e=> e.startsWith(prefix));
 
     for (const [look, prefix] of [
-        [{ background: { colour: 'red' } },     'master_schedule/items/0/background'],
-        [{ background: { opacity: 1.5 } },      'master_schedule/items/0/background/opacity'],
-        [{ background: '#fff' },                'master_schedule/items/0/background'],
-        [{ stroke: { type: 'wavy' } },          'master_schedule/items/0/stroke/type'],
-        [{ stroke: { width: -1 } },             'master_schedule/items/0/stroke/width'],
-        [{ font: { size: 0 } },                 'master_schedule/items/0/font/size'],
-        [{ font: { weight: true } },            'master_schedule/items/0/font/weight'],
-        [{ font: { family: 'serif' } },         'master_schedule/items/0/font'],
+        [{ background: { colour: 'red' } },     'master_schedule/workpackages/0/background'],
+        [{ background: { opacity: 1.5 } },      'master_schedule/workpackages/0/background/opacity'],
+        [{ background: '#fff' },                'master_schedule/workpackages/0/background'],
+        [{ stroke: { type: 'wavy' } },          'master_schedule/workpackages/0/stroke/type'],
+        [{ stroke: { width: -1 } },             'master_schedule/workpackages/0/stroke/width'],
+        [{ font: { size: 0 } },                 'master_schedule/workpackages/0/font/size'],
+        [{ font: { weight: true } },            'master_schedule/workpackages/0/font/weight'],
+        [{ font: { family: 'serif' } },         'master_schedule/workpackages/0/font'],
     ]) {
         const errors = item(look);
         assert.ok(has(errors, prefix), `${JSON.stringify(look)}\n${errors.join('\n')}`);
     }
 
-    assert.ok(has(row({ stroke: { type: 'double' } }), 'master_schedule/rows/0/stroke/type'));
-    assert.ok(has(row({ parent: '1' }), 'master_schedule/rows/0/parent'));
+    assert.ok(has(row({ stroke: { type: 'double' } }), 'master_schedule/wbs/0/stroke/type'));
+    assert.ok(has(row({ parent: '1' }), 'master_schedule/wbs/0/parent'));
+    assert.ok(has(row({ project: '1' }), 'master_schedule/wbs/0/project'));
+    assert.ok(has(project({ background: { opacity: -1 } }), 'master_schedule/projects/0/background/opacity'));
 });
 
-test('master_schedule: 行の parent が無いもの・入れ子の輪を見つける (ルール)', ()=> {
+test('master_schedule: WBS の parent・project が無いもの・入れ子の輪を見つける (ルール)', ()=> {
     assert.deepEqual(validateData(scheduleData([
-        { id: 1, name: 'A' },
+        { id: 1, name: 'A', project: 10 },
         { id: 2, name: 'B', parent: 99 },
         { id: 3, name: 'C', parent: 3 },
         { id: 4, name: 'D', parent: 5 },
         { id: 5, name: 'E', parent: 4 },
         { id: 6, name: 'F', parent: 4 },
-    ], [])), [
-        'master_schedule/rows: parent の行が見つかりません。(id=2, parent=99)',
-        'master_schedule/rows: 入れ子が輪になっています。(id=3)',
-        'master_schedule/rows: 入れ子が輪になっています。(id=4)',
-        'master_schedule/rows: 入れ子が輪になっています。(id=5)',
+        { id: 7, name: 'G', project: 99 },
+    ], [], [{ id: 10, name: 'P' }])), [
+        'master_schedule/wbs: parent の WBS が見つかりません。(id=2, parent=99)',
+        'master_schedule/wbs: project のプロジェクトが見つかりません。(id=7, project=99)',
+        'master_schedule/wbs: 入れ子が輪になっています。(id=3)',
+        'master_schedule/wbs: 入れ子が輪になっています。(id=4)',
+        'master_schedule/wbs: 入れ子が輪になっています。(id=5)',
     ]);
 });
 

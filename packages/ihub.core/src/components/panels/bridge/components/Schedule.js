@@ -36,9 +36,10 @@ function initialScale (width, size, columns = 1) {
     return Math.min(0.4, Math.max(0.1, k));
 }
 
-// 艦橋 (Bridge) の Schedule タブ: data/master_schedule/ の予定 (items) を、行 (rows) ごとに、d3.yabane の矢羽根で並べる。(0.7.0 以降)
-// 見るだけ。矢羽根を押すと、予定の行き先へ移る。wbs があれば /wbs/{id}、url があれば新しいタブで開く。どちらも無ければ、何もしない。
-// 予定は、items.json の各レコードの plan: { from, to } ('YYYY-MM-DD') に書く。
+// 艦橋 (Bridge) の Schedule タブ: data/master_schedule/ のプロジェクト・WBS・ワークパッケージを、d3.yabane の矢羽根で並べる。(0.7.0 以降)
+// プロジェクトは、いちばん左の列。(0.8.0 から) その右に、WBS が入れ子の列で並び、ワークパッケージが矢羽根になる。
+// 見るだけ。矢羽根を押すと、ワークパッケージの行き先へ移る。wbs があれば /wbs/{id}、url があれば新しいタブで開く。どちらも無ければ、何もしない。
+// 予定の期間は、workpackages.json の各レコードの plan: { from, to } ('YYYY-MM-DD') に書く。
 // 時間の目盛りのサイクル (日・週・月) は、右上のボタンで切り替える。選んだものは、ブラウザに覚える。(初めは週)
 export default function Schedule () {
     const { data, version } = useDiagramData(SCHEDULE_COLLECTIONS, buildScheduleData);
@@ -62,9 +63,9 @@ export default function Schedule () {
             <Box sx={{ pt: 3, px: '111px' }}>
               <Alert severity="info">
                 予定がありません。
-                {' '}<code>data/master_schedule/rows.json</code> に行を、<code>data/master_schedule/items.json</code> に予定を書くと、ここに出ます。
-                (予定の例: <code>{'{'} "id": 1001, "parent": 1, "name": "画面の作成", "plan": {'{'} "from": "2026-11-01", "to": "2026-11-30" {'}'} {'}'}</code>。
-                <code>parent</code> は、行の <code>id</code> です)
+                {' '}<code>data/master_schedule/wbs.json</code> に WBS を、<code>data/master_schedule/workpackages.json</code> にワークパッケージを書くと、ここに出ます。
+                (ワークパッケージの例: <code>{'{'} "id": 1001, "parent": 1, "name": "画面の作成", "plan": {'{'} "from": "2026-11-01", "to": "2026-11-30" {'}'} {'}'}</code>。
+                <code>parent</code> は、WBS の <code>id</code> です。いちばん左の列にプロジェクトを出すときは、<code>projects.json</code> にも書きます)
               </Alert>
             </Box>
         );
@@ -131,7 +132,7 @@ function Diagram ({ data, cycle }) {
 
         bindView(r);
 
-        const tree = new Pippala().build(scale.from, scale.to, { wbs: data.rows, workpackages: data.workpackages });
+        const tree = new Pippala().build(scale.from, scale.to, { projects: data.projects, wbs: data.wbs, workpackages: data.workpackages });
 
         r.data(r.chewing({
             scale: { cycle: scale.cycle, from: scale.from, to: scale.to, size: scale.size },

@@ -1,18 +1,20 @@
 // 艦橋 (Bridge) の Schedule (d3.yabane の矢羽根) に使うコレクションと、データの作り方。
 //
-// データは、WBS とは切り離して、data/master_schedule/ (0.7.0 以降) に持つ。
-//   master_schedule/rows  … 行。配列の順のまま、上から行になる。({ id, name, description? })
-//   master_schedule/items … 予定 (矢羽根)。({ id, parent (行の id), name, plan: { from, to } ('YYYY-MM-DD'), wbs? | url?, description? })
-// どちらも、ファイルが無いときは、空として扱う。(サーバーが、スキーマの default を返す)
+// データは、WBS (data/wbs/) とは切り離して、data/master_schedule/ (0.7.0 以降) に持つ。形は d3.yabane の入力と同じ。(0.8.0 から)
+//   master_schedule/projects     … プロジェクト。いちばん左の列に描く。({ id, name, description?, background?, stroke?, font? })
+//   master_schedule/wbs          … WBS (行)。({ id, name, project?, parent?, description?, background?, stroke?, font? })
+//   master_schedule/workpackages … ワークパッケージ (矢羽根)。({ id, name, plan: { from, to }, parent? | project?, wbs? | url?, ... })
+// どれも、ファイルが無いときは、空として扱う。(サーバーが、スキーマの default を返す)
 //
-// 矢羽根を押したときの行き先は、予定の wbs (WBS のノードの id。/wbs/{id}) か url (新しいタブ)。どちらも無ければ、何もしない。(linkOf)
+// 矢羽根を押したときの行き先は、ワークパッケージの wbs (data/wbs/ のノードの id。/wbs/{id}) か url (新しいタブ)。どちらも無ければ、何もしない。(linkOf)
 //
 // 時間の目盛りのサイクルは、日・週・月から選べる。(0.7.0 以降。選んだものは、ブラウザに覚える。readCycle・writeCycle)
 // 1 目盛り (1 日・1 週・1 か月) の幅は、どのサイクルでも UNIT_WIDTH にそろえる。(scheduleScale)
 
 export const SCHEDULE_COLLECTIONS = [
-    'master_schedule/rows',
-    'master_schedule/items',
+    'master_schedule/projects',
+    'master_schedule/wbs',
+    'master_schedule/workpackages',
 ];
 
 // 目盛りのサイクル。code は d3.yabane (dayjs) の単位。(月は大文字の 'M'。小文字の 'm' は、dayjs では分)
@@ -148,24 +150,24 @@ function lookOf (record) {
     return out;
 }
 
-// 行の入れ子 (parent。0.8.0 から)。行の id → 親の行の id。(親の無い行・最上位の行は、入っていない)
-// 無い行を指す parent と、輪になった入れ子の parent は、使わない。(ihub-srv check が知らせる誤り。描くときは、最上位の行として扱う)
-export function rowParents (rows) {
-    const ids = new Set(rows.map(row=> row.id));
+// WBS の入れ子 (parent。0.8.0 から)。WBS の id → 親の WBS の id。(親の無い WBS は、入っていない)
+// 無い WBS を指す parent と、輪になった入れ子の parent は、使わない。(ihub-srv check が知らせる誤り)
+export function wbsParents (wbs) {
+    const ids = new Set(wbs.map(d=> d.id));
     const parents = new Map();
 
-    for (const row of rows)
-        if (row.parent!==undefined && row.parent!==null && ids.has(row.parent) && row.parent!==row.id)
-            parents.set(row.id, row.parent);
+    for (const d of wbs)
+        if (d.parent!==undefined && d.parent!==null && ids.has(d.parent) && d.parent!==d.id)
+            parents.set(d.id, d.parent);
 
-    // 親をたどって、自分に戻るなら、輪。その行の parent を外して、輪を切る。
-    for (const row of rows) {
-        const seen = new Set([row.id]);
-        let id = parents.get(row.id);
+    // 親をたどって、自分に戻るなら、輪。その WBS の parent を外して、輪を切る。
+    for (const d of wbs) {
+        const seen = new Set([d.id]);
+        let id = parents.get(d.id);
 
         while (id!==undefined) {
             if (seen.has(id)) {
-                parents.delete(row.id);
+                parents.delete(d.id);
                 break;
             }
 
@@ -177,75 +179,121 @@ export function rowParents (rows) {
     return parents;
 }
 
-// 行の深さ (最上位が 0)。parents は rowParents の戻り値。
-function depthOf (id, parents) {
-    let depth = 0;
-
-    for (let p = parents.get(id); p!==undefined; p = parents.get(p))
-        depth++;
-
-    return depth;
-}
+// 木の節の鍵。(d3.yabane と同じく、プロジェクトと WBS は、同じ id でも別のもの)
+const projectNode = (id)=> `p:${id}`;
+const wbsNode = (id)=> `w:${id}`;
 
 // Schedule に渡すデータを作る。(サイクルによらない部分。表示する期間と幅は scheduleScale)
-//   rows         … d3.yabane の入力の wbs。([{ id, name, order, parent?, background?, stroke?, font? }]) rows.json の順。
-//                  d3.yabane 0.3.0 は、兄弟を order の順 (無ければ開始日の順) に並べるので、配列の順を order に書く。
-//                  (同じ親の下の行は、rows.json の順。子の行を持つ行の直下の予定は、子の行のあとに、開始日の順で並ぶ)
-//                  name は、行の箱の幅に収まるように、長いと末尾を … にする。(入れ子では、箱の幅が列ごとに違う)
-//   workpackages … d3.yabane の入力の workpackages。([{ id, parent, name, plan, background?, stroke?, font? }]) 予定。
-//                  order は書かない。(同じ行の予定は、d3.yabane が開始日の順に並べ、重なるものを下の段へ回す)
-//   columns      … 行の名前の列の数。(入れ子の深さの最大 + 1。入れ子が無ければ 1)
-//   links        … { [予定の id]: linkOf の戻り値 } (行き先がある予定だけ)
+//   projects     … d3.yabane の入力の projects。([{ id, name, order, background?, stroke?, font? }]) projects.json の順。
+//   wbs          … d3.yabane の入力の wbs。([{ id, name, order, parent? | project?, background?, stroke?, font? }]) wbs.json の順。
+//   workpackages … d3.yabane の入力の workpackages。([{ id, name, plan, parent? | project?, background?, stroke?, font? }])
+//                  order は書かない。(同じ親の下のワークパッケージは、d3.yabane が開始日の順に並べ、重なるものを下の段へ回す)
+//   columns      … 名前の列の数。(プロジェクトと WBS の木の深さの最大 + 1。プロジェクトも入れ子も無ければ 1)
+//   links        … { [ワークパッケージの id]: linkOf の戻り値 } (行き先があるものだけ)
 //   count        … 矢羽根の数。(0 のとき、図は描かず、知らせを出す)
-//   first・last  … 予定の一番早い from と、一番遅い to。('YYYY-MM-DD')
-// 予定が無いとき (ファイルが無いときも) は、count が 0。使えない plan (to が from より前・実在しない日) の予定と、
-// parent の行が無い予定は、描かない。
+//   first・last  … ワークパッケージの一番早い from と、一番遅い to。('YYYY-MM-DD')
+//
+// 並び: d3.yabane 0.4.0 は、兄弟を order の順 (無ければ開始日の順) に並べるので、プロジェクトと WBS には、配列の順を order に書く。
+//   (同じ親の下の WBS は wbs.json の順。子の WBS を持つ節の直下のワークパッケージは、子の WBS のあとに、開始日の順で並ぶ)
+// 親: WBS とワークパッケージは、parent (WBS) があれば parent、無ければ project の下に入る。(d3.yabane と同じ)
+//   無い先を指すもの・輪になった入れ子は、ihub-srv check が知らせる誤り。描くときは、d3.yabane に渡す前に直す。
+//   (WBS は、parent の先が無い・輪のときは最上位、project の先が無いときも最上位。ワークパッケージは、描かない)
+// 名前: 箱の幅に収まるように、長いと末尾を … にする。(入れ子では、箱の幅が列ごとに違う)
+// 予定が無いとき (ファイルが無いときも) は、count が 0。使えない plan (to が from より前・実在しない日) は、描かない。
 export function buildScheduleData (collections) {
-    const rows = collections['master_schedule/rows'] || [];
-    const items = collections['master_schedule/items'] || [];
+    const projects = collections['master_schedule/projects'] || [];
+    const wbs = collections['master_schedule/wbs'] || [];
+    const workpackages = collections['master_schedule/workpackages'] || [];
 
-    const row_ids = new Set(rows.map(row=> row.id));
-    const drawn = items.filter(item=> usablePlan(item.plan) && row_ids.has(item.parent));
+    const project_ids = new Set(projects.map(d=> d.id));
+    const wbs_ids = new Set(wbs.map(d=> d.id));
+    const parents = wbsParents(wbs);
+
+    // WBS の親の節。(parent を書いていれば親の WBS (使えなければ最上位 (null))。parent が無ければ、使える project。それも無ければ最上位)
+    const wbsParentNode = (d)=> parents.has(d.id)
+          ? wbsNode(parents.get(d.id))
+          : (d.parent===undefined || d.parent===null) && project_ids.has(d.project) ? projectNode(d.project) : null;
+
+    // ワークパッケージの親の節。(parent があれば parent だけを見る。無ければ project。どちらの先も無ければ null = 描かない)
+    const wpParentNode = (d)=> d.parent!==undefined && d.parent!==null
+          ? (wbs_ids.has(d.parent) ? wbsNode(d.parent) : null)
+          : (project_ids.has(d.project) ? projectNode(d.project) : null);
+
+    const drawn = workpackages.filter(d=> usablePlan(d.plan) && wpParentNode(d)!==null);
 
     if (drawn.length===0)
-        return { rows: [], workpackages: [], columns: 1, links: {}, count: 0, first: null, last: null };
+        return { projects: [], wbs: [], workpackages: [], columns: 1, links: {}, count: 0, first: null, last: null };
 
-    const froms = drawn.map(item=> parseDate(item.plan.from));
-    const tos = drawn.map(item=> parseDate(item.plan.to));
+    const froms = drawn.map(d=> parseDate(d.plan.from));
+    const tos = drawn.map(d=> parseDate(d.plan.to));
 
     const links = {};
 
-    for (const item of drawn) {
-        const link = linkOf(item);
+    for (const d of drawn) {
+        const link = linkOf(d);
 
         if (link)
-            links[item.id] = link;
+            links[d.id] = link;
     }
 
-    const parents = rowParents(rows);
-    const depths = new Map(rows.map(row=> [row.id, depthOf(row.id, parents)]));
-    const columns = Math.max(0, ...depths.values()) + 1;
-    const has_children = new Set(parents.values());
+    // 深さ (プロジェクトと、最上位の WBS が 0)。親の節をたどる。
+    const parent_node = new Map(wbs.map(d=> [wbsNode(d.id), wbsParentNode(d)]));
+    const depthOf = (node)=> {
+        let depth = 0;
 
-    // 行の箱の幅。子の行を持つ行は 1 列、持たない行は、右端の列まで伸びる。(d3.yabane の Branch.calW と同じ)
-    const boxWidth = (row)=> has_children.has(row.id)
-          ? columnsWidth(columns, 1)
-          : columnsWidth(columns, columns - depths.get(row.id));
+        for (let p = parent_node.get(node); p; p = parent_node.get(p))
+            depth++;
+
+        return depth;
+    };
+
+    const depths = new Map([
+        ...projects.map(d=> [projectNode(d.id), 0]),
+        ...wbs.map(d=> [wbsNode(d.id), depthOf(wbsNode(d.id))]),
+    ]);
+    const columns = Math.max(0, ...depths.values()) + 1;
+
+    // 子の WBS を持つ節。(その箱は 1 列。持たない箱は、右端の列まで伸びる。d3.yabane の Branch.calW と同じ)
+    const has_children = new Set([...parent_node.values()].filter(Boolean));
+
+    const label = (node, d)=> {
+        const width = has_children.has(node)
+              ? columnsWidth(columns, 1)
+              : columnsWidth(columns, columns - depths.get(node));
+
+        return rowLabel(d.name, labelUnits(width, d.font?.size || ROW_FONT_SIZE));
+    };
+
+    // d3.yabane に渡す、親の項目。(parent か project の、どちらか 1 つ)
+    const parentFields = (node)=> {
+        if (!node)
+            return {};
+
+        const id = Number(node.slice(2));
+
+        return node.startsWith('w:') ? { parent: id } : { project: id };
+    };
 
     return {
-        rows: rows.map((row, i)=> ({
-            id: row.id,
-            name: rowLabel(row.name, labelUnits(boxWidth(row), row.font?.size || ROW_FONT_SIZE)),
+        projects: projects.map((d, i)=> ({
+            id: d.id,
+            name: label(projectNode(d.id), d),
             order: i,
-            ...(parents.has(row.id) && { parent: parents.get(row.id) }),
-            ...lookOf(row),
+            ...lookOf(d),
         })),
-        workpackages: drawn.map(item=> ({
-            id: item.id,
-            parent: item.parent,
-            name: item.name,
-            plan: { from: item.plan.from, to: item.plan.to },
-            ...lookOf(item),
+        wbs: wbs.map((d, i)=> ({
+            id: d.id,
+            name: label(wbsNode(d.id), d),
+            order: i,
+            ...parentFields(wbsParentNode(d)),
+            ...lookOf(d),
+        })),
+        workpackages: drawn.map(d=> ({
+            id: d.id,
+            ...parentFields(wpParentNode(d)),
+            name: d.name,
+            plan: { from: d.plan.from, to: d.plan.to },
+            ...lookOf(d),
         })),
         columns,
         links,

@@ -16,6 +16,12 @@ import { RULES } from './rules.mjs';
 
 const SCHEMAS_DIR = fileURLToPath(new URL('../schemas/', import.meta.url));
 
+// 名前が変わったコレクション。(古い名前 → 新しい名前) 古い名前のファイルがあるときは、名前を変えるように知らせる。
+const RENAMED = {
+    'master_schedule/rows':  'master_schedule/wbs',            // 0.8.0
+    'master_schedule/items': 'master_schedule/workpackages',   // 0.8.0
+};
+
 // dir の下で suffix で終わるファイルを、dir からの相対パス (区切りは /) で返す。
 function listFiles (dir, suffix) {
     return readdirSync(dir, { recursive: true, withFileTypes: true })
@@ -169,9 +175,15 @@ export function createValidation ({ schemas_dir = null, rules = {} } = {}) {
     function validateData (data) {
         const errors = validateCollections(COLLECTIONS, data, data);
 
-        for (const name of Object.keys(data))
-            if (!findCollection(name))
+        for (const name of Object.keys(data)) {
+            if (findCollection(name))
+                continue;
+
+            if (RENAMED[name] && findCollection(RENAMED[name]))
+                errors.push(`${name}: ファイルの名前が変わりました。${RENAMED[name].split('/').pop()}.json に名前を変えてください。(${name}.json → ${RENAMED[name]}.json)`);
+            else
                 errors.push(`${name}: スキーマがありません。(${name}.schema.json を、extensions.schemas_dir のフォルダに作ってください)`);
+        }
 
         return errors;
     }
