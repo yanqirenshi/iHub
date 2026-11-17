@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "WBS のワークパッケージ",
-    "description": "WBS の下のワークパッケージ。parent は WBS の id。id は projects・wbs とまたいで一意にする。_class は読み込み時に付けるので、データには書かない。予定の期間 (plan) は、0.7.0 から、書けない。艦橋の Schedule タブの予定は、master_schedule (rows・items) に書く。",
+    "description": "WBS の下のワークパッケージ。parent は WBS の id。id は projects・wbs とまたいで一意にする。_class は読み込み時に付けるので、データには書かない。予定の期間 (plan) は、0.7.0 から、書けない。艦橋の Schedule タブの予定は、master_schedule (projects・wbs・workpackages) に書く。(0.8.0 から。矢羽根になるのは master_schedule/workpackages)",
     "x-id-start": 1000000,
     "type": "array",
     "items": {

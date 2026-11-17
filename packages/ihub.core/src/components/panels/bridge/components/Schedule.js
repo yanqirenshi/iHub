@@ -35,7 +35,7 @@ const graphStyle = (size, columns = 1, width = 100)=> ({
 });
 
 // 初めの拡大の度合い。図の全体 (名前の列と、時間の目盛り) の幅 total が、表示している幅 width に収まる度合い。(小さくしすぎない・大きくしすぎない)
-// total は、時間軸の右端 (図の座標)。描く前は見積もり (columnsWidth)、描いたあとは実際の値 (timeAxisOf) を使う。
+// total は、時間軸の右端 (図の座標)。描く前は見積もり (columnsWidth)、描いたあとは実際の値 (d3.yabane の onDraw の range) を使う。
 function initialScale (width, total) {
     const k = (width * 0.95) / total;
 
@@ -175,7 +175,7 @@ function currentView (rectum) {
 }
 
 // 画面に出している図の、時間軸の左端と右端 { start, end } (図の座標)。図をまだ描いていないときは、null。
-// (d3.yabane 0.5.0 は、描いた名前を測って列の幅を決め、描き直す。描いたあとの scale が、実際の位置)
+// (d3.yabane 0.5.0 から、名前の列の幅は、描いた名前を測って決まる。描いたあとの scale が、実際の位置)
 function timeAxisOf (rectum) {
     if (!currentView(rectum) || typeof rectum.scale!=='function' || !rectum.scale())
         return null;
@@ -185,22 +185,9 @@ function timeAxisOf (rectum) {
     return { start, end };
 }
 
-// 図を描いたあと (d3.yabane が、名前の幅に合わせて列の幅を決め、描き直したあと) に、1 度だけ fn(rectum) を呼ぶ。
-// (d3.yabane は、描き終わりを知らせないので、Rectum の draw を包む)
-function onFirstDraw (rectum, fn) {
-    const draw = rectum.draw;
-    let done = false;
-
-    rectum.draw = function (...args) {
-        const out = draw.apply(this, args);
-
-        if (!done && timeAxisOf(this)) {
-            done = true;
-            fn(this);
-        }
-
-        return out;
-    };
+// 前の図が測った名前の幅。(d3.yabane 0.6.0 の labelWidths。新しい Rectum に渡すと、測り直しの描き直しが要らない) 前の図が無いときは、undefined。
+function labelWidthsOf (rectum) {
+    return rectum && typeof rectum.labelWidths==='function' ? rectum.labelWidths() : undefined;
 }
 
 // 予定を押したときの行き先へ移る。(行き先が無ければ、何もしない)
@@ -244,15 +231,17 @@ function Diagram ({ data, cycle, width, current }) {
             transform: { k, x: INITIAL_LEFT / k, y: INITIAL_TOP / k },
             grid,
             svg: { style: { background: '#ffffff' } },
+            // 作り直すとき (サイクル・幅・データが変わったとき) は、前の図が測った名前の幅を引き継ぐ。(1 度の描画で、列の幅が決まる)
+            // 名前が変わったときは、その名前だけ、測って描き直す。(d3.yabane は、名前と文字ごとに覚える)
+            labelWidths: labelWidthsOf(current.current),
         });
 
-        // 位置を保管していないときは、描いたあとの実際の幅 (名前の列は、名前に合った幅) で、初めの拡大の度合いを決め直す。
+        // 位置を保管していないときは、描いたあとの実際の幅 (名前の列は、名前に合った幅) で、初めの拡大の度合いを決め直す。(初めの 1 回だけ)
         // (view で動かしたものは保管しない。d3.svg は、view では onViewChange を呼ばない)
         if (!readDiagramView(app.name, `schedule:${cycle}`))
-            onFirstDraw(r, (drawn)=> {
-                const fitted = initialScale(screen(), timeAxisOf(drawn).end);
-
-                drawn.view({ k: fitted, x: INITIAL_LEFT, y: INITIAL_TOP });
+            r.onDraw(({ range }, drawn)=> {
+                drawn.onDraw(null);
+                drawn.view({ k: initialScale(screen(), range[1]), x: INITIAL_LEFT, y: INITIAL_TOP });
             });
 
         bindView(r);
