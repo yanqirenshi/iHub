@@ -4,6 +4,15 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.8.3 (2026-11)
+
+### 変更 (艦橋の Schedule タブ: 行の区切り線。d3.yabane 0.7.0。yanqirenshi/iHub#202)
+
+- `dependencies` の `@yanqirenshi/d3.yabane` を `^0.7.0` に上げた。
+- 行の区切り線を、最上位の箱どうしの間に加えて、入れ子の子どうし (子の WBS・親の箱の直下のワークパッケージの帯) の間にも引くようになった。(d3.yabane 0.7.0 の変更。子どうしの線は、間の真ん中の高さに、親の箱の右端から時間軸の右端まで。同じ帯の中の段の間には、引かない) 色は、これまでどおり `style.body.row.stroke.color` (`#aaa`)。
+- iHub のコードの変更は無い。(d3.yabane の入力の形・`Rectum` の使い方は、変わっていない)
+- **利用側への影響**: 入れ子があるとき、区切り線が増える。入れ子の無いデータは、0.8.2 と同じ見え方。
+
 ## 0.8.2 (2026-11)
 
 ### 変更 (艦橋の Schedule タブ: d3.yabane 0.6.0。yanqirenshi/iHub#198)
