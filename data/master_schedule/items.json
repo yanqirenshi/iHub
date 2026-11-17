@@ -1,0 +1,9 @@
+[
+    { "id": 1000, "parent": 111, "name": "Task 1000", "plan": { "from": "2023-09-01", "to": "2024-09-30" }, "background": { "color": "#89c3eb" }, "font": { "color": "#ffffff", "weight": "bold" } },
+    { "id": 1001, "parent": 111, "name": "Task 1001", "plan": { "from": "2023-10-01", "to": "2023-12-31" } },
+    { "id": 1100, "parent": 112, "name": "Task 1100", "plan": { "from": "2023-11-01", "to": "2024-02-29" }, "stroke": { "color": "#e95464", "width": 6 } },
+    { "id": 1200, "parent": 11, "name": "Task 1200", "plan": { "from": "2024-02-01", "to": "2024-05-31" }, "stroke": { "type": "dotted" } },
+    { "id": 1300, "parent": 113, "name": "Task 1300", "plan": { "from": "2024-04-01", "to": "2024-06-30" } },
+    { "id": 2000, "parent": 12, "name": "Task 2000", "plan": { "from": "2024-01-01", "to": "2024-04-30" } },
+    { "id": 3000, "parent": 20, "name": "Task 3000", "plan": { "from": "2024-03-01", "to": "2024-07-31" }, "background": { "color": "#fdeff2", "opacity": 0.8 }, "font": { "size": 24, "color": "#666666" } }
+]

@@ -1,27 +1,120 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "マスタースケジュールの行",
-    "description": "艦橋の Schedule タブ (d3.yabane の矢羽根) の行。WBS とは切り離して、行と予定 (master_schedule/items) を、ここで持つ。並びは、配列の順のまま、上から行になる。id は、行と予定 (items) をまたいで一意にする。ファイルが無いときは、行が無いものとして扱う。",
+    "description": "艦橋の Schedule タブ (d3.yabane の矢羽根) の行。WBS とは切り離して、行と予定 (master_schedule/items) を、ここで持つ。並びは、配列の順のまま、上から行になる。parent (任意) に親の行の id を書くと、その行の下に入れ子になり、深さごとに列が分かれる。(0.8.0 から。同じ親の下の行は、配列の順) background・stroke・font (任意) は、行の箱の見た目。(d3.yabane の共有型。0.8.0 から) id は、行と予定 (items) をまたいで一意にする。(親の行があること・入れ子が輪になっていないことは、スキーマではなく、ルールで検査する) ファイルが無いときは、行が無いものとして扱う。",
     "x-id-start": 1,
     "type": "array",
     "default": [],
     "items": {
         "type": "object",
         "properties": {
-            "id":          { "type": "integer" },
-            "name":        { "type": "string" },
-            "description": { "$ref": "#/$defs/description" }
+            "id": {
+                "type": "integer"
+            },
+            "parent": {
+                "type": "integer",
+                "description": "親の行の id。(任意。書かないと、最上位の行)"
+            },
+            "name": {
+                "type": "string"
+            },
+            "description": {
+                "$ref": "#/$defs/description"
+            },
+            "background": {
+                "$ref": "#/$defs/background"
+            },
+            "stroke": {
+                "$ref": "#/$defs/stroke"
+            },
+            "font": {
+                "$ref": "#/$defs/font"
+            }
         },
-        "required": ["id", "name"],
+        "required": [
+            "id",
+            "name"
+        ],
         "additionalProperties": false
     },
     "$defs": {
         "description": {
             "description": "文字列、または段落ごとの文字列の配列",
             "oneOf": [
-                { "type": "string" },
-                { "type": "array", "items": { "type": "string" } }
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
             ]
+        },
+        "background": {
+            "description": "背景 (共有型 Background)。行では箱、予定では矢羽根に効く。(d3.yabane の既定: color 白)",
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string",
+                    "description": "色 (CSS の色。'#eaf4fc'・'rgb(0, 0, 0)'・'red' など)"
+                },
+                "opacity": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "不透明度 (0〜1)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "stroke": {
+            "description": "枠線 (共有型 Stroke)。行では箱、予定では矢羽根に効く。(d3.yabane の既定: color #0e9aa7・width 4・type solid)",
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string",
+                    "description": "CSS の色"
+                },
+                "width": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "太さ"
+                },
+                "type": {
+                    "enum": [
+                        "solid",
+                        "dashed",
+                        "dotted"
+                    ],
+                    "description": "線の種類。(破線・点線の間隔は、太さに比例する)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "font": {
+            "description": "名前の文字 (共有型 Font)。(d3.yabane の既定: size 33)",
+            "type": "object",
+            "properties": {
+                "size": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "description": "大きさ"
+                },
+                "color": {
+                    "type": "string",
+                    "description": "CSS の色"
+                },
+                "weight": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "太さ ('bold'・700 など)"
+                }
+            },
+            "additionalProperties": false
         }
     }
 }

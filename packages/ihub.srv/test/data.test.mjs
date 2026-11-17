@@ -216,6 +216,61 @@ test('master_schedule: wbs の検査は、データ全体の検証のときだ�
     assert.equal(RULES.master_schedule({ rows, items }, { 'wbs/projects': [], 'wbs/wbs': [], 'wbs/workpackages': [] }).length, 1);
 });
 
+test('master_schedule: 行の入れ子 (parent) と、行・予定の見た目 (background・stroke・font) を書ける', ()=> {
+    const rows = [
+        { id: 10, name: 'WBS 10', background: { color: '#eaf4fc' }, font: { weight: 'bold' } },
+        { id: 11, name: 'WBS 10-1', parent: 10 },
+        { id: 111, name: 'WBS 10-1-1', parent: 11, stroke: { color: '#999999', type: 'dashed' } },
+        { id: 20, name: 'WBS 20' },
+    ];
+
+    assert.deepEqual(validateData(scheduleData(rows, [
+        { id: 1000, parent: 111, name: 'A', plan: PLAN, background: { color: '#89c3eb' }, font: { color: '#ffffff', weight: 'bold' } },
+        { id: 1200, parent: 11, name: '子の行を持つ行の直下', plan: PLAN, stroke: { type: 'dotted' } },
+        { id: 3000, parent: 20, name: 'C', plan: PLAN, background: { color: '#fdeff2', opacity: 0.8 }, font: { size: 24, color: '#666666', weight: 700 } },
+        { id: 3001, parent: 20, name: 'D', plan: PLAN, stroke: { color: '#e95464', width: 6, type: 'solid' } },
+    ])), []);
+});
+
+test('master_schedule: 見た目の形の誤りを見つける (知らない項目・線の種類・不透明度・大きさ・型)', ()=> {
+    const item = (look)=> validateData(scheduleData(ROWS, [{ id: 1001, parent: 1, name: 'X', plan: PLAN, ...look }]));
+    const row = (look)=> validateData(scheduleData([{ id: 1, name: '開発', ...look }], []));
+    const has = (errors, prefix)=> errors.some(e=> e.startsWith(prefix));
+
+    for (const [look, prefix] of [
+        [{ background: { colour: 'red' } },     'master_schedule/items/0/background'],
+        [{ background: { opacity: 1.5 } },      'master_schedule/items/0/background/opacity'],
+        [{ background: '#fff' },                'master_schedule/items/0/background'],
+        [{ stroke: { type: 'wavy' } },          'master_schedule/items/0/stroke/type'],
+        [{ stroke: { width: -1 } },             'master_schedule/items/0/stroke/width'],
+        [{ font: { size: 0 } },                 'master_schedule/items/0/font/size'],
+        [{ font: { weight: true } },            'master_schedule/items/0/font/weight'],
+        [{ font: { family: 'serif' } },         'master_schedule/items/0/font'],
+    ]) {
+        const errors = item(look);
+        assert.ok(has(errors, prefix), `${JSON.stringify(look)}\n${errors.join('\n')}`);
+    }
+
+    assert.ok(has(row({ stroke: { type: 'double' } }), 'master_schedule/rows/0/stroke/type'));
+    assert.ok(has(row({ parent: '1' }), 'master_schedule/rows/0/parent'));
+});
+
+test('master_schedule: 行の parent が無いもの・入れ子の輪を見つける (ルール)', ()=> {
+    assert.deepEqual(validateData(scheduleData([
+        { id: 1, name: 'A' },
+        { id: 2, name: 'B', parent: 99 },
+        { id: 3, name: 'C', parent: 3 },
+        { id: 4, name: 'D', parent: 5 },
+        { id: 5, name: 'E', parent: 4 },
+        { id: 6, name: 'F', parent: 4 },
+    ], [])), [
+        'master_schedule/rows: parent の行が見つかりません。(id=2, parent=99)',
+        'master_schedule/rows: 入れ子が輪になっています。(id=3)',
+        'master_schedule/rows: 入れ子が輪になっています。(id=4)',
+        'master_schedule/rows: 入れ子が輪になっています。(id=5)',
+    ]);
+});
+
 test('ワークパッケージの plan は、書けない (予定は master_schedule に書く)', ()=> {
     const data = scheduleData([], []);
 
