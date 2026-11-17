@@ -1,6 +1,8 @@
 // ドメインごとの、コレクションをまたぐ検査 (id の重複・参照の整合性)。
 // 関数の引数はドメインのコレクション ({ entities: [...], ... })、戻り値はエラーのメッセージの配列。
 // スキーマに合っているデータだけを渡す。
+// 2 つ目の引数 (all) は、データ全体 ({ 'wbs/projects': [...], ... })。ドメインをまたぐ検査に使う。
+// データ全体の検証 (validateData・ihub-srv check) のときだけ渡る。(API サーバーがドメインごとに検証するときは、渡らないので、またぐ検査は飛ばす)
 
 import { check as checkEr } from '@yanqirenshi/model.er';
 import { check as checkTm } from '@yanqirenshi/model.tm';
@@ -57,22 +59,46 @@ function checkWbs ({ projects, wbs, workpackages }) {
         if (!wbs_ids.has(d.parent))
             errors.push(`wbs/workpackages: parent の WBS が見つかりません。(id=${d.id}, parent=${d.parent})`);
 
-    // plan (予定の期間) は、日付として正しく、to が from より前でないこと。
-    for (const d of workpackages) {
-        if (!d.plan)
-            continue;
+    return errors;
+}
+
+// マスタースケジュール (艦橋の Schedule タブ): 行と予定の id が、またいで一意なこと (矢羽根の図が、行と予定を同じ id で引くため)・
+// 予定の parent の行があること・plan の日付が実在して、to が from より前でないこと・行き先が wbs と url の両方でないこと・
+// wbs の id が WBS のノード (プロジェクト・WBS・ワークパッケージ) にあること。
+function checkMasterSchedule ({ rows, items }, all = null) {
+    const errors = [];
+
+    checkUnique(errors, 'master_schedule', [...rows, ...items]);
+
+    const row_ids = new Set(rows.map(d=> d.id));
+
+    // wbs の id の検査は、WBS のデータが渡されたときだけ。(API サーバーのドメインごとの検証では、渡らない)
+    const wbs_nodes = ['wbs/projects', 'wbs/wbs', 'wbs/workpackages'].map(name=> all?.[name]);
+    const wbs_ids = wbs_nodes.every(Array.isArray)
+          ? new Set(wbs_nodes.flatMap(list=> list.map(d=> d.id)))
+          : null;
+
+    for (const d of items) {
+        if (!row_ids.has(d.parent))
+            errors.push(`master_schedule/items: parent の行が見つかりません。(id=${d.id}, parent=${d.parent})`);
 
         const from = parseDate(d.plan.from);
         const to = parseDate(d.plan.to);
 
         if (from===null)
-            errors.push(`wbs/workpackages: plan.from が日付として正しくありません。(id=${d.id}, from=${d.plan.from})`);
+            errors.push(`master_schedule/items: plan.from が日付として正しくありません。(id=${d.id}, from=${d.plan.from})`);
 
         if (to===null)
-            errors.push(`wbs/workpackages: plan.to が日付として正しくありません。(id=${d.id}, to=${d.plan.to})`);
+            errors.push(`master_schedule/items: plan.to が日付として正しくありません。(id=${d.id}, to=${d.plan.to})`);
 
         if (from!==null && to!==null && to < from)
-            errors.push(`wbs/workpackages: plan.to が plan.from より前です。(id=${d.id}, from=${d.plan.from}, to=${d.plan.to})`);
+            errors.push(`master_schedule/items: plan.to が plan.from より前です。(id=${d.id}, from=${d.plan.from}, to=${d.plan.to})`);
+
+        if (d.wbs!==undefined && d.url!==undefined)
+            errors.push(`master_schedule/items: wbs と url は、両方は書けません。(id=${d.id})`);
+
+        if (d.wbs!==undefined && wbs_ids && !wbs_ids.has(d.wbs))
+            errors.push(`master_schedule/items: wbs の WBS のノードが見つかりません。(id=${d.id}, wbs=${d.wbs})`);
     }
 
     return errors;
@@ -100,6 +126,7 @@ function checkClasses ({ classes, relationships }) {
 
 export const RULES = {
     wbs:        checkWbs,
+    master_schedule: checkMasterSchedule,
     classes:    checkClasses,
     // 図の検査は、図ごとの model.* パッケージが持つ。(文言は、もとここにあった検査と同じ)
     er:         (data)=> checkEr(data, 'er/'),

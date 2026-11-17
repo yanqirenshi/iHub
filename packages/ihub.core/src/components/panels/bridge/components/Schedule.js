@@ -29,9 +29,9 @@ function initialScale (width, size) {
     return Math.min(0.4, Math.max(0.1, k));
 }
 
-// 艦橋 (Bridge) の Schedule タブ: 予定の期間 (plan) のあるワークパッケージを、d3.yabane の矢羽根で並べる。
-// 見るだけ。矢羽根を押すと、そのワークパッケージのページ (/wbs/{id}) へ移る。
-// 期間は、data/wbs/workpackages.json の各レコードの plan: { from, to } ('YYYY-MM-DD') に書く。
+// 艦橋 (Bridge) の Schedule タブ: data/master_schedule/ の予定 (items) を、行 (rows) ごとに、d3.yabane の矢羽根で並べる。(0.7.0 以降)
+// 見るだけ。矢羽根を押すと、予定の行き先へ移る。wbs があれば /wbs/{id}、url があれば新しいタブで開く。どちらも無ければ、何もしない。
+// 予定は、items.json の各レコードの plan: { from, to } ('YYYY-MM-DD') に書く。
 export default function Schedule () {
     const { data, version } = useDiagramData(SCHEDULE_COLLECTIONS, buildScheduleData);
 
@@ -40,15 +40,27 @@ export default function Schedule () {
             // 左の余白は、サイドメニューにかからないようにする。(Cockpit タブの Monitor と同じ)
             <Box sx={{ pt: 3, px: '111px' }}>
               <Alert severity="info">
-                予定の期間 (plan) のあるワークパッケージがありません。
-                {' '}<code>data/wbs/workpackages.json</code> に <code>plan: {'{'} from, to {'}'}</code> を書くと、ここに出ます。
-                (例: <code>"plan": {'{'} "from": "2026-11-01", "to": "2026-11-30" {'}'}</code>)
+                予定がありません。
+                {' '}<code>data/master_schedule/rows.json</code> に行を、<code>data/master_schedule/items.json</code> に予定を書くと、ここに出ます。
+                (予定の例: <code>{'{'} "id": 1001, "parent": 1, "name": "画面の作成", "plan": {'{'} "from": "2026-11-01", "to": "2026-11-30" {'}'} {'}'}</code>。
+                <code>parent</code> は、行の <code>id</code> です)
               </Alert>
             </Box>
         );
 
     // ほかからデータが変わったときは、図を作り直す。(位置と拡大は、保管した値で戻る)
     return <Diagram key={version} data={data}/>;
+}
+
+// 予定を押したときの行き先へ移る。(行き先が無ければ、何もしない)
+function open (link, navigate) {
+    if (!link)
+        return;
+
+    if (link.type==='wbs')
+        navigate(`/wbs/${link.id}`);
+    else if (link.type==='url')
+        window.open(link.url, '_blank', 'noopener,noreferrer');
 }
 
 function Diagram ({ data }) {
@@ -81,7 +93,7 @@ function Diagram ({ data }) {
             scale: { cycle: SCHEDULE_CYCLE, from: data.from, to: data.to, size: data.size },
             style: graphStyle(data.size),
             tree,
-            events: { reaf: { click: (reaf)=> navigate.current(`/wbs/${reaf.id()}`) } },
+            events: { reaf: { click: (reaf)=> open(data.links[reaf.id()], navigate.current) } },
         }));
 
         setRectum(r);
