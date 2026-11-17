@@ -12,6 +12,7 @@
 
 ## 0.7.0 (2026-11)
 
+- `@yanqirenshi/ihub.core`: 艦橋の Schedule タブに「日・週・月」のボタンを置き、時間の目盛りのサイクルを切り替えられるようにした。(選んだものはブラウザに覚える。初めは週。1 目盛り (1 日・1 週・1 か月) の幅は、どれも 111 にそろえる。図の位置と拡大は、サイクルごとに覚える) `@yanqirenshi/d3.yabane` を `^0.3.0` に上げた。(日・週の見出しが出る)
 - `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`: 艦橋の Schedule タブのデータを、WBS のワークパッケージの `plan` から切り離して、新しい `data/master_schedule/` (`rows.json` の行・`items.json` の予定) にした。(行は `rows.json` の順。予定は `parent` (行の id)・`name`・`plan` が必須で、行き先は任意で `wbs` (押すと `/wbs/{id}`) か `url` (新しいタブ) のどちらか 1 つ。どちらも無ければ、押しても何も起きない。ファイルが無くても動く) **データの形が変わるので 0.7.0。ワークパッケージの `plan` は、使えなくなる。(書いてあると `ihub-srv check` が誤りにする) 予定は `data/master_schedule/` に書く。**
 
 ## 0.6.1 (2026-11)
