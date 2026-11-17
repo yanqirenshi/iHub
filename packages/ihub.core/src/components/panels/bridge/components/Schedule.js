@@ -3,23 +3,28 @@ import { useNavigate } from 'react-router-dom';
 
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 import D3Yabane, { Rectum, Pippala } from '@yanqirenshi/d3.yabane';
 
 import { useConfig } from '../../../../config.js';
-import { useDiagramData, useDiagramView } from '../../../../manegers/diagram.js';
+import { readDiagramView, useDiagramData, useDiagramView, writeDiagramView } from '../../../../manegers/diagram.js';
 import {
-    COLUMN_GAP, CYCLE_KEY, ROW_MARGIN, SCHEDULE_COLLECTIONS, SCHEDULE_CYCLES, UNIT_WIDTH,
-    buildScheduleData, columnsWidth, readCycle, rowColumnWidth, scheduleScale, writeCycle,
+    COLUMN_GAP, CYCLE_KEY, ROW_MARGIN, SCHEDULE_COLLECTIONS, SCHEDULE_CYCLES, UNIT_WIDTH, WIDTH_KEY,
+    buildScheduleData, columnsWidth, headOfWidth, readCycle, readWidth, rowColumnWidth, scheduleScale, stepWidth,
+    viewForWidth, writeCycle, writeWidth,
 } from '../../../../manegers/schedule.js';
 
 // 図のスタイル (d3.yabane のスタイル)。stage.w は、時間の目盛りの全体の幅。(表示する期間に比例させる)
 // row.w は、行の名前の 1 列の幅。入れ子で列が増えるときは、細くする。(manegers/schedule.js の rowColumnWidth)
-const graphStyle = (size, columns = 1)=> ({
+// head は、目盛りの見出し。100% より狭い幅の段では、見出しの文字を小さくする。(manegers/schedule.js の headOfWidth)
+const graphStyle = (size, columns = 1, width = 100)=> ({
     stage: { w: size },
-    head: { h: 33 },
+    head: { h: 33, ...headOfWidth(width) },
     body: {
         h: null, w: null,
         columns: { h: 88, w: UNIT_WIDTH },
@@ -41,12 +46,22 @@ function initialScale (width, size, columns = 1) {
 // 見るだけ。矢羽根を押すと、ワークパッケージの行き先へ移る。wbs があれば /wbs/{id}、url があれば新しいタブで開く。どちらも無ければ、何もしない。
 // 予定の期間は、workpackages.json の各レコードの plan: { from, to } ('YYYY-MM-DD') に書く。
 // 時間の目盛りのサイクル (日・週・月) は、右上のボタンで切り替える。選んだものは、ブラウザに覚える。(初めは週)
+// 1 目盛りの幅は、その左の「−」「＋」で、段 (50%〜400%) を上り下りする。選んだものは、サイクルごとにブラウザに覚える。(初めは 100%。0.8.1 から)
 export default function Schedule () {
     const { data, version } = useDiagramData(SCHEDULE_COLLECTIONS, buildScheduleData);
 
     const { app } = useConfig();
     const cycle_key = CYCLE_KEY(app.name);
     const [cycle, setCycle] = React.useState(()=> readCycle(cycle_key));
+
+    // 幅の段は、サイクルごとに覚える。(サイクルを変えたら、そのサイクルの幅を読み直す)
+    const [widths, setWidths] = React.useState({});
+    const width = widths[cycle] ?? readWidth(WIDTH_KEY(app.name, cycle));
+
+    const box = React.useRef(null);
+
+    // 今、画面に出している図。(幅を変えるとき、位置をまだ保管していなければ、今の位置と拡大の度合いを使う)
+    const rectum = React.useRef(null);
 
     const changeCycle = (e, next)=> {
         // 選んでいるボタンをもう一度押したときは、null が来る。(選んだままにする)
@@ -55,6 +70,30 @@ export default function Schedule () {
 
         writeCycle(cycle_key, next);
         setCycle(next);
+    };
+
+    const changeWidth = (step)=> {
+        const next = stepWidth(width, step);
+
+        if (next===null)
+            return;
+
+        // 図を作り直す前に、位置を合わせ直して保管する。(画面の中央にあった日付が、中央に残るように。拡大の度合いは、そのまま)
+        // 位置をまだ保管していない (開いてから動かしていない) ときは、今、画面に出ている位置と拡大の度合いを元にする。
+        // (保管しないまま作り直すと、初めの拡大の度合いが、広がった図の全体を画面に収め直すので、1 目盛りの画面の幅が、ほとんど変わらない)
+        const code = `schedule:${cycle}`;
+        const view = readDiagramView(app.name, code) || currentView(rectum.current);
+
+        if (view)
+            writeDiagramView(app.name, code, viewForWidth(view, {
+                from: width,
+                to: next,
+                start_x: columnsWidth(data.columns) + ROW_MARGIN,
+                screen: box.current?.clientWidth || 1000,
+            }));
+
+        writeWidth(WIDTH_KEY(app.name, cycle), next);
+        setWidths({ ...widths, [cycle]: next });
     };
 
     if (data.count===0)
@@ -70,23 +109,61 @@ export default function Schedule () {
             </Box>
         );
 
-    // ほかからデータが変わったとき・サイクルを変えたときは、図を作り直す。(位置と拡大は、サイクルごとに保管した値で戻る)
+    // ほかからデータが変わったとき・サイクルや幅を変えたときは、図を作り直す。(位置と拡大は、サイクルごとに保管した値で戻る)
     return (
-        <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
-          <Diagram key={`${version}:${cycle}`} data={data} cycle={cycle}/>
+        <Box ref={box} sx={{ position: 'relative', width: '100%', height: '100%' }}>
+          <Diagram key={`${version}:${cycle}:${width}`} data={data} cycle={cycle} width={width} current={rectum}/>
 
           {/* 図の右上。(図にかぶらないように、背景を付ける。左はサイドメニューがあるので、右に置く) */}
-          <ToggleButtonGroup value={cycle} exclusive size="small" onChange={changeCycle}
-                             aria-label="目盛りのサイクル"
-                             sx={{ position: 'absolute', top: 8, right: 16, bgcolor: 'background.paper' }}>
-            {SCHEDULE_CYCLES.map(c=> (
-                <ToggleButton key={c.code} value={c.code} aria-label={c.label} sx={{ px: 2 }}>
-                  {c.label}
-                </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+          <Stack direction="row" spacing={1} sx={{ position: 'absolute', top: 8, right: 16 }}>
+            <WidthControl width={width}
+                          onNarrow={stepWidth(width, -1)===null ? null : ()=> changeWidth(-1)}
+                          onWiden={stepWidth(width, 1)===null ? null : ()=> changeWidth(1)}/>
+
+            <ToggleButtonGroup value={cycle} exclusive size="small" onChange={changeCycle}
+                               aria-label="目盛りのサイクル"
+                               sx={{ bgcolor: 'background.paper' }}>
+              {SCHEDULE_CYCLES.map(c=> (
+                  <ToggleButton key={c.code} value={c.code} aria-label={c.label} sx={{ px: 2 }}>
+                    {c.label}
+                  </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
+          </Stack>
         </Box>
     );
+}
+
+// 1 目盛りの幅を変える部品。(「−」今の幅「＋」。いちばん端の段では、その向きのボタンを押せなくする)
+// 見た目は、となりの「日・週・月」のボタン (ToggleButtonGroup の small) にそろえる。
+function WidthControl ({ width, onNarrow, onWiden }) {
+    const button = { minWidth: 40, px: 1.5, borderRadius: 0, color: 'text.primary', fontSize: '1rem', lineHeight: 1 };
+
+    return (
+        <Paper variant="outlined" role="group" aria-label="1 目盛りの幅"
+               sx={{ display: 'flex', alignItems: 'stretch', overflow: 'hidden' }}>
+          <Button sx={button} disabled={!onNarrow} onClick={onNarrow || undefined} aria-label="1 目盛りの幅を狭くする">
+            −
+          </Button>
+          <Box aria-live="polite" aria-label={`1 目盛りの幅 ${width}%`}
+               sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 52, px: 0.5,
+                     borderLeft: 1, borderRight: 1, borderColor: 'divider', typography: 'body2' }}>
+            {width}%
+          </Box>
+          <Button sx={button} disabled={!onWiden} onClick={onWiden || undefined} aria-label="1 目盛りの幅を広くする">
+            ＋
+          </Button>
+        </Paper>
+    );
+}
+
+// 画面に出している図の、今の位置と拡大の度合い { k, x, y }。(d3.svg の view。画面の x = 図の x × k + x)
+// 図をまだ描いていないときは、null。(描く前の Rectum は、初めの transform を、view と違う意味の値で持っている)
+function currentView (rectum) {
+    if (!rectum || typeof rectum.view!=='function' || typeof rectum.d3Element!=='function' || !rectum.d3Element())
+        return null;
+
+    return rectum.view();
 }
 
 // 予定を押したときの行き先へ移る。(行き先が無ければ、何もしない)
@@ -100,7 +177,7 @@ function open (link, navigate) {
         window.open(link.url, '_blank', 'noopener,noreferrer');
 }
 
-function Diagram ({ data, cycle }) {
+function Diagram ({ data, cycle, width, current }) {
     const nav = useNavigate();
 
     // 矢羽根を押したときには、いつも最新の関数を呼ぶ。
@@ -119,7 +196,7 @@ function Diagram ({ data, cycle }) {
     const grid = diagrams.schedule.grid;
 
     React.useEffect(()=> {
-        const scale = scheduleScale(data, cycle);
+        const scale = scheduleScale(data, cycle, width);
         const k = initialScale(box.current?.clientWidth || 1000, scale.size, data.columns);
 
         const r = new Rectum({
@@ -136,13 +213,14 @@ function Diagram ({ data, cycle }) {
 
         r.data(r.chewing({
             scale: { cycle: scale.cycle, from: scale.from, to: scale.to, size: scale.size },
-            style: graphStyle(scale.size, data.columns),
+            style: graphStyle(scale.size, data.columns, width),
             tree,
             events: { reaf: { click: (reaf)=> open(data.links[reaf.id()], navigate.current) } },
         }));
 
         setRectum(r);
-    }, [bindView, data, cycle, grid]);
+        current.current = r;
+    }, [bindView, data, cycle, width, grid, current]);
 
     return (
         <Box ref={box} sx={{ width: '100%', height: '100%' }}>

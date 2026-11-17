@@ -4,6 +4,10 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.8.1 (2026-11)
+
+- コードの変更は無い。(ihub.core 0.8.1 と、版をそろえるだけ)
+
 ## 0.8.0 (2026-11)
 
 ### 変更 (master_schedule: d3.yabane の入力と同じ形にする。yanqirenshi/iHub#188・#190)

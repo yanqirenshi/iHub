@@ -99,6 +99,16 @@ function writeView (key, view) {
     }
 }
 
+// 保管した位置を、図の外から読み書きする。(無い・壊れているときは null)
+// 図を作り直す前に、位置を合わせ直すのに使う。(例: Schedule の幅を変えたとき。0.8.1 から)
+export function readDiagramView (app_name, code) {
+    return readView(VIEW_KEY(app_name, code));
+}
+
+export function writeDiagramView (app_name, code, view) {
+    writeView(VIEW_KEY(app_name, code), view);
+}
+
 // 図のカメラを保管して戻す。戻り値の関数に、作った Rectum (d3 の図) を渡す。
 //
 //   const bindView = useDiagramView('er');
