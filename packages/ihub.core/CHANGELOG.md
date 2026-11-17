@@ -4,6 +4,16 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.8.2 (2026-11)
+
+### 変更 (艦橋の Schedule タブ: d3.yabane 0.6.0。yanqirenshi/iHub#198)
+
+- `dependencies` の `@yanqirenshi/d3.yabane` を `^0.6.0` に上げた。
+- 初めの拡大の度合いを、描いたあとの実際の幅で決め直す作り (位置を覚えていないとき) を、d3.yabane の描き終わりを知らせる口 `rectum.onDraw(fn)` で受けるようにした。(0.8.1 の、Rectum の `draw` を包む作り (`onFirstDraw`) は、やめた) 初めの 1 回だけ使うので、呼ばれた中で `onDraw(null)` で外す。動きは 0.8.1 と同じ。
+- 図を作り直すとき (サイクル・幅・データが変わったとき) は、前の図が測った名前の幅 (`rectum.labelWidths()`) を、新しい Rectum に渡す (`new Rectum({ labelWidths })`)。測り直しの描き直しが要らず、1 度の描画で済む。(前の図が無いとき (初めて開いたとき) は、渡さない。名前を書き換えたときは、新しい名前だけ、d3.yabane が測って描き直す)
+- 現在線: 今日が表示する期間の外のときは、出なくなった。(d3.yabane 0.6.0 の直し。iHub のコードの変更は無い。0.8.1 までは、時間軸の外に出ていた)
+- **利用側への影響**: 無い。(現在線が、時間軸の外に出なくなるだけ)
+
 ## 0.8.1 (2026-11)
 
 ### 追加 (艦橋の Schedule タブ: 1 目盛りの幅を、画面から変える。yanqirenshi/iHub#192)
