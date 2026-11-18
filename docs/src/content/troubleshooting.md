@@ -15,7 +15,7 @@
 | OAuth で認証したのに、「GitHub に接続していません。」のまま | `@yanqirenshi/ihub.srv` 0.4.x までに得たトークンには、`read:user` の権限がありません。0.5.0 にしたあとで、Scrum の Account タブから認証し直してください。 |
 | OAuth で認証して、しばらくすると (8 時間ほど)、GitHub から読み込めなくなる | OAuth App の「Expire user access tokens」が入っています。外して、認証し直してください。(API サーバーは、トークンを取り直しません) |
 | `ihub-srv` が見つからない・動かない | `@yanqirenshi/ihub.srv` が入っていません。`npm install` を実行してください。Node.js は 22 以上です。 |
-| `ihub-srv init` が、雛形が見つからないと言う | `@yanqirenshi/ihub.core` が入っていません。`npm install` を実行してください。(iHub のリポジトリの中では、`npm run build -w @yanqirenshi/ihub.core` で、雛形を作ってください) |
+| `ihub-srv init` が、「雛形 (examples/app) が見つかりません。」と言う | 実行したところに、`@yanqirenshi/ihub.core` が入っていません。`ihub-srv init` は、雛形を ihub.core から読みます。アプリのフォルダでは、`npm install` を実行してください。アプリの外で雛形を作るときは、`npx -p @yanqirenshi/ihub.srv ...` のように ihub.srv だけを入れるのではなく、[導入のしかた](#/setup) のように、`--package` で 2 つとも入れて実行してください。([iHub の更新](#/update) の「minor が上がったとき」の 5)(iHub のリポジトリの中では、`npm run build -w @yanqirenshi/ihub.core` で、雛形を作ってください) |
 | `npm start` ですぐに止まる | 画面のポート (3000) を、ほかのアプリが使っています。[ビルドと配信](#/build) の「ポートを変える」を見て、別のポートにしてください。 |
 | エディタで変えた内容が、画面に出ない | 画面が API サーバーとつながっていないことがあります。画面を読み直してください。 |
 | サイドメニューの項目が消えた | ドックのメニューのボタン (≡) で、非表示になっていないか確かめてください。 |
