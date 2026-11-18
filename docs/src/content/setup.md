@@ -44,7 +44,7 @@ npx --yes --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ih
 
 | ファイル・フォルダ | 内容 |
 |---|---|
-| `package.json` | 2 つのパッケージと、必要なパッケージ・`scripts`。(すでにあるときは、足りない項目だけを足します) |
+| `package.json` | 2 つのパッケージと、必要なパッケージ・`scripts`。(すでにあるときは、足りない項目だけを足します) 2 つのパッケージの版は、`init` に使った版の `^x.y.z` になります。(0.9.1 以降) |
 | `src/index.js` | 入り口。アプリの設定を組み立てて、iHub に渡します。([設定の渡し方](#/customize)) |
 | `src/Router.js` | ページの URL |
 | `src/components/` | 自分で作る部品を置くフォルダ (`assemblies/`・`pages/`・`panels/`・`parts/`)。中身は、それぞれの `README.md` だけです |
@@ -58,6 +58,8 @@ npx --yes --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ih
 | `.gitignore`・`.env.local.template` | git で共有しないもの・環境変数の雛形 |
 
 - 雛形の `package.json` は、React 19 を使います。(React 18 のままにするときは、`package.json` の `react`・`react-dom` を `^18.3.1` にします。iHub は、どちらでも動きます)
+- `package.json` に書く `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` の版は、`init` に使った版です。(例: 0.9.1 で作ると `^0.9.1`) すでにある `package.json` に、この 2 つが書いてあるときは、変えません。
+  0.9.0 までの `init --app` は、雛形の `^0.6.0` のまま書いていました。(0.x の `^` は minor の違う版を入れないので、`npm install` で 0.6.x が入ります) そのころに作ったアプリは、`package.json` の 2 つの版を、手で `^0.9.1` などに直して、`npm install` してください。
 - 同じ名前のファイルがあるときは、何も書かずに止まります。(`--force` で上書き、`--skip-existing` で、無いものだけを作ります)
 
 ## 2. パッケージを入れる

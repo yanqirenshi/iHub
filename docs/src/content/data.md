@@ -104,7 +104,8 @@
   4. `parent` も `project` も無いワークパッケージ
   5. `data/wbs/` に無い行き先の `wbs`・`wbs` と `url` の両方
   6. `id` の重なり
-- 予定は、画面からは書き換えられません。JSON を直接書きます。
+- 名前・予定の期間・見た目は、艦橋の Schedule タブで、矢羽根や箱を右クリックして、画面から書き換えられます。(0.9.0 以降。[図の編集](#/diagrams) の「Schedule で名前・予定・見た目を変える」。0.8.x までは、画面からは書き換えられませんでした)
+  レコードの追加と削除・親の付け替え・並び順・説明・行き先・`result`・`progress` は、JSON を直接書きます。
 - 図の描き方とできることは、コンポーネントの [Schedule](#/components/panels/bridge/Schedule) にあります。
 
 0.6.x までは、`wbs/workpackages.json` のワークパッケージに `plan` を書いていました。
