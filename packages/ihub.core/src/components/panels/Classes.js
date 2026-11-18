@@ -5,26 +5,22 @@ import Box from '@mui/material/Box';
 
 import { ClassDiagram } from '@yanqirenshi/d3.classes';
 import { ModelInspector } from '@yanqirenshi/colonoscope';
+import { ModelError, applyPatch, fieldsOf, findById, movePatch, titleOf, withDefaults } from '@yanqirenshi/model.classes';
 
 import { useConfig } from '../../config.js';
 import { useDiagramData, useDiagramView } from '../../manegers/diagram.js';
-import {
-    CLASSES_COLLECTIONS, ModelError, applyPatch, buildClassesData, fieldsOf, findById, movePatch, titleOf, withDefaults,
-} from '../../manegers/classes.js';
+import { CLASSES_COLLECTIONS, buildClassesData } from '../../manegers/classes.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../redux/api/dataApi.js';
 
 // 'classes' / 'relationships' を、data/ のコレクション名にする。
 const collectionName = (collection)=> `classes/${collection}`;
 
-// 線をクリックしたと見なす、線からの距離 (画面の px)。(線は 1px と細いため)
-const LINE_TOLERANCE = 6;
-
 // クラス (/classes) のクラス図タブ: d3.classes をコンテンツエリア一杯に表示する。
 // 図のデータは data/classes/ にあり、クラスの箱をドラッグすると、動かした位置を classes/classes に保存する。
-// 箱を右クリックするとクラス、線をクリック (か右クリック) すると関係を、右端のインスペクタに出し、項目を書き換えられる。
+// 箱を右クリックするとクラス、線をクリックか右クリックすると関係を、右端のインスペクタに出し、項目を書き換えられる。
 //
-// 図の知識 (編集できる項目・patch への変換・図に渡す形) は manegers/classes.js が持つ。
-// ここは view (d3.classes) と model (manegers/classes.js) とインスペクタ (colonoscope の ModelInspector) をつなぎ、
+// 図の知識 (編集できる項目・patch への変換) は @yanqirenshi/model.classes が持つ。(図に渡す形は manegers/classes.js)
+// ここは view (d3.classes) と model (model.classes) とインスペクタ (colonoscope の ModelInspector) をつなぎ、
 // model が返す { collection, id, patch } を PATCH /classes/{collection}/{id} で保存するだけ。(TM と同じ流儀)
 export default function Classes () {
     const { diagrams } = useConfig();
@@ -35,7 +31,7 @@ export default function Classes () {
     const collections = useCollections();
     const [patchRecord] = usePatchRecordMutation();
 
-    // 右クリック (線はクリック) した要素。{ collection: 'classes' | 'relationships', id }
+    // 右クリック (線はクリックも) した要素。{ collection: 'classes' | 'relationships', id }
     const [target, setTarget] = React.useState(null);
     const [error, setError] = React.useState(null);
 
@@ -51,12 +47,16 @@ export default function Classes () {
     const save = (change)=> patchRecord({ name: collectionName(change.collection), id: change.id, patch: change.patch }).unwrap();
 
     // ドラッグの終わり: 動かした位置を保存する。(図は動かし終えているので、作り直さない)
-    const onMove = async (id, position)=> {
+    // move は移動量 ({ dx, dy })。d3.classes は、動いたときだけ知らせる。
+    // 移動量は、描いたときのレコード (d3.classes の core) ではなく、id で引いた保存済みのレコードに足す。
+    // (保存のあと図を作り直さないので、core の位置は古いまま。同じ箱を 2 回動かすと、2 回目がずれる)
+    const onMove = async (id, move)=> {
         const found = recordOf({ collection: 'classes', id });
-        const change = found && movePatch(found, position);
 
-        if (!change)
+        if (!found)
             return;
+
+        const change = movePatch(found, move);
 
         try {
             await save(change);
@@ -119,46 +119,6 @@ export default function Classes () {
         </Box>
     );
 }
-
-// 点 (px, py) と線分 (a, b) の距離。
-function distanceToSegment (px, py, a, b) {
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const length = dx * dx + dy * dy;
-    const t = length===0 ? 0 : Math.max(0, Math.min(1, ((px - a.x) * dx + (py - a.y) * dy) / length));
-
-    return Math.hypot(px - (a.x + t * dx), py - (a.y + t * dy));
-}
-
-// 押した位置にある関係の id。(線は細いので、LINE_TOLERANCE の内なら、その線と見なす) 無ければ null。
-function relationshipAt (container, event) {
-    const direct = event.target.closest?.('g.relationship');
-
-    if (direct)
-        return direct.getAttribute('data-id');
-
-    let found = null;
-    let nearest = LINE_TOLERANCE;
-
-    for (const line of container.querySelectorAll('g.relationship line')) {
-        const matrix = line.getScreenCTM();
-
-        if (!matrix)
-            continue;
-
-        const point = (x, y)=> new DOMPoint(Number(line.getAttribute(x)), Number(line.getAttribute(y))).matrixTransform(matrix);
-        const distance = distanceToSegment(event.clientX, event.clientY, point('x1', 'y1'), point('x2', 'y2'));
-
-        if (distance <= nearest) {
-            nearest = distance;
-            found = line.closest('g.relationship').getAttribute('data-id');
-        }
-    }
-
-    return found;
-}
-
-const classAt = (event)=> event.target.closest?.('g.class-box')?.getAttribute('data-id') ?? null;
 
 // d3.classes のカメラ (ズーム・パン) を、useDiagramView に渡せる形にする。
 // d3.classes には、カメラを読み書きする口が無いので、d3-zoom が svg に持たせている現在値 (__zoom) と、
@@ -274,11 +234,25 @@ function Diagram (props) {
         const root = container.current;
         const disposers = [];
 
-        // 描いたクラスの入力。d3.classes はドラッグで、この position を書き換える。
-        const inputs = new Map(data.classes.map(d=> [d.id, d]));
+        // 操作の知らせ。(d3.classes 0.14.0 のコールバック)
+        // 右クリックのブラウザのメニューは、コールバックを渡していれば d3.classes が止める。
+        // 線は 1px と細いが、d3.classes が透明な太い線を重ねて、線の近くのクリックも受ける。
+        const inspectRelationship = (core)=> handlers.current.onInspect({ collection: 'relationships', id: core.id });
+
+        const callbacks = {
+            class: {
+                contextmenu: (core)=> handlers.current.onInspect({ collection: 'classes', id: core.id }),
+                // 動いたときだけ呼ばれる。move は移動量 ({ dx, dy })。core は描いたときの入力なので、id だけを使う。
+                dragend: (core, box, move)=> handlers.current.onMove(core.id, move),
+            },
+            relationship: {
+                click: inspectRelationship,
+                contextmenu: inspectRelationship,
+            },
+        };
 
         try {
-            const diagram = new ClassDiagram(root, { grid });
+            const diagram = new ClassDiagram(root, { grid, callbacks });
 
             diagram.loadFromData({ classes: data.classes, relationships: data.relationships }).render();
 
@@ -300,63 +274,7 @@ function Diagram (props) {
                 camera.fit();
         }
 
-        // d3.classes には、ドラッグの終わりと右クリックを知らせる口が無いので、DOM で拾う。
-        // d3-drag が mousedown・mouseup の伝播を止めるので、capture で拾う。
-        let dragging = null;
-
-        const onMouseDown = (event)=> {
-            dragging = event.button===0 ? classAt(event) : null;
-        };
-
-        const onMouseUp = ()=> {
-            if (!dragging)
-                return;
-
-            const id = dragging;
-            dragging = null;
-
-            const input = inputs.get(id);
-
-            if (input)
-                handlers.current.onMove(id, input.position);
-        };
-
-        const onContextMenu = (event)=> {
-            const class_id = classAt(event);
-            const relationship_id = class_id===null ? relationshipAt(root, event) : null;
-
-            if (class_id===null && relationship_id===null)
-                return;
-
-            event.preventDefault();
-
-            if (class_id!==null)
-                handlers.current.onInspect({ collection: 'classes', id: class_id });
-            else
-                handlers.current.onInspect({ collection: 'relationships', id: relationship_id });
-        };
-
-        const onClick = (event)=> {
-            if (classAt(event)!==null)
-                return;
-
-            const relationship_id = relationshipAt(root, event);
-
-            if (relationship_id!==null)
-                handlers.current.onInspect({ collection: 'relationships', id: relationship_id });
-        };
-
-        root.addEventListener('mousedown', onMouseDown, { capture: true });
-        window.addEventListener('mouseup', onMouseUp, { capture: true });
-        root.addEventListener('contextmenu', onContextMenu);
-        root.addEventListener('click', onClick);
-
         return ()=> {
-            root.removeEventListener('mousedown', onMouseDown, { capture: true });
-            window.removeEventListener('mouseup', onMouseUp, { capture: true });
-            root.removeEventListener('contextmenu', onContextMenu);
-            root.removeEventListener('click', onClick);
-
             for (const dispose of disposers)
                 dispose();
 

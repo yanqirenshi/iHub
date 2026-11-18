@@ -82,7 +82,7 @@
             },
             "header": {
                 "type": "object",
-                "description": "ヘッダー (クラス名の行) の見た目。d3.classes にそのまま渡す。(設定の diagrams.classes.header の色より優先する)",
+                "description": "ヘッダー (クラス名の行) の見た目。d3.classes にそのまま渡す。",
                 "properties": {
                     "background": {
                         "type": "object",

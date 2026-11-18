@@ -11,6 +11,18 @@
 - `examples/app/package.template.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、`^0.6.0` から `^0.9.1` にした。(`ihub-srv init --app` は、0.9.1 から、この版ではなく、動かしている版を書く。雛形の版は、パッケージの版とそろっていることを、`@yanqirenshi/ihub.srv` のテストで確かめる)
 - 画面の部品の変更は無い。
 
+### 変更 (クラス図: 図の知識を `@yanqirenshi/model.classes` に、操作の受け取りを d3.classes のコールバックに替える。yanqirenshi/iHub#206)
+
+- `dependencies` の `@yanqirenshi/d3.classes` を `^0.14.0` に上げ、`@yanqirenshi/model.classes` `^0.1.0` を足した。
+- インスペクタの項目・入力の検証・patch への変換 (`withDefaults`・`fieldsOf`・`titleOf`・`applyPatch`・`movePatch`) は、`manegers/classes.js` から model.classes に移った。(iHub のコードを移したもので、項目・文言・保存する patch は変わらない) `manegers/classes.js` に残るのは、iHub 固有のもの (`CLASSES_COLLECTIONS`・`buildClassesData`・設定によるヘッダーの色 `headerOf`) だけ。
+- 箱のドラッグの終わり・箱の右クリック・関係の線のクリックと右クリックは、DOM のリスナーで拾うのをやめ、d3.classes 0.14.0 のコールバック (`callbacks.class.dragend`・`callbacks.class.contextmenu`・`callbacks.relationship.click`・`callbacks.relationship.contextmenu`) で受ける。
+- 動かした位置は、移動量 (`dragend` の `{ dx, dy }`) を、id で引いた保存済みのレコードの位置に足して保存する。(d3.classes 0.14.0 は、入力の `position` を書き換えない) 動かさずに離したとき (クリック) は、これまでどおり保存しない。
+- クラス・属性・メソッドの名前は、文字列でも組でも、そのまま d3.classes に渡す。(d3.classes 0.14.0 が両方を受ける)
+- **利用側から見える違い**:
+  - 関係の線は、クリックでも右クリックでも開ける。(右クリックは 0.9.0 でも開けた。線の右クリックでブラウザのメニューが出ないのも、0.9.0 と同じ)
+  - 関係の線の当たりが、線から 6px 以内から、約 4px 以内 (d3.classes が重ねる、透明な 9px の線) になった。これまでの 6px は画面の上の距離だったが、新しい当たりは図と一緒に拡大・縮小する。(拡大が 100% のとき約 4px、縮小して 58% のときは約 2.5px)
+  - データの形・設定の形は、変わらない。(データの移行は無い)
+
 ## 0.9.0 (2026-11)
 
 ### 追加 (艦橋の Schedule タブ: 右クリックで、インスペクタを出して書き換える。yanqirenshi/iHub#204)

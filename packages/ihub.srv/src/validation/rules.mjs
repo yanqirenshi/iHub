@@ -4,6 +4,7 @@
 // 2 つ目の引数 (all) は、データ全体 ({ 'wbs/projects': [...], ... })。ドメインをまたぐ検査に使う。
 // データ全体の検証 (validateData・ihub-srv check) のときだけ渡る。(API サーバーがドメインごとに検証するときは、渡らないので、またぐ検査は飛ばす)
 
+import { check as checkClasses } from '@yanqirenshi/model.classes';
 import { check as checkEr } from '@yanqirenshi/model.er';
 import { check as checkTm } from '@yanqirenshi/model.tm';
 import { check as checkSitemap } from '@yanqirenshi/model.sitemap';
@@ -143,31 +144,11 @@ function checkMasterSchedule ({ projects, wbs, workpackages }, all = null) {
     return errors;
 }
 
-// クラス図: クラスと関係の id の重複 (d3.classes は重複すると例外にする) と、関係の端のクラスがあること。
-function checkClasses ({ classes, relationships }) {
-    const errors = [];
-
-    const ids = checkUnique(errors, 'classes/classes', classes);
-
-    checkUnique(errors, 'classes/relationships', relationships);
-
-    for (const d of relationships) {
-        for (const end of ['from', 'to']) {
-            const class_id = d[end].classId;
-
-            if (class_id!==undefined && !ids.has(class_id))
-                errors.push(`classes/relationships: ${end}.classId のクラスが見つかりません。(id=${d.id}, classId=${class_id})`);
-        }
-    }
-
-    return errors;
-}
-
 export const RULES = {
     wbs:        checkWbs,
     master_schedule: checkMasterSchedule,
-    classes:    checkClasses,
     // 図の検査は、図ごとの model.* パッケージが持つ。(文言は、もとここにあった検査と同じ)
+    classes:    (data)=> checkClasses(data, 'classes/'),
     er:         (data)=> checkEr(data, 'er/'),
     tm:         (data)=> checkTm(data, 'tm/'),
     sitemap:    (data)=> checkSitemap(data, 'sitemap/'),

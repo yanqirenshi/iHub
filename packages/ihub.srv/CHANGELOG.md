@@ -13,6 +13,12 @@
 - すでにある `package.json` に、iHub のパッケージが書いてあるときは、これまでどおり変えない。
 - **利用側への影響**: 0.9.0 以前の `init --app` で作ったアプリは、`package.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、手で `^0.9.1` などに直してください。
 
+### 変更 (クラス図の検査とスキーマを、model.classes のものにする。yanqirenshi/iHub#206)
+
+- `dependencies` に `@yanqirenshi/model.classes` `^0.1.0` を足した。(yanqirenshi/iHub#206)
+- `classes` ドメインの検査 (クラスと関係の id の重複・関係の端のクラスがあること) を、自前の `checkClasses` から、model.classes の `check(data, 'classes/')` に替えた。(検査と文言は同じ)
+- `schemas/classes/{classes,relationships}.schema.json` を、model.classes の `SCHEMAS` の内容にした。違いは、`classes` の `header` の説明から「(設定の diagrams.classes.header の色より優先する)」の 1 文が無くなったことだけ。(スキーマの形・検査は、変わらない。データの移行は無い)
+
 ## 0.9.0 (2026-11)
 
 - コードの変更は無い。(ihub.core 0.9.0 と、版をそろえるだけ)
