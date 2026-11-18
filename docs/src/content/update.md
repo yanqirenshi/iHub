@@ -10,11 +10,11 @@ iHub 本体 (`@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`) は `node_modul
 npm update @yanqirenshi/ihub.core @yanqirenshi/ihub.srv
 ```
 
-- `package.json` の範囲 (例: `^0.8.0`) の中で、新しい版に上がります。
-- 0.x の間は、`^0.8.0` は 0.8.x だけを指します。minor (0.9.0 など) に上げるときは、範囲を書き換えます。
+- `package.json` の範囲 (例: `^0.9.0`) の中で、新しい版に上がります。
+- 0.x の間は、`^0.9.0` は 0.9.x だけを指します。minor (0.10.0 など) に上げるときは、範囲を書き換えます。
 
 ```
-npm install @yanqirenshi/ihub.core@^0.8.0 @yanqirenshi/ihub.srv@^0.8.0
+npm install @yanqirenshi/ihub.core@^0.9.0 @yanqirenshi/ihub.srv@^0.9.0
 ```
 
 - 2 つのパッケージは、同じ版にそろえてください。
@@ -27,12 +27,12 @@ npm ls @yanqirenshi/ihub.core @yanqirenshi/ihub.srv
 ```
 
 ```
-+-- @yanqirenshi/ihub.core@0.8.2
-`-- @yanqirenshi/ihub.srv@0.8.2
++-- @yanqirenshi/ihub.core@0.9.1
+`-- @yanqirenshi/ihub.srv@0.9.1
 ```
 
 - 出力の最初の行には、アプリの名前と場所が出ます。
-その下の 2 行の `@` のあとの版が、同じになっていれば大丈夫です。(上は 0.8.2 の例です)
+その下の 2 行の `@` のあとの版が、同じになっていれば大丈夫です。(上は 0.9.1 の例です)
 - 版が違うときは、片方に、`package.json` の範囲に合わない版として `invalid` が付くことがあります。
 上の `npm install` で、同じ版を指定して、入れ直してください。
 
@@ -101,7 +101,7 @@ npx ihub-srv init --app --only src/operators --only src/wbs
 ## 0.6.x から 0.7.0 以降に上げるとき
 
 0.7.0・0.8.0 では、データのフォーマットと、図の既定の見た目が変わりました。
-`@yanqirenshi/ihub.core` と `@yanqirenshi/ihub.srv` を、同じ版 (0.8.x) にそろえてから、次のものを直します。
+`@yanqirenshi/ihub.core` と `@yanqirenshi/ihub.srv` を、同じ版 (0.8.0 以降) にそろえてから、次のものを直します。
 
 ### ワークパッケージの `plan` を書いていたとき
 
@@ -130,3 +130,24 @@ d3.* で描く 7 つの図は、0.7.0 から、既定ではグリッド線を描
 - Schedule タブの名前の列の幅が、名前に合うようになります。(0.8.1)
 - Schedule タブの現在線 (今日の位置の縦の線) は、今日が表示する期間の外のときは、描かなくなります。(0.8.2)
 - Schedule タブの図の位置は、0.6.x で覚えたものを使わず、初めの位置で開きます。(図の code が、サイクルごとに分かれたため)
+
+0.9.0 以降で変わったところは、次の「0.8.x から 0.9.x に上げるとき」を見てください。
+
+## 0.8.x から 0.9.x に上げるとき
+
+0.9.0・0.9.1 では、データのフォーマットと設定の形は、0.8.x から変わっていません。
+(0.8.3 は、npm に出していません。中身は、0.9.0 に入っています)
+`package.json` の 2 つのパッケージの範囲を `^0.9.0` などに書き換えて、上の「新しくする」の `npm install` で入れ直します。
+
+### `init --app` で作ったアプリ
+
+0.9.0 までの `npx ihub-srv init --app` で作ったアプリは、`package.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` が、雛形の `^0.6.0` のままになっています。
+このままでは、`npm update` しても、0.6.x のままです。(0.x の `^` は、minor の違う版を入れません)
+2 つの版を、`^0.9.1` などに直してから、`npm install` してください。
+0.9.1 以降の `init --app` は、`init` に使った版を書きます。([導入のしかた](#/setup))
+
+### 見え方が変わるところ (直さなくてよいもの)
+
+- Schedule タブで、入れ子の子どうしの間にも、行の区切り線を引きます。(0.9.0) 入れ子の無いデータは、0.8.x と同じ見え方です。
+- Schedule タブで、矢羽根・WBS の箱・プロジェクトの箱を右クリックすると、インスペクタで、名前・予定・見た目を書き換えられます。(0.9.0) 書き換えると、`data/master_schedule/` のファイルが変わります。([図の編集](#/diagrams) の「Schedule で名前・予定・見た目を変える」)
+- クラス図の関係の線の当たり (線の近くをクリックしても、線が開く幅) が、画面の上の 6px から、拡大が 100% のときの約 4px になり、図と一緒に拡大・縮小します。(0.9.1)

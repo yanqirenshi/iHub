@@ -27,7 +27,7 @@ Docs のページは、モデリングの手法などの参考資料をまとめ
 
 | ページ | URL | 内容 |
 |---|---|---|
-| 艦橋 | `/` | タブ: Cockpit (自分が担当している GitHub の Issue のうち、今日が Plan の期間に入っているものと、NextAction.Date が入っているものを、NextAction.Date の近い順にカードで並べる)・Overview (ポンチ絵。ノードをドラッグすると位置を保存する)・Schedule (`data/master_schedule/` の予定を、矢羽根で並べる。目盛りのサイクル (日・週・月) と 1 目盛りの幅を、ボタンで変えられる。見るだけ) |
+| 艦橋 | `/` | タブ: Cockpit (自分が担当している GitHub の Issue のうち、今日が Plan の期間に入っているものと、NextAction.Date が入っているものを、NextAction.Date の近い順にカードで並べる)・Overview (ポンチ絵。ノードをドラッグすると位置を保存する)・Schedule (`data/master_schedule/` の予定を、矢羽根で並べる。目盛りのサイクル (日・週・月) と 1 目盛りの幅を、ボタンで変えられる。矢羽根・箱を右クリックすると、インスペクタで書き換えられる) |
 | ビジネス | `/business` | タブ: SYSTEMIC DESIGN・TM・機能一覧・WBS・HELP |
 | 画面 | `/screens` | タブ: 画面遷移図・画面・WBS・Help |
 | データ | `/data` | タブ: ER図・WBS・HELP |
@@ -38,7 +38,7 @@ Docs のページは、モデリングの手法などの参考資料をまとめ
 
 - 艦橋のページは、0.2.x まで「コックピット」という名前でした。(0.3.0 で改めました。中のタブの「Cockpit」は、名前が変わっていません)
 - 艦橋の Cockpit タブの絞り込みと並びは、0.5.0 からです。(0.4.x までは、担当の Issue を全部、読み込んだ順に出していました) カードには、NextAction の日付を出し、過ぎた日付は赤で出します。決まりは [GitHub との連携](#/github) の「Cockpit タブに出す Issue」にあります。
-- 艦橋の Schedule タブは、0.4.0 で足しました。予定は、0.7.0 から `data/master_schedule/` に書きます。(書き方は [データの管理](#/data) の「Schedule の予定 (`master_schedule`)」、図でできることは [Schedule](#/components/panels/bridge/Schedule))
+- 艦橋の Schedule タブは、0.4.0 で足しました。予定は、0.7.0 から `data/master_schedule/` に書きます。0.9.0 から、図の要素を右クリックして、名前・予定・見た目を書き換えられます。(0.8.x までは、見るだけでした) (書き方は [データの管理](#/data) の「Schedule の予定 (`master_schedule`)」、図でできることは [Schedule](#/components/panels/bridge/Schedule))
 - Scrum の Timeline・Gantt Chart・Issues・Pull Requests のタブは、中身が無かったため、0.3.0 で外しました。
 
 図の編集のしかたは [図の編集](#/diagrams)、WBS は [WBS](#/wbs) を見てください。
