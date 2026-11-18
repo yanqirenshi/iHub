@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.9.0 (2026-11)
+
+- `@yanqirenshi/ihub.core`: 艦橋の Schedule タブで、矢羽根・WBS の箱・プロジェクトの箱を右クリックすると、右端にインスペクタが出て、名称・見た目 (背景色・枠線・文字)・予定の開始日と終了日 (矢羽根だけ) を書き換えられるようにした。(yanqirenshi/iHub#204。作りは Overview タブと同じ。変えた項目だけを `PATCH /api/master_schedule/{collection}/{id}` で保存する。並び順は出さない) `@yanqirenshi/d3.yabane` を `^0.8.0` に上げ、`@yanqirenshi/model.yabane` `^0.1.1` を足した。
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(ihub.core 0.9.0 と、版をそろえるだけ。インスペクタの保存は、今の `master_schedule/*` のスキーマとルールを通る)
+
 ## 0.8.3 (2026-11)
 
 - `@yanqirenshi/ihub.core`: `@yanqirenshi/d3.yabane` を `^0.7.0` に上げた。(yanqirenshi/iHub#202) 艦橋の Schedule タブで、行の区切り線を、入れ子の子どうし (子の WBS・直下のワークパッケージの帯) の間にも引くようになった。iHub のコードの変更は無い。
