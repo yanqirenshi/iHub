@@ -4,6 +4,19 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.9.2 (2026-11)
+
+### 修正 (クラス図の関係の線・TM の結線の当たりが、縮小すると狭くなる。yanqirenshi/iHub#212)
+
+- `dependencies` の `@yanqirenshi/d3.classes` を `^0.14.1` に、`@yanqirenshi/d3.ter` を `^0.4.2` に上げた。(範囲は、0.9.1 のままでも、この 2 つを受けられる。下限を上げたのは、lock を持っているアプリが ihub.core を上げたときに、直った版が必ず入るようにするため)
+- 2 つとも、線に重ねる透明な当たりの線を、`vector-effect: non-scaling-stroke` で描くようになった。(Foolsgolds/Assholes#209) 当たりの太さが、図の拡大率ではなく、画面の px で決まる。
+- iHub のコードの変更は無い。(当たりの太さ `style().relationship.hit.width` を設定しているところは無い)
+- 雛形の `examples/app/package.template.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、`^0.9.2` にした。
+- **利用側から見える違い**:
+  - クラス図の関係の線と、TM の結線の当たりが、拡大率に関わらず、線から約 4.5px になった。(0.9.1 は、図と一緒に拡大・縮小して、100% で約 4px、50% で約 2px、25% で約 1px だった)
+  - 100% のときの動きは、変わらない。
+  - データの形・設定の形は、変わらない。(データの移行は無い)
+
 ## 0.9.1 (2026-11)
 
 ### 修正 (雛形のアプリの package.json の iHub の版。yanqirenshi/iHub#207)

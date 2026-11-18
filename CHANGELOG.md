@@ -10,6 +10,12 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.9.2 (2026-11)
+
+- `@yanqirenshi/ihub.core`: `@yanqirenshi/d3.classes` を `^0.14.1`、`@yanqirenshi/d3.ter` を `^0.4.2` に上げた。(yanqirenshi/iHub#212) クラス図の関係の線と、TM の結線の当たり (クリック・右クリックが届く範囲) が、図を縮小しても狭くならず、拡大率に関わらず線から約 4.5px になった。(0.9.1 は、100% で約 4px、50% で約 2px だった) 100% のときの動きは変わらない。iHub のコードの変更は無い。データの形・設定の形は変わらない。
+- `@yanqirenshi/ihub.core`: 雛形の `examples/app/package.template.json` の iHub の版を、`^0.9.2` にそろえた。
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(ihub.core 0.9.2 と、版をそろえるだけ)
+
 ## 0.9.1 (2026-11)
 
 - `@yanqirenshi/ihub.srv`: `ihub-srv init --app` で作る `package.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、init に使った版 (`^0.9.1` など) にするようにした。(yanqirenshi/iHub#207) これまでは、雛形に書いた `^0.6.0` のままで、`npm install` で 0.6.x が入っていた。
