@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.9.1 (2026-11)
+
+- `@yanqirenshi/ihub.srv`: `ihub-srv init --app` で作る `package.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、init に使った版 (`^0.9.1` など) にするようにした。(yanqirenshi/iHub#207) これまでは、雛形に書いた `^0.6.0` のままで、`npm install` で 0.6.x が入っていた。
+- `@yanqirenshi/ihub.core`: 雛形の `examples/app/package.template.json` の iHub の版を、`^0.9.1` にそろえた。
+
 ## 0.9.0 (2026-11)
 
 - `@yanqirenshi/ihub.core`: 艦橋の Schedule タブで、矢羽根・WBS の箱・プロジェクトの箱を右クリックすると、右端にインスペクタが出て、名称・見た目 (背景色・枠線・文字)・予定の開始日と終了日 (矢羽根だけ) を書き換えられるようにした。(yanqirenshi/iHub#204。作りは Overview タブと同じ。変えた項目だけを `PATCH /api/master_schedule/{collection}/{id}` で保存する。並び順は出さない) `@yanqirenshi/d3.yabane` を `^0.8.0` に上げ、`@yanqirenshi/model.yabane` `^0.1.1` を足した。

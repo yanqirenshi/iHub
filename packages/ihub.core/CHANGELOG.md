@@ -4,6 +4,13 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.9.1 (2026-11)
+
+### 修正 (雛形のアプリの package.json の iHub の版。yanqirenshi/iHub#207)
+
+- `examples/app/package.template.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、`^0.6.0` から `^0.9.1` にした。(`ihub-srv init --app` は、0.9.1 から、この版ではなく、動かしている版を書く。雛形の版は、パッケージの版とそろっていることを、`@yanqirenshi/ihub.srv` のテストで確かめる)
+- 画面の部品の変更は無い。
+
 ## 0.9.0 (2026-11)
 
 ### 追加 (艦橋の Schedule タブ: 右クリックで、インスペクタを出して書き換える。yanqirenshi/iHub#204)

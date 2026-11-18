@@ -8,6 +8,7 @@
 import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 import { createApp, serve } from '../src/index.mjs';
@@ -174,6 +175,23 @@ const APP_RENAMES = { 'gitignore': '.gitignore', 'env.local.template': '.env.loc
 // package.json に重ねるときの、雛形のオブジェクトの項目。(無いキーだけを足す)
 const PACKAGE_FIELDS = ['dependencies', 'overrides', 'scripts'];
 
+// 雛形の dependencies の iHub のパッケージの版を、いま動かしている版にする。
+// ihub.srv は、この CLI のパッケージの版。ihub.core は、雛形 (from = examples/app) を取り出したパッケージの版。
+// (テンプレートに書いた版は、版を上げるたびに古くなりうるので、使わない。0.x の ^ は、minor が違う版を入れない)
+function withIhubVersions (template, from) {
+    const versionOf = (file)=> JSON.parse(readFileSync(file, 'utf8')).version;
+    const versions = {
+        '@yanqirenshi/ihub.core': versionOf(join(from, '..', '..', 'package.json')),
+        '@yanqirenshi/ihub.srv':  versionOf(fileURLToPath(new URL('../package.json', import.meta.url))),
+    };
+    const dependencies = { ...template.dependencies };
+
+    for (const [name, version] of Object.entries(versions))
+        dependencies[name] = `^${version}`;
+
+    return { ...template, dependencies };
+}
+
 // 作業フォルダの package.json に、雛形の項目を足す。(すでにある項目は変えない)
 // 戻り値は、足した項目の説明の配列。
 function mergePackageJson (file, template, out) {
@@ -278,7 +296,7 @@ function initApp (dir, { force = false, skip_existing = false, only = [] } = {})
     if (only_paths.length > 0)
         return 0;
 
-    const template = JSON.parse(readFileSync(join(from, 'package.template.json'), 'utf8'));
+    const template = withIhubVersions(JSON.parse(readFileSync(join(from, 'package.template.json'), 'utf8')), from);
     const added = mergePackageJson(join(out, 'package.json'), template, out);
 
     if (added.length > 0)

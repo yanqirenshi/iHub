@@ -4,6 +4,15 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.9.1 (2026-11)
+
+### 修正 (init --app で作る package.json の iHub の版。yanqirenshi/iHub#207)
+
+- `ihub-srv init --app` が、作る (足す) `package.json` の `dependencies` に、`@yanqirenshi/ihub.srv` はこの CLI の版を、`@yanqirenshi/ihub.core` は雛形を取り出したコアの版を、`^x.y.z` で書くようにした。雛形 (`package.template.json`) に書いた版は、使わない。
+- これまでは、雛形の `^0.6.0` のままだった。0.x の `^` は minor が違う版を入れないので、0.9.0 で作ったアプリでも、`npm install` で 0.6.1 が入っていた。
+- すでにある `package.json` に、iHub のパッケージが書いてあるときは、これまでどおり変えない。
+- **利用側への影響**: 0.9.0 以前の `init --app` で作ったアプリは、`package.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、手で `^0.9.1` などに直してください。
+
 ## 0.9.0 (2026-11)
 
 - コードの変更は無い。(ihub.core 0.9.0 と、版をそろえるだけ)
