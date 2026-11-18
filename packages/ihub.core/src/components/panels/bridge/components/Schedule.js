@@ -10,9 +10,12 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 import D3Yabane, { Rectum, Pippala } from '@yanqirenshi/d3.yabane';
+import { ModelInspector } from '@yanqirenshi/colonoscope';
+import { ModelError, applyPatch, fieldsOf, titleOf, withDefaults } from '@yanqirenshi/model.yabane';
 
 import { useConfig } from '../../../../config.js';
-import { readDiagramView, useDiagramData, useDiagramView, writeDiagramView } from '../../../../manegers/diagram.js';
+import { findRecord, readDiagramView, useDiagramData, useDiagramView, writeDiagramView } from '../../../../manegers/diagram.js';
+import { errorMessage, useCollections, usePatchRecordMutation } from '../../../../redux/api/dataApi.js';
 import {
     COLUMN_GAP, CYCLE_KEY, ROW_MARGIN, SCHEDULE_COLLECTIONS, SCHEDULE_CYCLES, UNIT_WIDTH, WIDTH_KEY,
     buildScheduleData, columnsWidth, headOfWidth, readCycle, readWidth, rowColumnWidth, scheduleScale, stepWidth,
@@ -47,14 +50,28 @@ function initialScale (width, total) {
 const INITIAL_LEFT = 100;
 const INITIAL_TOP = 60;
 
+// インスペクタの幅。(Overview と同じ)
+const INSPECTOR_WIDTH = 320;
+
+// model.yabane のコレクション ('projects' / 'wbs' / 'workpackages') を、data/ のコレクション名にする。
+const collectionName = (collection)=> `master_schedule/${collection}`;
+
 // 艦橋 (Bridge) の Schedule タブ: data/master_schedule/ のプロジェクト・WBS・ワークパッケージを、d3.yabane の矢羽根で並べる。(0.7.0 以降)
 // プロジェクトは、いちばん左の列。(0.8.0 から) その右に、WBS が入れ子の列で並び、ワークパッケージが矢羽根になる。
-// 見るだけ。矢羽根を押すと、ワークパッケージの行き先へ移る。wbs があれば /wbs/{id}、url があれば新しいタブで開く。どちらも無ければ、何もしない。
+// 矢羽根を押すと、ワークパッケージの行き先へ移る。wbs があれば /wbs/{id}、url があれば新しいタブで開く。どちらも無ければ、何もしない。
+// 矢羽根・WBS の箱・プロジェクトの箱を右クリックすると、右端にインスペクタを出し、項目を書き換えられる。(0.9.0 から)
 // 予定の期間は、workpackages.json の各レコードの plan: { from, to } ('YYYY-MM-DD') に書く。
 // 時間の目盛りのサイクル (日・週・月) は、右上のボタンで切り替える。選んだものは、ブラウザに覚える。(初めは週)
 // 1 目盛りの幅は、その左の「−」「＋」で、段 (50%〜400%) を上り下りする。選んだものは、サイクルごとにブラウザに覚える。(初めは 100%。0.8.1 から)
+//
+// インスペクタの作りは、Overview タブと同じ。図ごとの知識 (編集できる項目・検証・patch への変換・d3.yabane の既定の見た目) は
+// @yanqirenshi/model.yabane が持つ。ここは view (d3.yabane) と model (model.yabane) とインスペクタ (colonoscope の ModelInspector) をつなぎ、
+// model が返す { collection, id, patch } を PATCH /api/master_schedule/{collection}/{id} で保存するだけ。
+// 並び順 (order) は出さない。(iHub は、プロジェクトと WBS を、ファイルの配列の順で並べる。buildScheduleData が order を振る)
 export default function Schedule () {
-    const { data, version } = useDiagramData(SCHEDULE_COLLECTIONS, buildScheduleData);
+    const { data, version, rebuild } = useDiagramData(SCHEDULE_COLLECTIONS, buildScheduleData);
+    const collections = useCollections();
+    const [patchRecord] = usePatchRecordMutation();
 
     const { app } = useConfig();
     const cycle_key = CYCLE_KEY(app.name);
@@ -68,6 +85,72 @@ export default function Schedule () {
 
     // 今、画面に出している図。(幅を変えるとき、位置をまだ保管していなければ、今の位置と拡大の度合いを使う)
     const rectum = React.useRef(null);
+
+    // 右クリックした要素。{ collection: 'projects' | 'wbs' | 'workpackages', id }
+    // サイクルや幅を変えても (図を作り直しても)、開いたまま。
+    const [target, setTarget] = React.useState(null);
+    const [error, setError] = React.useState(null);
+
+    // レコードは、読み込んだデータ (保存のたびに差し替わる) から id で引く。
+    // d3.yabane に渡したデータ (コールバックの core) は、名前を省略したり、親を付け替えたりしているので、使わない。
+    const latest = React.useRef(collections);
+    latest.current = collections;
+
+    const recordOf = ({ collection, id })=> findRecord(latest.current[collectionName(collection)] || [], 'id', id);
+
+    // インスペクタに渡すのは、d3.yabane の既定の見た目を重ねたレコード。(書いていない色なども、図に描いている値が初期値に出る)
+    // (iHub は、箱と矢羽根の見た目 (d3.yabane の looks。レコードの background・stroke・font に重なる既定) を上書きしていないので、重ねるのは withDefaults だけ)
+    const record = target ? recordOf(target) : null;
+    const current = React.useMemo(()=> record ? withDefaults(record, target.collection) : null, [record, target]);
+
+    // ほかからデータが変わって、選んでいたレコードが無くなったら、インスペクタを閉じる。
+    React.useEffect(()=> {
+        if (target && !record)
+            setTarget(null);
+    }, [target, record]);
+
+    // 右クリック: どの知らせかで、コレクションが決まる。(プロジェクトと WBS は、同じ id でもよい)
+    const inspect = React.useCallback((collection, id)=> setTarget({ collection, id }), []);
+
+    // model が返した変更 ({ collection, id, patch }) を保存して、図を作り直す。
+    // 作り直しても、位置・拡大・サイクル・1 目盛りの幅は変えない。
+    // (位置をまだ保管していない (開いてから動かしていない) ときは、今の位置を保管してから作り直す。保管しないと、初めの拡大の度合いで収め直すため)
+    const saveAndRebuild = async (change)=> {
+        const code = `schedule:${cycle}`;
+
+        if (!readDiagramView(app.name, code)) {
+            const view = currentView(rectum.current);
+
+            if (view)
+                writeDiagramView(app.name, code, view);
+        }
+
+        rebuild();
+
+        try {
+            await patchRecord({ name: collectionName(change.collection), id: change.id, patch: change.patch }).unwrap();
+        } catch (e) {
+            // 保存できなかったときは、作り直すのをやめる。
+            rebuild(false);
+            throw e;
+        }
+    };
+
+    // 適用: 変えた項目だけが patch に入る。変更が無ければ、何もしない。不正な値は ModelError (利用者向けの日本語)。
+    const onApply = async (values)=> {
+        setError(null);
+
+        try {
+            const change = applyPatch(record, values, target.collection);
+
+            if (Object.keys(change.patch).length===0)
+                return;
+
+            await saveAndRebuild(change);
+        } catch (e) {
+            setError(e instanceof ModelError ? e.message : errorMessage(e, '変更を保存できません。'));
+        }
+    };
 
     const changeCycle = (e, next)=> {
         // 選んでいるボタンをもう一度押したときは、null が来る。(選んだままにする)
@@ -120,10 +203,12 @@ export default function Schedule () {
     // ほかからデータが変わったとき・サイクルや幅を変えたときは、図を作り直す。(位置と拡大は、サイクルごとに保管した値で戻る)
     return (
         <Box ref={box} sx={{ position: 'relative', width: '100%', height: '100%' }}>
-          <Diagram key={`${version}:${cycle}:${width}`} data={data} cycle={cycle} width={width} current={rectum}/>
+          <Diagram key={`${version}:${cycle}:${width}`} data={data} cycle={cycle} width={width} current={rectum} onInspect={inspect}/>
 
-          {/* 図の右上。(図にかぶらないように、背景を付ける。左はサイドメニューがあるので、右に置く) */}
-          <Stack direction="row" spacing={1} sx={{ position: 'absolute', top: 8, right: 16 }}>
+          {/* 図の右上。(図にかぶらないように、背景を付ける。左はサイドメニューがあるので、右に置く)
+              インスペクタを開いているあいだは、その左へずらす。(インスペクタに隠れずに、押せるように) */}
+          <Stack direction="row" spacing={1}
+                 sx={{ position: 'absolute', top: 8, right: current ? INSPECTOR_WIDTH + 16 : 16 }}>
             <WidthControl width={width}
                           onNarrow={stepWidth(width, -1)===null ? null : ()=> changeWidth(-1)}
                           onWiden={stepWidth(width, 1)===null ? null : ()=> changeWidth(1)}/>
@@ -138,6 +223,23 @@ export default function Schedule () {
               ))}
             </ToggleButtonGroup>
           </Stack>
+
+          {/* 項目は model (fieldsOf) が決める。コンテンツエリアの右端に、上から下まで。(Overview と同じ) */}
+          <ModelInspector target={current}
+                          fields={(t)=> fieldsOf(t, target.collection)}
+                          title={titleOf}
+                          hide={['order']}
+                          width={INSPECTOR_WIDTH}
+                          onApply={onApply}
+                          onClose={()=> setTarget(null)}
+                          style={{ position: 'absolute', top: 0, right: 0, bottom: 0, zIndex: 5 }}/>
+
+          {/* 右上のボタンにかからないように、その下に出す。左は、サイドメニューにかからないようにする。(予定が無いときの知らせと同じ) */}
+          {error &&
+           <Alert severity="error" onClose={()=> setError(null)}
+                  sx={{ position: 'absolute', top: 56, left: 111, right: current ? INSPECTOR_WIDTH + 8 : 8, whiteSpace: 'pre-wrap' }}>
+             {error}
+           </Alert>}
         </Box>
     );
 }
@@ -201,12 +303,15 @@ function open (link, navigate) {
         window.open(link.url, '_blank', 'noopener,noreferrer');
 }
 
-function Diagram ({ data, cycle, width, current }) {
+function Diagram ({ data, cycle, width, current, onInspect }) {
     const nav = useNavigate();
 
-    // 矢羽根を押したときには、いつも最新の関数を呼ぶ。
+    // 矢羽根を押したとき・右クリックしたときには、いつも最新の関数を呼ぶ。
     const navigate = React.useRef(nav);
     navigate.current = nav;
+
+    const inspect = React.useRef(onInspect);
+    inspect.current = onInspect;
 
     const box = React.useRef(null);
     const [rectum, setRectum] = React.useState(null);
@@ -252,7 +357,17 @@ function Diagram ({ data, cycle, width, current }) {
             scale: { cycle: scale.cycle, from: scale.from, to: scale.to, size: scale.size },
             style: graphStyle(scale.size, data.columns, width),
             tree,
-            events: { reaf: { click: (reaf)=> open(data.links[reaf.id()], navigate.current) } },
+            // 左クリック: 矢羽根の行き先へ移る。
+            // 右クリック (d3.yabane 0.8.0 から): インスペクタを出す。d.core() は d3.yabane に渡したレコードで、id だけを使う。
+            // (知らせの種類で、コレクションが決まる。プロジェクトの d.id() は 'project-<id>' なので、使わない)
+            events: {
+                reaf: {
+                    click: (reaf)=> open(data.links[reaf.id()], navigate.current),
+                    contextmenu: (d)=> inspect.current('workpackages', d.core().id),
+                },
+                branch: { contextmenu: (d)=> inspect.current('wbs', d.core().id) },
+                project: { contextmenu: (d)=> inspect.current('projects', d.core().id) },
+            },
         }));
 
         setRectum(r);

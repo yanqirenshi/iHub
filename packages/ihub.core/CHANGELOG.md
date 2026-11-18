@@ -4,6 +4,21 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.9.0 (2026-11)
+
+### 追加 (艦橋の Schedule タブ: 右クリックで、インスペクタを出して書き換える。yanqirenshi/iHub#204)
+
+- `dependencies` の `@yanqirenshi/d3.yabane` を `^0.8.0` に上げ、`@yanqirenshi/model.yabane` `^0.1.1` を足した。
+- 矢羽根 (ワークパッケージ)・WBS の箱・プロジェクトの箱を右クリックすると、コンテンツエリアの右端に、インスペクタ (colonoscope の `ModelInspector`) を出す。(d3.yabane 0.8.0 の `events.reaf.contextmenu`・`events.branch.contextmenu`・`events.project.contextmenu`。ブラウザのメニューは出ない。図の何も無いところでは、これまでどおりブラウザのメニューが出る)
+- 作りは、Overview タブと同じ。編集できる項目・検証・patch への変換・d3.yabane の既定の見た目は、model.yabane (`fieldsOf`・`applyPatch`・`withDefaults`・`titleOf`) が決める。iHub は、model が返す `{ collection, id, patch }` を `PATCH /api/master_schedule/{collection}/{id}` で保存するだけ。
+- 出す項目: 名称・ID (読むだけ)・背景色・枠線の色・枠線の太さ・枠線の種類・文字の大きさ・文字の色。WBS とワークパッケージは、親の WBS・親のプロジェクト (読むだけ)。ワークパッケージは、予定の開始日・終了日。並び順 (`order`) は出さない。(iHub は、プロジェクトと WBS を、ファイルの配列の順で並べる)
+- インスペクタに出すレコードは、読み込んだデータ (`master_schedule/projects`・`wbs`・`workpackages`) から id で引く。(d3.yabane に渡したデータは、名前を省略したり、親を付け替えたりしているので、使わない)
+- 「適用」で、変えた項目だけを保存し、図を作り直す。位置・拡大・サイクル・1 目盛りの幅は、変えない。(位置をまだ覚えていないときは、今の位置を覚えてから作り直す) 名前を変えたときは、名前の列の幅も、新しい名前に合う。
+- 入力の誤り (終了日が開始日より前・日付でない・色でない など) と、保存の失敗は、図の上に知らせる。(保存しない)
+- インスペクタを開いているあいだは、右上の「− 100% ＋」と「日・週・月」を、インスペクタの左へずらす。(押せる) サイクルや幅を変えても、インスペクタは開いたまま。ほかからデータが変わって、選んでいたレコードが無くなったら、閉じる。
+- 矢羽根の左クリック (行き先へ移る) は、これまでどおり。
+- **利用側への影響**: Schedule タブで、データを書き換えられるようになる。(これまでは見るだけ) データの形・設定の形は、変わらない。
+
 ## 0.8.3 (2026-11)
 
 ### 変更 (艦橋の Schedule タブ: 行の区切り線。d3.yabane 0.7.0。yanqirenshi/iHub#202)
