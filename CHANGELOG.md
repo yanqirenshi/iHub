@@ -10,6 +10,11 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.9.1 (2026-11)
+
+- `@yanqirenshi/ihub.core`: クラス図の図の知識 (インスペクタの項目・patch への変換) を `@yanqirenshi/model.classes` `^0.1.0` に置き換え、箱のドラッグ・右クリック、線のクリック・右クリックを、DOM で拾うのをやめて `@yanqirenshi/d3.classes` `^0.14.0` のコールバックで受けるようにした。(yanqirenshi/iHub#206) 関係の線の当たりは、線から 6px 以内から、約 4px 以内 (拡大が 100% のとき。図と一緒に拡大・縮小する) になった。線は、これまでどおりクリックでも右クリックでも開ける。データの移行は無い。
+- `@yanqirenshi/ihub.srv`: `classes` の検査を model.classes の `check` に、`schemas/classes` を model.classes の `SCHEMAS` の内容にした。(検査と文言は同じ。スキーマは説明の 1 文だけが違う)
+
 ## 0.9.0 (2026-11)
 
 - `@yanqirenshi/ihub.core`: 艦橋の Schedule タブで、矢羽根・WBS の箱・プロジェクトの箱を右クリックすると、右端にインスペクタが出て、名称・見た目 (背景色・枠線・文字)・予定の開始日と終了日 (矢羽根だけ) を書き換えられるようにした。(yanqirenshi/iHub#204。作りは Overview タブと同じ。変えた項目だけを `PATCH /api/master_schedule/{collection}/{id}` で保存する。並び順は出さない) `@yanqirenshi/d3.yabane` を `^0.8.0` に上げ、`@yanqirenshi/model.yabane` `^0.1.1` を足した。

@@ -4,6 +4,12 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.9.1 (2026-11)
+
+- `dependencies` に `@yanqirenshi/model.classes` `^0.1.0` を足した。(yanqirenshi/iHub#206)
+- `classes` ドメインの検査 (クラスと関係の id の重複・関係の端のクラスがあること) を、自前の `checkClasses` から、model.classes の `check(data, 'classes/')` に替えた。(検査と文言は同じ)
+- `schemas/classes/{classes,relationships}.schema.json` を、model.classes の `SCHEMAS` の内容にした。違いは、`classes` の `header` の説明から「(設定の diagrams.classes.header の色より優先する)」の 1 文が無くなったことだけ。(スキーマの形・検査は、変わらない。データの移行は無い)
+
 ## 0.9.0 (2026-11)
 
 - コードの変更は無い。(ihub.core 0.9.0 と、版をそろえるだけ)

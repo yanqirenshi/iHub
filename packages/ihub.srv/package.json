@@ -1,6 +1,6 @@
 {
   "name": "@yanqirenshi/ihub.srv",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "iHub の API サーバー。data/ の JSON を、スキーマとルールで検証しながら読み書きする。",
   "keywords": [
     "ihub",
@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^2.1.5",
+    "@yanqirenshi/model.classes": "^0.1.0",
     "@yanqirenshi/model.deployment": "^0.1.0",
     "@yanqirenshi/model.er": "^0.2.0",
     "@yanqirenshi/model.sitemap": "^0.1.0",
