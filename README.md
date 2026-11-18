@@ -49,6 +49,7 @@ npm start
 2 つのパッケージを、同じ版にそろえて、npm に公開します。(版は semver。0.x の間は、設定の形や公開する部品を変えるときに minor を上げます。変更は、`CHANGELOG.md` に書きます)
 
 1. `packages/*/package.json` の `version` を、同じ版にします。`CHANGELOG.md` に、その版の変更を書きます。
+   雛形のアプリの `packages/ihub.core/examples/app/package.template.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` も、`^` + 同じ版にします。(`ihub-srv init --app` は、動かしている版を書くので、ここが古くても作るアプリには影響しません。そろっていないと、`npm run test:data` が失敗します)
 2. テストが通ることを確かめます。(`npm run test:data`・`CI=true npm run build`)
 3. 中身を確かめます。
 

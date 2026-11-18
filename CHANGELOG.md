@@ -12,6 +12,8 @@
 
 ## 0.9.1 (2026-11)
 
+- `@yanqirenshi/ihub.srv`: `ihub-srv init --app` で作る `package.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、init に使った版 (`^0.9.1` など) にするようにした。(yanqirenshi/iHub#207) これまでは、雛形に書いた `^0.6.0` のままで、`npm install` で 0.6.x が入っていた。
+- `@yanqirenshi/ihub.core`: 雛形の `examples/app/package.template.json` の iHub の版を、`^0.9.1` にそろえた。
 - `@yanqirenshi/ihub.core`: クラス図の図の知識 (インスペクタの項目・patch への変換) を `@yanqirenshi/model.classes` `^0.1.0` に置き換え、箱のドラッグ・右クリック、線のクリック・右クリックを、DOM で拾うのをやめて `@yanqirenshi/d3.classes` `^0.14.0` のコールバックで受けるようにした。(yanqirenshi/iHub#206) 関係の線の当たりは、線から 6px 以内から、約 4px 以内 (拡大が 100% のとき。図と一緒に拡大・縮小する) になった。線は、これまでどおりクリックでも右クリックでも開ける。データの移行は無い。
 - `@yanqirenshi/ihub.srv`: `classes` の検査を model.classes の `check` に、`schemas/classes` を model.classes の `SCHEMAS` の内容にした。(検査と文言は同じ。スキーマは説明の 1 文だけが違う)
 

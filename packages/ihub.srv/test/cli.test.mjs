@@ -9,7 +9,20 @@ import { fileURLToPath } from 'node:url';
 const BIN = fileURLToPath(new URL('../bin/ihub-srv.mjs', import.meta.url));
 const EXAMPLE = fileURLToPath(new URL('../../ihub.core/examples/data/', import.meta.url));
 
+const CORE_PKG = fileURLToPath(new URL('../../ihub.core/package.json', import.meta.url));
+const SRV_PKG = fileURLToPath(new URL('../package.json', import.meta.url));
+const APP_TEMPLATE = fileURLToPath(new URL('../../ihub.core/examples/app/package.template.json', import.meta.url));
+
 const run = (...args)=> spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8' });
+const versionOf = (file)=> JSON.parse(readFileSync(file, 'utf8')).version;
+
+test('雛形の package.template.json の iHub の版は、パッケージの版とそろっている', ()=> {
+    const deps = JSON.parse(readFileSync(APP_TEMPLATE, 'utf8')).dependencies;
+
+    assert.equal(versionOf(CORE_PKG), versionOf(SRV_PKG));
+    assert.equal(deps['@yanqirenshi/ihub.core'], `^${versionOf(CORE_PKG)}`);
+    assert.equal(deps['@yanqirenshi/ihub.srv'], `^${versionOf(SRV_PKG)}`);
+});
 
 test('check は、正しいデータで 0、壊れたデータで 1 で終わり、メッセージを出す', ()=> {
     const dir = mkdtempSync(join(tmpdir(), 'ihub-cli-'));
@@ -54,8 +67,11 @@ test('init --app は、アプリのファイルを作り、package.json が無�
     const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
 
     assert.equal(pkg.scripts['start:api'], 'ihub-srv --data data');
-    assert.ok(pkg.dependencies['@yanqirenshi/ihub.core']);
     assert.equal(pkg.overrides, undefined);
+
+    // iHub のパッケージは、init に使った版にする。(0.x の ^ は、minor が違う版を入れないため)
+    assert.equal(pkg.dependencies['@yanqirenshi/ihub.core'], `^${versionOf(CORE_PKG)}`);
+    assert.equal(pkg.dependencies['@yanqirenshi/ihub.srv'], `^${versionOf(SRV_PKG)}`);
 
     // 同じ名前のファイルがあれば、何も書かずに 1 で終わる。--force なら上書きする。
     assert.equal(run('init', '--app', dir).status, 1);
@@ -80,6 +96,7 @@ test('init --app は、package.json があれば、足りない項目だけを�
     assert.equal(pkg.dependencies.react, '^18.2.0');
     assert.equal(pkg.scripts['start:api'], 'ihub-srv --data data');
     assert.ok(pkg.dependencies['react-scripts']);
+    assert.equal(pkg.dependencies['@yanqirenshi/ihub.core'], `^${versionOf(CORE_PKG)}`);
 });
 
 test('convert-legacy と migrate-er は、引数が足りなければ 1 で終わる', ()=> {

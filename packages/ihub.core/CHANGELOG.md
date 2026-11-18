@@ -6,6 +6,11 @@
 
 ## 0.9.1 (2026-11)
 
+### 修正 (雛形のアプリの package.json の iHub の版。yanqirenshi/iHub#207)
+
+- `examples/app/package.template.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、`^0.6.0` から `^0.9.1` にした。(`ihub-srv init --app` は、0.9.1 から、この版ではなく、動かしている版を書く。雛形の版は、パッケージの版とそろっていることを、`@yanqirenshi/ihub.srv` のテストで確かめる)
+- 画面の部品の変更は無い。
+
 ### 変更 (クラス図: 図の知識を `@yanqirenshi/model.classes` に、操作の受け取りを d3.classes のコールバックに替える。yanqirenshi/iHub#206)
 
 - `dependencies` の `@yanqirenshi/d3.classes` を `^0.14.0` に上げ、`@yanqirenshi/model.classes` `^0.1.0` を足した。
