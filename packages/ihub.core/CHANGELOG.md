@@ -4,6 +4,19 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.10.1 (2026-11)
+
+### 修正 (TM の結線のラベルをクリックしても、インスペクタが開かない。yanqirenshi/iHub#218)
+
+- `dependencies` の `@yanqirenshi/d3.ter` を `^0.4.3` に上げた。(範囲は、0.10.0 のままでも 0.4.3 を受けられる。下限を上げたのは、lock を持っているアプリが ihub.core を上げたときに、直った版が必ず入るようにするため。0.9.2 と同じ)
+- d3.ter 0.4.3 は、結線のラベルのクリックも、結線のクリック (`callbacks.relationship.click`) として知らせるようになった。(Foolsgolds/Assholes#213) d3.ter 0.4.3 から、npm のパッケージにテストと開発用のファイルが入らなくなった。(Foolsgolds/Assholes#212。動きは同じ)
+- iHub のコードの変更は無い。(`TM.js` は、`callbacks.relationship.click` を受けているだけ)
+- 雛形の `examples/app/package.template.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、`^0.10.1` にした。
+- **利用側から見える違い**:
+  - TM の結線のラベルの文字の上をクリックすると、結線がインスペクタに開く。(0.10.0 までは、ラベルの上では開かず、線の上か、線の近くをクリックする必要があった)
+  - 線の上・線の近く (線から約 4.5px) のクリックは、変わらない。
+  - データの形・設定の形は、変わらない。(データの移行は無い)
+
 ## 0.10.0 (2026-11)
 
 ### 追加 (艦橋の Schedule タブ: マイルストーンを △ で描く。yanqirenshi/iHub#216)
