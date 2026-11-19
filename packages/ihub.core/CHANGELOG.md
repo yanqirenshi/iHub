@@ -4,6 +4,25 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.10.0 (2026-11)
+
+### 追加 (艦橋の Schedule タブ: マイルストーンを △ で描く。yanqirenshi/iHub#216)
+
+- `dependencies` の `@yanqirenshi/d3.yabane` を `^0.9.0` に、`@yanqirenshi/model.yabane` を `^0.2.0` に上げた。
+- `master_schedule/milestones` (`data/master_schedule/milestones.json`。`{ id, name, date, parent か project, description?, background?, stroke?, font? }`) を読み、WBS かプロジェクトの行の中の、`date` の位置に、△ と名前を描く。(d3.yabane 0.9.0 の `milestones`) 矢羽根やほかのマイルストーンと横に重なるものは、d3.yabane が下の段へ積む。
+- 置く行の決め方は、ワークパッケージと同じ。(`parent` があれば `parent` の WBS だけを見る。無ければ `project` のプロジェクト) `date` が実在しない日・置く行が見つからないものは、描かない。(`ihub-srv check` が知らせる誤り)
+- 表示する期間に、マイルストーンの日付を入れる。(これまでは、ワークパッケージの一番早い `from` と一番遅い `to` だけから決めていた) ワークパッケージの期間の外のマイルストーンも、描かれる。
+- ワークパッケージが 1 つも無くても、描けるマイルストーンがあれば、図を描く。(知らせ「予定がありません。」は、どちらも無いとき)
+- △ は、押しても何もしない。(行き先は持たない) 右クリックで、インスペクタを出す。(d3.yabane 0.9.0 の `events.milestone.contextmenu`) 項目は model.yabane の `fieldsOf` で、名称・ID (読むだけ)・親の WBS・親のプロジェクト (読むだけ)・日付・背景色・枠線の色・枠線の太さ・枠線の種類・文字の大きさ・文字の色。並び順 (`order`) は、ほかと同じく出さない。
+- 保存は、ほかと同じ。(変えた項目だけを `PATCH /api/master_schedule/milestones/{id}` で保存する) 日付に実在しない日を入れたときは、インスペクタが誤りを出して、保存しない。
+- `manegers/schedule.js`: `SCHEDULE_COLLECTIONS` に `master_schedule/milestones` を足した。`buildScheduleData` は `milestones` を返し、`count` (図を描くかの判定) にマイルストーンを数え、`first`・`last` にマイルストーンの日付を入れる。
+- `buildScheduleData` のテストを足した。(`npm test -w @yanqirenshi/ihub.core`。ihub.core の初めてのテスト。node の `node:test` で、`src/manegers/schedule.js` をそのまま読む)
+- 雛形の `examples/app/package.template.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、`^0.10.0` にした。
+- **利用側から見える違い**:
+  - `milestones.json` が無いアプリでは、0.9.2 と同じに描く。(データの移行は無い)
+  - `milestones.json` を書くと、△ が出る。マイルストーンの日付がワークパッケージの期間の外にあると、表示する期間が広がる。
+  - 設定の形は、変わらない。
+
 ## 0.9.2 (2026-11)
 
 ### 修正 (クラス図の関係の線・TM の結線の当たりが、縮小すると狭くなる。yanqirenshi/iHub#212)

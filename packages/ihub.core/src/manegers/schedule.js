@@ -4,9 +4,11 @@
 //   master_schedule/projects     … プロジェクト。いちばん左の列に描く。({ id, name, description?, background?, stroke?, font? })
 //   master_schedule/wbs          … WBS (行)。({ id, name, project?, parent?, description?, background?, stroke?, font? })
 //   master_schedule/workpackages … ワークパッケージ (矢羽根)。({ id, name, plan: { from, to }, parent? | project?, wbs? | url?, ... })
+//   master_schedule/milestones   … マイルストーン (△)。WBS かプロジェクトの行の、date の位置に描く。(0.10.0 から。{ id, name, date, parent? | project?, ... })
 // どれも、ファイルが無いときは、空として扱う。(サーバーが、スキーマの default を返す)
 //
 // 矢羽根を押したときの行き先は、ワークパッケージの wbs (data/wbs/ のノードの id。/wbs/{id}) か url (新しいタブ)。どちらも無ければ、何もしない。(linkOf)
+// マイルストーンは、行き先を持たない。(押しても、何もしない)
 //
 // 時間の目盛りのサイクルは、日・週・月から選べる。(0.7.0 以降。選んだものは、ブラウザに覚える。readCycle・writeCycle)
 // 1 目盛り (1 日・1 週・1 か月) の幅は、どのサイクルでも UNIT_WIDTH × 幅の段 にそろえる。(scheduleScale)
@@ -16,6 +18,7 @@ export const SCHEDULE_COLLECTIONS = [
     'master_schedule/projects',
     'master_schedule/wbs',
     'master_schedule/workpackages',
+    'master_schedule/milestones',
 ];
 
 // 目盛りのサイクル。code は d3.yabane (dayjs) の単位。(月は大文字の 'M'。小文字の 'm' は、dayjs では分)
@@ -182,9 +185,12 @@ const wbsNode = (id)=> `w:${id}`;
 //   workpackages … d3.yabane の入力の workpackages。([{ id, name, plan, parent? | project?, background?, stroke?, font? }])
 //                  order は書かない。(同じ親の下のワークパッケージは、d3.yabane が開始日の順に並べ、重なるものを下の段へ回す)
 //   columns      … 名前の列の数。(プロジェクトと WBS の木の深さの最大 + 1。プロジェクトも入れ子も無ければ 1)
+//   milestones   … d3.yabane の入力の milestones。([{ id, name, date, parent? | project?, background?, stroke?, font? }]) (0.10.0 から)
+//                  order は書かない。(同じ行の中では、d3.yabane が日付の順に並べ、矢羽根やほかのマイルストーンと重なるものを下の段へ回す)
 //   links        … { [ワークパッケージの id]: linkOf の戻り値 } (行き先があるものだけ)
-//   count        … 矢羽根の数。(0 のとき、図は描かず、知らせを出す)
-//   first・last  … ワークパッケージの一番早い from と、一番遅い to。('YYYY-MM-DD')
+//   count        … 描く矢羽根とマイルストーンの数。(0 のとき、図は描かず、知らせを出す)
+//   first・last  … ワークパッケージの一番早い from・マイルストーンの一番早い date と、ワークパッケージの一番遅い to・マイルストーンの一番遅い date。('YYYY-MM-DD')
+//                  (マイルストーンの日付も、表示する期間に入れる。ワークパッケージの期間の外のマイルストーンも描けるように)
 //
 // 並び: d3.yabane (0.4.0 以降) は、兄弟を order の順 (無ければ開始日の順) に並べるので、プロジェクトと WBS には、配列の順を order に書く。
 //   (同じ親の下の WBS は wbs.json の順。子の WBS を持つ節の直下のワークパッケージは、子の WBS のあとに、開始日の順で並ぶ)
@@ -193,10 +199,13 @@ const wbsNode = (id)=> `w:${id}`;
 //   (WBS は、parent の先が無い・輪のときは最上位、project の先が無いときも最上位。ワークパッケージは、描かない)
 // 名前: 省略せずに渡す。(d3.yabane 0.5.0 が、名前に合わせて列の幅を決める) LABEL_MAX_UNITS を超える名前だけ、末尾を … にする。
 // 予定が無いとき (ファイルが無いときも) は、count が 0。使えない plan (to が from より前・実在しない日) は、描かない。
+// マイルストーン: 親の行の決め方は、ワークパッケージと同じ。date が実在しない日・親の行が見つからないものは、描かない。
+//   ワークパッケージが無くても、描けるマイルストーンがあれば、図を描く。(count はマイルストーンも数える)
 export function buildScheduleData (collections) {
     const projects = collections['master_schedule/projects'] || [];
     const wbs = collections['master_schedule/wbs'] || [];
     const workpackages = collections['master_schedule/workpackages'] || [];
+    const milestones = collections['master_schedule/milestones'] || [];
 
     const project_ids = new Set(projects.map(d=> d.id));
     const wbs_ids = new Set(wbs.map(d=> d.id));
@@ -214,11 +223,14 @@ export function buildScheduleData (collections) {
 
     const drawn = workpackages.filter(d=> usablePlan(d.plan) && wpParentNode(d)!==null);
 
-    if (drawn.length===0)
-        return { projects: [], wbs: [], workpackages: [], columns: 1, links: {}, count: 0, first: null, last: null };
+    // マイルストーンの親の行は、ワークパッケージと同じ決め方。(d3.yabane は、行の見つからないマイルストーンを描かない)
+    const drawn_milestones = milestones.filter(d=> parseDate(d?.date)!==null && wpParentNode(d)!==null);
 
-    const froms = drawn.map(d=> parseDate(d.plan.from));
-    const tos = drawn.map(d=> parseDate(d.plan.to));
+    if (drawn.length===0 && drawn_milestones.length===0)
+        return { projects: [], wbs: [], workpackages: [], milestones: [], columns: 1, links: {}, count: 0, first: null, last: null };
+
+    const froms = [...drawn.map(d=> parseDate(d.plan.from)), ...drawn_milestones.map(d=> parseDate(d.date))];
+    const tos = [...drawn.map(d=> parseDate(d.plan.to)), ...drawn_milestones.map(d=> parseDate(d.date))];
 
     const links = {};
 
@@ -277,9 +289,16 @@ export function buildScheduleData (collections) {
             plan: { from: d.plan.from, to: d.plan.to },
             ...lookOf(d),
         })),
+        milestones: drawn_milestones.map(d=> ({
+            id: d.id,
+            ...parentFields(wpParentNode(d)),
+            name: d.name,
+            date: d.date,
+            ...lookOf(d),
+        })),
         columns,
         links,
-        count: drawn.length,
+        count: drawn.length + drawn_milestones.length,
         first: formatDate(Math.min(...froms)),
         last: formatDate(Math.max(...tos)),
     };

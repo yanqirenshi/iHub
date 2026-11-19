@@ -226,12 +226,16 @@ data/local/ に保存し、git では共有しません。
 ファイルが無いときは、`default` を返し、`default` のデータとしてルールも検査します。
 最初に書き込んだときに、ファイルを作ります。
 
-いまは、local のコレクションと、クラス図 (`classes/classes`・`classes/relationships`。`default` は `[]`)、マスタースケジュール (`master_schedule/projects`・`master_schedule/wbs`・`master_schedule/workpackages`。`default` は `[]`) が当てはまります。
-クラス図は 0.6.0 で、マスタースケジュールは 0.7.0 で足したので、`data/classes/`・`data/master_schedule/` の無いアプリでも、今までどおり動くようにしています。
+いまは、local のコレクションと、クラス図 (`classes/classes`・`classes/relationships`。`default` は `[]`)、マスタースケジュール (`master_schedule/projects`・`master_schedule/wbs`・`master_schedule/workpackages`・`master_schedule/milestones`。`default` は `[]`) が当てはまります。
+クラス図は 0.6.0 で、マスタースケジュールは 0.7.0 (マイルストーンは 0.10.0) で足したので、`data/classes/`・`data/master_schedule/` の無いアプリでも、今までどおり動くようにしています。
 
 ## マスタースケジュール (艦橋の Schedule タブ)
 
 `master_schedule/projects` (プロジェクト)・`master_schedule/wbs` (WBS)・`master_schedule/workpackages` (ワークパッケージ) は、艦橋の Schedule タブの矢羽根のデータです。(0.7.0 以降。0.8.0 から、d3.yabane の入力と同じ 3 つ。書き方は、ihub.core の README の「艦橋の Schedule タブ」)
+`master_schedule/milestones` (マイルストーン) は、同じタブで、WBS かプロジェクトの行に △ で描くデータです。(0.10.0 以降。d3.yabane 0.9.0 の入力と同じ形)
+項目は `id`・`name`・`date` (必須) と、`parent` (WBS の id)・`project` (プロジェクトの id)・`description`・`background`・`stroke`・`font` です。
+`date` を必須にしていること・`description` を持つこと・`order` を持たないことのほかは、model.yabane 0.2.0 の `SCHEMAS.milestones` と同じです。
+ルールは、id がマイルストーンの中で重ならないこと・`parent` か `project` があること・その先があること・`date` が実在する日付であることを、検査します。
 0.7.0 の `rows`・`items` は、`wbs`・`workpackages` に名前が変わりました。古い名前のファイルがあると、`ihub-srv check` が、名前を変えるように知らせます。
 ワークパッケージの行き先の `wbs` (`data/wbs/` の WBS のノードの id) が `data/wbs/` にあるかは、データ全体の検証 (`ihub-srv check`) だけが検査します。API サーバーは、ドメインごとに検証するので、書き込むときは、この検査を飛ばします。
 (ルールの関数は、2 つ目の引数に、データ全体を受け取れます。渡らないときは、ドメインをまたぐ検査を飛ばす書き方にしてください)

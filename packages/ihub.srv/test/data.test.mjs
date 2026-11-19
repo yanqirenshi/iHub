@@ -137,12 +137,14 @@ test('master_schedule のファイルは無くてもよく、無いときは予�
     assert.deepEqual(validateData(data), []);
 });
 
-test('master_schedule: d3.yabane のショーケースの 3 ファイル (参照アプリの data/master_schedule/) が、そのまま通る', ()=> {
+test('master_schedule: d3.yabane のショーケースの 4 ファイル (参照アプリの data/master_schedule/) が、そのまま通る', ()=> {
     const data = loadDataDir(join(ROOT, 'data'));
 
     assert.deepEqual(Object.keys(data).filter(name=> name.startsWith('master_schedule/')).sort(),
-                     ['master_schedule/projects', 'master_schedule/wbs', 'master_schedule/workpackages']);
+                     ['master_schedule/milestones', 'master_schedule/projects', 'master_schedule/wbs', 'master_schedule/workpackages']);
     assert.ok(data['master_schedule/workpackages'].some(d=> d.result && d.progress!==undefined));
+    assert.ok(data['master_schedule/milestones'].some(d=> d.parent!==undefined));
+    assert.ok(data['master_schedule/milestones'].some(d=> d.project!==undefined));
     assert.deepEqual(validateData(data), []);
 });
 
@@ -277,6 +279,72 @@ test('master_schedule: ワークパッケージの parent・project が無いも
         'master_schedule/workpackages: wbs と url は、両方は書けません。(id=1003)',
         'master_schedule/workpackages: parent (WBS の id) か project (プロジェクトの id) を書いてください。(id=1006)',
         'master_schedule/workpackages: project のプロジェクトが見つかりません。(id=1007, project=99)',
+    ]);
+});
+
+// マイルストーン (0.10.0 から) のデータ。WBS は ROWS (id 1・2)、プロジェクトは id 10。
+function milestoneData (milestones) {
+    const data = scheduleData(ROWS, [{ id: 1001, parent: 1, name: 'A', plan: PLAN }], [{ id: 10, name: 'P' }]);
+
+    data['master_schedule/milestones'] = milestones;
+
+    return data;
+}
+
+test('master_schedule: マイルストーンを、WBS の行 (parent) とプロジェクトの行 (project) に書ける。id は、ほかのコレクションと重なってよい', ()=> {
+    assert.deepEqual(validateData(milestoneData([
+        { id: 1, parent: 1, name: 'Release 1', date: '2026-11-15' },
+        { id: 2, project: 10, name: 'Kickoff', date: '2026-10-01', description: ['説明'] },
+        { id: 1001, parent: 2, project: 10, name: '両方 (parent が優先)', date: '2026-12-01',
+          background: { color: '#ffd900' }, stroke: { color: '#e95464', width: 6, type: 'dashed' }, font: { size: 24, weight: 'bold' } },
+    ])), []);
+});
+
+test('master_schedule: マイルストーンのファイルが無いときは、空 (default) として検査する', ()=> {
+    const data = scheduleData(ROWS, [{ id: 1001, parent: 1, name: 'A', plan: PLAN }]);
+
+    assert.ok(!('master_schedule/milestones' in data));
+    assert.deepEqual(validateData(data), []);
+    assert.deepEqual(RULES.master_schedule({ projects: [], wbs: ROWS, workpackages: [] }), []);
+});
+
+test('master_schedule: マイルストーンの形の誤りを見つける (name・date が無い・date の形・知らない項目)', ()=> {
+    const check = (milestone)=> validateData(milestoneData([{ id: 1, parent: 1, name: 'M', date: '2026-11-15', ...milestone }]));
+
+    const no_date = validateData(milestoneData([{ id: 1, parent: 1, name: 'M' }]));
+    assert.ok(no_date.some(e=> e.startsWith('master_schedule/milestones/0') && e.includes('date')), no_date.join('\n'));
+
+    const no_name = validateData(milestoneData([{ id: 1, parent: 1, date: '2026-11-15' }]));
+    assert.ok(no_name.some(e=> e.startsWith('master_schedule/milestones/0') && e.includes('name')), no_name.join('\n'));
+
+    const bad_form = check({ date: '2026/11/15' });
+    assert.ok(bad_form.some(e=> e.startsWith('master_schedule/milestones/0/date')), bad_form.join('\n'));
+
+    for (const key of ['order', 'url', 'wbs', 'plan']) {
+        const errors = check({ [key]: key==='plan' ? PLAN : 1 });
+        assert.ok(errors.some(e=> e.startsWith('master_schedule/milestones/0') && e.endsWith(`(${key})`)), `${key}\n${errors.join('\n')}`);
+    }
+
+    const bad_look = check({ stroke: { type: 'wavy' } });
+    assert.ok(bad_look.some(e=> e.startsWith('master_schedule/milestones/0/stroke/type')), bad_look.join('\n'));
+});
+
+test('master_schedule: マイルストーンの id の重複・parent も project も無いもの・先の無いもの・実在しない日付を見つける (ルール)', ()=> {
+    assert.deepEqual(validateData(milestoneData([
+        { id: 1, parent: 1, name: 'A', date: '2026-11-15' },
+        { id: 1, parent: 2, name: 'B (同じ id)', date: '2026-11-16' },
+        { id: 3, name: 'C (parent も project も無い)', date: '2026-11-17' },
+        { id: 4, parent: 9, name: 'D (無い WBS)', date: '2026-11-18' },
+        { id: 5, project: 99, name: 'E (無いプロジェクト)', date: '2026-11-19' },
+        { id: 6, parent: 1, name: 'F (実在しない日)', date: '2026-02-30' },
+        { id: 7, project: 10, name: 'G (13 月)', date: '2026-13-01' },
+    ])), [
+        'master_schedule/milestones: id が重複しています。(id=1)',
+        'master_schedule/milestones: parent (WBS の id) か project (プロジェクトの id) を書いてください。(id=3)',
+        'master_schedule/milestones: parent の WBS が見つかりません。(id=4, parent=9)',
+        'master_schedule/milestones: project のプロジェクトが見つかりません。(id=5, project=99)',
+        'master_schedule/milestones: date が日付として正しくありません。(id=6, date=2026-02-30)',
+        'master_schedule/milestones: date が日付として正しくありません。(id=7, date=2026-13-01)',
     ]);
 });
 

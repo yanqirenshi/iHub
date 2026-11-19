@@ -4,6 +4,22 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.10.0 (2026-11)
+
+### 追加 (マスタースケジュールのマイルストーン。yanqirenshi/iHub#216)
+
+- `schemas/master_schedule/milestones.schema.json` を足した。(コレクション `master_schedule/milestones`。`data/master_schedule/milestones.json`)
+  - 項目: `id` (整数。必須)・`name` (必須)・`date` (`YYYY-MM-DD`。必須)・`parent` (WBS の id)・`project` (プロジェクトの id)・`description`・`background`・`stroke`・`font`。ほかの項目は書けない。(`additionalProperties: false`)
+  - model.yabane 0.2.0 の `SCHEMAS.milestones` との違いは、`date` を必須にしたこと (ワークパッケージの `plan` にそろえる)・`description` を持つこと・`order` を持たないこと (並びは d3.yabane に任せる)。
+  - `default` は `[]`。ファイルが無いときは、マイルストーンが無いものとして扱う。(データの移行は無い)
+- `master_schedule` の検査 (`ihub-srv check`・API の書き込み) に、マイルストーンの検査を足した。
+  - id が、マイルストーンの中で一意。(WBS・ワークパッケージ・プロジェクトと同じ値でもよい。d3.yabane は `'milestone-<id>'` で引く)
+  - `parent` か `project` の、少なくとも 1 つがある。(両方あるときは `parent` が優先。誤りにはしない)
+  - `parent` の WBS・`project` のプロジェクトが、見つかる。
+  - `date` が、実在する日付。
+- API は、スキーマのファイルからコレクションを作るので、`GET /api/master_schedule/milestones`・`PATCH /api/master_schedule/milestones/{id}` などが、そのまま使える。(テストで確かめた)
+- `init --app` で作る `package.json` の iHub の版は、`^0.10.0` になる。
+
 ## 0.9.2 (2026-11)
 
 - コードの変更は無い。(ihub.core 0.9.2 と、版をそろえるだけ。yanqirenshi/iHub#212)

@@ -1,0 +1,8 @@
+[
+  { "id": 1, "parent": 111, "name": "Release 1",  "date": "2023-12-15" },
+  { "id": 2, "parent": 12,  "name": "Review 10-2", "date": "2024-03-20" },
+  { "id": 3, "project": 10, "name": "Kickoff 10", "date": "2023-10-02",
+    "background": { "color": "#ffd900" } },
+  { "id": 4, "project": 20, "name": "Go-live 20", "date": "2024-11-15",
+    "stroke": { "color": "#0e9aa7" }, "font": { "weight": "bold" } }
+]

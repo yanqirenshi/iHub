@@ -1,6 +1,6 @@
 import { test, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -194,6 +194,41 @@ test('PATCH でレコードの一部を書き換える', async ()=> {
 
     assert.equal(child.status, 200);
     assert.equal(readData('deployment/nodes')[0].children[0].label.text, 'NODE 03 改');
+});
+
+test('マスタースケジュールのマイルストーン: ファイルが無ければ空で読み、あれば PATCH で変えた項目だけを書き換える', async ()=> {
+    // 雛形のデータには、master_schedule/ が無い。
+    const empty = await (await request('/api/data')).json();
+
+    assert.deepEqual(empty.collections['master_schedule/milestones'], []);
+
+    mkdirSync(join(dir, 'master_schedule'));
+    writeFileSync(join(dir, 'master_schedule/wbs.json'), JSON.stringify([{ id: 1, name: '開発' }]));
+    writeFileSync(join(dir, 'master_schedule/milestones.json'), JSON.stringify([
+        { id: 1, parent: 1, name: 'Release', date: '2026-11-15', background: { color: '#ffffff' } },
+    ]));
+
+    const res = await request('/api/master_schedule/milestones/1', {
+        method: 'PATCH',
+        body: { name: 'Release 1', date: '2026-11-20', stroke: { width: 6 } },
+    });
+
+    assert.equal(res.status, 200);
+    assert.deepEqual(readData('master_schedule/milestones'), [
+        { id: 1, parent: 1, name: 'Release 1', date: '2026-11-20', background: { color: '#ffffff' }, stroke: { width: 6 } },
+    ]);
+
+    // 実在しない日付・先の無い WBS は、ルールで 400 にして、書き込まない。
+    const bad_date = await request('/api/master_schedule/milestones/1', { method: 'PATCH', body: { date: '2026-02-30' } });
+
+    assert.equal(bad_date.status, 400);
+    assert.deepEqual((await bad_date.json()).errors, ['master_schedule/milestones: date が日付として正しくありません。(id=1, date=2026-02-30)']);
+
+    const added = await request('/api/master_schedule/milestones', { method: 'POST', body: { parent: 9, name: 'X', date: '2026-11-01' } });
+
+    assert.equal(added.status, 400);
+    assert.equal(readData('master_schedule/milestones').length, 1);
+    assert.equal(readData('master_schedule/milestones')[0].date, '2026-11-20');
 });
 
 test('DELETE は、参照されているレコードを 409 にする', async ()=> {
