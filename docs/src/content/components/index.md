@@ -58,7 +58,7 @@
 | [Monitor](#/components/panels/bridge/Monitor) | カードを、石積み (masonry) のレイアウトで並べます。 |
 | [Overview](#/components/panels/bridge/Overview) | ポンチ絵 (なんでもありの概念図) を、@yanqirenshi/d3.unchi で、パネル一杯に描きます。 |
 | [Card](#/components/panels/bridge/Card) | 艦橋の 1 枚のカードを描きます。 |
-| [Schedule](#/components/panels/bridge/Schedule) | `data/master_schedule/` の予定を、矢羽根で並べます。(0.4.0 以降。0.7.0 からデータの場所が変わりました) |
+| [Schedule](#/components/panels/bridge/Schedule) | `data/master_schedule/` の予定を、矢羽根で並べます。マイルストーンは △ で描きます。(0.4.0 以降。0.7.0 からデータの場所が変わりました。マイルストーンは 0.10.0 以降) |
 
 ## panels.sogh
 

@@ -10,11 +10,11 @@ iHub 本体 (`@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`) は `node_modul
 npm update @yanqirenshi/ihub.core @yanqirenshi/ihub.srv
 ```
 
-- `package.json` の範囲 (例: `^0.9.0`) の中で、新しい版に上がります。
-- 0.x の間は、`^0.9.0` は 0.9.x だけを指します。minor (0.10.0 など) に上げるときは、範囲を書き換えます。
+- `package.json` の範囲 (例: `^0.10.0`) の中で、新しい版に上がります。
+- 0.x の間は、`^0.10.0` は 0.10.x だけを指します。minor (0.11.0 など) に上げるときは、範囲を書き換えます。
 
 ```
-npm install @yanqirenshi/ihub.core@^0.9.0 @yanqirenshi/ihub.srv@^0.9.0
+npm install @yanqirenshi/ihub.core@^0.10.0 @yanqirenshi/ihub.srv@^0.10.0
 ```
 
 - 2 つのパッケージは、同じ版にそろえてください。
@@ -27,12 +27,12 @@ npm ls @yanqirenshi/ihub.core @yanqirenshi/ihub.srv
 ```
 
 ```
-+-- @yanqirenshi/ihub.core@0.9.2
-`-- @yanqirenshi/ihub.srv@0.9.2
++-- @yanqirenshi/ihub.core@0.10.1
+`-- @yanqirenshi/ihub.srv@0.10.1
 ```
 
 - 出力の最初の行には、アプリの名前と場所が出ます。
-その下の 2 行の `@` のあとの版が、同じになっていれば大丈夫です。(上は 0.9.2 の例です)
+その下の 2 行の `@` のあとの版が、同じになっていれば大丈夫です。(上は 0.10.1 の例です)
 - 版が違うときは、片方に、`package.json` の範囲に合わない版として `invalid` が付くことがあります。
 上の `npm install` で、同じ版を指定して、入れ直してください。
 
@@ -79,10 +79,10 @@ npx ihub-srv init --app ../ihub-template
 そのため、ihub.core が入っているところ (アプリのフォルダ) で実行します。
 作る雛形は、入っている ihub.core の版のものです。(`package.json` に書く 2 つのパッケージの版も、入っている版です)
 - ihub.core が入っていないところで実行すると、「雛形 (examples/app) が見つかりません。」と出て、止まります。(`npx -p @yanqirenshi/ihub.srv ihub-srv init --app` のように、ihub.srv だけを入れて実行したときも同じです)
-- 上げる前に、新しい版の雛形を見たいときは、[導入のしかた](#/setup) と同じ形で、2 つのパッケージの版を指定して実行します。(0.9.2 の例)
+- 上げる前に、新しい版の雛形を見たいときは、[導入のしかた](#/setup) と同じ形で、2 つのパッケージの版を指定して実行します。(0.10.1 の例)
 
 ```
-npx --yes --package=@yanqirenshi/ihub.core@0.9.2 --package=@yanqirenshi/ihub.srv@0.9.2 -- ihub-srv init --app ../ihub-template-0.9.2
+npx --yes --package=@yanqirenshi/ihub.core@0.10.1 --package=@yanqirenshi/ihub.srv@0.10.1 -- ihub-srv init --app ../ihub-template-0.10.1
 ```
 
 (アプリのフォルダの中で実行しても、指定した版の雛形を作ります。アプリに入っている版は、変わりません)
@@ -121,7 +121,7 @@ npx ihub-srv init --app --only src/operators --only src/wbs
 2. 個人用アクセストークンを使っている人は、トークンに `read:user` の権限を足します。(権限は、`repo`・`project`・`read:org`・`read:user` の 4 つです)
 
 詳しくは、[GitHub との連携](#/github) にあります。
-このあとの「0.6.x から 0.7.0 以降に上げるとき」と「0.8.x から 0.9.x に上げるとき」も、順に見てください。
+このあとの「0.6.x から 0.7.0 以降に上げるとき」「0.8.x から 0.9.x に上げるとき」「0.9.x から 0.10.x に上げるとき」も、順に見てください。
 
 ## 0.6.x から 0.7.0 以降に上げるとき
 
@@ -178,3 +178,16 @@ d3.* で描く 7 つの図は、0.7.0 から、既定ではグリッド線を描
 - クラス図の関係の線と、TM の結線の当たり (線の近くをクリックしても、線が開く幅) は、拡大の度合いにかかわらず、画面の上で約 4.5px です。(0.9.2)
   - クラス図は、0.9.0 までは画面の上で 6px、0.9.1 は図と一緒に拡大・縮小する当たり (100% で約 4.5px) でした。
   - 100% のときの動きは、0.9.1 と変わりません。100% より拡大したときは、0.9.1 より狭くなります。(200% のとき、画面の上で約 9px から約 4.5px)
+
+## 0.9.x から 0.10.x に上げるとき
+
+0.10.0・0.10.1 では、データのフォーマットと設定の形は、0.9.x から変わっていません。
+(`data/master_schedule/milestones.json` は、マイルストーンを描きたいときに足します。無くても動きます)
+`package.json` の 2 つのパッケージの範囲を `^0.10.0` などに書き換えて、上の「新しくする」の `npm install` で入れ直します。
+(0.x の `^0.9.0` は、0.10.x を入れません。`npm update` だけでは、0.9.x のままです)
+
+### 見え方が変わるところ (直さなくてよいもの)
+
+- Schedule タブで、`data/master_schedule/milestones.json` に書いたマイルストーンを、WBS かプロジェクトの行に △ で描きます。(0.10.0) 右クリックで、インスペクタで書き換えられます。`milestones.json` が無いアプリは、0.9.x と同じ見え方です。(書き方は [データの管理](#/data) の「Schedule の予定 (`master_schedule`)」)
+- マイルストーンの日付がワークパッケージの期間の外にあると、Schedule タブの表示する期間が、そこまで広がります。(0.10.0)
+- TM の結線のラベルの文字の上をクリックしても、結線がインスペクタに開きます。(0.10.1) 線の上と線の近くのクリックは、0.9.2 と変わりません。
