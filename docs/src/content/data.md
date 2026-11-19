@@ -13,6 +13,7 @@
 | `master_schedule/projects.json` | Schedule のプロジェクト (無くてもよい) | 艦橋の Schedule |
 | `master_schedule/wbs.json` | Schedule の WBS (行。入れ子にできる。無くてもよい) | 艦橋の Schedule |
 | `master_schedule/workpackages.json` | Schedule のワークパッケージ (矢羽根。無くてもよい) | 艦橋の Schedule |
+| `master_schedule/milestones.json` | Schedule のマイルストーン (△。無くてもよい。0.10.0 以降) | 艦橋の Schedule |
 | `er/schemas.json` | テーブルの名前空間 (スキーマ) のマスタ | ER 図 |
 | `er/identifiers.json` | 識別子 (主キー) のマスタ | ER 図 |
 | `er/attributes.json` | 属性 (カラム) のマスタ | ER 図 |
@@ -50,7 +51,7 @@
 
 ### Schedule の予定 (`master_schedule`)
 
-艦橋 (`/`) の「Schedule」タブに出す予定は、WBS (`data/wbs/`) とは切り離して、`data/master_schedule/` の 3 つのファイルに書きます。(0.7.0 以降。0.8.0 で 3 つのファイルにしました)
+艦橋 (`/`) の「Schedule」タブに出す予定は、WBS (`data/wbs/`) とは切り離して、`data/master_schedule/` のファイルに書きます。(0.7.0 以降。0.8.0 で 3 つのファイルにし、0.10.0 で `milestones.json` を足しました)
 ファイルの形は、d3.yabane の入力と同じです。
 どのファイルも、無くても動きます。
 
@@ -74,6 +75,12 @@
   { "id": 1001, "parent": 11,  "name": "API", "plan": { "from": "2026-11-10", "to": "2026-12-10" }, "wbs": 1000003 },
   { "id": 1002, "project": 20, "name": "公開", "plan": { "from": "2026-12-15", "to": "2026-12-15" }, "url": "https://example.com/release" }
 ]
+
+// milestones.json (0.10.0 以降)
+[
+  { "id": 1, "parent": 111, "name": "画面の確認", "date": "2026-11-30" },
+  { "id": 2, "project": 20, "name": "リリース", "date": "2026-12-15", "background": { "color": "#ffd900" } }
+]
 ```
 
 | ファイル | 書くもの |
@@ -81,21 +88,28 @@
 | `projects.json` | `id`・`name`。`id` は、プロジェクトの中で重ならないようにします。(WBS と同じ `id` でも構いません) |
 | `wbs.json` | `id`・`name`。最上位の WBS は `project` にプロジェクトの `id` を、入れ子の WBS は `parent` に親の WBS の `id` を書きます。(両方あるときは `parent` を使います) |
 | `workpackages.json` | `id`・`name`・`plan` と、`parent` (WBS の `id`) か `project` (プロジェクトの `id`) の少なくとも 1 つ。(両方あるときは `parent` を使います) |
+| `milestones.json` | `id`・`name`・`date` と、`parent` (WBS の `id`) か `project` (プロジェクトの `id`) の少なくとも 1 つ。(両方あるときは `parent` を使います。0.10.0 以降) |
 
 - `plan` の `from` (始まりの日)・`to` (終わりの日) は、`'YYYY-MM-DD'` の日付で、どちらも書きます。`to` は、`from` と同じ日か、あとの日です。
 - WBS とワークパッケージの `id` は、またいで重ならないようにします。
 - ワークパッケージには、任意で行き先を 1 つ書けます。(両方は書けません)
   1. `wbs`: **`data/wbs/` の** WBS のノード (プロジェクト・WBS・ワークパッケージ) の `id`。矢羽根を押すと、そのページ (`/wbs/{id}`) へ移ります。(`master_schedule/wbs.json` の `id` ではありません)
   2. `url`: `http://` か `https://` で始まる URL。矢羽根を押すと、新しいタブで開きます。
-- プロジェクト・WBS・ワークパッケージには、任意で見た目を書けます。(書いた項目だけが、d3.yabane の既定に重なります)
+- マイルストーンは、次のように書きます。(0.10.0 以降)
+  1. `date` は、`'YYYY-MM-DD'` の日付です。△ の頂点が、この日の位置に来ます。
+  2. `name` は、△ の右に描く名前です。
+  3. `id` は、マイルストーンの中で重ならないようにします。(WBS・ワークパッケージ・プロジェクトと同じ値でも構いません)
+  4. 任意で、`description` (説明。文字列か、文字列の配列。図には出ません) と、見た目を書けます。
+  5. ほかの項目 (`order`・`wbs`・`url` など) は、書けません。並びは、同じ行の中で日付の順です。
+- プロジェクト・WBS・ワークパッケージ・マイルストーンには、任意で見た目を書けます。(書いた項目だけが、d3.yabane の既定に重なります)
 
 | 項目 | 中身 | d3.yabane の既定 |
 |---|---|---|
 | `background` | `{ color, opacity }` (`opacity` は 0〜1) | `color` 白 |
-| `stroke` | `{ color, width, type }` (`type` は `solid`・`dashed`・`dotted`) | `#0e9aa7`・太さ 4・実線 |
+| `stroke` | `{ color, width, type }` (`type` は `solid`・`dashed`・`dotted`) | `#0e9aa7`・太さ 4・実線 (マイルストーンは `#e95464`・太さ 4・実線) |
 | `font` | `{ size, color, weight }` (`weight` は `'bold'`・`700` など) | 大きさ 33 |
 
-- `background`・`stroke` は、プロジェクトと WBS では箱、ワークパッケージでは矢羽根に効きます。`font` は、名前の文字に効きます。
+- `background`・`stroke` は、プロジェクトと WBS では箱、ワークパッケージでは矢羽根、マイルストーンでは △ に効きます。`font` は、名前の文字に効きます。
 - ワークパッケージの `result` (実績の期間)・`progress` (進捗) も書けますが、描きません。
 - `npx ihub-srv check data` が、次の誤りを知らせます。
   1. 形の誤り・日付の誤り (実在しない日・`to` が `from` より前)
@@ -104,7 +118,8 @@
   4. `parent` も `project` も無いワークパッケージ
   5. `data/wbs/` に無い行き先の `wbs`・`wbs` と `url` の両方
   6. `id` の重なり
-- 名前・予定の期間・見た目は、艦橋の Schedule タブで、矢羽根や箱を右クリックして、画面から書き換えられます。(0.9.0 以降。[図の編集](#/diagrams) の「Schedule で名前・予定・見た目を変える」。0.8.x までは、画面からは書き換えられませんでした)
+  7. マイルストーンの、`parent` も `project` も無いもの・無い先を指すもの・実在しない日付・`id` の重なり (0.10.0 以降)
+- 名前・予定の期間・マイルストーンの日付・見た目は、艦橋の Schedule タブで、矢羽根や箱や △ を右クリックして、画面から書き換えられます。(0.9.0 以降。マイルストーンは 0.10.0 以降。[図の編集](#/diagrams) の「Schedule で名前・予定・見た目を変える」。0.8.x までは、画面からは書き換えられませんでした)
   レコードの追加と削除・親の付け替え・並び順・説明・行き先・`result`・`progress` は、JSON を直接書きます。
 - 図の描き方とできることは、コンポーネントの [Schedule](#/components/panels/bridge/Schedule) にあります。
 
