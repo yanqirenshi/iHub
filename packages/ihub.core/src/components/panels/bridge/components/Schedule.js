@@ -53,13 +53,15 @@ const INITIAL_TOP = 60;
 // インスペクタの幅。(Overview と同じ)
 const INSPECTOR_WIDTH = 320;
 
-// model.yabane のコレクション ('projects' / 'wbs' / 'workpackages') を、data/ のコレクション名にする。
+// model.yabane のコレクション ('projects' / 'wbs' / 'workpackages' / 'milestones') を、data/ のコレクション名にする。
 const collectionName = (collection)=> `master_schedule/${collection}`;
 
 // 艦橋 (Bridge) の Schedule タブ: data/master_schedule/ のプロジェクト・WBS・ワークパッケージを、d3.yabane の矢羽根で並べる。(0.7.0 以降)
 // プロジェクトは、いちばん左の列。(0.8.0 から) その右に、WBS が入れ子の列で並び、ワークパッケージが矢羽根になる。
 // 矢羽根を押すと、ワークパッケージの行き先へ移る。wbs があれば /wbs/{id}、url があれば新しいタブで開く。どちらも無ければ、何もしない。
 // 矢羽根・WBS の箱・プロジェクトの箱を右クリックすると、右端にインスペクタを出し、項目を書き換えられる。(0.9.0 から)
+// マイルストーン (milestones.json) は、WBS かプロジェクトの行の、date の位置に △ と名前で描く。(0.10.0 から)
+// △ を押しても、何もしない。(行き先は持たない) 右クリックすると、インスペクタを出す。
 // 予定の期間は、workpackages.json の各レコードの plan: { from, to } ('YYYY-MM-DD') に書く。
 // 時間の目盛りのサイクル (日・週・月) は、右上のボタンで切り替える。選んだものは、ブラウザに覚える。(初めは週)
 // 1 目盛りの幅は、その左の「−」「＋」で、段 (50%〜400%) を上り下りする。選んだものは、サイクルごとにブラウザに覚える。(初めは 100%。0.8.1 から)
@@ -86,7 +88,7 @@ export default function Schedule () {
     // 今、画面に出している図。(幅を変えるとき、位置をまだ保管していなければ、今の位置と拡大の度合いを使う)
     const rectum = React.useRef(null);
 
-    // 右クリックした要素。{ collection: 'projects' | 'wbs' | 'workpackages', id }
+    // 右クリックした要素。{ collection: 'projects' | 'wbs' | 'workpackages' | 'milestones', id }
     // サイクルや幅を変えても (図を作り直しても)、開いたまま。
     const [target, setTarget] = React.useState(null);
     const [error, setError] = React.useState(null);
@@ -351,7 +353,12 @@ function Diagram ({ data, cycle, width, current, onInspect }) {
 
         bindView(r);
 
-        const tree = new Pippala().build(scale.from, scale.to, { projects: data.projects, wbs: data.wbs, workpackages: data.workpackages });
+        const tree = new Pippala().build(scale.from, scale.to, {
+            projects: data.projects,
+            wbs: data.wbs,
+            workpackages: data.workpackages,
+            milestones: data.milestones,
+        });
 
         r.data(r.chewing({
             scale: { cycle: scale.cycle, from: scale.from, to: scale.to, size: scale.size },
@@ -367,6 +374,8 @@ function Diagram ({ data, cycle, width, current, onInspect }) {
                 },
                 branch: { contextmenu: (d)=> inspect.current('wbs', d.core().id) },
                 project: { contextmenu: (d)=> inspect.current('projects', d.core().id) },
+                // マイルストーン (d3.yabane 0.9.0 から): 押しても、何もしない。右クリックで、インスペクタを出す。
+                milestone: { contextmenu: (d)=> inspect.current('milestones', d.core().id) },
             },
         }));
 

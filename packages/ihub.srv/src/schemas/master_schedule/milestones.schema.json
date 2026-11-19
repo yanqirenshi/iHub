@@ -1,0 +1,135 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "マスタースケジュールのマイルストーン",
+    "description": "艦橋の Schedule タブに △ で描くマイルストーン。(0.10.0 から) parent (WBS (master_schedule/wbs) の id) か project (プロジェクト (master_schedule/projects) の id) の、少なくとも 1 つを書き、その行の中の、date (YYYY-MM-DD) の位置に △ と名前を描く。(両方があるときは、parent が優先。ワークパッケージと同じ) date は必須。(ワークパッケージの plan にそろえる) 押しても、何も起きない。(行き先は持たない) 並びは、d3.yabane に任せる。(同じ行の中では、日付の順。矢羽根やほかのマイルストーンと横に重なるときは、下の段へ積む) background・stroke・font (任意) は、△ と名前の見た目。(d3.yabane の共有型) id は、マイルストーンの中で一意にする。(d3.yabane は 'milestone-<id>' で引くので、WBS・ワークパッケージ・プロジェクトと同じ id でもよい) (parent・project の先があること・日付が実在することは、スキーマではなく、ルールで検査する) ファイルが無いときは、マイルストーンが無いものとして扱う。",
+    "x-id-start": 1,
+    "type": "array",
+    "default": [],
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer"
+            },
+            "parent": {
+                "type": "integer",
+                "description": "WBS (master_schedule/wbs) の id"
+            },
+            "project": {
+                "type": "integer",
+                "description": "プロジェクト (master_schedule/projects) の id。(プロジェクトの行に置く。parent があるときは、parent が優先)"
+            },
+            "name": {
+                "type": "string",
+                "description": "△ の右に描く名前"
+            },
+            "description": {
+                "$ref": "#/$defs/description"
+            },
+            "date": {
+                "$ref": "#/$defs/date",
+                "description": "マイルストーンの日。△ の頂点が、この日の位置に来る"
+            },
+            "background": {
+                "$ref": "#/$defs/background"
+            },
+            "stroke": {
+                "$ref": "#/$defs/stroke"
+            },
+            "font": {
+                "$ref": "#/$defs/font"
+            }
+        },
+        "required": [
+            "id",
+            "name",
+            "date"
+        ],
+        "additionalProperties": false
+    },
+    "$defs": {
+        "date": {
+            "description": "日付。'YYYY-MM-DD' の形の文字列 (例: '2026-11-30')。(日付として正しいことは、スキーマではなく、ルールで検査する)",
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "description": {
+            "description": "文字列、または段落ごとの文字列の配列",
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            ]
+        },
+        "background": {
+            "description": "背景 (共有型 Background)。△ の中の色。(d3.yabane の既定: color 白)",
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string",
+                    "description": "色 (CSS の色。'#eaf4fc'・'rgb(0, 0, 0)'・'red' など)"
+                },
+                "opacity": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "不透明度 (0〜1)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "stroke": {
+            "description": "枠線 (共有型 Stroke)。△ の枠線。(d3.yabane の既定: color #e95464・width 4・type solid。矢羽根と見分けやすいように、赤い)",
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string",
+                    "description": "CSS の色"
+                },
+                "width": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "太さ"
+                },
+                "type": {
+                    "enum": [
+                        "solid",
+                        "dashed",
+                        "dotted"
+                    ],
+                    "description": "線の種類。(破線・点線の間隔は、太さに比例する)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "font": {
+            "description": "名前の文字 (共有型 Font)。(d3.yabane の既定: size 33)",
+            "type": "object",
+            "properties": {
+                "size": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "description": "大きさ"
+                },
+                "color": {
+                    "type": "string",
+                    "description": "CSS の色"
+                },
+                "weight": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "太さ ('bold'・700 など)"
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

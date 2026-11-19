@@ -63,7 +63,7 @@ function checkWbs ({ projects, wbs, workpackages }) {
     return errors;
 }
 
-// マスタースケジュール (艦橋の Schedule タブ。d3.yabane の入力と同じ形): プロジェクト (projects)・WBS (wbs)・ワークパッケージ (workpackages)。
+// マスタースケジュール (艦橋の Schedule タブ。d3.yabane の入力と同じ形): プロジェクト (projects)・WBS (wbs)・ワークパッケージ (workpackages)・マイルストーン (milestones)。
 //   - プロジェクトの id は、プロジェクトの中で一意。(d3.yabane は、プロジェクトを 'project-<id>' で引くので、WBS と同じ id でもよい)
 //   - WBS とワークパッケージの id は、またいで一意。(d3.yabane が、同じ id で引くため)
 //   - WBS の project のプロジェクトがあること・parent の WBS があること・入れ子が輪になっていないこと
@@ -71,7 +71,9 @@ function checkWbs ({ projects, wbs, workpackages }) {
 //     (両方があるときは、parent が優先。d3.yabane と同じ。誤りにはしない)
 //   - plan の日付が実在して、to が from より前でないこと・行き先が wbs と url の両方でないこと
 //   - 行き先の wbs (data/wbs/ のノードの id) が、WBS のドメインにあること。(データ全体の検証のときだけ)
-function checkMasterSchedule ({ projects, wbs, workpackages }, all = null) {
+//   - マイルストーン (milestones。0.10.0 から) の id は、マイルストーンの中で一意。(d3.yabane は 'milestone-<id>' で引くので、ほかと同じ id でもよい)
+//     parent か project の、少なくとも 1 つがあり、その先があること・date が実在する日付であること。(ワークパッケージと同じ)
+function checkMasterSchedule ({ projects, wbs, workpackages, milestones = [] }, all = null) {
     const errors = [];
 
     const project_ids = checkUnique(errors, 'master_schedule/projects', projects);
@@ -139,6 +141,22 @@ function checkMasterSchedule ({ projects, wbs, workpackages }, all = null) {
 
         if (d.wbs!==undefined && node_ids && !node_ids.has(d.wbs))
             errors.push(`master_schedule/workpackages: wbs (行き先) の WBS のノードが見つかりません。(id=${d.id}, wbs=${d.wbs})`);
+    }
+
+    checkUnique(errors, 'master_schedule/milestones', milestones);
+
+    for (const d of milestones) {
+        if (d.parent===undefined && d.project===undefined)
+            errors.push(`master_schedule/milestones: parent (WBS の id) か project (プロジェクトの id) を書いてください。(id=${d.id})`);
+
+        if (d.parent!==undefined && !wbs_ids.has(d.parent))
+            errors.push(`master_schedule/milestones: parent の WBS が見つかりません。(id=${d.id}, parent=${d.parent})`);
+
+        if (d.project!==undefined && !project_ids.has(d.project))
+            errors.push(`master_schedule/milestones: project のプロジェクトが見つかりません。(id=${d.id}, project=${d.project})`);
+
+        if (parseDate(d.date)===null)
+            errors.push(`master_schedule/milestones: date が日付として正しくありません。(id=${d.id}, date=${d.date})`);
     }
 
     return errors;

@@ -10,6 +10,12 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.10.0 (2026-11)
+
+- `@yanqirenshi/ihub.core`: 艦橋の Schedule タブに、マイルストーン (`data/master_schedule/milestones.json`) を、WBS かプロジェクトの行の、日付の位置に △ と名前で描くようにした。(yanqirenshi/iHub#216) 表示する期間に、マイルストーンの日付も入れる。ワークパッケージが無くても、描けるマイルストーンがあれば図を描く。△ は、押しても何もせず、右クリックでインスペクタ (名称・日付・見た目) を出す。`@yanqirenshi/d3.yabane` を `^0.9.0`、`@yanqirenshi/model.yabane` を `^0.2.0` に上げた。
+- `@yanqirenshi/ihub.srv`: データのコレクション `master_schedule/milestones` を足した。(ファイルが無いときは空。データの移行は無い) `ihub-srv check` は、マイルストーンの id の重複・`parent` も `project` も無いもの・その先が無いもの・実在しない日付を、誤りとして知らせる。
+- `@yanqirenshi/ihub.core`: 雛形の `examples/app/package.template.json` の iHub の版を、`^0.10.0` にそろえた。
+
 ## 0.9.2 (2026-11)
 
 - `@yanqirenshi/ihub.core`: `@yanqirenshi/d3.classes` を `^0.14.1`、`@yanqirenshi/d3.ter` を `^0.4.2` に上げた。(yanqirenshi/iHub#212) クラス図の関係の線と、TM の結線の当たり (クリック・右クリックが届く範囲) が、図を縮小しても狭くならず、拡大率に関わらず線から約 4.5px になった。(0.9.1 は、図と一緒に拡大・縮小して、100% で約 4.5px、50% で約 2px だった。0.9.1 の項目で「約 4px」と書いたものと同じ当たり) 100% のときの動きは変わらない。100% より拡大したときは、0.9.1 より狭くなる。(200% のとき、画面の上で約 9px から約 4.5px に)iHub のコードの変更は無い。データの形・設定の形は変わらない。
