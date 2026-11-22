@@ -48,6 +48,7 @@ npx --yes --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ih
 | `src/index.js` | 入り口。アプリの設定を組み立てて、iHub に渡します。([設定の渡し方](#/customize)) |
 | `src/Router.js` | ページの URL |
 | `src/components/` | 自分で作る部品を置くフォルダ (`assemblies/`・`pages/`・`panels/`・`parts/`)。中身は、それぞれの `README.md` だけです |
+| `src/manegers/` | 自分で作るデータのマネージャを置くフォルダ。中身は `README.md` だけです |
 | `src/config/` | サイドメニューの項目・色・アイコン・アプリの配色・ドックのボタン |
 | `src/operators/` | ドックの吹き出しの中身 |
 | `src/wbs/` | WBS のノードのページ。(ページが無いときの表示の 2 つが入っています) |
