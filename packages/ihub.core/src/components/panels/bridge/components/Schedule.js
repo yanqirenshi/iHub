@@ -21,6 +21,7 @@ import {
     buildScheduleData, columnsWidth, headOfWidth, readCycle, readWidth, rowColumnWidth, scheduleScale, stepWidth,
     viewForWidth, writeCycle, writeWidth,
 } from '../../../../manegers/schedule.js';
+import { inspectClick } from '../../../../manegers/inspectClick.js';
 
 // 図のスタイル (d3.yabane のスタイル)。stage.w は、時間の目盛りの全体の幅。(表示する期間に比例させる)
 // row.w は、名前を測れなかった列の幅。(d3.yabane 0.5.0 は、名前の列の幅を、描いた名前の幅に合わせる。manegers/schedule.js の rowColumnWidth)
@@ -59,9 +60,9 @@ const collectionName = (collection)=> `master_schedule/${collection}`;
 // 艦橋 (Bridge) の Schedule タブ: data/master_schedule/ のプロジェクト・WBS・ワークパッケージを、d3.yabane の矢羽根で並べる。(0.7.0 以降)
 // プロジェクトは、いちばん左の列。(0.8.0 から) その右に、WBS が入れ子の列で並び、ワークパッケージが矢羽根になる。
 // 矢羽根を押すと、ワークパッケージの行き先へ移る。wbs があれば /wbs/{id}、url があれば新しいタブで開く。どちらも無ければ、何もしない。
-// 矢羽根・WBS の箱・プロジェクトの箱を右クリックすると、右端にインスペクタを出し、項目を書き換えられる。(0.9.0 から)
+// 矢羽根・WBS の箱・プロジェクトの箱を Ctrl + クリック (Mac は ⌘ + クリック) すると、右端にインスペクタを出し、項目を書き換えられる。(0.9.0 から。0.10.x までは右クリック)
 // マイルストーン (milestones.json) は、WBS かプロジェクトの行の、date の位置に △ と名前で描く。(0.10.0 から)
-// △ を押しても、何もしない。(行き先は持たない) 右クリックすると、インスペクタを出す。
+// △ を押しても、何もしない。(行き先は持たない) Ctrl + クリック (Mac は ⌘ + クリック) すると、インスペクタを出す。
 // 予定の期間は、workpackages.json の各レコードの plan: { from, to } ('YYYY-MM-DD') に書く。
 // 時間の目盛りのサイクル (日・週・月) は、右上のボタンで切り替える。選んだものは、ブラウザに覚える。(初めは週)
 // 1 目盛りの幅は、その左の「−」「＋」で、段 (50%〜400%) を上り下りする。選んだものは、サイクルごとにブラウザに覚える。(初めは 100%。0.8.1 から)
@@ -88,7 +89,7 @@ export default function Schedule () {
     // 今、画面に出している図。(幅を変えるとき、位置をまだ保管していなければ、今の位置と拡大の度合いを使う)
     const rectum = React.useRef(null);
 
-    // 右クリックした要素。{ collection: 'projects' | 'wbs' | 'workpackages' | 'milestones', id }
+    // Ctrl + クリック (Mac は ⌘ + クリック) した要素。{ collection: 'projects' | 'wbs' | 'workpackages' | 'milestones', id }
     // サイクルや幅を変えても (図を作り直しても)、開いたまま。
     const [target, setTarget] = React.useState(null);
     const [error, setError] = React.useState(null);
@@ -111,7 +112,7 @@ export default function Schedule () {
             setTarget(null);
     }, [target, record]);
 
-    // 右クリック: どの知らせかで、コレクションが決まる。(プロジェクトと WBS は、同じ id でもよい)
+    // Ctrl + クリック (Mac は ⌘ + クリック): どの知らせかで、コレクションが決まる。(プロジェクトと WBS は、同じ id でもよい)
     const inspect = React.useCallback((collection, id)=> setTarget({ collection, id }), []);
 
     // model が返した変更 ({ collection, id, patch }) を保存して、図を作り直す。
@@ -308,7 +309,7 @@ function open (link, navigate) {
 function Diagram ({ data, cycle, width, current, onInspect }) {
     const nav = useNavigate();
 
-    // 矢羽根を押したとき・右クリックしたときには、いつも最新の関数を呼ぶ。
+    // 矢羽根を押したとき・Ctrl + クリック (Mac は ⌘ + クリック) したときには、いつも最新の関数を呼ぶ。
     const navigate = React.useRef(nav);
     navigate.current = nav;
 
@@ -364,18 +365,18 @@ function Diagram ({ data, cycle, width, current, onInspect }) {
             scale: { cycle: scale.cycle, from: scale.from, to: scale.to, size: scale.size },
             style: graphStyle(scale.size, data.columns, width),
             tree,
-            // 左クリック: 矢羽根の行き先へ移る。
-            // 右クリック (d3.yabane 0.8.0 から): インスペクタを出す。d.core() は d3.yabane に渡したレコードで、id だけを使う。
+            // Ctrl + クリック (Mac は ⌘ + クリック) (0.11.0 から): インスペクタを出す。(矢羽根でも、行き先へは移らない) d.core() は d3.yabane に渡したレコードで、id だけを使う。
+            // 修飾キーの無いクリック: 矢羽根は、行き先へ移る。ほかは、何もしない。右クリックでは、ブラウザのメニューが出る。
             // (知らせの種類で、コレクションが決まる。プロジェクトの d.id() は 'project-<id>' なので、使わない)
             events: {
                 reaf: {
-                    click: (reaf)=> open(data.links[reaf.id()], navigate.current),
-                    contextmenu: (d)=> inspect.current('workpackages', d.core().id),
+                    click: inspectClick((d)=> inspect.current('workpackages', d.core().id),
+                                        (reaf)=> open(data.links[reaf.id()], navigate.current)),
                 },
-                branch: { contextmenu: (d)=> inspect.current('wbs', d.core().id) },
-                project: { contextmenu: (d)=> inspect.current('projects', d.core().id) },
-                // マイルストーン (d3.yabane 0.9.0 から): 押しても、何もしない。右クリックで、インスペクタを出す。
-                milestone: { contextmenu: (d)=> inspect.current('milestones', d.core().id) },
+                branch: { click: inspectClick((d)=> inspect.current('wbs', d.core().id)) },
+                project: { click: inspectClick((d)=> inspect.current('projects', d.core().id)) },
+                // マイルストーン (d3.yabane 0.9.0 から): 押しても、何もしない。Ctrl + クリック (Mac は ⌘ + クリック) で、インスペクタを出す。
+                milestone: { click: inspectClick((d)=> inspect.current('milestones', d.core().id)) },
             },
         }));
 

@@ -8,6 +8,7 @@ import { ModelInspector } from '@yanqirenshi/colonoscope';
 import { ModelError, applyPatch, fieldsOf, findById, movePatch, titleOf, withDefaults } from '@yanqirenshi/model.deployment';
 
 import { useDiagramData, useDiagramView } from '../../../manegers/diagram.js';
+import { inspectClick } from '../../../manegers/inspectClick.js';
 import { useConfig } from '../../../config.js';
 import { DEPLOYMENT_COLLECTIONS, buildDeploymentData } from '../../../manegers/deployment.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../../redux/api/dataApi.js';
@@ -20,7 +21,7 @@ const collectionName = (collection)=> `deployment/${collection}`;
 
 // システム構成 (/system-environment) のシステム構成図タブ: d3.deployment をコンテンツエリア一杯に表示する。
 // 図のデータは data/deployment/ にあり、ノードをドラッグすると、動かした位置を deployment/nodes に保存する。
-// ノードや線を右クリックすると、右端のインスペクタに出し、項目を書き換えられる。
+// ノードや線を Ctrl + クリック (Mac は ⌘ + クリック) すると、右端のインスペクタに出し、項目を書き換えられる。
 //
 // 図ごとの知識 (編集できる項目・検証・patch への変換・既定値) は @yanqirenshi/model.deployment が持つ。
 // ここは view (d3.deployment) と model (model.deployment) とインスペクタ (colonoscope の ModelInspector) をつなぎ、
@@ -30,7 +31,7 @@ export default function SystemConfigurationDiagram () {
     const collections = useCollections();
     const [patchRecord] = usePatchRecordMutation();
 
-    // 右クリックした要素。{ collection: 'nodes' | 'edges', id }
+    // Ctrl + クリック (Mac は ⌘ + クリック) した要素。{ collection: 'nodes' | 'edges', id }
     const [target, setTarget] = React.useState(null);
     const [error, setError] = React.useState(null);
 
@@ -114,7 +115,7 @@ export default function SystemConfigurationDiagram () {
 function Diagram (props) {
     const data = props.data;
 
-    // ドラッグの終わりと右クリックには、いつも最新の関数を呼ぶ。
+    // ドラッグの終わりとクリックには、いつも最新の関数を呼ぶ。
     const onMove = React.useRef(props.onMove);
     onMove.current = props.onMove;
 
@@ -135,14 +136,15 @@ function Diagram (props) {
             transform: INITIAL_VIEW,
             grid,
             // コールバックの core は入力のレコードそのもの。(子のノードも)
+            // インスペクタは Ctrl + クリック (Mac は ⌘ + クリック) で開く。(0.11.0 から。右クリックでは、ブラウザのメニューが出る)
             callbacks: {
                 node: {
-                    contextmenu: (core)=> onInspect.current({ collection: 'nodes', id: core.id }),
+                    click: inspectClick((core)=> onInspect.current({ collection: 'nodes', id: core.id })),
                     // ドラッグの終わり (動いたときだけ)
                     dragend: (core, _node, move)=> onMove.current(core, move),
                 },
                 edge: {
-                    contextmenu: (core)=> onInspect.current({ collection: 'edges', id: core.id }),
+                    click: inspectClick((core)=> onInspect.current({ collection: 'edges', id: core.id })),
                 },
             },
         });

@@ -8,6 +8,7 @@ import { ModelInspector } from '@yanqirenshi/colonoscope';
 import { ModelError, applyPatch, collectionOf, fieldsOf, mergePatch, movePatch, titleOf, withDefaults } from '@yanqirenshi/model.unchi';
 
 import { findRecord, useDiagramData, useDiagramView } from '../../../../manegers/diagram.js';
+import { inspectClick } from '../../../../manegers/inspectClick.js';
 import { useConfig } from '../../../../config.js';
 import { OVERVIEW_COLLECTIONS, buildOverviewData } from '../../../../manegers/overview.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../../../redux/api/dataApi.js';
@@ -25,7 +26,7 @@ const isLiveEdgePatch = (change)=> change.collection==='edges' && Object.keys(ch
 
 // 艦橋 (Bridge) の Overview タブ: d3.unchi (ポンチ絵) をコンテンツエリア一杯に表示する。
 // 図のデータは data/overview/ にあり、ノードをドラッグすると、動かした位置を overview/nodes に保存する。
-// ノードや線を右クリックすると、右端にインスペクタを出し、項目を書き換えられる。
+// ノードや線を Ctrl + クリック (Mac は ⌘ + クリック) すると、右端にインスペクタを出し、項目を書き換えられる。
 //
 // 図ごとの知識 (編集できる項目・検証・patch への変換・d3.unchi の既定値) は @yanqirenshi/model.unchi が持つ。
 // ここは view (d3.unchi) と model (model.unchi) とインスペクタ (colonoscope の ModelInspector) をつなぎ、
@@ -35,7 +36,7 @@ export default function Overview () {
     const collections = useCollections();
     const [patchRecord] = usePatchRecordMutation();
 
-    // 右クリックした要素。{ collection: 'nodes' | 'edges', id }
+    // Ctrl + クリック (Mac は ⌘ + クリック) した要素。{ collection: 'nodes' | 'edges', id }
     const [target, setTarget] = React.useState(null);
     const [error, setError] = React.useState(null);
 
@@ -83,7 +84,7 @@ export default function Overview () {
         }
     };
 
-    // 右クリック: core は入力のレコードそのもの。
+    // Ctrl + クリック (Mac は ⌘ + クリック): core は入力のレコードそのもの。
     const onInspect = (core)=> setTarget({ collection: collectionOf(core), id: core.id });
 
     // 適用: 変えた項目だけが patch に入る。不正な値は ModelError (利用者向けの日本語)。
@@ -142,7 +143,7 @@ export default function Overview () {
 function Diagram (props) {
     const data = props.data;
 
-    // ドラッグの終わりと右クリックには、いつも最新の関数を呼ぶ。
+    // ドラッグの終わりとクリックには、いつも最新の関数を呼ぶ。
     const onMove = React.useRef(props.onMove);
     onMove.current = props.onMove;
 
@@ -162,15 +163,16 @@ function Diagram (props) {
         const r = new Rectum({
             transform: INITIAL_VIEW,
             grid,
+            // インスペクタは Ctrl + クリック (Mac は ⌘ + クリック) で開く。(0.11.0 から。右クリックでは、ブラウザのメニューが出る)
             callbacks: {
                 node: {
                     // ドラッグの終わり。掴んだノードについてだけ、1 回呼ばれる。
                     // (子のノードは親の中での位置なので、親を動かしても変わらない)
                     dragend: (core, _node, move)=> onMove.current(core, move),
-                    contextmenu: (core)=> onInspect.current(core),
+                    click: inspectClick((core)=> onInspect.current(core)),
                 },
                 edge: {
-                    contextmenu: (core)=> onInspect.current(core),
+                    click: inspectClick((core)=> onInspect.current(core)),
                 },
             },
         });

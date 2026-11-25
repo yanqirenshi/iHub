@@ -4,6 +4,12 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.11.0 (2026-11)
+
+- コードの変更は無い。(ihub.core 0.11.0 と、版をそろえるだけ。yanqirenshi/iHub#222)
+- `init --app` で作る `package.json` の iHub の版は、`^0.11.0` になる。
+- `init --app` で作るアプリに、`src/manegers/` (中身は `README.md` だけ) が入る。(雛形は ihub.core 0.11.0 が持つ。yanqirenshi/iHub#175)
+
 ## 0.10.1 (2026-11)
 
 - コードの変更は無い。(ihub.core 0.10.1 と、版をそろえるだけ。yanqirenshi/iHub#218)

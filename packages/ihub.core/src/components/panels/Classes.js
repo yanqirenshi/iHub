@@ -9,6 +9,7 @@ import { ModelError, applyPatch, fieldsOf, findById, movePatch, titleOf, withDef
 
 import { useConfig } from '../../config.js';
 import { useDiagramData, useDiagramView } from '../../manegers/diagram.js';
+import { inspectClick } from '../../manegers/inspectClick.js';
 import { CLASSES_COLLECTIONS, buildClassesData } from '../../manegers/classes.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../redux/api/dataApi.js';
 
@@ -17,7 +18,7 @@ const collectionName = (collection)=> `classes/${collection}`;
 
 // クラス (/classes) のクラス図タブ: d3.classes をコンテンツエリア一杯に表示する。
 // 図のデータは data/classes/ にあり、クラスの箱をドラッグすると、動かした位置を classes/classes に保存する。
-// 箱を右クリックするとクラス、線をクリックか右クリックすると関係を、右端のインスペクタに出し、項目を書き換えられる。
+// 箱を Ctrl + クリック (Mac は ⌘ + クリック) するとクラス、線を同じく押すと関係を、右端のインスペクタに出し、項目を書き換えられる。
 //
 // 図の知識 (編集できる項目・patch への変換) は @yanqirenshi/model.classes が持つ。(図に渡す形は manegers/classes.js)
 // ここは view (d3.classes) と model (model.classes) とインスペクタ (colonoscope の ModelInspector) をつなぎ、
@@ -31,7 +32,7 @@ export default function Classes () {
     const collections = useCollections();
     const [patchRecord] = usePatchRecordMutation();
 
-    // 右クリック (線はクリックも) した要素。{ collection: 'classes' | 'relationships', id }
+    // Ctrl + クリック (Mac は ⌘ + クリック) した要素。{ collection: 'classes' | 'relationships', id }
     const [target, setTarget] = React.useState(null);
     const [error, setError] = React.useState(null);
 
@@ -219,7 +220,7 @@ function Diagram (props) {
 
     const container = React.useRef(null);
 
-    // ドラッグの終わりと右クリック・クリックには、いつも最新の関数を呼ぶ。
+    // ドラッグの終わりとクリックには、いつも最新の関数を呼ぶ。
     const handlers = React.useRef(props);
     handlers.current = props;
 
@@ -235,19 +236,18 @@ function Diagram (props) {
         const disposers = [];
 
         // 操作の知らせ。(d3.classes 0.14.0 のコールバック)
-        // 右クリックのブラウザのメニューは、コールバックを渡していれば d3.classes が止める。
+        // インスペクタは Ctrl + クリック (Mac は ⌘ + クリック) で開く。(0.11.0 から。右クリックでは、ブラウザのメニューが出る。線も、修飾キーの無いクリックでは開かない)
         // 線は 1px と細いが、d3.classes が透明な太い線を重ねて、線の近くのクリックも受ける。
-        const inspectRelationship = (core)=> handlers.current.onInspect({ collection: 'relationships', id: core.id });
+        const inspectRelationship = inspectClick((core)=> handlers.current.onInspect({ collection: 'relationships', id: core.id }));
 
         const callbacks = {
             class: {
-                contextmenu: (core)=> handlers.current.onInspect({ collection: 'classes', id: core.id }),
+                click: inspectClick((core)=> handlers.current.onInspect({ collection: 'classes', id: core.id })),
                 // 動いたときだけ呼ばれる。move は移動量 ({ dx, dy })。core は描いたときの入力なので、id だけを使う。
                 dragend: (core, box, move)=> handlers.current.onMove(core.id, move),
             },
             relationship: {
                 click: inspectRelationship,
-                contextmenu: inspectRelationship,
             },
         };
 

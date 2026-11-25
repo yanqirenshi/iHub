@@ -4,6 +4,48 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.11.0 (2026-11)
+
+### 変更 (インスペクタを開く操作を、右クリックから Ctrl + クリック (Mac は ⌘ + クリック) に変える。yanqirenshi/iHub#222)
+
+- 7 つの図 (ER 図・TM・クラス図・画面遷移図・システム構成図・艦橋の Overview・艦橋の Schedule) で、d3.* に `contextmenu` のコールバックを渡すのをやめ、`click` のコールバックで、Ctrl か ⌘ を押しているときだけ、インスペクタを開くようにした。
+  - 判定は `manegers/inspectClick.js` の 1 か所にまとめた。d3.* の `click` の最後の引数 (DOM の MouseEvent) の `ctrlKey || metaKey` が真のときだけ開き、開くと決めたときに `event.preventDefault()` を呼ぶ。(リンクを持つ要素で、ブラウザがリンクを開くのを止めるため)
+  - 開くもの: ER 図はテーブルの見出し・カラム。TM はエンティティの見出し・識別子の行・属性の行・結線 (線とラベル)。クラス図は箱・関係の線。システム構成図・画面遷移図・Overview はノード・線。Schedule は矢羽根・WBS の箱・プロジェクトの箱・マイルストーン。
+  - Schedule の矢羽根の `click` は、Ctrl・⌘ があればインスペクタ (行き先へは移らない)、無ければ、これまでどおり行き先へ移る。
+- `inspectClick(open, otherwise)`・`isInspectClick(event)` を公開した。(`import { inspectClick } from '@yanqirenshi/ihub.core'`。`manegers` からも引ける)
+- 判定の関数のテストを足した。(`test/inspectClick.test.mjs`)
+- `dependencies` を上げた。(`click` に `event` が渡る版。Foolsgolds/Assholes#253・#254・#257)
+  - `@yanqirenshi/d3.er`: `^0.6.2` → `^0.6.6`
+  - `@yanqirenshi/d3.ter`: `^0.4.3` → `^0.4.7`
+  - `@yanqirenshi/d3.deployment`: `^0.11.1` → `^0.11.5`
+  - `@yanqirenshi/d3.sitemap`: `^0.9.1` → `^0.9.4`
+  - `@yanqirenshi/d3.unchi`: `^0.10.0` → `^0.10.3`
+  - d3.classes (`^0.14.1`)・d3.yabane (`^0.9.0`) は、もとから `click` に `event` が渡るので、上げていない。model.* も、上げていない。
+- 間の版で変わったこと (利用側から見える違いは、下の 3 つだけ):
+  - 5 つとも: `click` のコールバックの最後の引数に、DOM の MouseEvent が渡る。(Foolsgolds/Assholes#253)
+  - d3.ter 0.4.7: 結線の、クリックが届く範囲にポインタが入ると、線の色が変わる。(`relationship.click` を渡したときだけ。左ボタンを押している間は変わらない。Foolsgolds/Assholes#254) iHub は、色を d3.ter の既定 (`#1a73e8`) のまま使う。(設定は足していない)
+  - d3.deployment 0.11.5・d3.sitemap 0.9.4・d3.unchi 0.10.3: リンクの部分 (ノードに添えたリンクのアイコンなど) の上でも、Ctrl・⌘ + クリックなら `click` のコールバックを呼ぶ。(修飾キーの無いクリックは、これまでどおりリンクを開く。Foolsgolds/Assholes#257)
+  - そのほか (コメントの直し・既定の export のコンポーネントを名前つきでも出す・型の定義・`@babel/preset-react` を d3.er の依存から外す) は、動きを変えない。iHub のコードの直しは要らなかった。
+- 雛形の `examples/app/package.template.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、`^0.11.0` にした。
+- **利用側から見える違い**:
+  - 図の要素の**右クリックでは、インスペクタが開かなくなった。**ブラウザの普通のメニューが出る。
+  - インスペクタは、**Ctrl + クリック (Mac は ⌘ + クリック)** で開く。(Mac の Ctrl + クリックは、OS が右クリックとして扱うので、使えない)
+  - **TM の結線 (線・ラベル) と、クラス図の関係の線は、クリックだけでは開かなくなった。**Ctrl + クリックで開く。
+  - Schedule の矢羽根は、修飾キーの無いクリックでは、これまでどおり行き先へ移る。Ctrl + クリックでは、行き先へは移らず、インスペクタが開く。
+  - 画面遷移図などのリンクのアイコンを Ctrl + クリックすると、インスペクタが開き、リンクは開かない。修飾キーの無いクリックでは、これまでどおりリンクが開く。
+  - TM の結線は、ポインタが近づくと、線の色が変わる。
+  - データの形・設定の形は、変わらない。(データの移行は無い)
+- **制限**:
+  - ⌘ + クリックは、押している間に 1px でも動くと、クリックにならず、ドラッグかパンになる。(修飾キーの無いクリックと同じ。Ctrl では起きない)
+  - 触って操作する端末 (修飾キーの無い端末) では、インスペクタを開けない。
+  - Mac の実機では、確かめていない。(`metaKey` のクリックのイベントを送って確かめた)
+
+### 追加 (雛形のアプリに `src/manegers/` を入れる。yanqirenshi/iHub#175)
+
+- 雛形のアプリ (`examples/app/`。`ihub-srv init --app` がコピーする) に、自分で作るデータのマネージャを置くフォルダ `src/manegers/` を入れた。中身は `README.md` だけ。(自分で作る部品を置く `src/components/` (0.6.1 から) と同じ扱い)
+  - 雛形にコピーするものの一覧 (`scripts/copy-assets.mjs` の `REF_SRC`) に、`manegers` を足した。参照アプリにも、`src/manegers/README.md` を足した。
+  - 0.10.x までの `init --app` で作ったアプリには、このフォルダは無い。自分でデータのマネージャを作るときに、作る。(無くても、動きは変わらない)
+
 ## 0.10.1 (2026-11)
 
 ### 修正 (TM の結線のラベルをクリックしても、インスペクタが開かない。yanqirenshi/iHub#218)
@@ -203,7 +245,6 @@
 
 - 雛形のアプリ (`examples/app/`。`ihub-srv init --app` がコピーする) に、自分で作る部品を置くフォルダ `src/components/` (`assemblies/`・`pages/`・`panels/`・`parts/`) を入れた。中身は、それぞれの `README.md` だけ。
   - これまでは、参照アプリにはあるが、雛形にコピーするものの一覧 (`scripts/copy-assets.mjs` の `REF_SRC`) に無かったので、雛形から作ったアプリには無かった。
-- 同じように、自分で作るデータのマネージャを置くフォルダ `src/manegers/` も入れた。中身は `README.md` だけ。(参照アプリにも、`src/manegers/README.md` を足した)
 
 ## 0.6.0 (2026-11)
 
