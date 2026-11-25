@@ -9,6 +9,7 @@ import { ModelError, applyPatch, fieldsOf, findById, movePatch, titleOf, withDef
 
 import { useConfig } from '../../config.js';
 import { useDiagramData, useDiagramView } from '../../manegers/diagram.js';
+import { inspectClick } from '../../manegers/inspectClick.js';
 import { ER_COLLECTIONS, buildErData } from '../../manegers/er.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../redux/api/dataApi.js';
 
@@ -20,7 +21,7 @@ const collectionName = (collection)=> `er/${collection}`;
 
 // データ (/data) の ER 図タブ: d3.er をコンテンツエリア一杯に表示する。
 // 図のデータは data/er/ にあり (階層形式。TM と同じ)、テーブルをドラッグすると、動かした位置を er/entities に保存する。
-// テーブルの見出しを右クリックするとエンティティ、カラムを右クリックするとそのカラムが参照する識別子 / 属性のマスタを、
+// テーブルの見出しを Ctrl + クリック (Mac は ⌘ + クリック) するとエンティティ、カラムを同じく押すとそのカラムが参照する識別子 / 属性のマスタを、
 // 右端のインスペクタに出し、項目を書き換えられる。
 //
 // 図ごとの知識 (編集できる項目・検証・patch への変換・既定値) は @yanqirenshi/model.er が持つ。
@@ -31,7 +32,7 @@ export default function ER () {
     const collections = useCollections();
     const [patchRecord] = usePatchRecordMutation();
 
-    // 右クリックした要素。{ collection: 'entities' | 'identifiers' | 'attributes', id }
+    // Ctrl + クリック (Mac は ⌘ + クリック) した要素。{ collection: 'entities' | 'identifiers' | 'attributes', id }
     const [target, setTarget] = React.useState(null);
     const [error, setError] = React.useState(null);
 
@@ -114,7 +115,7 @@ export default function ER () {
 function Diagram (props) {
     const data = props.data;
 
-    // ドラッグの終わりと右クリックには、いつも最新の関数を呼ぶ。
+    // ドラッグの終わりとクリックには、いつも最新の関数を呼ぶ。
     const onMove = React.useRef(props.onMove);
     onMove.current = props.onMove;
 
@@ -135,19 +136,20 @@ function Diagram (props) {
             transform: INITIAL_VIEW,
             grid,
             // コールバックの d は d3.er の内部の行で、入力のレコードは d._core にある。
+            // インスペクタは Ctrl + クリック (Mac は ⌘ + クリック) で開く。(0.11.0 から。右クリックでは、ブラウザのメニューが出る。manegers/inspectClick.js)
             callbacks: {
                 table: {
                     // 見出し: _core はエンティティ
-                    header: { contextmenu: (d)=> onInspect.current({ collection: 'entities', id: d._core.id }) },
+                    header: { click: inspectClick((d)=> onInspect.current({ collection: 'entities', id: d._core.id })) },
                     // カラム: _core はエンティティの identifiers[] / attributes[] の要素。参照しているマスタを出す
                     columns: {
-                        contextmenu: (d)=> {
+                        click: inspectClick((d)=> {
                             const ref = d._core;
 
                             onInspect.current(ref.identifier!==undefined
                                               ? { collection: 'identifiers', id: ref.identifier }
                                               : { collection: 'attributes',  id: ref.attribute });
-                        },
+                        }),
                     },
                     // ドラッグの終わり (動いたときだけ)。core はエンティティ
                     dragend: (core, _table, move)=> onMove.current(core, move),

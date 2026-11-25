@@ -9,6 +9,7 @@ import { ModelError, applyPatch, fieldsOf, findById, movePatch, titleOf, withDef
 
 import { useConfig } from '../../config.js';
 import { useDiagramData, useDiagramView } from '../../manegers/diagram.js';
+import { inspectClick } from '../../manegers/inspectClick.js';
 import { TM_COLLECTIONS, buildTmData } from '../../manegers/tm.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../redux/api/dataApi.js';
 
@@ -20,8 +21,8 @@ const collectionName = (collection)=> `tm/${collection}`;
 
 // ビジネス (/business) の TM タブ: d3.ter をコンテンツエリア一杯に表示する。
 // 図のデータは data/tm/ にあり、エンティティをドラッグすると、動かした位置を tm/entities に保存する。
-// エンティティの見出しを右クリックするとエンティティ、識別子・属性の行を右クリックするとその行が参照するマスタ、
-// 結線をクリックするとリレーションシップを、右端のインスペクタに出し、項目を書き換えられる。
+// エンティティの見出しを Ctrl + クリック (Mac は ⌘ + クリック) するとエンティティ、識別子・属性の行を同じく押すとその行が参照するマスタ、
+// 結線 (線とラベル) を同じく押すとリレーションシップを、右端のインスペクタに出し、項目を書き換えられる。
 //
 // 図ごとの知識 (編集できる項目・検証・patch への変換・既定値) は @yanqirenshi/model.tm が持つ。
 // ここは view (d3.ter) と model (model.tm) とインスペクタ (colonoscope の ModelInspector) をつなぎ、
@@ -31,7 +32,7 @@ export default function TM () {
     const collections = useCollections();
     const [patchRecord] = usePatchRecordMutation();
 
-    // 右クリック (結線はクリック) した要素。{ collection: 'entities' | 'identifiers' | 'attributes' | 'relationships', id }
+    // Ctrl + クリック (Mac は ⌘ + クリック) した要素。{ collection: 'entities' | 'identifiers' | 'attributes' | 'relationships', id }
     const [target, setTarget] = React.useState(null);
     const [error, setError] = React.useState(null);
 
@@ -114,7 +115,7 @@ export default function TM () {
 function Diagram (props) {
     const data = props.data;
 
-    // ドラッグの終わりと右クリック・クリックには、いつも最新の関数を呼ぶ。
+    // ドラッグの終わりとクリックには、いつも最新の関数を呼ぶ。
     const onMove = React.useRef(props.onMove);
     onMove.current = props.onMove;
 
@@ -144,15 +145,17 @@ function Diagram (props) {
             grid,
             svg: { style: { background: '#fff' } },
             // コールバックの d は d3.ter の内部のデータで、入力のレコードは d._core にある。
+            // インスペクタは Ctrl + クリック (Mac は ⌘ + クリック) で開く。(0.11.0 から。右クリックでは、ブラウザのメニューが出る。結線も、修飾キーの無いクリックでは開かない)
+            // 結線のホバーの色 (クリックが届く範囲にポインタが入ると変わる) は、d3.ter の既定のまま。(relationship.click を渡したときだけ付く)
             callbacks: {
                 entity: {
-                    contextmenu: (d)=> onInspect.current({ collection: 'entities', id: d._core.id }),
+                    click: inspectClick((d)=> onInspect.current({ collection: 'entities', id: d._core.id })),
                     // ドラッグの終わり (動いたときだけ)。core はエンティティ
                     dragend: (core, _entity, move)=> onMove.current(core, move),
                 },
-                identifier:   { contextmenu: master('identifiers') },
-                attribute:    { contextmenu: master('attributes') },
-                relationship: { click: (d)=> onInspect.current({ collection: 'relationships', id: d._core.id }) },
+                identifier:   { click: inspectClick(master('identifiers')) },
+                attribute:    { click: inspectClick(master('attributes')) },
+                relationship: { click: inspectClick((d)=> onInspect.current({ collection: 'relationships', id: d._core.id })) },
             },
         });
 

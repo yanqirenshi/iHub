@@ -8,6 +8,7 @@ import { ModelInspector } from '@yanqirenshi/colonoscope';
 import { ModelError, applyPatch, fieldsOf, findById, movePatch, titleOf, withDefaults } from '@yanqirenshi/model.sitemap';
 
 import { useDiagramData, useDiagramView } from '../../../manegers/diagram.js';
+import { inspectClick } from '../../../manegers/inspectClick.js';
 import { useConfig } from '../../../config.js';
 import { SITEMAP_COLLECTIONS, buildSitemapData } from '../../../manegers/sitemap.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../../redux/api/dataApi.js';
@@ -27,7 +28,7 @@ const collectionName = (collection)=> `sitemap/${collection}`;
 
 // 画面 (/screens) の画面遷移図タブ: d3.sitemap をコンテンツエリア一杯に表示する。
 // 図のデータは data/sitemap/ にあり、画面のノードをドラッグすると、動かした位置を sitemap/nodes に保存する。
-// ノードや線 (path と両端のポートの○) を右クリックすると、右端のインスペクタに出し、項目を書き換えられる。
+// ノードや線 (path と両端のポートの○) を Ctrl + クリック (Mac は ⌘ + クリック) すると、右端のインスペクタに出し、項目を書き換えられる。
 //
 // 図ごとの知識 (編集できる項目・検証・patch への変換・既定値) は @yanqirenshi/model.sitemap が持つ。
 // ここは view (d3.sitemap) と model (model.sitemap) とインスペクタ (colonoscope の ModelInspector) をつなぎ、
@@ -37,7 +38,7 @@ export default function ScreenTransitionDiagram () {
     const collections = useCollections();
     const [patchRecord] = usePatchRecordMutation();
 
-    // 右クリックした要素。{ collection: 'nodes' | 'edges', id }
+    // Ctrl + クリック (Mac は ⌘ + クリック) した要素。{ collection: 'nodes' | 'edges', id }
     const [target, setTarget] = React.useState(null);
     const [error, setError] = React.useState(null);
 
@@ -121,7 +122,7 @@ export default function ScreenTransitionDiagram () {
 function Diagram (props) {
     const data = props.data;
 
-    // ドラッグの終わりと右クリックには、いつも最新の関数を呼ぶ。
+    // ドラッグの終わりとクリックには、いつも最新の関数を呼ぶ。
     const onMove = React.useRef(props.onMove);
     onMove.current = props.onMove;
 
@@ -142,15 +143,17 @@ function Diagram (props) {
             transform: INITIAL_VIEW,
             grid,
             // コールバックの core は入力のレコードそのもの。(子のノードも、線も)
+            // インスペクタは Ctrl + クリック (Mac は ⌘ + クリック) で開く。(0.11.0 から。右クリックでは、ブラウザのメニューが出る)
+            // リンクのアイコン (a.link-alt) の上でも、Ctrl + クリック (Mac は ⌘ + クリック) ならインスペクタを開き、リンクは開かない。(inspectClick が preventDefault する。修飾キーの無いクリックは、いまのままリンクを開く)
             callbacks: {
                 node: {
-                    contextmenu: (core)=> onInspect.current({ collection: 'nodes', id: core.id }),
+                    click: inspectClick((core)=> onInspect.current({ collection: 'nodes', id: core.id })),
                     // ドラッグの終わり (動いたときだけ)
                     dragend: (core, _node, move)=> onMove.current(core, move),
                 },
                 // 線の path と両端のポートの○ (d3.sitemap 0.9.0+)
                 edge: {
-                    contextmenu: (core)=> onInspect.current({ collection: 'edges', id: core.id }),
+                    click: inspectClick((core)=> onInspect.current({ collection: 'edges', id: core.id })),
                 },
             },
         });

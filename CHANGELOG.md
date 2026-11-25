@@ -10,6 +10,14 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.11.0 (2026-11)
+
+- `@yanqirenshi/ihub.core`: 図の要素のインスペクタを開く操作を、右クリックから **Ctrl + クリック (Mac は ⌘ + クリック)** に変えた。(yanqirenshi/iHub#222。7 つの図: ER 図・TM・クラス図・画面遷移図・システム構成図・艦橋の Overview・艦橋の Schedule) 右クリックでは、インスペクタは開かず、ブラウザの普通のメニューが出る。0.10.x までクリックだけで開いた TM の結線・クラス図の関係の線も、Ctrl + クリックにそろえた。(修飾キーの無いクリックでは開かない) Schedule の矢羽根は、修飾キーの無いクリックでは、これまでどおり行き先へ移る。
+- `@yanqirenshi/ihub.core`: `@yanqirenshi/d3.er` を `^0.6.6`、`@yanqirenshi/d3.ter` を `^0.4.7`、`@yanqirenshi/d3.deployment` を `^0.11.5`、`@yanqirenshi/d3.sitemap` を `^0.9.4`、`@yanqirenshi/d3.unchi` を `^0.10.3` に上げた。(`click` のコールバックに `event` が渡る。TM の結線は、ポインタが近づくと色が変わる)
+- `@yanqirenshi/ihub.core`: 判定の関数 `inspectClick`・`isInspectClick` を公開した。(アプリが足した図のパネルでも、同じ操作にそろえられる)
+- `@yanqirenshi/ihub.core`: 雛形の `examples/app/package.template.json` の iHub の版を、`^0.11.0` にそろえた。
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(ihub.core 0.11.0 と、版をそろえるだけ)
+
 ## 0.10.1 (2026-11)
 
 - `@yanqirenshi/ihub.core`: `@yanqirenshi/d3.ter` を `^0.4.3` に上げた。(yanqirenshi/iHub#218) TM の結線のラベルの文字の上をクリックしても、結線がインスペクタに開くようになった。(0.10.0 までは、ラベルの上では開かず、線の上か、線の近くをクリックする必要があった) 線の上・線の近くのクリックは、変わらない。iHub のコードの変更は無い。データの形・設定の形は変わらない。
