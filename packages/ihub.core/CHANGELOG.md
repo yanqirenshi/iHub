@@ -40,6 +40,12 @@
   - 触って操作する端末 (修飾キーの無い端末) では、インスペクタを開けない。
   - Mac の実機では、確かめていない。(`metaKey` のクリックのイベントを送って確かめた)
 
+### 追加 (雛形のアプリに `src/manegers/` を入れる。yanqirenshi/iHub#175)
+
+- 雛形のアプリ (`examples/app/`。`ihub-srv init --app` がコピーする) に、自分で作るデータのマネージャを置くフォルダ `src/manegers/` を入れた。中身は `README.md` だけ。(自分で作る部品を置く `src/components/` (0.6.1 から) と同じ扱い)
+  - 雛形にコピーするものの一覧 (`scripts/copy-assets.mjs` の `REF_SRC`) に、`manegers` を足した。参照アプリにも、`src/manegers/README.md` を足した。
+  - 0.10.x までの `init --app` で作ったアプリには、このフォルダは無い。自分でデータのマネージャを作るときに、作る。(無くても、動きは変わらない)
+
 ## 0.10.1 (2026-11)
 
 ### 修正 (TM の結線のラベルをクリックしても、インスペクタが開かない。yanqirenshi/iHub#218)
@@ -239,7 +245,6 @@
 
 - 雛形のアプリ (`examples/app/`。`ihub-srv init --app` がコピーする) に、自分で作る部品を置くフォルダ `src/components/` (`assemblies/`・`pages/`・`panels/`・`parts/`) を入れた。中身は、それぞれの `README.md` だけ。
   - これまでは、参照アプリにはあるが、雛形にコピーするものの一覧 (`scripts/copy-assets.mjs` の `REF_SRC`) に無かったので、雛形から作ったアプリには無かった。
-- 同じように、自分で作るデータのマネージャを置くフォルダ `src/manegers/` も入れた。中身は `README.md` だけ。(参照アプリにも、`src/manegers/README.md` を足した)
 
 ## 0.6.0 (2026-11)
 

@@ -16,6 +16,7 @@
 - `@yanqirenshi/ihub.core`: `@yanqirenshi/d3.er` を `^0.6.6`、`@yanqirenshi/d3.ter` を `^0.4.7`、`@yanqirenshi/d3.deployment` を `^0.11.5`、`@yanqirenshi/d3.sitemap` を `^0.9.4`、`@yanqirenshi/d3.unchi` を `^0.10.3` に上げた。(`click` のコールバックに `event` が渡る。TM の結線は、ポインタが近づくと色が変わる)
 - `@yanqirenshi/ihub.core`: 判定の関数 `inspectClick`・`isInspectClick` を公開した。(アプリが足した図のパネルでも、同じ操作にそろえられる)
 - `@yanqirenshi/ihub.core`: 雛形の `examples/app/package.template.json` の iHub の版を、`^0.11.0` にそろえた。
+- `@yanqirenshi/ihub.core`: 雛形のアプリ (`ihub-srv init --app` で作るアプリ) に、自分で作るデータのマネージャを置くフォルダ `src/manegers/` を入れた。(yanqirenshi/iHub#175。中身は `README.md` だけ)
 - `@yanqirenshi/ihub.srv`: コードの変更は無い。(ihub.core 0.11.0 と、版をそろえるだけ)
 
 ## 0.10.1 (2026-11)
