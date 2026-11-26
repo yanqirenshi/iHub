@@ -6,7 +6,9 @@
 //
 // モーダルの形: 左にエンティティのイメージ (d3.ter で描く。previewEntityData)、右にタブ (基本・Identifiers・Attributes)。
 //
-// どれも、ほかのファイルを読み込まない、ただの関数。(node --test で、そのまま確かめる)
+// どれも、ただの関数。(読み込むのは、同じフォルダの tmTables.js だけ。node --test で、そのまま確かめる)
+
+import { nameParts } from './tmTables.js';
 
 // フォームのタブ。(並びは、タブの並び)
 export const ENTITY_FORM_TABS = [
@@ -145,4 +147,59 @@ export function previewEntityData (values, collections) {
         entities: [{ ...record, id: PREVIEW_ENTITY_ID, position: { x: 0, y: 0 } }],
         relationships: [],
     });
+}
+
+// ---- Identifiers・Attributes のタブの、選ぶ一覧 (#232 のユーザーの図) ------------------------------
+// タブの中は、左に「選択した一覧」(選んだ順)、右の上に「検索」、右の下に「全ての一覧」(ファイルの順。選んだものは出さない)。
+// 右の行を選ぶと、左の末尾に入る。左の行を外すと、右の、ファイルの順の位置に戻る。
+// 検索は、右の一覧だけを絞り込む。(左は絞り込まない)
+
+// マスタ (識別子・属性) の一覧。[{ id, logical, physical, description }]。ファイルの順。
+//   master … 'identifiers' か 'attributes'
+export function masterItems (collections, master) {
+    const list = collections?.[`tm/${master}`];
+
+    return (Array.isArray(list) ? list : [])
+        .filter(Boolean)
+        .map(d=> ({
+            id: d.id,
+            ...nameParts(d.name),
+            description: Array.isArray(d.description) ? d.description.join('\n') : String(d.description ?? ''),
+        }));
+}
+
+// 検索の文字に合うか。論理名・物理名・ID・説明の、どれかに含むもの。(大文字と小文字は区別しない。前後の空白は落とす。空なら、全部が合う)
+export function matchesMaster (item, query) {
+    const q = String(query ?? '').trim().toLowerCase();
+
+    if (q==='')
+        return true;
+
+    return [item?.logical, item?.physical, item?.id, item?.description]
+        .some(v=> v!==undefined && v!==null && String(v).toLowerCase().includes(q));
+}
+
+// 左右の一覧。
+//   selected  … 選んだ順。(マスタから消えた id も、id だけの行で残す。保存すると誤りになるので、外せるように)
+//   available … ファイルの順。選んだものを除き、検索に合うものだけ。
+export function pickerLists (items, selectedIds, query) {
+    const ids = Array.isArray(selectedIds) ? selectedIds : [];
+    const byId = new Map(items.map(d=> [d.id, d]));
+
+    return {
+        selected: ids.map(id=> byId.get(id) || { id, logical: '', physical: '', description: '', missing: true }),
+        available: items.filter(d=> !ids.includes(d.id) && matchesMaster(d, query)),
+    };
+}
+
+// 選ぶ。(左の末尾に入れる。もう選んでいれば、そのまま)
+export function selectMaster (selectedIds, id) {
+    const ids = Array.isArray(selectedIds) ? selectedIds : [];
+
+    return ids.includes(id) ? ids : [...ids, id];
+}
+
+// 外す。(左から消す。右では、ファイルの順の位置に戻る)
+export function unselectMaster (selectedIds, id) {
+    return (Array.isArray(selectedIds) ? selectedIds : []).filter(v=> v!==id);
 }

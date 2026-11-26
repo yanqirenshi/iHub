@@ -36,9 +36,9 @@
   - 左の枠: エンティティのイメージ。フォームの入力から作るレコード 1 件を、d3.ter で描く。(TM のタブの図と同じ描き方。種別のバッジと色・名前・選んだ識別子・選んだ属性) 入力が変わるたびに描き直す。見るだけ。(枠の上の操作は止めている) 描いたあとの大きさを測って、枠の真ん中に収める。(大きくはしない) 論理名が空のときは、d3.ter の既定の「????????」の名前で描く。
   - 右の枠: タブ「基本」「Identifiers」「Attributes」。
     - 基本: 種別 (model.tm の `ENTITY_TYPES`。既定は `RESOURCE`)・論理名 (必須)・物理名・説明。
-    - Identifiers・Attributes: 識別子・属性のマスタの一覧の表 (チェック・ID・論理名・物理名・説明)。行ごとのチェックで、このエンティティに持たせるものを選ぶ。(選んだ順に、行になる)
-  - タブを切り替えても、入力と選択は消えない。
-  - タブ・項目の定義・初めの値・入力の確かめ・イメージに描くデータ・保存するレコードの作り方は、`manegers/tmEntityForm.js` にまとめた。(`ENTITY_FORM_TABS`・`ENTITY_FORM_FIELDS`・`previewEntityData`・`buildEntityRecord`。画面の部品 `components/panels/tm/AddTmEntity.js` は、タブと項目の定義を見てフォームを組み立てる) テストを足した。(`test/tmEntityForm.test.mjs`)
+    - Identifiers・Attributes: 中を左右に分ける。左は「選択した一覧」(選んだ順。行の「×」で外す)。右の上は「検索」、右の下は「全ての一覧」(マスタの全部をファイルの順で。選んだものは出さない。行を押すと、左の末尾に入る)。外したものは、右の、ファイルの順の位置に戻る。検索は、論理名・物理名・ID・説明のどれかに含むもので、右の一覧だけを絞り込む。(大文字と小文字は区別しない) 1 行には、論理名と、物理名・ID を出す。(説明は出さない) 検索に合うものが無いとき・全部を選び終えたとき・マスタが無いときは、知らせを出す。保存する `identifiers[]`・`attributes[]` の並びは、選んだ順。
+  - タブを切り替えても、入力と選択と検索の文字は消えない。
+  - タブ・項目の定義・初めの値・入力の確かめ・イメージに描くデータ・保存するレコードの作り方は、`manegers/tmEntityForm.js` にまとめた。(`ENTITY_FORM_TABS`・`ENTITY_FORM_FIELDS`・`previewEntityData`・`buildEntityRecord`。選ぶ一覧の並びと絞り込みは `masterItems`・`pickerLists`・`selectMaster`・`unselectMaster`。画面の部品 `components/panels/tm/AddTmEntity.js` は、タブと項目の定義を見てフォームを組み立てる) テストを足した。(`test/tmEntityForm.test.mjs`)
   - d3.ter の部品 (`D3Ter`) は、初めに描いた SVG にだけ Rectum をつなぐので、イメージを描き直すときは、部品ごと作り直している。(`key`。d3.ter 0.4.7 のままで作れた。d3.ter の側に足すものは無い)
 - 保存するレコード:
   - `name`: 物理名が空なら、論理名の文字列。物理名があれば、`{ logical, physical }` の組。

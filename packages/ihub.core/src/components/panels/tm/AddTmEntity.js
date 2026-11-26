@@ -3,32 +3,34 @@ import React from 'react';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
 import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Tab from '@mui/material/Tab';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 
 import D3Ter, { Rectum } from '@yanqirenshi/d3.ter';
 import { ENTITY_TYPES } from '@yanqirenshi/model.tm';
 
 import { errorMessage, useAddRecordMutation, useCollections } from '../../../redux/api/dataApi.js';
 import {
-    ENTITY_FORM_FIELDS, ENTITY_FORM_TABS, buildEntityRecord, firstTabWithError, initialEntityForm, previewEntityData, validateEntityForm,
+    ENTITY_FORM_FIELDS, ENTITY_FORM_TABS, buildEntityRecord, firstTabWithError, initialEntityForm, masterItems, pickerLists,
+    previewEntityData, selectMaster, unselectMaster, validateEntityForm,
 } from '../../../manegers/tmEntityForm.js';
-import { TM_TABLE_COLLECTIONS, nameParts } from '../../../manegers/tmTables.js';
+import { TM_TABLE_COLLECTIONS } from '../../../manegers/tmTables.js';
 
 // ビジネスのページの Entities のタブの「Entity の追加」。(0.12.0 から。叩き台)
 // ボタンを押すと、モーダル (MUI の Dialog) のフォームを出し、POST /api/tm/entities で、エンティティを 1 件足す。(id は API サーバーが振る)
@@ -36,6 +38,7 @@ import { TM_TABLE_COLLECTIONS, nameParts } from '../../../manegers/tmTables.js';
 // モーダルの形 (#232 のコメントの、ユーザーの図):
 //   左: エンティティのイメージ。入力から作るレコードを、d3.ter で描く。(EntityImage。見るだけ)
 //   右: タブ「基本」「Identifiers」「Attributes」と、その中身。
+//       Identifiers・Attributes の中は、左「選択した一覧」(選んだ順)・右上「検索」・右下「全ての一覧」(選んだものは出さない)。(MastersPicker)
 //   下: 「キャンセル」「作成」。
 //
 // タブと項目は、manegers/tmEntityForm.js の ENTITY_FORM_TABS・ENTITY_FORM_FIELDS が決める。(この部品は、項目の input の種類ごとに、入力の部品を出すだけ)
@@ -74,6 +77,13 @@ function EntityDialog ({ onClose }) {
     const [errors, setErrors] = React.useState({});
     const [failure, setFailure] = React.useState(null);
     const [tab, setTab] = React.useState(ENTITY_FORM_TABS[0].code);
+
+    // Identifiers・Attributes のタブの、検索の文字。(項目の鍵 → 文字。タブを切り替えても残す)
+    const [queries, setQueries] = React.useState({});
+
+    // 選んでいるタブの項目。(マスタを選ぶ項目だけのタブは、中身を枠の高さいっぱいに出す。左右の一覧が、それぞれの中でスクロールするように)
+    const fields = ENTITY_FORM_FIELDS.filter(f=> f.tab===tab);
+    const fill = fields.length===1 && fields[0].input==='masters';
 
     const change = (key, value)=> setValues(v=> ({ ...v, [key]: value }));
 
@@ -131,14 +141,16 @@ function EntityDialog ({ onClose }) {
                   ))}
                 </Tabs>
 
-                <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto', pt: 2 }}>
-                  <Stack spacing={2}>
-                    {ENTITY_FORM_FIELDS.filter(f=> f.tab===tab).map(field=> (
+                <Box sx={{ flex: 1, minHeight: 0, overflow: fill ? 'hidden' : 'auto', pt: 2 }}>
+                  <Stack spacing={2} sx={fill ? { height: '100%' } : undefined}>
+                    {fields.map(field=> (
                         <Field key={field.key}
                                field={field}
                                value={values[field.key]}
                                error={errors[field.key]}
                                collections={collections}
+                               query={queries[field.key] ?? ''}
+                               onQuery={(q)=> setQueries(v=> ({ ...v, [field.key]: q }))}
                                onChange={(value)=> change(field.key, value)}/>
                     ))}
                   </Stack>
@@ -158,7 +170,7 @@ function EntityDialog ({ onClose }) {
 }
 
 // 1 つの項目。field.input の種類ごとに、入力の部品を出す。
-function Field ({ field, value, error, collections, onChange }) {
+function Field ({ field, value, error, collections, query, onQuery, onChange }) {
     const common = {
         label: field.label,
         required: !!field.required,
@@ -179,61 +191,108 @@ function Field ({ field, value, error, collections, onChange }) {
         return <TextField multiline minRows={3} {...common} value={value} onChange={e=> onChange(e.target.value)}/>;
 
     if (field.input==='masters')
-        return <MastersTable field={field} value={value} collections={collections} onChange={onChange}/>;
+        return <MastersPicker field={field} value={value} collections={collections} query={query} onQuery={onQuery} onChange={onChange}/>;
 
     return <TextField {...common} value={value} onChange={e=> onChange(e.target.value)}/>;
 }
 
-// マスタ (識別子・属性) の一覧の表。行ごとのチェックで、このエンティティに持たせるものを選ぶ。(叩き台)
-// 列は、チェック・ID・論理名・物理名・説明。(Identifiers・Attributes のタブの表と同じ出し方) 値は、選んだマスタの id の配列。(選んだ順)
-// マスタが 1 件も無いときは、知らせを出す。
-function MastersTable ({ field, value, collections, onChange }) {
-    const rows = React.useMemo(()=> {
-        const list = collections?.[TM_TABLE_COLLECTIONS[field.master]];
+// マスタ (識別子・属性) を選ぶ。(#232 のユーザーの図)
+//   左: 選択した一覧。選んだ順。行の「×」で外す。(外したものは、右の一覧の、ファイルの順の位置に戻る)
+//   右の上: 検索。論理名・物理名・ID・説明のどれかに含むもので、右の一覧を絞り込む。(大文字と小文字は区別しない。左は絞り込まない)
+//   右の下: 全ての一覧。ファイルの順。選んだものは出さない。行を押すと、左の末尾に入る。
+// 値は、選んだマスタの id の配列。(選んだ順。保存する identifiers[]・attributes[] も、この順)
+// 並びと絞り込みの決まりは、manegers/tmEntityForm.js の masterItems・pickerLists・selectMaster・unselectMaster。
+// マスタが 1 件も無い (選んだものも無い) ときは、知らせだけを出す。
+function MastersPicker ({ field, value, collections, query, onQuery, onChange }) {
+    const items = React.useMemo(()=> masterItems(collections, field.master), [collections, field.master]);
+    const { selected, available } = React.useMemo(()=> pickerLists(items, value, query), [items, value, query]);
 
-        return (Array.isArray(list) ? list : [])
-            .filter(Boolean)
-            .map(d=> ({ id: d.id, ...nameParts(d.name), description: d.description ?? '' }));
-    }, [collections, field.master]);
-
-    if (rows.length===0)
+    if (items.length===0 && value.length===0)
         return (
             <Alert severity="info">
               {field.label}のマスタがありません。<code>data/tm/{field.master}.json</code> に書くと、ここで選べます。
             </Alert>
         );
 
-    const toggle = (id)=> onChange(value.includes(id) ? value.filter(v=> v!==id) : [...value, id]);
+    // 右の一覧が空のときの知らせ。
+    const rest = items.filter(d=> !value.includes(d.id)).length;
+    const nothing = rest===0 ? `${field.label}は、全部を選びました。` : '検索に合うものがありません。';
 
     return (
-        <TableContainer component={Paper} variant="outlined">
-          <Table size="small" aria-label={field.label}>
-            <TableHead>
-              <TableRow>
-                <TableCell padding="checkbox"/>
-                {['ID', '論理名', '物理名', '説明'].map(h=> <TableCell key={h} sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>{h}</TableCell>)}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row, i)=> {
-                  const checked = value.includes(row.id);
+        <Box sx={{ display: 'flex', gap: 2, height: '100%', minHeight: 0 }}>
+          {/* 左: 選択した一覧 */}
+          <Paper variant="outlined" sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+            <Typography variant="subtitle2" sx={{ px: 1.5, py: 1, borderBottom: 1, borderColor: 'divider' }}>
+              選択した{field.label} ({selected.length})
+            </Typography>
 
-                  return (
-                      <TableRow key={`${i}:${row.id}`} hover selected={checked} onClick={()=> toggle(row.id)} sx={{ cursor: 'pointer' }}>
-                        <TableCell padding="checkbox">
-                          <Checkbox size="small" checked={checked} slotProps={{ input: { 'aria-label': `${row.logical || row.physical || row.id} を選ぶ` } }}/>
-                        </TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{String(row.id)}</TableCell>
-                        <TableCell>{row.logical}</TableCell>
-                        <TableCell>{row.physical}</TableCell>
-                        <TableCell sx={{ whiteSpace: 'pre-wrap' }}>{String(row.description)}</TableCell>
-                      </TableRow>
-                  );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+              {selected.length===0
+               ? <Typography variant="body2" color="text.secondary" sx={{ p: 1.5 }}>まだ選んでいません。右の一覧から選びます。</Typography>
+               : (
+                   <List dense disablePadding aria-label={`選択した${field.label}`}>
+                     {selected.map((d, i)=> (
+                         <ListItem key={`${i}:${d.id}`} divider
+                                   secondaryAction={
+                                       <IconButton edge="end" size="small" aria-label={`${itemLabel(d)} を外す`}
+                                                   onClick={()=> onChange(unselectMaster(value, d.id))}>
+                                         <CloseIcon fontSize="small"/>
+                                       </IconButton>
+                                   }>
+                           <ListItemText primary={itemLabel(d)} secondary={itemDetail(d)} slotProps={{ primary: { sx: { wordBreak: 'break-all' } } }}/>
+                         </ListItem>
+                     ))}
+                   </List>
+               )}
+            </Box>
+          </Paper>
+
+          {/* 右: 検索と、全ての一覧 */}
+          <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <TextField size="small" fullWidth
+                       label="検索"
+                       placeholder="論理名・物理名・ID・説明"
+                       value={query}
+                       onChange={e=> onQuery(e.target.value)}/>
+
+            <Paper variant="outlined" sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="subtitle2" sx={{ px: 1.5, py: 1, borderBottom: 1, borderColor: 'divider' }}>
+                全ての{field.label} ({available.length})
+              </Typography>
+
+              <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+                {available.length===0
+                 ? <Typography variant="body2" color="text.secondary" sx={{ p: 1.5 }}>{nothing}</Typography>
+                 : (
+                     <List dense disablePadding aria-label={`全ての${field.label}`}>
+                       {available.map(d=> (
+                           <ListItemButton key={String(d.id)} divider
+                                           aria-label={`${itemLabel(d)} を選ぶ`}
+                                           onClick={()=> onChange(selectMaster(value, d.id))}>
+                             <ListItemText primary={itemLabel(d)} secondary={itemDetail(d)} slotProps={{ primary: { sx: { wordBreak: 'break-all' } } }}/>
+                             <AddIcon fontSize="small" color="action"/>
+                           </ListItemButton>
+                       ))}
+                     </List>
+                 )}
+              </Box>
+            </Paper>
+          </Box>
+        </Box>
     );
+}
+
+// 一覧の 1 行の、上の段。(論理名。無ければ物理名。どちらも無ければ id。マスタから消えたものは、そのことを出す)
+function itemLabel (d) {
+    if (d.missing)
+        return `(マスタに無い id: ${d.id})`;
+
+    return d.logical || d.physical || String(d.id);
+}
+
+// 一覧の 1 行の、下の段。(物理名と ID。説明は、幅が狭いので出さない。検索には使う)
+function itemDetail (d) {
+    return [d.logical && d.physical ? d.physical : null, `ID ${d.id}`].filter(Boolean).join(' ・ ');
 }
 
 // エンティティのイメージ。入力から作るレコード 1 件を、d3.ter で描く。(TM のタブの図と同じ描き方)
