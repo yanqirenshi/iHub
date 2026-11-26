@@ -11,18 +11,18 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
 import { useCollections } from '../../../redux/api/dataApi.js';
-import { entityRows, relationshipRows } from '../../../manegers/tmTables.js';
+import { entityRows, masterRows, relationshipRows } from '../../../manegers/tmTables.js';
 
 // ビジネスのページの、TM のデータを表で見るタブ。(0.12.0 から)
-//   Entities (entities)・Relationships (relationships)
+//   Entities (entities)・Identifiers (identifiers)・Attributes (attributes)・Relationships (relationships)
 //
 // 見るだけ。(書き換えは、TM タブのインスペクタか、data/tm/ のファイルで行う)
 // 並びは、ファイルの順。(並べ替え・絞り込みは付けない)
 // データは、API サーバーから読んだもの (useCollections)。TM タブのインスペクタで書き換えると、表も新しい値になる。
-// 行の作り方 (識別子・属性・エンティティの名前の解決) は、manegers/tmTables.js。
+// 行の作り方 (名前の解決・エンティティの逆引き) は、manegers/tmTables.js。
 // 列の見出しは、TM のインスペクタ (@yanqirenshi/model.tm の fieldsOf のラベル) に合わせる。
 
-// 表。2 つのタブで同じものを使う。
+// 表。4 つのタブで同じものを使う。
 //   columns      … [{ key, label, nowrap? }]。行の値が配列のときは、1 つずつ行を分けて出す。nowrap の列は折り返さない
 //   rows         … 行の配列 (manegers/tmTables.js が作る)
 //   emptyMessage … 行が無いときに、表の代わりに出す知らせ
@@ -76,6 +76,13 @@ const ENTITY_COLUMNS = [
     { key: 'description', label: '説明' },
 ];
 
+const MASTER_COLUMNS = [
+    { key: 'id',          label: 'ID', nowrap: true },
+    { key: 'name',        label: '名称' },
+    { key: 'description', label: '説明' },
+    { key: 'entities',    label: 'エンティティ' },
+];
+
 const RELATIONSHIP_COLUMNS = [
     { key: 'id',          label: 'ID',         nowrap: true },
     { key: 'type',        label: '種類',       nowrap: true },
@@ -96,6 +103,22 @@ export function TmEntities () {
     const rows = React.useMemo(()=> entityRows(collections), [collections]);
 
     return <TmTable label="エンティティ" columns={ENTITY_COLUMNS} rows={rows} emptyMessage={empty('エンティティ', 'entities')}/>;
+}
+
+// Identifiers のタブ
+export function TmIdentifiers () {
+    const collections = useCollections();
+    const rows = React.useMemo(()=> masterRows(collections, 'identifiers'), [collections]);
+
+    return <TmTable label="識別子" columns={MASTER_COLUMNS} rows={rows} emptyMessage={empty('識別子', 'identifiers')}/>;
+}
+
+// Attributes のタブ
+export function TmAttributes () {
+    const collections = useCollections();
+    const rows = React.useMemo(()=> masterRows(collections, 'attributes'), [collections]);
+
+    return <TmTable label="属性" columns={MASTER_COLUMNS} rows={rows} emptyMessage={empty('属性', 'attributes')}/>;
 }
 
 // Relationships のタブ

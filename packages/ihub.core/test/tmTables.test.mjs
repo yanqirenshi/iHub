@@ -5,9 +5,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { entityRows, nameText, relationshipRows, subsetText } from '../src/manegers/tmTables.js';
+import { entityRows, masterRows, nameText, relationshipRows, subsetText } from '../src/manegers/tmTables.js';
 
-// 参照アプリの data/tm/ (エンティティ 3・結線 2。識別子・属性のマスタは、エンティティの識別子・属性の名前に使う)
+// 参照アプリの data/tm/ (エンティティ 3・識別子 2・属性 4・結線 2)
 const DATA = fileURLToPath(new URL('../../../data/tm/', import.meta.url));
 const read = (name)=> JSON.parse(readFileSync(`${DATA}${name}.json`, 'utf8'));
 const REFERENCE = {
@@ -31,9 +31,13 @@ test('nameText: 文字列はそのまま、論理名と物理名の組は「論�
 
 test('参照アプリの data/tm/ の件数のまま、ファイルの順で行を作る', ()=> {
     assert.deepEqual(entityRows(REFERENCE).map(d=> d.id), REFERENCE['tm/entities'].map(d=> String(d.id)));
+    assert.deepEqual(masterRows(REFERENCE, 'identifiers').map(d=> d.id), REFERENCE['tm/identifiers'].map(d=> String(d.id)));
+    assert.deepEqual(masterRows(REFERENCE, 'attributes').map(d=> d.id), REFERENCE['tm/attributes'].map(d=> String(d.id)));
     assert.deepEqual(relationshipRows(REFERENCE).map(d=> d.id), REFERENCE['tm/relationships'].map(d=> String(d.id)));
 
     assert.equal(entityRows(REFERENCE).length, 3);
+    assert.equal(masterRows(REFERENCE, 'identifiers').length, 2);
+    assert.equal(masterRows(REFERENCE, 'attributes').length, 4);
     assert.equal(relationshipRows(REFERENCE).length, 2);
 });
 
@@ -83,6 +87,19 @@ test('entityRows: 識別子・属性は名前で出す (行の name、無けれ�
     ]);
 });
 
+test('masterRows: そのマスタを持つエンティティを、entities.json の順で、1 度ずつ出す', ()=> {
+    assert.deepEqual(masterRows(COLLECTIONS, 'identifiers'), [
+        { id: '10', name: '顧客番号', description: '', entities: ['顧客 (customer)', '注文'] },
+        { id: '11', name: '注文番号 (order_no)', description: '', entities: ['注文'] },
+    ]);
+
+    assert.deepEqual(masterRows(COLLECTIONS, 'attributes'), [
+        { id: '20', name: '名前', description: '氏名', entities: ['顧客 (customer)', '注文'] },
+        { id: '21', name: '住所', description: '', entities: ['顧客 (customer)'] },
+        { id: '22', name: '使われない属性', description: '', entities: [] },
+    ]);
+});
+
 test('relationshipRows: 接続元・接続先は名前で出す (エンティティが無ければ id)。サブセットは「区分・区分コード」', ()=> {
     assert.deepEqual(relationshipRows(COLLECTIONS), [
         { id: '1', type: 'RE', from: '顧客 (customer)', to: '注文', label: '注文する', subset: '', description: '説明' },
@@ -100,6 +117,8 @@ test('subsetText: 区分と区分コード。片方だけ・無いときも落�
 test('ファイルが無い・空・形が違うときは、行が無い (落ちない)', ()=> {
     for (const collections of [undefined, null, {}, { 'tm/entities': null, 'tm/relationships': {} }]) {
         assert.deepEqual(entityRows(collections), []);
+        assert.deepEqual(masterRows(collections, 'identifiers'), []);
+        assert.deepEqual(masterRows(collections, 'attributes'), []);
         assert.deepEqual(relationshipRows(collections), []);
     }
 
