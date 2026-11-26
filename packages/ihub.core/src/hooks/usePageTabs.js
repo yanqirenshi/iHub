@@ -45,6 +45,8 @@ const TAB_DEFS = {
             { code: 'tm',              label: 'TM' },
             // TM のデータの表 (0.12.0 から。panels/tm/TmTables.js)
             { code: 'entities',        label: 'Entities' },
+            { code: 'identifiers',     label: 'Identifiers' },
+            { code: 'attributes',      label: 'Attributes' },
             { code: 'relationships',   label: 'Relationships' },
             { code: 'procedures',      label: '機能一覧' },
             { code: 'wbs',             label: 'WBS' },

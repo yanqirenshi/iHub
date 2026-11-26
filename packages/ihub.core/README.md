@@ -215,7 +215,7 @@ export default function Section01 ({ size }) {
 | `PAGE_BATCHS` | `pages.Batchs` (参照アプリでは `/batchs`) | `wbs`・`help` | `wbs` |
 | `PAGE_BPMN` | `docPages.BPMN` (参照アプリでは `/bpmn`) | `palettes`・`styles`・`methods`・`overview` | `palettes` |
 | `PAGE_BRIDGE` | `pages.Bridge` (参照アプリでは `/`。0.3.0 以降) | `cockpit`・`overview`・`schedule` | `cockpit` |
-| `PAGE_BUSINESS` | `pages.Business` (参照アプリでは `/business`) | `systemic-design`・`tm`・`entities`・`relationships`・`procedures`・`wbs`・`help` (`entities`・`relationships` は 0.12.0 以降。[ビジネスのページの TM の表](#ビジネスのページの-tm-の表)) | `tm` |
+| `PAGE_BUSINESS` | `pages.Business` (参照アプリでは `/business`) | `systemic-design`・`tm`・`entities`・`identifiers`・`attributes`・`relationships`・`procedures`・`wbs`・`help` (`entities`〜`relationships` は 0.12.0 以降。[ビジネスのページの TM の表](#ビジネスのページの-tm-の表)) | `tm` |
 | `PAGE_CLASSES` | `pages.Classes` (参照アプリでは `/classes`) | `class-diagram`・`wbs`・`help` | `class-diagram` |
 | `PAGE_DATA` | `pages.Data` (参照アプリでは `/data`) | `er-diagram`・`wbs`・`help` | `er-diagram` |
 | `PAGE_DDD` | `pages.DDD` (参照アプリでは `/ddd`) | `ubiquitous-language`・`model-driven-design`・`hands-on-modeler`・`declarative-design`・`layer-architecture`・`overview` | `layer-architecture` |
@@ -371,27 +371,30 @@ WBS とプロジェクトの行には、マイルストーンを △ で描け�
 
 ## ビジネスのページの TM の表
 
-ビジネスのページ (`pages.Business`。参照アプリでは `/business`) には、TM のデータを表で見るタブが 2 つあります。(0.12.0 以降)
+ビジネスのページ (`pages.Business`。参照アプリでは `/business`) には、TM のデータを表で見るタブが 4 つあります。(0.12.0 以降)
 タブは、「TM」と「機能一覧」の間に並びます。
 
 ```
-Systemic Design / TM / Entities / Relationships / 機能一覧 / WBS / Help
+Systemic Design / TM / Entities / Identifiers / Attributes / Relationships / 機能一覧 / WBS / Help
 ```
 
 | タブ (code) | 中身 | 列 |
 |---|---|---|
 | Entities (`entities`) | `data/tm/entities.json` | ID・種別・名称・識別子・属性・説明 |
+| Identifiers (`identifiers`) | `data/tm/identifiers.json` | ID・名称・説明・エンティティ |
+| Attributes (`attributes`) | `data/tm/attributes.json` | ID・名称・説明・エンティティ |
 | Relationships (`relationships`) | `data/tm/relationships.json` | ID・種類・接続元のエンティティ・接続先のエンティティ・ラベル・サブセット (区分・区分コード)・説明 |
 
 - 見るだけです。(書き換えは、TM タブのインスペクタか、`data/tm/` のファイルで行います) 並びは、ファイルの順です。
 - 名前は、文字列ならそのまま、論理名と物理名の組 (`{ logical, physical }`) なら「論理名 (物理名)」で出します。
 - Entities の識別子・属性は、エンティティが持つ行 (`identifiers[]`・`attributes[]`) の名前です。行に `name` があればそれを、無ければ、参照しているマスタ (`identifiers.json`・`attributes.json`) の名前を出します。
+- Identifiers・Attributes のエンティティは、その識別子 (属性) を持っているエンティティの名前です。(どこからも使われていなければ、空)
 - Relationships の接続元・接続先は、`from.entity`・`to.entity` の指すエンティティの名前です。
 - 指す先が見つからない (無い id の) ときは、id をそのまま出します。
 - 出さないもの: エンティティの位置と大きさ (`position`・`size`)、結線の位置 (角度)・カーディナリティ・オプショナリティ・`details`・`mapping`。
 - レコードが無いときは、表の代わりに知らせを出します。
 - 表がコンテンツエリアより長い・広いときは、表の中でスクロールします。見出しの行は、上に残ります。
-- パネルは `panels.TmEntities`・`panels.TmRelationships` です。設定の `panels.PAGE_BUSINESS` で差し替えられ、`tabs.PAGE_BUSINESS` の `{ code, hidden: true }` で消せます。([ページのタブとパネルを足す](#ページのタブとパネルを足す))
+- パネルは `panels.TmEntities`・`panels.TmIdentifiers`・`panels.TmAttributes`・`panels.TmRelationships` です。設定の `panels.PAGE_BUSINESS` で差し替えられ、`tabs.PAGE_BUSINESS` の `{ code, hidden: true }` で消せます。([ページのタブとパネルを足す](#ページのタブとパネルを足す))
 
 ## 艦橋の Cockpit タブの並び
 
