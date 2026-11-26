@@ -31,7 +31,7 @@ test('validateEntityForm: 種別と論理名が必須 (空白だけも、空と�
 });
 
 test('nextRowId: 識別子と属性の行を通して、数の id の最大 + 1。行が無ければ 1', ()=> {
-    // 参照アプリ: 識別子の行は 100〜104、属性の行は 200 台
+    // 参照アプリ: 行の id は 100〜103・300 台・400 台・500 台 (最大は 563)
     const ids = ENTITIES.flatMap(e=> [...(e.identifiers || []), ...(e.attributes || [])]).map(r=> r.id);
 
     assert.equal(nextRowId(ENTITIES), Math.max(...ids) + 1);

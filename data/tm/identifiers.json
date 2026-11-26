@@ -1,12 +1,76 @@
 [
     {
         "id": 10000,
-        "name": "firebase_uid",
-        "description": ""
+        "name": {
+            "logical": "Firebase UID",
+            "physical": "firebase_uid"
+        },
+        "description": "Firebase Authentication が、ユーザーに振る ID。",
+        "data_type": {
+            "type": "varchar",
+            "length": 128,
+            "description": [
+                "Firebase の UID は、128 文字まで。"
+            ]
+        }
     },
     {
         "id": 10001,
-        "name": "firebase_auth_provider_id",
-        "description": ""
+        "name": {
+            "logical": "Firebase Auth プロバイダ ID",
+            "physical": "firebase_auth_provider_id"
+        },
+        "description": "サインインの方法の ID。(google.com・password など)",
+        "data_type": {
+            "type": "varchar",
+            "length": 32
+        }
+    },
+    {
+        "id": 10002,
+        "name": {
+            "logical": "ユーザー ID",
+            "physical": "user_id"
+        },
+        "description": "アプリが、ユーザーに振る番号。",
+        "data_type": {
+            "type": "bigint"
+        }
+    },
+    {
+        "id": 10003,
+        "name": {
+            "logical": "組織 ID",
+            "physical": "organization_id"
+        },
+        "description": "アプリが、組織に振る番号。",
+        "data_type": {
+            "type": "bigint"
+        }
+    },
+    {
+        "id": 10004,
+        "name": {
+            "logical": "招待 ID",
+            "physical": "invitation_id"
+        },
+        "description": "招待のメールのリンクに入れる ID。推測されないように、UUID にする。",
+        "data_type": {
+            "type": "uuid",
+            "description": [
+                "バージョン 4 (乱数) の UUID。"
+            ]
+        }
+    },
+    {
+        "id": 10005,
+        "name": {
+            "logical": "ログイン ID",
+            "physical": "login_id"
+        },
+        "description": "ログインの記録に振る番号。",
+        "data_type": {
+            "type": "bigint"
+        }
     }
 ]

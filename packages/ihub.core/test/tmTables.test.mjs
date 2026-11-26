@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 import { dataTypeText, entityRows, masterRows, nameParts, nameText, relationshipRows, subsetText } from '../src/manegers/tmTables.js';
 
-// 参照アプリの data/tm/ (エンティティ 3・識別子 2・属性 4・結線 2)
+// 参照アプリの data/tm/ (エンティティ 10・識別子 6・属性 14・結線 7。yanqirenshi/iHub#236)
 const DATA = fileURLToPath(new URL('../../../data/tm/', import.meta.url));
 const read = (name)=> JSON.parse(readFileSync(`${DATA}${name}.json`, 'utf8'));
 const REFERENCE = {
@@ -35,10 +35,23 @@ test('参照アプリの data/tm/ の件数のまま、ファイルの順で行�
     assert.deepEqual(masterRows(REFERENCE, 'attributes').map(d=> d.id), REFERENCE['tm/attributes'].map(d=> String(d.id)));
     assert.deepEqual(relationshipRows(REFERENCE).map(d=> d.id), REFERENCE['tm/relationships'].map(d=> String(d.id)));
 
-    assert.equal(entityRows(REFERENCE).length, 3);
-    assert.equal(masterRows(REFERENCE, 'identifiers').length, 2);
-    assert.equal(masterRows(REFERENCE, 'attributes').length, 4);
-    assert.equal(relationshipRows(REFERENCE).length, 2);
+    assert.equal(entityRows(REFERENCE).length, 10);
+    assert.equal(masterRows(REFERENCE, 'identifiers').length, 6);
+    assert.equal(masterRows(REFERENCE, 'attributes').length, 14);
+    assert.equal(relationshipRows(REFERENCE).length, 7);
+});
+
+test('参照アプリの data/tm/ のマスタは、表の列がすべて埋まる。データ型は 3 つの形が混ざる (yanqirenshi/iHub#236)', ()=> {
+    for (const master of ['identifiers', 'attributes'])
+        for (const row of masterRows(REFERENCE, master))
+            for (const key of ['logical', 'physical', 'dataType', 'description'])
+                assert.notEqual(row[key], '', `${master} ${row.id} の ${key} が空`);
+
+    const types = masterRows(REFERENCE, 'attributes').map(d=> d.dataType);
+
+    assert.ok(types.includes('timestamp'));
+    assert.ok(types.includes('varchar(64)'));
+    assert.ok(types.includes('decimal(10, 2)'));
 });
 
 const COLLECTIONS = {
