@@ -10,6 +10,12 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.12.0 (2026-11)
+
+- `@yanqirenshi/ihub.core`: ビジネスのページに、TM のデータ (`data/tm/` の entities・relationships) を表で見るタブ (Entities・Relationships) を、「TM」と「機能一覧」の間に足した。(yanqirenshi/iHub#224) 見るだけ。並びはファイルの順。エンティティの識別子・属性、結線の接続元・接続先は、id ではなく名前で出す。初めに開くタブは、これまでどおり TM。
+- `@yanqirenshi/ihub.core`: 雛形の `examples/app/package.template.json` の iHub の版を、`^0.12.0` にそろえた。
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。(ihub.core 0.12.0 と、版をそろえるだけ)
+
 ## 0.11.0 (2026-11)
 
 - `@yanqirenshi/ihub.core`: 図の要素のインスペクタを開く操作を、右クリックから **Ctrl + クリック (Mac は ⌘ + クリック)** に変えた。(yanqirenshi/iHub#222。7 つの図: ER 図・TM・クラス図・画面遷移図・システム構成図・艦橋の Overview・艦橋の Schedule) 右クリックでは、インスペクタは開かず、ブラウザの普通のメニューが出る。0.10.x までクリックだけで開いた TM の結線・クラス図の関係の線も、Ctrl + クリックにそろえた。(修飾キーの無いクリックでは開かない) Schedule の矢羽根は、修飾キーの無いクリックでは、これまでどおり行き先へ移る。

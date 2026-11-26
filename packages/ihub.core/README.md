@@ -215,7 +215,7 @@ export default function Section01 ({ size }) {
 | `PAGE_BATCHS` | `pages.Batchs` (参照アプリでは `/batchs`) | `wbs`・`help` | `wbs` |
 | `PAGE_BPMN` | `docPages.BPMN` (参照アプリでは `/bpmn`) | `palettes`・`styles`・`methods`・`overview` | `palettes` |
 | `PAGE_BRIDGE` | `pages.Bridge` (参照アプリでは `/`。0.3.0 以降) | `cockpit`・`overview`・`schedule` | `cockpit` |
-| `PAGE_BUSINESS` | `pages.Business` (参照アプリでは `/business`) | `systemic-design`・`tm`・`procedures`・`wbs`・`help` | `tm` |
+| `PAGE_BUSINESS` | `pages.Business` (参照アプリでは `/business`) | `systemic-design`・`tm`・`entities`・`relationships`・`procedures`・`wbs`・`help` (`entities`・`relationships` は 0.12.0 以降。[ビジネスのページの TM の表](#ビジネスのページの-tm-の表)) | `tm` |
 | `PAGE_CLASSES` | `pages.Classes` (参照アプリでは `/classes`) | `class-diagram`・`wbs`・`help` | `class-diagram` |
 | `PAGE_DATA` | `pages.Data` (参照アプリでは `/data`) | `er-diagram`・`wbs`・`help` | `er-diagram` |
 | `PAGE_DDD` | `pages.DDD` (参照アプリでは `/ddd`) | `ubiquitous-language`・`model-driven-design`・`hands-on-modeler`・`declarative-design`・`layer-architecture`・`overview` | `layer-architecture` |
@@ -368,6 +368,30 @@ WBS とプロジェクトの行には、マイルストーンを △ で描け�
 - 書き換えられないもの: 親 (`parent`・`project`) の付け替え・並び順・レコードの追加と削除・説明 (`description`)・行き先 (`wbs`・`url`)・`result`・`progress`。(ファイルを直接直します。インスペクタの「JSON」のタブで、レコード全体を見られます)
 - 矢羽根を、修飾キーを押さずにクリックすると、これまでどおり、行き先へ移ります。Ctrl + クリックでは、行き先へは移らず、インスペクタが出ます。(0.11.0 以降) マイルストーンの △ を、修飾キーを押さずにクリックしても、何も起きません。
 - 項目・検証・既定の見た目は、[@yanqirenshi/model.yabane](https://github.com/Foolsgolds/Assholes/tree/main/packages/model.yabane) が決めます。iHub は、model.yabane が返す変更を、`PATCH /api/master_schedule/{projects|wbs|workpackages|milestones}/{id}` で保存するだけです。
+
+## ビジネスのページの TM の表
+
+ビジネスのページ (`pages.Business`。参照アプリでは `/business`) には、TM のデータを表で見るタブが 2 つあります。(0.12.0 以降)
+タブは、「TM」と「機能一覧」の間に並びます。
+
+```
+Systemic Design / TM / Entities / Relationships / 機能一覧 / WBS / Help
+```
+
+| タブ (code) | 中身 | 列 |
+|---|---|---|
+| Entities (`entities`) | `data/tm/entities.json` | ID・種別・名称・識別子・属性・説明 |
+| Relationships (`relationships`) | `data/tm/relationships.json` | ID・種類・接続元のエンティティ・接続先のエンティティ・ラベル・サブセット (区分・区分コード)・説明 |
+
+- 見るだけです。(書き換えは、TM タブのインスペクタか、`data/tm/` のファイルで行います) 並びは、ファイルの順です。
+- 名前は、文字列ならそのまま、論理名と物理名の組 (`{ logical, physical }`) なら「論理名 (物理名)」で出します。
+- Entities の識別子・属性は、エンティティが持つ行 (`identifiers[]`・`attributes[]`) の名前です。行に `name` があればそれを、無ければ、参照しているマスタ (`identifiers.json`・`attributes.json`) の名前を出します。
+- Relationships の接続元・接続先は、`from.entity`・`to.entity` の指すエンティティの名前です。
+- 指す先が見つからない (無い id の) ときは、id をそのまま出します。
+- 出さないもの: エンティティの位置と大きさ (`position`・`size`)、結線の位置 (角度)・カーディナリティ・オプショナリティ・`details`・`mapping`。
+- レコードが無いときは、表の代わりに知らせを出します。
+- 表がコンテンツエリアより長い・広いときは、表の中でスクロールします。見出しの行は、上に残ります。
+- パネルは `panels.TmEntities`・`panels.TmRelationships` です。設定の `panels.PAGE_BUSINESS` で差し替えられ、`tabs.PAGE_BUSINESS` の `{ code, hidden: true }` で消せます。([ページのタブとパネルを足す](#ページのタブとパネルを足す))
 
 ## 艦橋の Cockpit タブの並び
 
@@ -570,7 +594,7 @@ import { IHub, pages, Frame } from '@yanqirenshi/ihub.core';
 | `createStore` | 設定からストアを作る (`IHub` が使う) |
 | `pages` | ページ (`pages.Bridge`・`pages.Data`・`pages.WbsNode` など) |
 | `docPages` | ドキュメントのページ (`docPages.ER`・`docPages.TM` など) |
-| `panels` | ページの中身 (`panels.ER`・`panels.TM` など) |
+| `panels` | ページの中身 (`panels.ER`・`panels.TM`・`panels.TmEntities` など) |
 | `GithubOAuth`・`ProjectItemForm`・`Frame`・`FrameTabs`・`FrameWbsNode`・`FrameWbsNodeTabs`・`TabbedPage`・`Link`・`TableTMRelationships` など | 中間の部品 (`components/assemblies/index.js`) |
 | `ItemWbsNode`・`LinkWBS`・`Tabs` など | 小さな部品 (`components/parts/index.js`) |
 | `HelpSlide` | Help のセクションで使う、1 枚のスライド (0.2.4 以降。[Help を差し替える](#help-を差し替える)) |
