@@ -6,25 +6,24 @@
 
 ## 0.12.0 (2026-11)
 
-### 追加 (ビジネスのページに、TM のデータを表で見るタブを足す。yanqirenshi/iHub#224)
+### 追加 (ビジネスのページに、TM のデータを表で見るタブ (Entities・Relationships) を足す。yanqirenshi/iHub#224)
 
-- ビジネスのページ (`pages.Business`) の既定のタブに、`entities` (Entities)・`identifiers` (Identifiers)・`attributes` (Attributes)・`relationships` (Relationships) を、「TM」と「機能一覧」の間に、この順で足した。(`hooks/usePageTabs.js` の `TAB_DEFS.PAGE_BUSINESS`) 初めに開くタブは、これまでどおり `tm`。
-- 4 つのタブは、`data/tm/` の `entities.json`・`identifiers.json`・`attributes.json`・`relationships.json` を、表 (MUI の `Table`) で出す。見るだけ。並びはファイルの順。(並べ替え・絞り込み・編集は無い)
-  - Entities: ID・種別・名称・識別子・属性・説明。識別子・属性は、エンティティが持つ行の名前 (行に `name` があればそれ、無ければ参照しているマスタの名前)。
-  - Identifiers・Attributes: ID・名称・説明・エンティティ。エンティティは、その識別子 (属性) を持っているエンティティの名前。(entities.json の順。どこからも使われていなければ、空)
+- ビジネスのページ (`pages.Business`) の既定のタブに、`entities` (Entities)・`relationships` (Relationships) を、「TM」と「機能一覧」の間に、この順で足した。(`hooks/usePageTabs.js` の `TAB_DEFS.PAGE_BUSINESS`) 初めに開くタブは、これまでどおり `tm`。
+- 2 つのタブは、`data/tm/` の `entities.json`・`relationships.json` を、表 (MUI の `Table`) で出す。見るだけ。並びはファイルの順。(並べ替え・絞り込み・編集は無い)
+  - Entities: ID・種別・名称・識別子・属性・説明。識別子・属性は、エンティティが持つ行の名前 (行に `name` があればそれ、無ければ参照しているマスタ (`identifiers.json`・`attributes.json`) の名前)。
   - Relationships: ID・種類・接続元のエンティティ・接続先のエンティティ・ラベル・サブセット (区分・区分コード)・説明。接続元・接続先は、エンティティの名前。
   - 名前は、文字列ならそのまま、論理名と物理名の組なら「論理名 (物理名)」。(同じなら 1 つ) 列の見出しは、TM のインスペクタ (model.tm の `fieldsOf` のラベル) に合わせた。
   - 指す先が見つからない (無い id の) ときは、id をそのまま出す。
-  - レコードが無いとき (ファイルが空) は、表の代わりに、知らせを出す。(TM の 4 つのファイルは、スキーマに既定の値が無いので、ファイルが無いときは、これまでどおり API サーバーがデータを返さない)
+  - レコードが無いとき (ファイルが空) は、表の代わりに、知らせを出す。(TM のファイル (識別子・属性のマスタを含む 4 つ) は、スキーマに既定の値が無いので、ファイルが無いときは、これまでどおり API サーバーがデータを返さない)
   - 表がコンテンツエリアより長い・広いときは、表の中でスクロールする。見出しの行は、上に残る。
   - データは、API サーバーから読んだもの (`useCollections`)。TM タブのインスペクタで書き換えると、表も新しい値になる。
-- パネル `panels.TmEntities`・`panels.TmIdentifiers`・`panels.TmAttributes`・`panels.TmRelationships` を足した。(`components/panels/tm/TmTables.js`。4 つで同じ表の部品を使う)
-- 行の作り方 (名前の解決・エンティティの逆引き) は、`manegers/tmTables.js` にまとめ、テストを足した。(`test/tmTables.test.mjs`)
+- パネル `panels.TmEntities`・`panels.TmRelationships` を足した。(`components/panels/tm/TmTables.js`。2 つで同じ表の部品を使う)
+- 行の作り方 (識別子・属性・エンティティの名前の解決) は、`manegers/tmTables.js` にまとめ、テストを足した。(`test/tmTables.test.mjs`)
 - 雛形の `examples/app/package.template.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、`^0.12.0` にした。
 - **利用側から見える違い**:
-  - ビジネスのページのタブが 4 つ増える。(Systemic Design / TM / **Entities / Identifiers / Attributes / Relationships** / 機能一覧 / WBS / Help)
-  - 設定の `tabs.PAGE_BUSINESS` でタブを足しているアプリでは、足したタブは、これまでどおり末尾に並ぶ。新しい 4 つは、TM と機能一覧の間に入る。
-  - 足したタブの code が、新しい 4 つのどれかと同じ (`entities` など) ときは、新しいタブの位置で、アプリのタブに差し替わる。(`mergeTabs` の重ね方。パネルも、設定の `panels.PAGE_BUSINESS` のものが使われる)
+  - ビジネスのページのタブが 2 つ増える。(Systemic Design / TM / **Entities / Relationships** / 機能一覧 / WBS / Help)
+  - 設定の `tabs.PAGE_BUSINESS` でタブを足しているアプリでは、足したタブは、これまでどおり末尾に並ぶ。新しい 2 つは、TM と機能一覧の間に入る。
+  - 足したタブの code が、新しい 2 つのどちらかと同じ (`entities`・`relationships`) ときは、新しいタブの位置で、アプリのタブに差し替わる。(`mergeTabs` の重ね方。パネルも、設定の `panels.PAGE_BUSINESS` のものが使われる)
   - 新しいタブが要らないときは、`tabs.PAGE_BUSINESS` の `{ code: 'entities', hidden: true }` などで消せる。
   - データの形・設定の形は、変わらない。(データの移行は無い)
 

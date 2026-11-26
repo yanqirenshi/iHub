@@ -1,4 +1,4 @@
-// ビジネスのページの、TM のデータを表で見るタブ (Entities・Identifiers・Attributes・Relationships) の行を作る。(0.12.0 から)
+// ビジネスのページの、TM のデータを表で見るタブ (Entities・Relationships) の行を作る。(0.12.0 から)
 //
 // どれも、ほかのファイルを読み込まない、ただの関数。(node --test で、そのまま確かめる)
 // 入力は、API サーバーから読んだコレクション ({ 'tm/entities': [...], ... })。ファイルが無い・形が違うときは、空として扱う。
@@ -84,34 +84,6 @@ export function entityRows (collections) {
         identifiers: (Array.isArray(d.identifiers) ? d.identifiers : []).map(r=> instanceName(r, 'identifier', identifiers)),
         attributes: (Array.isArray(d.attributes) ? d.attributes : []).map(r=> instanceName(r, 'attribute', attributes)),
         description: textOf(d.description),
-    }));
-}
-
-// Identifiers・Attributes のタブの行。
-//   { id, name, description, entities: [この識別子 (属性) を持つエンティティの名前] }
-//   kind … 'identifiers' か 'attributes'
-// エンティティは、entities.json の順。1 つのエンティティが同じマスタを 2 度持っていても、1 度だけ出す。どこからも使われていなければ、空。
-export function masterRows (collections, kind) {
-    const key = kind==='identifiers' ? 'identifier' : 'attribute';
-    const users = new Map();
-
-    for (const entity of listOf(collections, 'entities')) {
-        for (const row of (Array.isArray(entity?.[kind]) ? entity[kind] : [])) {
-            const id = row?.[key];
-            const list = users.get(id) || [];
-
-            if (!list.includes(entity))
-                list.push(entity);
-
-            users.set(id, list);
-        }
-    }
-
-    return listOf(collections, kind).filter(Boolean).map(d=> ({
-        id: textOf(d.id),
-        name: nameText(d.name),
-        description: textOf(d.description),
-        entities: (users.get(d.id) || []).map(e=> nameText(e.name) || textOf(e.id)),
     }));
 }
 

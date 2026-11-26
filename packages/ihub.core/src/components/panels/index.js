@@ -9,7 +9,7 @@ export { default as Loading        } from './Loading.js';
 export { default as Procedures     } from './Procedures.js';
 export { default as SystemDynamics } from './SystemDynamics.js';
 export { default as TM             } from './TM.js';
-export { TmEntities, TmIdentifiers, TmAttributes, TmRelationships } from './tm/TmTables.js';
+export { TmEntities, TmRelationships } from './tm/TmTables.js';
 export { default as Wbs            } from './Wbs.js';
 
 export * as bridge from './bridge/index.js';

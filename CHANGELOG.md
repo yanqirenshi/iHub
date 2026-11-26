@@ -12,7 +12,7 @@
 
 ## 0.12.0 (2026-11)
 
-- `@yanqirenshi/ihub.core`: ビジネスのページに、TM のデータ (`data/tm/` の entities・identifiers・attributes・relationships) を表で見るタブ (Entities・Identifiers・Attributes・Relationships) を、「TM」と「機能一覧」の間に足した。(yanqirenshi/iHub#224) 見るだけ。並びはファイルの順。識別子・属性・接続元・接続先は、id ではなく名前で出す。初めに開くタブは、これまでどおり TM。
+- `@yanqirenshi/ihub.core`: ビジネスのページに、TM のデータ (`data/tm/` の entities・relationships) を表で見るタブ (Entities・Relationships) を、「TM」と「機能一覧」の間に足した。(yanqirenshi/iHub#224) 見るだけ。並びはファイルの順。エンティティの識別子・属性、結線の接続元・接続先は、id ではなく名前で出す。初めに開くタブは、これまでどおり TM。
 - `@yanqirenshi/ihub.core`: 雛形の `examples/app/package.template.json` の iHub の版を、`^0.12.0` にそろえた。
 - `@yanqirenshi/ihub.srv`: コードの変更は無い。(ihub.core 0.12.0 と、版をそろえるだけ)
 
