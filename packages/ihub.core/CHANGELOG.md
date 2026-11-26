@@ -28,6 +28,22 @@
   - 新しいタブが要らないときは、`tabs.PAGE_BUSINESS` の `{ code: 'entities', hidden: true }` などで消せる。
   - データの形・設定の形は、変わらない。(データの移行は無い)
 
+### 追加 (ビジネスのページの Entities のタブ: 「Entity の追加」。yanqirenshi/iHub#232)
+
+- Entities のタブの表の上の右端に、「Entity の追加」ボタンを足した。(Entities のタブだけ。エンティティが無くて、知らせを出しているときも出す)
+- ボタンを押すと、モーダル (MUI の `Dialog`)のフォームが出る。「作成」で、`POST /api/tm/entities` に、エンティティを 1 件足す。(id は、API サーバーが振る) 表と、TM のタブの図に、新しいエンティティが出る。
+- フォームは、叩き台。(画面を見ながら、項目を足し引きする) 項目は、種別 (model.tm の `ENTITY_TYPES`。既定は `RESOURCE`)・論理名 (必須)・物理名・説明・識別子 (識別子のマスタから複数)・属性 (属性のマスタから複数)。
+  - 項目の定義・初めの値・入力の確かめ・保存するレコードの作り方は、`manegers/tmEntityForm.js` にまとめた。(`ENTITY_FORM_FIELDS`・`buildEntityRecord`。画面の部品 `components/panels/tm/AddTmEntity.js` は、項目の定義を見てフォームを組み立てる) テストを足した。(`test/tmEntityForm.test.mjs`)
+- 保存するレコード:
+  - `name`: 物理名が空なら、論理名の文字列。物理名があれば、`{ logical, physical }` の組。
+  - `description`: 空なら、書かない。
+  - `identifiers[]`・`attributes[]`: 選んだマスタの行。行の `id` は、全部のエンティティの行 (識別子と属性の両方) を通して、数の id の最大 + 1 から順に振る。(model.tm の `check` の決まり。行が 1 つも無ければ 1 から)
+  - `position`: いまあるエンティティの `position.x` の最大 + 400、`position.y` の最小。(重ならないように、右に置く。エンティティが無ければ `{ x: 0, y: 0 }`) TM のタブの図で、ドラッグして動かせる。
+  - `size`: `{ w: 0, h: 0 }`。(中身に合わせる)
+- 論理名が空のまま「作成」を押すと、その項目に誤りを出して、保存しない。保存できなかったとき (API サーバーの検査の誤りなど) は、閉じずに、誤りの文を出す。保存の間は、「作成」を押せない。
+- 「キャンセル」・モーダルの外のクリック・Esc で、何も保存せずに閉じる。開き直したときは、入力は初めの値に戻る。
+- 識別子・属性のマスタが 1 件も無いときは、その項目を選べなくして、マスタが無いことを出す。
+
 ### 追加 (FrameWbsNode・FrameWbsNodeTabs: WBS の表の表示/非表示。yanqirenshi/iHub#176)
 
 - WBS のノードのページの枠 `FrameWbsNode`・`FrameWbsNodeTabs` に、props `showWbsTable` を足した。`false` のとき、ノードから下の WBS の表 (`WBSTable`) を出さない。省略したとき (既定は `true`) は、0.11.x までと同じく出す。
