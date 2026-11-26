@@ -51,6 +51,28 @@
 - 識別子・属性のマスタが 1 件も無いときは、そのタブに、マスタが無いことの知らせを出す。
 - モーダルの左端は、サイドメニュー (選んでいる項目の札を含む) の右から始める。(サイドメニューは、モーダルの背景より手前に出るため)
 
+### 変更 (TM・ER のデータ型 (`data_type`)・Null 制約 (`not_null`) の版を取り込む。yanqirenshi/iHub#234)
+
+- 依存の版を上げた。
+  - `@yanqirenshi/model.core`: `^0.1.1` (データ型の形をそろえる `normalizeDataType` が入った版)
+  - `@yanqirenshi/model.tm`: `^0.1.3`
+  - `@yanqirenshi/d3.ter`: `^0.4.8`
+  - `@yanqirenshi/model.er`: `^0.2.2`
+  - `@yanqirenshi/d3.er`: `^0.6.7`
+- TM・ER 図のインスペクタで、識別子・属性のマスタに、項目が 4 つ増える。(データ型・長さ・小数部の桁数・データ型の説明。model.tm・model.er の `fieldsOf` が出すものを、そのまま出す)
+  - 入れて適用すると、マスタの `data_type` (`{ type, length, scale, description }`) に保存する。4 つとも空に戻して適用すると、`data_type` ごと消える。1 つだけ空にすると、その項目だけが消える。
+  - ER 図の、文字列の `data_type` (`"varchar"` など。これまでの形) を持つマスタは、何も変えずに適用しても、書き換えない。長さなどを入れて適用すると、`{ type: "varchar", length: 20 }` のような組の形で保存する。(型の名前は残る)
+  - データ型の説明の行の前後の空白は、そのまま保存する。(model.tm・model.er の決まり)
+- ビジネスのページの Identifiers・Attributes のタブの表に、「データ型」の列を足した。(物理名と説明の間) `data_type` を、`decimal(10, 2)`・`varchar(20)`・`date` のように出す。(型の名前・長さ・小数部の桁数。データ型の説明は出さない) 長さが無く、小数部の桁数だけがあるときは、`decimal(?, 2)` のように出す。`data_type` が無いときは、空。文字列の `data_type` は、そのまま出す。
+  - 出し方は、`manegers/tmTables.js` の `dataTypeText` にまとめ、テストを足した。(`test/tmTables.test.mjs`)
+- TM・ER の図の見た目は、変わらない。(`data_type`・`not_null` は、図には描かない)
+- **利用側から見える違い**:
+  - TM・ER 図のインスペクタで、識別子・属性のマスタの項目が 4 つ増える。(データ型・長さ・小数部の桁数・データ型の説明)
+  - Identifiers・Attributes のタブの列が 1 つ増える。(ID・論理名・物理名・**データ型**・説明)
+  - データの形が増える。マスタ (`data/tm/`・`data/er/` の identifiers・attributes) の `data_type` と、エンティティの属性の行 (`attributes[]`) の `not_null` (真偽値。`true` で NOT NULL)。どちらも書かなくてよい。
+  - いまのデータは、そのまま読める。(データの移行は無い) ER の文字列の `data_type` も、これまでどおり使える。
+  - `not_null` は、画面からは書き換えられない。(ファイルに書く。インスペクタの項目には出ない)
+
 ### 追加 (FrameWbsNode・FrameWbsNodeTabs: WBS の表の表示/非表示。yanqirenshi/iHub#176)
 
 - WBS のノードのページの枠 `FrameWbsNode`・`FrameWbsNodeTabs` に、props `showWbsTable` を足した。`false` のとき、ノードから下の WBS の表 (`WBSTable`) を出さない。省略したとき (既定は `true`) は、0.11.x までと同じく出す。

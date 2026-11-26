@@ -546,3 +546,47 @@ test('クラス図の id の重複と、関係の端のクラスが無いもの�
         'classes/relationships: to.classId のクラスが見つかりません。(id=r1, classId=C)',
     ]);
 });
+
+// TM・ER のデータ型 (data_type) と Null 制約 (not_null)。(0.12.0 から。model.tm 0.1.3・model.er 0.2.2 のスキーマ。#234)
+test('TM: 識別子・属性のマスタに data_type、エンティティの属性の行に not_null を書ける。形の誤りは見つける', ()=> {
+    const base = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
+    const tm = (fn)=> { const data = structuredClone(base); fn(data); return validateData(data); };
+
+    assert.deepEqual(tm(data=> {
+        data['tm/attributes'][0].data_type = { type: 'decimal', length: 10, scale: 2, description: ['金額。', '税込み。'] };
+        data['tm/identifiers'][0].data_type = { type: 'varchar' };
+        data['tm/attributes'][1].data_type = null;
+        const row = data['tm/entities'].flatMap(e=> e.attributes || [])[0];
+        row.not_null = true;
+    }), []);
+
+    const bad_length = tm(data=> { data['tm/attributes'][0].data_type = { type: 'varchar', length: 0 }; });
+    assert.ok(bad_length.some(e=> e.startsWith('tm/attributes/0/data_type/length')), bad_length.join('\n'));
+
+    const bad_scale = tm(data=> { data['tm/identifiers'][0].data_type = { type: 'decimal', scale: -1 }; });
+    assert.ok(bad_scale.some(e=> e.startsWith('tm/identifiers/0/data_type/scale')), bad_scale.join('\n'));
+
+    const string_type = tm(data=> { data['tm/attributes'][0].data_type = 'varchar'; });
+    assert.ok(string_type.some(e=> e.startsWith('tm/attributes/0/data_type')), string_type.join('\n'));
+
+    const bad_not_null = tm(data=> { data['tm/entities'].flatMap(e=> e.attributes || [])[0].not_null = 'yes'; });
+    assert.ok(bad_not_null.some(e=> /^tm\/entities\/\d+\/attributes\/\d+\/not_null/.test(e)), bad_not_null.join('\n'));
+});
+
+test('ER: data_type は、オブジェクト・null・文字列 (0.2.1 までの書き方) のどれでもよい。属性の行に not_null を書ける', ()=> {
+    const base = loadDataDir(join(ROOT, 'packages/ihub.core/examples/data'));
+    const er = (fn)=> { const data = structuredClone(base); fn(data); return validateData(data); };
+
+    assert.deepEqual(er(data=> {
+        data['er/attributes'][0].data_type = 'varchar';
+        data['er/attributes'][1].data_type = { type: 'decimal', length: 10, scale: 2 };
+        data['er/identifiers'][0].data_type = null;
+        // 雛形の er/schemas は空なので、1 件足す
+        data['er/schemas'].push({ id: 9001, name: 'S', data_type: { type: 'text', description: ['スキーマの型'] } });
+        const row = data['er/entities'].flatMap(e=> e.attributes || [])[0];
+        row.not_null = false;
+    }), []);
+
+    const bad = er(data=> { data['er/attributes'][0].data_type = 10; });
+    assert.ok(bad.some(e=> e.startsWith('er/attributes/0/data_type')), bad.join('\n'));
+});

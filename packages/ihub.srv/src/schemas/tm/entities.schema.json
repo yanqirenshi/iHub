@@ -164,6 +164,10 @@
                                 "string"
                             ]
                         },
+                        "not_null": {
+                            "type": "boolean",
+                            "description": "Null 制約。true で NOT NULL。書かなければ、制約なし。(図には描かない)"
+                        },
                         "name": {
                             "description": "文字列、または論理名と物理名の組",
                             "oneOf": [

@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { entityRows, masterRows, nameParts, nameText, relationshipRows, subsetText } from '../src/manegers/tmTables.js';
+import { dataTypeText, entityRows, masterRows, nameParts, nameText, relationshipRows, subsetText } from '../src/manegers/tmTables.js';
 
 // 参照アプリの data/tm/ (エンティティ 3・識別子 2・属性 4・結線 2)
 const DATA = fileURLToPath(new URL('../../../data/tm/', import.meta.url));
@@ -100,22 +100,22 @@ test('nameParts: 組は論理名と物理名に分ける。文字列は論理名
 
 test('masterRows: ID・論理名・物理名・説明の行を、ファイルの順で作る (エンティティは出さない)', ()=> {
     assert.deepEqual(masterRows(COLLECTIONS, 'identifiers'), [
-        { id: '10', logical: '顧客番号', physical: '', description: '' },
-        { id: '11', logical: '注文番号', physical: 'order_no', description: '' },
+        { id: '10', logical: '顧客番号', physical: '', dataType: '', description: '' },
+        { id: '11', logical: '注文番号', physical: 'order_no', dataType: '', description: '' },
     ]);
 
     assert.deepEqual(masterRows(COLLECTIONS, 'attributes'), [
-        { id: '20', logical: '名前', physical: '', description: '氏名' },
-        { id: '21', logical: '住所', physical: '', description: '' },
-        { id: '22', logical: '使われない属性', physical: '', description: '' },
+        { id: '20', logical: '名前', physical: '', dataType: '', description: '氏名' },
+        { id: '21', logical: '住所', physical: '', dataType: '', description: '' },
+        { id: '22', logical: '使われない属性', physical: '', dataType: '', description: '' },
     ]);
 
     // 片方だけの組
-    const half = { 'tm/attributes': [{ id: 1, name: { physical: 'only_physical' } }, { id: 2, name: { logical: '論理名だけ' }, description: 'd' }] };
+    const half = { 'tm/attributes': [{ id: 1, name: { physical: 'only_physical' } }, { id: 2, name: { logical: '論理名だけ' }, dataType: '', description: 'd' }] };
 
     assert.deepEqual(masterRows(half, 'attributes'), [
-        { id: '1', logical: '', physical: 'only_physical', description: '' },
-        { id: '2', logical: '論理名だけ', physical: '', description: 'd' },
+        { id: '1', logical: '', physical: 'only_physical', dataType: '', description: '' },
+        { id: '2', logical: '論理名だけ', physical: '', dataType: '', description: 'd' },
     ]);
 });
 
@@ -146,4 +146,30 @@ test('ファイルが無い・空・形が違うときは、行が無い (落ち
 
     assert.deepEqual(entityRows(only)[0].identifiers, ['5']);
     assert.deepEqual(relationshipRows(only)[0], { id: '3', type: '', from: 'E', to: '4', label: '', subset: '', description: '' });
+});
+
+test('dataTypeText: 型だけ・長さ・小数部の桁数。文字列の型 (ER の 0.2.1 まで) も同じ。説明は出さない', ()=> {
+    assert.equal(dataTypeText({ type: 'varchar' }), 'varchar');
+    assert.equal(dataTypeText({ type: 'varchar', length: 20 }), 'varchar(20)');
+    assert.equal(dataTypeText({ type: 'decimal', length: 10, scale: 2 }), 'decimal(10, 2)');
+    assert.equal(dataTypeText({ type: 'decimal', length: 10, scale: 0 }), 'decimal(10, 0)');
+    assert.equal(dataTypeText({ type: 'decimal', scale: 2 }), 'decimal(?, 2)');
+    assert.equal(dataTypeText({ type: 'text', description: ['説明'] }), 'text');
+    assert.equal(dataTypeText('varchar'), 'varchar');
+    assert.equal(dataTypeText(undefined), '');
+    assert.equal(dataTypeText(null), '');
+    assert.equal(dataTypeText(''), '');
+    assert.equal(dataTypeText({}), '');
+});
+
+test('masterRows: データ型の列 (dataType) を出す', ()=> {
+    const rows = masterRows({
+        'tm/attributes': [
+            { id: 1, name: '金額', data_type: { type: 'decimal', length: 10, scale: 2, description: ['税込み'] } },
+            { id: 2, name: '名前', data_type: 'varchar' },
+            { id: 3, name: '型なし' },
+        ],
+    }, 'attributes');
+
+    assert.deepEqual(rows.map(d=> d.dataType), ['decimal(10, 2)', 'varchar', '']);
 });

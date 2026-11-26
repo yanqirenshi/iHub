@@ -41,6 +41,45 @@
                     "string",
                     "null"
                 ]
+            },
+            "data_type": {
+                "description": "データ型。type は自由な文字列、length は 1 以上の整数、scale は 0 以上の整数、description は 1 要素 = 1 行",
+                "type": [
+                    "object",
+                    "null"
+                ],
+                "properties": {
+                    "type": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "length": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "minimum": 1
+                    },
+                    "scale": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "minimum": 0
+                    },
+                    "description": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "additionalProperties": true
             }
         },
         "required": [

@@ -390,3 +390,35 @@ test('クラス図のファイルが無いアプリでも、空の図として�
     assert.deepEqual(readData('classes/classes'), [{ id: 'A', name: 'A', position: { x: 0, y: 0 } }]);
     assert.equal(existsSync(join(dir, 'classes/relationships.json')), false);
 });
+
+test('TM・ER のデータ型: PATCH の入れ子の null は、その項目を消す。data_type: null で、データ型ごと消す (JSON Merge Patch)', async ()=> {
+    const id = readData('tm/attributes')[0].id;
+    const url = `/api/tm/attributes/${id}`;
+    const get = ()=> readData('tm/attributes').find(d=> d.id===id);
+
+    assert.equal((await request(url, { method: 'PATCH', body: { data_type: { type: 'decimal', length: 10, scale: 2, description: ['税込み'] } } })).status, 200);
+    assert.deepEqual(get().data_type, { type: 'decimal', length: 10, scale: 2, description: ['税込み'] });
+
+    // 長さだけを消す (インスペクタで、長さを空にしたとき)
+    assert.equal((await request(url, { method: 'PATCH', body: { data_type: { length: null } } })).status, 200);
+    assert.deepEqual(get().data_type, { type: 'decimal', scale: 2, description: ['税込み'] });
+
+    // 4 つとも空にしたとき
+    assert.equal((await request(url, { method: 'PATCH', body: { data_type: null } })).status, 200);
+    assert.equal('data_type' in get(), false);
+
+    // 形の誤りは 400 にして、書き込まない
+    assert.equal((await request(url, { method: 'PATCH', body: { data_type: { length: 0 } } })).status, 400);
+    assert.equal('data_type' in get(), false);
+});
+
+test('ER の文字列の data_type に、model.er が作る patch (型の名前を含む) を重ねると、オブジェクトになる', async ()=> {
+    const id = readData('er/attributes')[0].id;
+    const url = `/api/er/attributes/${id}`;
+
+    assert.equal((await request(url, { method: 'PATCH', body: { data_type: 'varchar' } })).status, 200);
+
+    // model.er の applyPatch は、文字列の data_type に長さを足すとき、型の名前も patch に入れる
+    assert.equal((await request(url, { method: 'PATCH', body: { data_type: { length: 20, type: 'varchar' } } })).status, 200);
+    assert.deepEqual(readData('er/attributes').find(d=> d.id===id).data_type, { length: 20, type: 'varchar' });
+});

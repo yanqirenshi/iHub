@@ -89,6 +89,7 @@ const MASTER_COLUMNS = [
     { key: 'id',          label: 'ID', nowrap: true },
     { key: 'logical',     label: '論理名' },
     { key: 'physical',    label: '物理名' },
+    { key: 'dataType',    label: 'データ型', nowrap: true },   // (#234)
     { key: 'description', label: '説明' },
 ];
 
