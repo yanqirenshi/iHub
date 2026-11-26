@@ -381,8 +381,8 @@ Systemic Design / TM / Entities / Identifiers / Attributes / Relationships / 機
 | タブ (code) | 中身 | 列 |
 |---|---|---|
 | Entities (`entities`) | `data/tm/entities.json` | ID・種別・名称・識別子・属性・説明 |
-| Identifiers (`identifiers`) | `data/tm/identifiers.json` | ID・論理名・物理名・説明 |
-| Attributes (`attributes`) | `data/tm/attributes.json` | ID・論理名・物理名・説明 |
+| Identifiers (`identifiers`) | `data/tm/identifiers.json` | ID・論理名・物理名・データ型・説明 |
+| Attributes (`attributes`) | `data/tm/attributes.json` | ID・論理名・物理名・データ型・説明 |
 | Relationships (`relationships`) | `data/tm/relationships.json` | ID・種類・接続元のエンティティ・接続先のエンティティ・ラベル・サブセット (区分・区分コード)・説明 |
 
 - 見るだけです。(書き換えは、TM タブのインスペクタか、`data/tm/` のファイルで行います) 並びは、ファイルの順です。
@@ -390,6 +390,7 @@ Systemic Design / TM / Entities / Identifiers / Attributes / Relationships / 機
 - Entities・Relationships の名前は、文字列ならそのまま、論理名と物理名の組 (`{ logical, physical }`) なら「論理名 (物理名)」で出します。
 - Entities の識別子・属性は、エンティティが持つ行 (`identifiers[]`・`attributes[]`) の名前です。行に `name` があればそれを、無ければ、参照しているマスタ (`identifiers.json`・`attributes.json`) の名前を出します。
 - Identifiers・Attributes の名前は、論理名と物理名の列に分けて出します。名前が組なら、`name.logical`・`name.physical` をそれぞれの列に (片方しか無ければ、無い方は空)、文字列なら論理名の列に出し、物理名の列は空です。
+- Identifiers・Attributes のデータ型は、マスタの `data_type` を、`decimal(10, 2)`・`varchar(20)`・`date` のように出します。(型の名前・長さ・小数部の桁数。データ型の説明は出しません。`data_type` が無ければ空です) `data_type` は、TM タブのインスペクタで入れられます。(0.12.0 以降)
 - Relationships の接続元・接続先は、`from.entity`・`to.entity` の指すエンティティの名前です。
 - 指す先が見つからない (無い id の) ときは、id をそのまま出します。
 - 出さないもの: エンティティの位置と大きさ (`position`・`size`)、結線の位置 (角度)・カーディナリティ・オプショナリティ・`details`・`mapping`。

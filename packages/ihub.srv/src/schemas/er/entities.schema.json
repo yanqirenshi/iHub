@@ -147,6 +147,10 @@
                                 "integer",
                                 "string"
                             ]
+                        },
+                        "not_null": {
+                            "type": "boolean",
+                            "description": "Null 制約。true で NOT NULL。書かなければ、制約なし。(図には描かない)"
                         }
                     },
                     "required": [

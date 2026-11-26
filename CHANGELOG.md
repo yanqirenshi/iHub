@@ -16,7 +16,7 @@
 - `@yanqirenshi/ihub.core`: ビジネスのページの Entities のタブに、「Entity の追加」ボタンを足した。(yanqirenshi/iHub#232) 押すと、モーダルのフォーム (叩き台) が出て、エンティティを 1 件足せる。左の枠にエンティティのイメージ (入力から d3.ter で描く)、右の枠にタブ「基本」(種別・論理名・物理名・説明)・「Identifiers」・「Attributes」(左に選んだ一覧、右に検索とマスタの一覧。行を押して選ぶ) が並ぶ。
 - `@yanqirenshi/ihub.core`: WBS のノードのページの枠 `FrameWbsNode`・`FrameWbsNodeTabs` に、props `showWbsTable` (WBS の表を出すか。既定は出す) と `headAlign` (見出しの寄せ) を足した。(yanqirenshi/iHub#176) **2 つの枠の見出しの既定が、左寄せから中央寄せに変わった。** 左寄せのままにするときは、`headAlign="left"` を付ける。(見出しの部品 `HeadWbsPage` にも `align` を足した。`HeadWbsPage` の既定は左寄せのまま)
 - `@yanqirenshi/ihub.core`: 雛形の `examples/app/package.template.json` の iHub の版を、`^0.12.0` にそろえた。
-- `@yanqirenshi/ihub.srv`: コードの変更は無い。(ihub.core 0.12.0 と、版をそろえるだけ)
+- `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`: TM・ER のデータ型 (`data_type`)・Null 制約 (`not_null`) の版 (model.core 0.1.1・model.tm 0.1.3・d3.ter 0.4.8・model.er 0.2.2・d3.er 0.6.7) を取り込んだ。(yanqirenshi/iHub#234) TM・ER 図のインスペクタで、識別子・属性のマスタの項目が 4 つ増える。(データ型・長さ・小数部の桁数・データ型の説明) Identifiers・Attributes のタブの表に、「データ型」の列 (`decimal(10, 2)` など) を足した。API サーバーの検査のスキーマも、そろえた。いまのデータは、そのまま読める。(ER の文字列の `data_type` も、これまでどおり使える)
 
 ## 0.11.0 (2026-11)
 

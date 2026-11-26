@@ -1,9 +1,11 @@
 // ビジネスのページの、TM のデータを表で見るタブ (Entities・Identifiers・Attributes・Relationships) の行を作る。(0.12.0 から)
 //
-// どれも、ほかのファイルを読み込まない、ただの関数。(node --test で、そのまま確かめる)
+// どれも、ただの関数。(読み込むのは、データ型をそろえる @yanqirenshi/model.core の normalizeDataType だけ。node --test で、そのまま確かめる)
 // 入力は、API サーバーから読んだコレクション ({ 'tm/entities': [...], ... })。ファイルが無い・形が違うときは、空として扱う。
 // 並びは、ファイルの順のまま。(並べ替え・絞り込みはしない)
 // 指す先が見つからないとき (無い id) は、id をそのまま文字にする。(落ちない)
+
+import { normalizeDataType } from '@yanqirenshi/model.core';
 
 export const TM_TABLE_COLLECTIONS = {
     entities:      'tm/entities',
@@ -101,13 +103,38 @@ export function nameParts (name) {
     return { logical: textOf(name.logical), physical: textOf(name.physical) };
 }
 
+// データ型 (data_type) を、表に出す 1 つの文字にする。(#234)
+//   { type: 'varchar' } … varchar
+//   { type: 'varchar', length: 20 } … varchar(20)
+//   { type: 'decimal', length: 10, scale: 2 } … decimal(10, 2)
+//   { type: 'decimal', scale: 2 } (長さが無く、小数部の桁数だけ) … decimal(?, 2)
+//   文字列 ('varchar'。ER の 0.2.1 までの書き方) … { type } と同じ。(model.core の normalizeDataType でそろえる)
+//   無い・空 … 空
+// データ型の説明 (data_type.description) は、出さない。
+export function dataTypeText (dataType) {
+    const dt = normalizeDataType(dataType);
+
+    if (!dt)
+        return '';
+
+    const type = textOf(dt.type);
+    const length = dt.length ?? null;
+    const scale = dt.scale ?? null;
+
+    if (length===null && scale===null)
+        return type;
+
+    return `${type}(${length===null ? '?' : length}${scale===null ? '' : `, ${scale}`})`;
+}
+
 // Identifiers・Attributes のタブの行。
-//   { id, logical, physical, description }
+//   { id, logical, physical, dataType, description }
 //   kind … 'identifiers' か 'attributes'
 export function masterRows (collections, kind) {
     return listOf(collections, kind).filter(Boolean).map(d=> ({
         id: textOf(d.id),
         ...nameParts(d.name),
+        dataType: dataTypeText(d.data_type),
         description: textOf(d.description),
     }));
 }

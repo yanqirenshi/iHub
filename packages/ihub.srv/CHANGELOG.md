@@ -6,8 +6,20 @@
 
 ## 0.12.0 (2026-11)
 
-- コードの変更は無い。(ihub.core 0.12.0 と、版をそろえるだけ。yanqirenshi/iHub#224)
+- ihub.core 0.12.0 と、版をそろえる。(yanqirenshi/iHub#224)
 - `init --app` で作る `package.json` の iHub の版は、`^0.12.0` になる。
+
+### 変更 (TM・ER のデータ型 (`data_type`)・Null 制約 (`not_null`) の版を取り込む。yanqirenshi/iHub#234)
+
+- 依存の版を上げた。(`@yanqirenshi/model.tm`: `^0.1.3`・`@yanqirenshi/model.er`: `^0.2.2`)
+- API サーバーの検査のスキーマ (`src/schemas/`) を、model.tm・model.er のスキーマにそろえた。
+  - `tm/identifiers`・`tm/attributes`: `data_type` を足した。(`{ type, length, scale, description }` の組か `null`。`length` は 1 以上、`scale` は 0 以上の整数。`description` は文字列の配列)
+  - `er/identifiers`・`er/attributes`・`er/schemas`: `data_type` を、文字列だけから、組・`null`・文字列のどれかに広げた。(これまでの文字列も、通る)
+  - `tm/entities`・`er/entities`: 属性の行 (`attributes[]`) に、`not_null` (真偽値) を足した。
+- `PATCH` は、変えていない。(これまでどおり JSON Merge Patch。`{ "data_type": { "length": null } }` で長さだけを消し、`{ "data_type": null }` で `data_type` ごと消す) テストを足した。
+- **利用側から見える違い**:
+  - データの形が増える。(`data_type`・`not_null`。どちらも書かなくてよい) いまのデータは、そのまま通る。(データの移行は無い)
+  - 形の合わない値 (TM の文字列の `data_type`・長さ 0・負の小数部の桁数・真偽値でない `not_null` など) は、`POST`・`PATCH`・`check` で誤りになる。
 
 ## 0.11.0 (2026-11)
 
