@@ -13,10 +13,12 @@ import TableRow from '@mui/material/TableRow';
 import { useCollections } from '../../../redux/api/dataApi.js';
 import { entityRows, masterRows, relationshipRows } from '../../../manegers/tmTables.js';
 
+import AddTmEntity from './AddTmEntity.js';
+
 // ビジネスのページの、TM のデータを表で見るタブ。(0.12.0 から)
 //   Entities (entities)・Identifiers (identifiers)・Attributes (attributes)・Relationships (relationships)
 //
-// 見るだけ。(書き換えは、TM タブのインスペクタか、data/tm/ のファイルで行う)
+// 見るだけ。(書き換えは、TM タブのインスペクタか、data/tm/ のファイルで行う) ただし、Entities のタブは、表の上の右端の「Entity の追加」で、エンティティを足せる。(#232。AddTmEntity.js)
 // 並びは、ファイルの順。(並べ替え・絞り込みは付けない)
 // データは、API サーバーから読んだもの (useCollections)。TM タブのインスペクタで書き換えると、表も新しい値になる。
 // 行の作り方 (名前の解決・論理名と物理名の分け方) は、manegers/tmTables.js。
@@ -26,16 +28,22 @@ import { entityRows, masterRows, relationshipRows } from '../../../manegers/tmTa
 //   columns      … [{ key, label, nowrap? }]。行の値が配列のときは、1 つずつ行を分けて出す。nowrap の列は折り返さない
 //   rows         … 行の配列 (manegers/tmTables.js が作る)
 //   emptyMessage … 行が無いときに、表の代わりに出す知らせ
+//   toolbar      … 表の上の右端に置くもの (ボタンなど。任意)。行が無くて、知らせを出しているときも出す
 // 表がコンテンツエリアより長い・広いときは、表の中でスクロールする。見出しの行は、上に残る。
-function TmTable ({ label, columns, rows, emptyMessage }) {
+function TmTable ({ label, columns, rows, emptyMessage, toolbar = null }) {
     return (
         // 左は、サイドメニューの、選んでいる項目の札 (「システム構成」のような長い名前でも、約 165px まで伸びる) にかからないようにする。
         // 下は、最後の行がドックに隠れないようにする。
-        <Box sx={{ height: '100%', pt: 3, pb: 12, pl: '180px', pr: 3, boxSizing: 'border-box' }}>
+        <Box sx={{ height: '100%', pt: 3, pb: 12, pl: '180px', pr: 3, boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
+          {toolbar &&
+           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+             {toolbar}
+           </Box>}
+
           {rows.length===0
            ? <Alert severity="info">{emptyMessage}</Alert>
            : (
-               <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: '100%' }}>
+               <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: '100%', minHeight: 0 }}>
                  <Table stickyHeader size="small" aria-label={label}>
                    <TableHead>
                      <TableRow>
@@ -103,7 +111,8 @@ export function TmEntities () {
     const collections = useCollections();
     const rows = React.useMemo(()=> entityRows(collections), [collections]);
 
-    return <TmTable label="エンティティ" columns={ENTITY_COLUMNS} rows={rows} emptyMessage={empty('エンティティ', 'entities')}/>;
+    return <TmTable label="エンティティ" columns={ENTITY_COLUMNS} rows={rows} emptyMessage={empty('エンティティ', 'entities')}
+                    toolbar={<AddTmEntity/>}/>;
 }
 
 // Identifiers のタブ
