@@ -3,10 +3,10 @@
 タブのある、WBS のノードのページの枠を描きます。
 [Frame](#/components/assemblies/Frame) (サイドメニューとドック) の中に、次の 4 つを上から順に描きます。
 
-1. ノードの見出し ([HeadWbsPage](#/components/parts/HeadWbsPage))
+1. ノードの見出し ([HeadWbsPage](#/components/parts/HeadWbsPage))。既定では中央に寄せます (`headAlign` で変えられます)
 2. タブの並び ([TabsSearchParam](#/components/assemblies/TabsSearchParam))
 3. `children` (ページの内容)
-4. このノードから下の WBS の表 ([WBSTable](#/components/assemblies/WBSTable))
+4. このノードから下の WBS の表 ([WBSTable](#/components/assemblies/WBSTable))。`showWbsTable={false}` のときは出しません
 
 - ソース: `packages/ihub.core/src/components/assemblies/frames/FrameWbsNodeTabs.js`
 
@@ -39,6 +39,8 @@ import { FrameWbsNodeTabs } from '@yanqirenshi/ihub.core';
 | `maxWidth` | string | - | タブの並びと WBS の表の幅。MUI の `Container` の `maxWidth` の値 (`'md'` など)。既定は `'lg'` |
 | `centered` | boolean | - | `true` のとき、タブを中央に寄せます。既定は左寄せ。(0.5.0 以降) |
 | `tabsProps` | object | - | タブ (MUI の `Tabs`) に渡す props。([TabsSearchParam](#/components/assemblies/TabsSearchParam) の `tabsProps` と同じ) (0.5.0 以降) |
+| `showWbsTable` | boolean | - | `false` のとき、WBS の表を出しません。既定は `true` (出す) |
+| `headAlign` | string | - | 見出し (種類・名前・説明) の寄せ。`'left'` (左寄せ)・`'center'` (中央寄せ)・`'right'` (右寄せ) のどれか。既定は `'center'` |
 
 `centered` と `tabsProps` は、そのまま [TabsSearchParam](#/components/assemblies/TabsSearchParam) に渡します。
 
@@ -87,6 +89,31 @@ export default function P1000 (props) {
 </FrameWbsNodeTabs>
 ```
 
+WBS の表を出さないときは、`showWbsTable={false}` を付けます。
+
+```jsx
+<FrameWbsNodeTabs wbs_node={props.wbs_node}
+                  tabs={TABS}
+                  tab={tab}
+                  onChangeTab={setTab}
+                  showWbsTable={false}>
+  ...
+</FrameWbsNodeTabs>
+```
+
+見出しを左に寄せるときは、`headAlign="left"` を付けます。(右に寄せるときは `"right"`)
+タブの寄せ (`centered`) とは別に決められます。
+
+```jsx
+<FrameWbsNodeTabs wbs_node={props.wbs_node}
+                  tabs={TABS}
+                  tab={tab}
+                  onChangeTab={setTab}
+                  headAlign="left">
+  ...
+</FrameWbsNodeTabs>
+```
+
 ## 注意
 
 - `<IHub>` の中で使ってください。
@@ -102,6 +129,13 @@ export default function P1000 (props) {
 - `centered`・`tabsProps` は、この部品が描くタブの並びにだけ効きます。
   `children` の中に描いたタブには、効きません。
   0.4.x までは、中央に寄せるには、この部品を `Box` で囲んで、MUI のクラス名 (`.MuiTabs-flexContainer`) に CSS を当てる必要がありました。0.5.0 からは、`centered` を使ってください。
+- タブによって WBS の表を出し分けるときは、`showWbsTable={tab==='overview'}` のように、`tab` から決めて渡します。
+- `headAlign` は、見出しにだけ効きます。
+  タブの並びの寄せは `centered` で、`children` の寄せは `children` の側で決めてください。
+  `'left'`・`'center'`・`'right'` 以外の値を渡したときは、省略したときと同じく、中央寄せになります。
+- 見出しは、これまで左寄せでした。
+  `headAlign` を足した版から、既定が中央寄せに変わります。
+  左寄せのままにするときは、`headAlign="left"` を付けてください。
 - `maxWidth` は、タブの並びと WBS の表にだけ効きます。
   見出しの幅は `'lg'` のままです。
   `children` の幅は、`children` の側で決めてください。
