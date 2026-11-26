@@ -87,31 +87,28 @@ export function entityRows (collections) {
     }));
 }
 
+// 名前を、論理名と物理名に分ける。(Identifiers・Attributes の表の列。#230)
+//   { logical, physical } の組 … それぞれ。(片方しか無ければ、無い方は空)
+//   文字列 … 論理名。物理名は空。
+//   それ以外 … どちらも空
+export function nameParts (name) {
+    if (typeof name==='string')
+        return { logical: name, physical: '' };
+
+    if (!name || typeof name!=='object')
+        return { logical: '', physical: '' };
+
+    return { logical: textOf(name.logical), physical: textOf(name.physical) };
+}
+
 // Identifiers・Attributes のタブの行。
-//   { id, name, description, entities: [この識別子 (属性) を持つエンティティの名前] }
+//   { id, logical, physical, description }
 //   kind … 'identifiers' か 'attributes'
-// エンティティは、entities.json の順。1 つのエンティティが同じマスタを 2 度持っていても、1 度だけ出す。どこからも使われていなければ、空。
 export function masterRows (collections, kind) {
-    const key = kind==='identifiers' ? 'identifier' : 'attribute';
-    const users = new Map();
-
-    for (const entity of listOf(collections, 'entities')) {
-        for (const row of (Array.isArray(entity?.[kind]) ? entity[kind] : [])) {
-            const id = row?.[key];
-            const list = users.get(id) || [];
-
-            if (!list.includes(entity))
-                list.push(entity);
-
-            users.set(id, list);
-        }
-    }
-
     return listOf(collections, kind).filter(Boolean).map(d=> ({
         id: textOf(d.id),
-        name: nameText(d.name),
+        ...nameParts(d.name),
         description: textOf(d.description),
-        entities: (users.get(d.id) || []).map(e=> nameText(e.name) || textOf(e.id)),
     }));
 }
 

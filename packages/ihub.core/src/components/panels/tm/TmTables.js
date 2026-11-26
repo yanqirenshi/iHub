@@ -19,7 +19,7 @@ import { entityRows, masterRows, relationshipRows } from '../../../manegers/tmTa
 // 見るだけ。(書き換えは、TM タブのインスペクタか、data/tm/ のファイルで行う)
 // 並びは、ファイルの順。(並べ替え・絞り込みは付けない)
 // データは、API サーバーから読んだもの (useCollections)。TM タブのインスペクタで書き換えると、表も新しい値になる。
-// 行の作り方 (名前の解決・エンティティの逆引き) は、manegers/tmTables.js。
+// 行の作り方 (名前の解決・論理名と物理名の分け方) は、manegers/tmTables.js。
 // 列の見出しは、TM のインスペクタ (@yanqirenshi/model.tm の fieldsOf のラベル) に合わせる。
 
 // 表。4 つのタブで同じものを使う。
@@ -76,11 +76,12 @@ const ENTITY_COLUMNS = [
     { key: 'description', label: '説明' },
 ];
 
+// Identifiers・Attributes。名前は、論理名と物理名の列に分ける。(文字列の名前は、論理名の列。#230)
 const MASTER_COLUMNS = [
     { key: 'id',          label: 'ID', nowrap: true },
-    { key: 'name',        label: '名称' },
+    { key: 'logical',     label: '論理名' },
+    { key: 'physical',    label: '物理名' },
     { key: 'description', label: '説明' },
-    { key: 'entities',    label: 'エンティティ' },
 ];
 
 const RELATIONSHIP_COLUMNS = [
