@@ -27,6 +27,23 @@
   - 新しいタブが要らないときは、`tabs.PAGE_BUSINESS` の `{ code: 'entities', hidden: true }` などで消せる。
   - データの形・設定の形は、変わらない。(データの移行は無い)
 
+### 追加 (FrameWbsNode・FrameWbsNodeTabs: WBS の表の表示/非表示。yanqirenshi/iHub#176)
+
+- WBS のノードのページの枠 `FrameWbsNode`・`FrameWbsNodeTabs` に、props `showWbsTable` を足した。`false` のとき、ノードから下の WBS の表 (`WBSTable`) を出さない。省略したとき (既定は `true`) は、0.11.x までと同じく出す。
+  - `FrameWbsNode` では、消えるのは WBS の表だけで、子のノードを追加するフォーム (`AddWbsNode`) は、そのまま出る。
+
+### 追加・変更 (FrameWbsNode・FrameWbsNodeTabs: 見出しの寄せ。yanqirenshi/iHub#176)
+
+- `FrameWbsNode`・`FrameWbsNodeTabs` に、props `headAlign` を足した。見出し (ノードの種類・名前・説明) を、`'left'` (左寄せ)・`'center'` (中央寄せ)・`'right'` (右寄せ) から選べる。
+- **2 つの枠の見出しの既定を、中央寄せに変えた。** 0.11.x までは左寄せだった。左寄せのままにするときは、`headAlign="left"` を付ける。(`'left'`・`'center'`・`'right'` 以外の値のときも、中央寄せ)
+- 見出しを描く `HeadWbsPage` に、props `align` を足した。`HeadWbsPage` だけを使うときの既定は、0.11.x までと同じく左寄せ。(`'left'`・`'center'`・`'right'` 以外の値のときも、左寄せ)
+- 寄せの値を決める処理 (`headAlignOf`) は、`HeadWbsPage` と 2 つの枠で共通に使う。(公開はしていない)
+- `headAlign` は、見出しにだけ効く。タブの並びの寄せ (`centered`。0.5.0 以降)・`children`・WBS の表は、変わらない。
+- **利用側から見える違い**:
+  - `FrameWbsNode`・`FrameWbsNodeTabs` で描く WBS のノードのページの見出しが、**左寄せから中央寄せに変わる。**(専用のページが無いノードを描く雛形の `src/wbs/NotFoundWbsNodeComponent.js` も、`FrameWbsNode` を使っている) 左寄せのままにするページには、`headAlign="left"` を付ける。
+  - `showWbsTable`・`headAlign` (と `HeadWbsPage` の `align`) を、props で渡せるようになった。渡さなければ、WBS の表は 0.11.x までと同じく出る。
+  - `HeadWbsPage` だけを使っているページの見出しは、変わらない。(左寄せのまま)
+
 ## 0.11.0 (2026-11)
 
 ### 変更 (インスペクタを開く操作を、右クリックから Ctrl + クリック (Mac は ⌘ + クリック) に変える。yanqirenshi/iHub#222)
@@ -268,18 +285,6 @@
 
 - 雛形のアプリ (`examples/app/`。`ihub-srv init --app` がコピーする) に、自分で作る部品を置くフォルダ `src/components/` (`assemblies/`・`pages/`・`panels/`・`parts/`) を入れた。中身は、それぞれの `README.md` だけ。
   - これまでは、参照アプリにはあるが、雛形にコピーするものの一覧 (`scripts/copy-assets.mjs` の `REF_SRC`) に無かったので、雛形から作ったアプリには無かった。
-
-### 追加 (FrameWbsNode・FrameWbsNodeTabs: WBS の表の表示/非表示)
-
-- `FrameWbsNode` と `FrameWbsNodeTabs` に、props `showWbsTable` を足した。`false` のとき、ノードから下の WBS の表 (`WBSTable`) を出さない。省略したときは、今までどおり出す。
-  - `FrameWbsNode` では、消えるのは WBS の表だけで、子のノードを追加するフォーム (`AddWbsNode`) は、そのまま出る。
-
-### 追加・変更 (FrameWbsNode・FrameWbsNodeTabs: 見出しの寄せ)
-
-- `FrameWbsNode` と `FrameWbsNodeTabs` に、props `headAlign` を足した。見出し (ノードの種類・名前・説明) を、`'left'` (左寄せ)・`'center'` (中央寄せ)・`'right'` (右寄せ) から選べる。
-- **見出しの既定を、中央寄せに変えた。** これまでは左寄せだった。左寄せのままにするときは、`headAlign="left"` を付ける。(`'left'`・`'center'`・`'right'` 以外の値のときも、中央寄せ)
-- 見出しを描く `HeadWbsPage` に、props `align` を足した。`HeadWbsPage` だけを使うときの既定は、これまでどおり左寄せ。
-- `headAlign` は、見出しにだけ効く。タブの並びの寄せ (`centered`)・`children`・WBS の表は、変わらない。
 
 ## 0.6.0 (2026-11)
 
