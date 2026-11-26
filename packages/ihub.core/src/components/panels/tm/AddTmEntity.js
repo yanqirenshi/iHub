@@ -66,7 +66,7 @@ export default function AddTmEntity () {
 // 左右の枠の高さ。(右の枠は、中身が長いときは、枠の中でスクロールする)
 // 画面が低くて、枠と題とボタンが収まらないときは、MUI の Dialog の既定 (scroll="paper") のとおり、
 // 題と「キャンセル」「作成」は出したまま、その間 (枠) を、モーダルの中でスクロールする。
-const PANE_HEIGHT = 640;
+const PANE_HEIGHT = 888;
 
 // モーダルの左の余白。(サイドメニューの、選んでいる項目の札は、長い名前でも約 165px まで伸びる。表の左の余白と同じ)
 const SIDE_MENU_WIDTH = 180;
