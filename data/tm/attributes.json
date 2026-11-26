@@ -1,18 +1,177 @@
 [
     {
         "id": 20000,
-        "name": "name"
+        "name": {
+            "logical": "プロバイダ名",
+            "physical": "name"
+        },
+        "description": "画面に出す、サインインの方法の名前。(Google・メールとパスワード など)",
+        "data_type": {
+            "type": "varchar",
+            "length": 64
+        }
     },
     {
         "id": 20001,
-        "name": "authenticated_at"
+        "name": {
+            "logical": "最終認証日時",
+            "physical": "authenticated_at"
+        },
+        "description": "最後に認証した日時。",
+        "data_type": {
+            "type": "timestamp"
+        }
     },
     {
         "id": 20002,
-        "name": "credential"
+        "name": {
+            "logical": "認証情報",
+            "physical": "credential"
+        },
+        "description": "プロバイダから受け取った認証情報。",
+        "data_type": {
+            "type": "text",
+            "description": [
+                "トークンは、暗号化して保存する。",
+                "平文では持たない。"
+            ]
+        }
     },
     {
         "id": 20003,
-        "name": "authed_at"
+        "name": {
+            "logical": "認証日時",
+            "physical": "authed_at"
+        },
+        "description": "プロバイダで認証した日時。",
+        "data_type": {
+            "type": "timestamp"
+        }
+    },
+    {
+        "id": 20004,
+        "name": {
+            "logical": "メールアドレス",
+            "physical": "email"
+        },
+        "description": "連絡に使うメールアドレス。",
+        "data_type": {
+            "type": "varchar",
+            "length": 254,
+            "description": [
+                "RFC 5321 の上限に合わせる。"
+            ]
+        }
+    },
+    {
+        "id": 20005,
+        "name": {
+            "logical": "表示名",
+            "physical": "display_name"
+        },
+        "description": "画面に出す、ユーザーの名前。",
+        "data_type": {
+            "type": "varchar",
+            "length": 64
+        }
+    },
+    {
+        "id": 20006,
+        "name": {
+            "logical": "有効",
+            "physical": "is_active"
+        },
+        "description": "false のユーザーは、ログインできない。",
+        "data_type": {
+            "type": "boolean"
+        }
+    },
+    {
+        "id": 20007,
+        "name": {
+            "logical": "組織名",
+            "physical": "organization_name"
+        },
+        "description": "組織の正式な名前。",
+        "data_type": {
+            "type": "varchar",
+            "length": 128
+        }
+    },
+    {
+        "id": 20008,
+        "name": {
+            "logical": "月額料金",
+            "physical": "monthly_fee"
+        },
+        "description": "組織が、毎月払う料金。",
+        "data_type": {
+            "type": "decimal",
+            "length": 10,
+            "scale": 2,
+            "description": [
+                "円。税込み。"
+            ]
+        }
+    },
+    {
+        "id": 20009,
+        "name": {
+            "logical": "役割",
+            "physical": "role"
+        },
+        "description": "組織の中での役割。(owner・admin・member)",
+        "data_type": {
+            "type": "varchar",
+            "length": 16
+        }
+    },
+    {
+        "id": 20010,
+        "name": {
+            "logical": "所属開始日",
+            "physical": "joined_on"
+        },
+        "description": "組織に入った日。",
+        "data_type": {
+            "type": "date"
+        }
+    },
+    {
+        "id": 20011,
+        "name": {
+            "logical": "招待日時",
+            "physical": "invited_at"
+        },
+        "description": "招待のメールを送った日時。",
+        "data_type": {
+            "type": "timestamp"
+        }
+    },
+    {
+        "id": 20012,
+        "name": {
+            "logical": "承諾日時",
+            "physical": "accepted_at"
+        },
+        "description": "招待を承諾した日時。",
+        "data_type": {
+            "type": "timestamp"
+        }
+    },
+    {
+        "id": 20013,
+        "name": {
+            "logical": "IP アドレス",
+            "physical": "ip_address"
+        },
+        "description": "ログインしたときの、接続元の IP アドレス。",
+        "data_type": {
+            "type": "varchar",
+            "length": 45,
+            "description": [
+                "IPv6 の文字列の最大の長さ。"
+            ]
+        }
     }
 ]

@@ -19,7 +19,13 @@
                 "identifier": 10000
             }
         ],
-        "attributes": []
+        "attributes": [
+            {
+                "id": 401,
+                "attribute": 20001,
+                "not_null": false
+            }
+        ]
     },
     {
         "id": 30001,
@@ -44,7 +50,8 @@
         "attributes": [
             {
                 "id": 400,
-                "attribute": 20000
+                "attribute": 20000,
+                "not_null": true
             }
         ]
     },
@@ -52,7 +59,7 @@
         "id": 30002,
         "type": "EVENT",
         "name": "Firebase Auth Provider 認証",
-        "description": "",
+        "description": "Firebase Auth のユーザーが、プロバイダで認証したこと。",
         "position": {
             "x": 100,
             "y": -100,
@@ -75,11 +82,262 @@
         "attributes": [
             {
                 "id": 300,
-                "attribute": 20002
+                "attribute": 20002,
+                "not_null": true
             },
             {
                 "id": 301,
-                "attribute": 20003
+                "attribute": 20003,
+                "not_null": true
+            }
+        ]
+    },
+    {
+        "id": 30003,
+        "type": "RESOURCE",
+        "name": {
+            "logical": "ユーザー",
+            "physical": "users"
+        },
+        "description": "アプリを使う人。Firebase Auth のユーザーと、1 対 1 に対照する。",
+        "position": {
+            "x": -300,
+            "y": -500,
+            "z": 0
+        },
+        "size": {
+            "w": 0,
+            "h": 0
+        },
+        "identifiers": [
+            {
+                "id": 500,
+                "identifier": 10002
+            }
+        ],
+        "attributes": [
+            {
+                "id": 501,
+                "attribute": 20004,
+                "not_null": true
+            },
+            {
+                "id": 502,
+                "attribute": 20005
+            },
+            {
+                "id": 503,
+                "attribute": 20006,
+                "not_null": true
+            }
+        ]
+    },
+    {
+        "id": 30004,
+        "type": "RESOURCE",
+        "name": {
+            "logical": "組織",
+            "physical": "organizations"
+        },
+        "description": "ユーザーが所属する会社・チーム。",
+        "position": {
+            "x": -1300,
+            "y": -500,
+            "z": 0
+        },
+        "size": {
+            "w": 0,
+            "h": 0
+        },
+        "identifiers": [
+            {
+                "id": 510,
+                "identifier": 10003
+            }
+        ],
+        "attributes": [
+            {
+                "id": 511,
+                "attribute": 20007,
+                "not_null": true
+            },
+            {
+                "id": 512,
+                "attribute": 20008,
+                "not_null": false
+            }
+        ]
+    },
+    {
+        "id": 30005,
+        "type": "CORRESPONDENCE",
+        "name": {
+            "logical": "所属",
+            "physical": "memberships"
+        },
+        "description": "ユーザーと組織の対応表。1 人のユーザーが、いくつもの組織に入れる。",
+        "position": {
+            "x": -900,
+            "y": -850,
+            "z": 0
+        },
+        "size": {
+            "w": 0,
+            "h": 0
+        },
+        "identifiers": [
+            {
+                "id": 520,
+                "identifier": 10003
+            },
+            {
+                "id": 521,
+                "identifier": 10002
+            }
+        ],
+        "attributes": [
+            {
+                "id": 522,
+                "attribute": 20009,
+                "not_null": true
+            },
+            {
+                "id": 523,
+                "attribute": 20010
+            }
+        ]
+    },
+    {
+        "id": 30006,
+        "type": "COMPARATIVE",
+        "name": "Firebase Auth・ユーザー対照表",
+        "description": "Firebase UID と、アプリのユーザー ID の対照表。",
+        "position": {
+            "x": -850,
+            "y": -250,
+            "z": 0
+        },
+        "size": {
+            "w": 0,
+            "h": 0
+        },
+        "identifiers": [
+            {
+                "id": 530,
+                "identifier": 10000
+            },
+            {
+                "id": 531,
+                "identifier": 10002
+            }
+        ],
+        "attributes": []
+    },
+    {
+        "id": 30007,
+        "type": "EVENT",
+        "name": {
+            "logical": "招待",
+            "physical": "invitations"
+        },
+        "description": "組織が、メールアドレスに宛てて、参加を誘ったこと。",
+        "position": {
+            "x": -1300,
+            "y": 100,
+            "z": 0
+        },
+        "size": {
+            "w": 0,
+            "h": 0
+        },
+        "identifiers": [
+            {
+                "id": 540,
+                "identifier": 10004
+            },
+            {
+                "id": 541,
+                "identifier": 10003
+            }
+        ],
+        "attributes": [
+            {
+                "id": 542,
+                "attribute": 20004,
+                "not_null": true
+            },
+            {
+                "id": 543,
+                "attribute": 20011,
+                "not_null": true
+            }
+        ]
+    },
+    {
+        "id": 30008,
+        "type": "EVENT-SUBSET",
+        "name": {
+            "logical": "招待の承諾",
+            "physical": "invitation_acceptances"
+        },
+        "description": "招待を受けた人が、承諾したもの。(招待のサブセット)",
+        "position": {
+            "x": -1300,
+            "y": 450,
+            "z": 0
+        },
+        "size": {
+            "w": 0,
+            "h": 0
+        },
+        "identifiers": [
+            {
+                "id": 550,
+                "identifier": 10004
+            }
+        ],
+        "attributes": [
+            {
+                "id": 551,
+                "attribute": 20012,
+                "not_null": true
+            }
+        ]
+    },
+    {
+        "id": 30009,
+        "type": "EVENT",
+        "name": "ログイン",
+        "description": "ユーザーが、アプリにログインしたこと。",
+        "position": {
+            "x": 650,
+            "y": -500,
+            "z": 0
+        },
+        "size": {
+            "w": 0,
+            "h": 0
+        },
+        "identifiers": [
+            {
+                "id": 560,
+                "identifier": 10005
+            },
+            {
+                "id": 561,
+                "identifier": 10002
+            }
+        ],
+        "attributes": [
+            {
+                "id": 562,
+                "attribute": 20003,
+                "not_null": true
+            },
+            {
+                "id": 563,
+                "attribute": 20013,
+                "not_null": false
             }
         ]
     }

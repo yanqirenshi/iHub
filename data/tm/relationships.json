@@ -1,6 +1,8 @@
 [
     {
         "id": 1,
+        "type": "リソース → イベント",
+        "label": "認証する",
         "from": {
             "id": 100,
             "entity": 30000,
@@ -10,10 +12,13 @@
             "id": 101,
             "entity": 30002,
             "position": 90
-        }
+        },
+        "description": "Firebase Auth のユーザーが、プロバイダで認証する。"
     },
     {
         "id": 2,
+        "type": "リソース → イベント",
+        "label": "使われる",
         "from": {
             "id": 103,
             "entity": 30001,
@@ -23,6 +28,111 @@
             "id": 102,
             "entity": 30002,
             "position": 90
-        }
+        },
+        "description": "認証に使ったプロバイダ。"
+    },
+    {
+        "id": 3,
+        "type": "対応",
+        "label": "所属する",
+        "from": {
+            "entity": 30004,
+            "cardinality": 3,
+            "optionality": 0,
+            "position": 270
+        },
+        "to": {
+            "entity": 30003,
+            "cardinality": 3,
+            "optionality": 0,
+            "position": 90
+        },
+        "mapping": {
+            "entity": 30005
+        },
+        "description": "ユーザーと組織は、多対多。所属の対応表で結ぶ。"
+    },
+    {
+        "id": 4,
+        "type": "対照",
+        "label": "同じ人",
+        "from": {
+            "entity": 30003,
+            "cardinality": 1,
+            "optionality": 1,
+            "position": 0
+        },
+        "to": {
+            "entity": 30000,
+            "cardinality": 1,
+            "optionality": 1,
+            "position": 180
+        },
+        "mapping": {
+            "entity": 30006
+        },
+        "description": "アプリのユーザーと、Firebase Auth のユーザーを、対照表で結ぶ。"
+    },
+    {
+        "id": 5,
+        "type": "リソース → イベント",
+        "label": "招待する",
+        "from": {
+            "entity": 30004,
+            "cardinality": 1,
+            "optionality": 1,
+            "position": 0
+        },
+        "to": {
+            "entity": 30007,
+            "cardinality": 3,
+            "optionality": 0,
+            "position": 180
+        },
+        "description": "組織が、人を招待する。"
+    },
+    {
+        "id": 6,
+        "type": "サブセット",
+        "label": "承諾",
+        "from": {
+            "entity": 30007
+        },
+        "to": {
+            "entity": 30008
+        },
+        "subset": {
+            "kind": "same",
+            "code": "承諾"
+        },
+        "description": "招待のうち、承諾されたもの。"
+    },
+    {
+        "id": 7,
+        "type": "リソース → イベント",
+        "label": "ログインする",
+        "from": {
+            "entity": 30003,
+            "cardinality": 1,
+            "optionality": 1,
+            "position": 270
+        },
+        "to": {
+            "entity": 30009,
+            "cardinality": 3,
+            "optionality": 0,
+            "position": 90
+        },
+        "details": [
+            {
+                "from": {
+                    "id": 500
+                },
+                "to": {
+                    "id": 561
+                }
+            }
+        ],
+        "description": "ユーザーが、アプリにログインする。"
     }
 ]
