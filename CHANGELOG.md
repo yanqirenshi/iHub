@@ -12,7 +12,7 @@
 
 ## 0.12.0 (2026-11)
 
-- `@yanqirenshi/ihub.core`: ビジネスのページに、TM のデータ (`data/tm/` の entities・identifiers・attributes・relationships) を表で見るタブ (Entities・Identifiers・Attributes・Relationships) を、「TM」と「機能一覧」の間に足した。(yanqirenshi/iHub#224) 見るだけ。並びはファイルの順。識別子・属性・接続元・接続先は、id ではなく名前で出す。初めに開くタブは、これまでどおり TM。
+- `@yanqirenshi/ihub.core`: ビジネスのページに、TM のデータ (`data/tm/` の entities・identifiers・attributes・relationships) を表で見るタブ (Entities・Identifiers・Attributes・Relationships) を、「TM」と「機能一覧」の間に足した。(yanqirenshi/iHub#224) 見るだけ。並びはファイルの順。エンティティの識別子・属性、結線の接続元・接続先は、id ではなく名前で出す。Identifiers・Attributes は、名前を論理名と物理名の列に分けて出す。(yanqirenshi/iHub#230) 初めに開くタブは、これまでどおり TM。
 - `@yanqirenshi/ihub.core`: WBS のノードのページの枠 `FrameWbsNode`・`FrameWbsNodeTabs` に、props `showWbsTable` (WBS の表を出すか。既定は出す) と `headAlign` (見出しの寄せ) を足した。(yanqirenshi/iHub#176) **2 つの枠の見出しの既定が、左寄せから中央寄せに変わった。** 左寄せのままにするときは、`headAlign="left"` を付ける。(見出しの部品 `HeadWbsPage` にも `align` を足した。`HeadWbsPage` の既定は左寄せのまま)
 - `@yanqirenshi/ihub.core`: 雛形の `examples/app/package.template.json` の iHub の版を、`^0.12.0` にそろえた。
 - `@yanqirenshi/ihub.srv`: コードの変更は無い。(ihub.core 0.12.0 と、版をそろえるだけ)

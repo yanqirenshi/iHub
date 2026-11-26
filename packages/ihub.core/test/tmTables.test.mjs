@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { entityRows, masterRows, nameText, relationshipRows, subsetText } from '../src/manegers/tmTables.js';
+import { entityRows, masterRows, nameParts, nameText, relationshipRows, subsetText } from '../src/manegers/tmTables.js';
 
 // 参照アプリの data/tm/ (エンティティ 3・識別子 2・属性 4・結線 2)
 const DATA = fileURLToPath(new URL('../../../data/tm/', import.meta.url));
@@ -87,16 +87,35 @@ test('entityRows: 識別子・属性は名前で出す (行の name、無けれ�
     ]);
 });
 
-test('masterRows: そのマスタを持つエンティティを、entities.json の順で、1 度ずつ出す', ()=> {
+test('nameParts: 組は論理名と物理名に分ける。文字列は論理名で、物理名は空', ()=> {
+    assert.deepEqual(nameParts({ logical: '顧客', physical: 'customer' }), { logical: '顧客', physical: 'customer' });
+    assert.deepEqual(nameParts({ logical: '顧客' }), { logical: '顧客', physical: '' });
+    assert.deepEqual(nameParts({ physical: 'customer' }), { logical: '', physical: 'customer' });
+    assert.deepEqual(nameParts({ logical: 'id', physical: 'id' }), { logical: 'id', physical: 'id' });
+    assert.deepEqual(nameParts('firebase_uid'), { logical: 'firebase_uid', physical: '' });
+    assert.deepEqual(nameParts(undefined), { logical: '', physical: '' });
+    assert.deepEqual(nameParts(null), { logical: '', physical: '' });
+    assert.deepEqual(nameParts(3), { logical: '', physical: '' });
+});
+
+test('masterRows: ID・論理名・物理名・説明の行を、ファイルの順で作る (エンティティは出さない)', ()=> {
     assert.deepEqual(masterRows(COLLECTIONS, 'identifiers'), [
-        { id: '10', name: '顧客番号', description: '', entities: ['顧客 (customer)', '注文'] },
-        { id: '11', name: '注文番号 (order_no)', description: '', entities: ['注文'] },
+        { id: '10', logical: '顧客番号', physical: '', description: '' },
+        { id: '11', logical: '注文番号', physical: 'order_no', description: '' },
     ]);
 
     assert.deepEqual(masterRows(COLLECTIONS, 'attributes'), [
-        { id: '20', name: '名前', description: '氏名', entities: ['顧客 (customer)', '注文'] },
-        { id: '21', name: '住所', description: '', entities: ['顧客 (customer)'] },
-        { id: '22', name: '使われない属性', description: '', entities: [] },
+        { id: '20', logical: '名前', physical: '', description: '氏名' },
+        { id: '21', logical: '住所', physical: '', description: '' },
+        { id: '22', logical: '使われない属性', physical: '', description: '' },
+    ]);
+
+    // 片方だけの組
+    const half = { 'tm/attributes': [{ id: 1, name: { physical: 'only_physical' } }, { id: 2, name: { logical: '論理名だけ' }, description: 'd' }] };
+
+    assert.deepEqual(masterRows(half, 'attributes'), [
+        { id: '1', logical: '', physical: 'only_physical', description: '' },
+        { id: '2', logical: '論理名だけ', physical: '', description: 'd' },
     ]);
 });
 
