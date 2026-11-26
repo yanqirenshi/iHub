@@ -5,7 +5,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import {
-    ENTITY_FORM_FIELDS, NEW_ENTITY_GAP_X, buildEntityRecord, initialEntityForm, newEntityPosition, nextRowId, validateEntityForm,
+    ENTITY_FORM_FIELDS, ENTITY_FORM_TABS, NEW_ENTITY_GAP_X, PREVIEW_ENTITY_ID, buildEntityRecord, firstTabWithError, initialEntityForm,
+    newEntityPosition, nextRowId, previewEntityData, validateEntityForm,
 } from '../src/manegers/tmEntityForm.js';
 
 // 参照アプリの data/tm/entities.json
@@ -97,4 +98,48 @@ test('buildEntityRecord: 参照アプリのデータで、新しい行の id が
     assert.equal(added.length, 3);
     assert.equal(new Set(added).size, 3);
     assert.ok(added.every(id=> !used.has(id)), JSON.stringify(added));
+});
+
+test('ENTITY_FORM_TABS・ENTITY_FORM_FIELDS: どの項目も、定義のあるタブに置かれる', ()=> {
+    const tabs = ENTITY_FORM_TABS.map(t=> t.code);
+
+    assert.deepEqual(tabs, ['basic', 'identifiers', 'attributes']);
+    assert.ok(ENTITY_FORM_FIELDS.every(f=> tabs.includes(f.tab)), JSON.stringify(ENTITY_FORM_FIELDS.map(f=> [f.key, f.tab])));
+    assert.deepEqual(ENTITY_FORM_FIELDS.filter(f=> f.tab==='basic').map(f=> f.key), ['type', 'logical', 'physical', 'description']);
+});
+
+test('firstTabWithError: 誤りのある項目を持つ、初めのタブ。誤りが無ければ null', ()=> {
+    assert.equal(firstTabWithError({ logical: '論理名を入力してください。' }), 'basic');
+    assert.equal(firstTabWithError({ attributes: 'x' }), 'attributes');
+    assert.equal(firstTabWithError({ attributes: 'x', type: 'y' }), 'basic');
+    assert.equal(firstTabWithError({}), null);
+    assert.equal(firstTabWithError(undefined), null);
+});
+
+test('previewEntityData: 入力のレコード 1 件 (位置は原点) と、マスタ。結線は無し。入力のデータは書き換えない', ()=> {
+    const collections = {
+        'tm/entities': [{ id: 1, position: { x: 100, y: 50 }, identifiers: [{ id: 7, identifier: 10 }] }],
+        'tm/identifiers': [{ id: 10, name: 'id' }],
+        'tm/attributes': [{ id: 20, name: 'name' }],
+        'tm/relationships': [{ id: 1 }],
+    };
+    const before = structuredClone(collections);
+
+    const data = previewEntityData({ ...initialEntityForm(), logical: '顧客', identifiers: [10], attributes: [20] }, collections);
+
+    assert.deepEqual(data.entities, [{
+        type: 'RESOURCE', name: '顧客', id: PREVIEW_ENTITY_ID, position: { x: 0, y: 0 }, size: { w: 0, h: 0 },
+        identifiers: [{ id: 8, identifier: 10 }], attributes: [{ id: 9, attribute: 20 }],
+    }]);
+    assert.deepEqual(data.identifiers, collections['tm/identifiers']);
+    assert.notEqual(data.identifiers, collections['tm/identifiers']);
+    assert.deepEqual(data.attributes, collections['tm/attributes']);
+    assert.deepEqual(data.relationships, []);
+    assert.deepEqual(collections, before);
+
+    // 論理名が空・マスタが無いときも、落ちない
+    const empty = previewEntityData(initialEntityForm(), {});
+
+    assert.equal(empty.entities[0].name, '');
+    assert.deepEqual(empty.identifiers, []);
 });

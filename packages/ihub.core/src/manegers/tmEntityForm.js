@@ -1,26 +1,43 @@
 // ビジネスのページの Entities のタブの「Entity の追加」のフォーム。(0.12.0 から。叩き台)
 //
-// フォームの項目・初めの値・入力の確かめ・保存するレコードの作り方を、ここにまとめる。
-// 画面の部品 (components/panels/tm/AddTmEntity.js) は、ENTITY_FORM_FIELDS を見て、フォームを組み立てる。
-// 項目を足す・消すときは、ENTITY_FORM_FIELDS と buildEntityRecord を直す。
+// フォームのタブ・項目・初めの値・入力の確かめ・保存するレコードの作り方を、ここにまとめる。
+// 画面の部品 (components/panels/tm/AddTmEntity.js) は、ENTITY_FORM_TABS と ENTITY_FORM_FIELDS を見て、フォームを組み立てる。
+// 項目を足す・消すときは、ENTITY_FORM_FIELDS と buildEntityRecord を直す。(タブを足す・消すときは、ENTITY_FORM_TABS も)
+//
+// モーダルの形: 左にエンティティのイメージ (d3.ter で描く。previewEntityData)、右にタブ (基本・Identifiers・Attributes)。
 //
 // どれも、ほかのファイルを読み込まない、ただの関数。(node --test で、そのまま確かめる)
 
-// フォームの項目。(並びは、フォームの並び)
+// フォームのタブ。(並びは、タブの並び)
+export const ENTITY_FORM_TABS = [
+    { code: 'basic',       label: '基本' },
+    { code: 'identifiers', label: 'Identifiers' },
+    { code: 'attributes',  label: 'Attributes' },
+];
+
+// フォームの項目。(並びは、タブの中の並び)
 //   key      … 入力の値の鍵
 //   label    … 見出し
-//   input    … 'entityType' (種別を選ぶ)・'text' (1 行)・'textarea' (複数行)・'masters' (マスタから複数を選ぶ)
+//   tab      … 置くタブ (ENTITY_FORM_TABS の code)
+//   input    … 'entityType' (種別を選ぶ)・'text' (1 行)・'textarea' (複数行)・'masters' (マスタの一覧の表で、チェックで複数を選ぶ)
 //   master   … input が 'masters' のとき、選ぶマスタ ('identifiers' か 'attributes')
 //   required … 必須か
 //   initial  … 初めの値
 export const ENTITY_FORM_FIELDS = [
-    { key: 'type',        label: '種別',   input: 'entityType', required: true, initial: 'RESOURCE' },
-    { key: 'logical',     label: '論理名', input: 'text',       required: true, initial: '' },
-    { key: 'physical',    label: '物理名', input: 'text',       initial: '' },
-    { key: 'description', label: '説明',   input: 'textarea',   initial: '' },
-    { key: 'identifiers', label: '識別子', input: 'masters', master: 'identifiers', initial: [] },
-    { key: 'attributes',  label: '属性',   input: 'masters', master: 'attributes',  initial: [] },
+    { key: 'type',        label: '種別',   tab: 'basic',       input: 'entityType', required: true, initial: 'RESOURCE' },
+    { key: 'logical',     label: '論理名', tab: 'basic',       input: 'text',       required: true, initial: '' },
+    { key: 'physical',    label: '物理名', tab: 'basic',       input: 'text',       initial: '' },
+    { key: 'description', label: '説明',   tab: 'basic',       input: 'textarea',   initial: '' },
+    { key: 'identifiers', label: '識別子', tab: 'identifiers', input: 'masters', master: 'identifiers', initial: [] },
+    { key: 'attributes',  label: '属性',   tab: 'attributes',  input: 'masters', master: 'attributes',  initial: [] },
 ];
+
+// 誤りのある項目を持つ、初めのタブの code。(誤りが無ければ null。「作成」を押したとき、そのタブに切り替える)
+export function firstTabWithError (errors) {
+    const tab = ENTITY_FORM_TABS.find(t=> ENTITY_FORM_FIELDS.some(f=> f.tab===t.code && errors?.[f.key]));
+
+    return tab ? tab.code : null;
+}
 
 // 新しいエンティティを置く所の、いまあるエンティティからの横のずれ。(図の座標)
 export const NEW_ENTITY_GAP_X = 400;
@@ -106,4 +123,26 @@ export function buildEntityRecord (values, collections) {
         identifiers,
         attributes,
     };
+}
+
+// エンティティのイメージの、エンティティの id。(描くだけ。保存はしない)
+export const PREVIEW_ENTITY_ID = 'preview';
+
+// エンティティのイメージ (左の枠) に、d3.ter で描くデータ。
+// 入力から作るレコード (buildEntityRecord) 1 件と、識別子・属性のマスタ。結線は無し。位置は (0, 0)。
+// d3.ter は、渡したデータを書き換えるので、複製して返す。
+export function previewEntityData (values, collections) {
+    const record = buildEntityRecord(values, collections);
+    const list = (name)=> {
+        const v = collections?.[name];
+
+        return Array.isArray(v) ? v : [];
+    };
+
+    return structuredClone({
+        identifiers: list('tm/identifiers'),
+        attributes: list('tm/attributes'),
+        entities: [{ ...record, id: PREVIEW_ENTITY_ID, position: { x: 0, y: 0 } }],
+        relationships: [],
+    });
 }
