@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { fieldsOf } from '@yanqirenshi/model.unchi';
 
 import {
-    NEW_NODE_GAP_X, OVERVIEW_NODE_FIELDS, OVERVIEW_NODE_GROUPS, buildOverviewNodeRecord, initialOverviewNodeForm,
+    LABEL_FONT_DEFAULTS, NEW_NODE_GAP_X, OVERVIEW_NODE_FIELDS, OVERVIEW_NODE_GROUPS, buildOverviewNodeRecord, initialOverviewNodeForm,
     isNodeLink, newNodePosition, validateOverviewNodeForm,
 } from '../src/manegers/overviewNodeForm.js';
 
@@ -171,6 +171,22 @@ test('buildOverviewNodeRecord: すべての項目。数は数に、選ぶ項目�
         description: '1 行め\n2 行め',
         link: { url: 'https://example.com' },
     });
+});
+
+test('buildOverviewNodeRecord: 文字は、どれか 1 つを入れたら、3 つともそろえて書く (入れなかったものは既定)', ()=> {
+    const base = { ...initialOverviewNodeForm(), text: 'A' };
+    const font = (values)=> buildOverviewNodeRecord({ ...base, ...values }, []).label.font;
+
+    assert.deepEqual(LABEL_FONT_DEFAULTS, { size: 16, color: '#333333', weight: 'normal' });
+
+    // label.font を一部だけ書くと、書いていない色が白になる (assh0le の Label.build) ため
+    assert.deepEqual(font({ fontSize: '20' }),       { size: 20, color: '#333333', weight: 'normal' });
+    assert.deepEqual(font({ fontColor: 'orange' }),  { size: 16, color: 'orange',  weight: 'normal' });
+    assert.deepEqual(font({ fontWeight: 'bold' }),   { size: 16, color: '#333333', weight: 'bold' });
+    assert.deepEqual(font({ fontSize: '12', fontWeight: 'normal' }), { size: 12, color: '#333333', weight: 'normal' });
+
+    // 3 つとも入れなかったときは、書かない
+    assert.equal(font({}), undefined);
 });
 
 test('buildOverviewNodeRecord: 「指定なし」と影の「あり」(既定) は書かない', ()=> {

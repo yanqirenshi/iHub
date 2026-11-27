@@ -63,6 +63,11 @@ export const OVERVIEW_NODE_FIELDS = [
 // 名称を置く所。(参照アプリのいまのノードと同じ、箱の中央)
 export const NODE_LABEL_ALIGN = { align: 'center', valign: 'middle' };
 
+// 文字の既定。(d3.unchi で、label.font を丸ごと書かないときの値)
+// label.font を一部だけ書くと、書いていない色は白 (#fff) になる。(assh0le の Label.build。yanqirenshi/iHub#244 のコメント)
+// そのため、文字の大きさ・色・太さのどれかを入れたときは、入れなかったものに、この値を書いて、3 つともそろえる。
+export const LABEL_FONT_DEFAULTS = { size: 16, color: '#333333', weight: 'normal' };
+
 // 新しいノードと、いまあるノードの右端との間。(図の座標)
 export const NEW_NODE_GAP_X = 60;
 
@@ -194,6 +199,7 @@ function recordValue (f, v) {
 //   values … フォームの値。(validateOverviewNodeForm で確かめたもの)
 //   nodes  … いまある最上位のノード。(data/overview/nodes.json。置く所を決めるのに使う)
 // 空の項目 (選ぶ項目の「指定なし」も) は、書かない。(fallback のある項目は、fallback を書く) 数の項目は、数にする。
+// ただし、文字 (label.font) は、どれかを入れたら、3 つともそろえて書く。(LABEL_FONT_DEFAULTS)
 export function buildOverviewNodeRecord (values, nodes) {
     const record = { type: 'NODE', label: {} };
 
@@ -208,6 +214,10 @@ export function buildOverviewNodeRecord (values, nodes) {
 
         put(record, f.path, recordValue(f, v));
     }
+
+    // 文字は、どれかを入れたときだけ、3 つともそろえて書く。(LABEL_FONT_DEFAULTS)
+    if (record.label.font)
+        record.label.font = { ...LABEL_FONT_DEFAULTS, ...record.label.font };
 
     record.label = { ...record.label, ...NODE_LABEL_ALIGN };
 
