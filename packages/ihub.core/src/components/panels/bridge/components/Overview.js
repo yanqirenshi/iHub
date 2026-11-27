@@ -13,7 +13,7 @@ import { inspectClick } from '../../../../manegers/inspectClick.js';
 import { useConfig } from '../../../../config.js';
 import { OVERVIEW_COLLECTIONS, buildOverviewData } from '../../../../manegers/overview.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../../../redux/api/dataApi.js';
-import { DockMenu, useDockOperator } from '../../../assemblies/frames/dockOperators.js';
+import { useDockOperator } from '../../../assemblies/frames/dockOperators.js';
 
 import AddOverviewNode, { useAddOverviewNode } from './AddOverviewNode.js';
 
@@ -37,7 +37,7 @@ const isLiveEdgePatch = (change)=> change.collection==='edges' && Object.keys(ch
 // model が返す { collection, id, patch } を PATCH /overview/{collection}/{id} で保存するだけ。
 //
 // このタブを開いている間だけ、ドックの右端に「要素の追加」の丸を出す。(0.12.0 から。yanqirenshi/iHub#242)
-// 丸の吹き出しの「ノードの追加」で、モーダル (AddOverviewNode.js) を開き、最上位のノードを 1 件足す。
+// 丸を押すと、吹き出しの中に、ノードの登録フォーム (AddOverviewNode.js) を出し、最上位のノードを足す。
 // 足したら、図を作り直す。(見ている位置と拡大の度合いは、変えない。足したノードが見えない所にあっても、図は動かさない)
 export default function Overview () {
     const { data, version, rebuild } = useDiagramData(OVERVIEW_COLLECTIONS, buildOverviewData);
@@ -50,20 +50,14 @@ export default function Overview () {
 
     const rectum = React.useRef(null);
 
-    // ドックの「要素の追加」の丸と、「ノードの追加」のモーダル。
-    const [adding, setAdding] = React.useState(false);
+    // ドックの「要素の追加」の丸。吹き出しの中は、ノードの登録フォーム。
     const addNode = useAddOverviewNode();
 
     useDockOperator({
         code: 'overview',
         label: '要素の追加',
         Icon: AddIcon,
-        leaf: ({ root, close })=> (
-            <DockMenu root={root}
-                      items={[
-                          { code: 'node', label: 'ノードの追加', onClick: ()=> { close(); setAdding(true); } },
-                      ]}/>
-        ),
+        leaf: ({ root })=> <AddOverviewNode root={root} onSave={onAddNode}/>,
     });
 
     // レコードは、読み込んだデータ (保存のたびに差し替わる) から id で引く。
@@ -166,11 +160,6 @@ export default function Overview () {
                           onApply={onApply}
                           onClose={()=> setTarget(null)}
                           style={{ position: 'absolute', top: 0, right: 0, bottom: 0, zIndex: 5 }}/>
-
-          {adding &&
-           <AddOverviewNode nodes={collections['overview/nodes']}
-                            onSave={onAddNode}
-                            onClose={()=> setAdding(false)}/>}
 
           {error &&
            <Alert severity="error" onClose={()=> setError(null)}

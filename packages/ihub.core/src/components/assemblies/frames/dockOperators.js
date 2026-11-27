@@ -1,16 +1,9 @@
 import React from 'react';
 
-import Box from '@mui/material/Box';
-import ButtonBase from '@mui/material/ButtonBase';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 
 import { useDispatch } from 'react-redux';
 
-import { Leaf } from '@yanqirenshi/manipulater';
-
-import { useConfig } from '../../../config.js';
-import { dockColor } from '../../../manegers/colors.js';
 import { dockOperatorCode } from '../../../manegers/dockOperators.js';
 import { dockOperatorAdded, dockOperatorRemoved } from '../../../redux/slices/operatorsSlice.js';
 
@@ -20,13 +13,14 @@ import { dockOperatorAdded, dockOperatorRemoved } from '../../../redux/slices/op
 //       code:  'overview',                     // 丸の名前。(ドックの丸の code は 'ihub.core:overview' になる)
 //       label: '要素の追加',                    // ツールチップの文
 //       Icon:  AddIcon,                         // アイコンの部品 (MUI のアイコンなど)
-//       leaf:  ({ root, close })=> <DockMenu root={root} items={[...]} onClose={close}/>,  // 丸を押したときの吹き出し
+//       leaf:  ({ root, close })=> <MyLeaf root={root}/>,  // 丸を押したときの吹き出し
 //   });
 //
 // - 部品が表示されたときに、ドックの右端に丸を足し、消えたとき (タブ・ページを離れたとき) に丸を消す。
 //   丸の数が変わると、ドックは、丸を中央にそろえて並べ直す。(manegers/dockOperators.js)
 // - 丸を押したときの吹き出しは、leaf が描く。(設定の operators.Leafs には、回さない)
 //   root はドックの丸 (位置と大きさ)、close() は吹き出しを閉じる関数。leaf は、いつも最後に渡した関数を使う。
+//   吹き出しの枠は、@yanqirenshi/manipulater の Leaf で描く。位置は dockLeafPosition で決められる。(例: panels/bridge/components/AddOverviewNode.js)
 // - アイコンは、ここで描く。(設定の operators.labels.withIcons が知らない code でも出る)
 // - 吹き出しを出したまま部品が消えたときは、選択も外す。
 // - Frame の中 (ページの中) でだけ働く。Frame の外では、何もしない。
@@ -131,19 +125,19 @@ export function dockLeaf (entries, root, close) {
     return entry ? entry.leaf({ root, close }) : null;
 }
 
-// ---- 吹き出しの部品 --------------------------------------------------------------------------------------------------
+// ---- 吹き出しの位置 --------------------------------------------------------------------------------------------------
 
-// 項目の高さと、吹き出しの大きさ
-const MENU_ITEM_H = 44;
-const MENU_W = 222;
-const MENU_PADDING = 8;
-// ボタンと吹き出しの間隔
-const BRANCH_H = 33;
+// 丸と吹き出しの間隔
+export const DOCK_LEAF_BRANCH_H = 33;
 // 画面の端からの余白
-const MARGIN = 8;
+export const DOCK_LEAF_MARGIN = 8;
+
+const BRANCH_H = DOCK_LEAF_BRANCH_H;
+const MARGIN = DOCK_LEAF_MARGIN;
 
 // 吹き出しの位置。(丸の真上。画面の右端・左端からは、はみ出さない)
-export function dockMenuPosition (root, size, window_width) {
+//   root … ドックの丸、size … 吹き出しの中の大きさ { w, h }
+export function dockLeafPosition (root, size, window_width = window.innerWidth) {
     const w_center = root.position.x + (root.size.w / 2);
 
     const x = Math.min(Math.max(MARGIN, w_center - (size.w / 2)),
@@ -151,31 +145,4 @@ export function dockMenuPosition (root, size, window_width) {
     const y = Math.max(MARGIN, root.position.y - BRANCH_H - size.h);
 
     return { x, y };
-}
-
-// 項目を並べた、吹き出し。(押すと、onClick を呼ぶ)
-//   root  … ドックの丸 (useDockOperator の leaf に渡る root)
-//   items … [{ code, label, onClick }]
-export function DockMenu ({ root, items }) {
-    const { colors } = useConfig();
-    const theme_color = React.useMemo(()=> dockColor(colors), [colors]);
-
-    const size = { w: MENU_W, h: items.length * MENU_ITEM_H + MENU_PADDING * 2 };
-    const { x, y } = dockMenuPosition(root, size, window.innerWidth);
-
-    return (
-        <Leaf x={x} y={y} w={size.w} h={size.h} theme_color={theme_color || undefined}>
-          <Box component="ul" sx={{ m: 0, p: `${MENU_PADDING}px`, listStyle: 'none' }}>
-            {items.map(item=> (
-                <li key={item.code}>
-                  <ButtonBase onClick={item.onClick}
-                              sx={{ width: '100%', height: MENU_ITEM_H, px: 2, justifyContent: 'flex-start',
-                                    borderRadius: '4px', '&:hover': { background: '#f0f0f0' } }}>
-                    <Typography variant="body1">{item.label}</Typography>
-                  </ButtonBase>
-                </li>
-            ))}
-          </Box>
-        </Leaf>
-    );
 }

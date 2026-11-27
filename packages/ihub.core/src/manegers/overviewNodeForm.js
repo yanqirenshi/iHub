@@ -1,7 +1,7 @@
 // 艦橋の Overview のタブの「ノードの追加」のフォーム。(0.12.0 から。yanqirenshi/iHub#242。叩き台)
 //
 // フォームの項目・初めの値・入力の確かめ・保存するレコードの作り方を、ここにまとめる。
-// 画面の部品 (components/panels/bridge/components/AddOverviewNode.js) は、OVERVIEW_NODE_FIELDS を見て、フォームを組み立てる。
+// 画面の部品 (components/panels/bridge/components/AddOverviewNode.js。ドックの吹き出しの中のフォーム) は、OVERVIEW_NODE_FIELDS を見て、フォームを組み立てる。
 // 項目を足す・消すときは、OVERVIEW_NODE_FIELDS だけを直す。(path の所に、値を書く)
 //
 // どれも、ただの関数。(何も読み込まない。node --test で、そのまま確かめる)
@@ -14,8 +14,9 @@
 //   required … 必須か
 //   initial  … 初めの値
 //   fallback … 空のときに書く値。(無い項目は、空のとき、レコードに書かない)
+//   wide     … フォームの横幅いっぱいに置くか。(無い項目は、2 つずつ横に並べる)
 export const OVERVIEW_NODE_FIELDS = [
-    { key: 'text',        label: '名称',     path: 'label.text',       input: 'text',   required: true, initial: '' },
+    { key: 'text',        label: '名称',     path: 'label.text',       input: 'text',   required: true, initial: '', wide: true },
     { key: 'w',           label: '幅',       path: 'size.w',           input: 'number', initial: '160', fallback: 160 },
     { key: 'h',           label: '高さ',     path: 'size.h',           input: 'number', initial: '80',  fallback: 80 },
     { key: 'background',  label: '背景色',   path: 'background.color', input: 'text',   initial: '' },

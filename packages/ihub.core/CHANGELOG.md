@@ -82,18 +82,20 @@
 
 ### 追加 (タブだけのドックの丸 `useDockOperator`。艦橋の Overview のタブ: 「ノードの追加」。yanqirenshi/iHub#242)
 
-- タブ (やページ) の部品が、表示されている間だけ、ドックの右端に丸を足せるフック `useDockOperator` と、項目を並べた吹き出し `DockMenu` を足して、公開した。(`components/assemblies/frames/dockOperators.js`)
+- タブ (やページ) の部品が、表示されている間だけ、ドックの右端に丸を足せるフック `useDockOperator` を足して、公開した。(`components/assemblies/frames/dockOperators.js`)
   - 部品が表示されたときに丸を足し、消えたとき (タブ・ページを離れたとき) に丸を消す。丸の数が変わると、ドックは、丸を画面の中央にそろえて並べ直す。(Redux の `operators.initialized` を偽にして、`@yanqirenshi/manipulater` 0.1.0 に、位置を計算し直させる)
   - 丸を押したときの吹き出しは、足した部品が描く。(設定の `operators.Leafs` には回さない) アイコンも、ihub.core が描く。(設定の `operators.labels.withIcons` が知らない code でも出る)
   - 足した丸の code には `ihub.core:` を付ける。(アプリの丸の code と重ならない) 吹き出しを出したまま部品が消えたときは、選択も外す。
   - Redux の operators に、操作 `dockOperatorAdded`・`dockOperatorRemoved`・`dockOperatorClosed` を足した。(`redux/slices/operatorsSlice.js`。state の作り直し方は `manegers/dockOperators.js`。テストは `test/dockOperators.test.mjs`)
-- 艦橋の Overview のタブ (`/?tab=overview`) を開いている間だけ、ドックの右端に「要素の追加」の丸 (MUI の `Add` のアイコン) を出す。押すと、吹き出しに「ノードの追加」が出て、押すと、モーダル (叩き台) が開く。
+- 艦橋の Overview のタブ (`/?tab=overview`) を開いている間だけ、ドックの右端に「要素の追加」の丸 (MUI の `Add` のアイコン) を出す。押すと、吹き出しの中に、ノードの登録フォーム「ノードの追加」(叩き台) が出る。(見た目は、GitHub の丸の吹き出し `ProjectItemForm` に近づけた。ユーザーの補正で、モーダルはやめた)
   - 項目は、名称 (必須)・幅 (既定 160)・高さ (既定 80)・背景色・枠線の色。項目の名前は、Overview のインスペクタ (model.unchi の `fieldsOf`) に合わせた。
   - 「作成」で、`POST /api/overview/nodes` に、最上位のノードを 1 件足す。(id は API サーバーが振る) 名前は箱の中央。空の色は書かない。幅・高さが空なら、既定の大きさ。
   - 置く所は、いまある最上位のノードの右端 (子のノードで広がった幅を含む) の最大 + 60、y の最小。(ノードが無ければ `{ x: 0, y: 0 }`)
+  - 足せたら、フォームを初めの値に戻し、足したことを短い知らせで出す。吹き出しは開いたまま。(続けて足せる) 吹き出しは、丸をもう一度押すと閉じる。(「キャンセル」は無い) 開き直すと、入力は初めの値に戻る。
+  - 画面の高さが足りないときは、吹き出しを低くし、項目の所をスクロールさせる。(「作成」のボタンは、いつも見える)
+  - 名称が空なら、誤りを出して、保存しない。保存できなかったときは、誤りの文を、吹き出しの中に出す。
   - 足したあとは、図を作り直す。図の見ている位置と拡大の度合いは変えない。(足したノードが見えない所にあっても、図は動かさない)
-  - 項目と、保存するレコードの作り方は、`manegers/overviewNodeForm.js` にまとめ、テストを足した。(`test/overviewNodeForm.test.mjs`) モーダルは `components/panels/bridge/components/AddOverviewNode.js`。
-- モーダルの重なりの順 (TM の 4 つの「〜 の追加」と同じ値) を、`components/panels/dialog.js` に移した。(`panels/tm/tmDialog.js` は、これを読む)
+  - 項目と、保存するレコードの作り方は、`manegers/overviewNodeForm.js` にまとめ、テストを足した。(`test/overviewNodeForm.test.mjs`) 吹き出しは `components/panels/bridge/components/AddOverviewNode.js`。
 - **利用側から見える違い**:
   - 艦橋の Overview のタブを開いている間だけ、ドックの丸が 4 つになる。(いまの 3 つが少し左に寄る)
   - 設定の `operators` (丸の一覧・`Leafs`・`labels`) の形は、変わらない。
