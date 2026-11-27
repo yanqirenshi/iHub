@@ -7,7 +7,8 @@ import { fileURLToPath } from 'node:url';
 import { fieldsOf } from '@yanqirenshi/model.unchi';
 
 import {
-    LABEL_FONT_DEFAULTS, NEW_NODE_GAP_X, OVERVIEW_NODE_FIELDS, OVERVIEW_NODE_GROUPS, buildOverviewNodeRecord, initialOverviewNodeForm,
+    LABEL_FONT_DEFAULTS, NEW_NODE_GAP_X, OVERVIEW_NODE_FIELDS, OVERVIEW_NODE_GROUPS, buildOverviewNodeRecord, firstGroupWithError,
+    initialOverviewNodeForm,
     isNodeLink, newNodePosition, validateOverviewNodeForm,
 } from '../src/manegers/overviewNodeForm.js';
 
@@ -30,7 +31,7 @@ test('OVERVIEW_NODE_FIELDS: 見出しは、Overview のインスペクタ (model
         assert.equal(f.label, inspector[f.path], f.path);
 });
 
-test('OVERVIEW_NODE_FIELDS: 15 個。鍵と保存する所は重ならない。まとまりは、決めたものだけ', ()=> {
+test('OVERVIEW_NODE_FIELDS: 15 個。鍵と保存する所は重ならない。まとまり (タブ) は、決めたものだけ', ()=> {
     assert.equal(OVERVIEW_NODE_FIELDS.length, 15);
     assert.equal(new Set(OVERVIEW_NODE_FIELDS.map(f=> f.key)).size, 15);
     assert.equal(new Set(OVERVIEW_NODE_FIELDS.map(f=> f.path)).size, 15);
@@ -40,8 +41,26 @@ test('OVERVIEW_NODE_FIELDS: 15 個。鍵と保存する所は重ならない。�
     for (const f of OVERVIEW_NODE_FIELDS.filter(f=> f.group))
         assert.ok(groups.has(f.group), f.key);
 
-    // いつも出すのは、名称・幅・高さ
-    assert.deepEqual(OVERVIEW_NODE_FIELDS.filter(f=> !f.group).map(f=> f.key), ['text', 'w', 'h']);
+    // タブの上に、いつも出すのは、名称だけ
+    assert.deepEqual(OVERVIEW_NODE_FIELDS.filter(f=> !f.group).map(f=> f.key), ['text']);
+
+    // タブ: 基本 (初めに開く) / 背景 / 枠線 / 文字 / そのほか。項目の無いタブは無い
+    assert.deepEqual(OVERVIEW_NODE_GROUPS.map(g=> g.label), ['基本', '背景', '枠線', '文字', 'そのほか']);
+    assert.deepEqual(OVERVIEW_NODE_GROUPS.map(g=> OVERVIEW_NODE_FIELDS.filter(f=> f.group===g.code).map(f=> f.key)), [
+        ['w', 'h'],
+        ['background', 'opacity'],
+        ['borderType', 'border', 'borderWidth', 'radius', 'shadow'],
+        ['fontSize', 'fontColor', 'fontWeight'],
+        ['description', 'link'],
+    ]);
+});
+
+test('firstGroupWithError: 誤りのある項目を持つ、並びの先のタブ。名称だけの誤り・誤りなしは null', ()=> {
+    assert.equal(firstGroupWithError({}), null);
+    assert.equal(firstGroupWithError({ text: '名称を入力してください。' }), null);
+    assert.equal(firstGroupWithError({ fontColor: 'x', borderWidth: 'x' }), 'border');
+    assert.equal(firstGroupWithError({ text: 'x', link: 'x' }), 'other');
+    assert.equal(firstGroupWithError({ w: 'x', link: 'x' }), 'basic');
 });
 
 test('initialOverviewNodeForm: 幅 160・高さ 80。ほかは空 (選ぶ項目は「指定なし」)', ()=> {

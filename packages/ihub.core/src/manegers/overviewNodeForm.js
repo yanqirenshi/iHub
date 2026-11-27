@@ -9,8 +9,10 @@
 //
 // どれも、ただの関数。(何も読み込まない。node --test で、そのまま確かめる)
 
-// まとまり。(並びは、フォームの並び。まとまりの無い項目は、いつも上に出す)
+// まとまり。吹き出しの中では、まとまりごとのタブになる。(並びは、タブの並び。初めに開くのは、先頭の「基本」)
+// まとまりの無い項目 (名称) は、タブの上に、いつも出す。
 export const OVERVIEW_NODE_GROUPS = [
+    { code: 'basic',      label: '基本' },
     { code: 'background', label: '背景' },
     { code: 'border',     label: '枠線' },
     { code: 'font',       label: '文字' },
@@ -24,7 +26,7 @@ const UNSET = { value: '', label: '指定なし' };
 //   key      … 入力の値の鍵
 //   label    … 見出し。(Overview のインスペクタ (@yanqirenshi/model.unchi の fieldsOf) に同じ項目があれば、そのラベルに合わせる)
 //   path     … 保存するレコードの項目 ('size.w' など)
-//   group    … まとまり (OVERVIEW_NODE_GROUPS の code)。無ければ、いつも上に出す
+//   group    … まとまり (OVERVIEW_NODE_GROUPS の code。吹き出しのタブ)。無ければ、タブの上に、いつも出す
 //   input    … 'text' (1 行)・'textarea' (複数行)・'number' (数)・'select' (選ぶ)
 //   check    … 文字の確かめ。'color' (CSS の色)・'url' (リンク)
 //   range    … 数の範囲。{ gt } (より大きい)・{ ge } (以上)・{ le } (以下) を組み合わせる
@@ -36,8 +38,8 @@ const UNSET = { value: '', label: '指定なし' };
 //   wide     … フォームの横幅いっぱいに置くか。(無い項目は、2 つずつ横に並べる)
 export const OVERVIEW_NODE_FIELDS = [
     { key: 'text',        label: '名称',         path: 'label.text',         input: 'text',     required: true, initial: '', wide: true },
-    { key: 'w',           label: '幅',           path: 'size.w',             input: 'number',   range: { gt: 0 }, initial: '160', fallback: 160 },
-    { key: 'h',           label: '高さ',         path: 'size.h',             input: 'number',   range: { gt: 0 }, initial: '80',  fallback: 80 },
+    { key: 'w',           label: '幅',           path: 'size.w',             input: 'number',   range: { gt: 0 }, group: 'basic', initial: '160', fallback: 160 },
+    { key: 'h',           label: '高さ',         path: 'size.h',             input: 'number',   range: { gt: 0 }, group: 'basic', initial: '80',  fallback: 80 },
 
     { key: 'background',  label: '背景色',       path: 'background.color',   input: 'text',     check: 'color', group: 'background', initial: '' },
     { key: 'opacity',     label: '背景の透明度', path: 'background.opacity', input: 'number',   range: { ge: 0, le: 1 }, group: 'background', initial: '' },
@@ -74,6 +76,14 @@ export const NEW_NODE_GAP_X = 60;
 // フォームの初めの値。({ text: '', w: '160', ... }。開き直したときも、これに戻す)
 export function initialOverviewNodeForm () {
     return Object.fromEntries(OVERVIEW_NODE_FIELDS.map(f=> [f.key, f.initial]));
+}
+
+// 誤りのある項目を持つ、初めのまとまり (タブ) の code。(誤りが無い・まとまりの無い項目だけの誤りなら null)
+// 「作成」を押したとき、そのタブに切り替える。
+export function firstGroupWithError (errors) {
+    const group = OVERVIEW_NODE_GROUPS.find(g=> OVERVIEW_NODE_FIELDS.some(f=> f.group===g.code && errors?.[f.key]));
+
+    return group ? group.code : null;
 }
 
 const trimmed = (v)=> String(v ?? '').trim();

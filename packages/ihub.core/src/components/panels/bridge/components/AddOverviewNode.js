@@ -3,6 +3,8 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
@@ -12,17 +14,19 @@ import { useConfig } from '../../../../config.js';
 import { dockColor } from '../../../../manegers/colors.js';
 import { errorMessage, useAddRecordMutation, useCollections } from '../../../../redux/api/dataApi.js';
 import {
-    OVERVIEW_NODE_FIELDS, OVERVIEW_NODE_GROUPS, buildOverviewNodeRecord, initialOverviewNodeForm, validateOverviewNodeForm,
+    OVERVIEW_NODE_FIELDS, OVERVIEW_NODE_GROUPS, buildOverviewNodeRecord, firstGroupWithError, initialOverviewNodeForm,
+    validateOverviewNodeForm,
 } from '../../../../manegers/overviewNodeForm.js';
 import { DOCK_LEAF_BRANCH_H, DOCK_LEAF_MARGIN, dockLeafPosition } from '../../../assemblies/frames/dockOperators.js';
 
 const TITLE = 'ノードの追加';
 
 // 吹き出しの中の大きさ
-// (項目が 15 個あるので、まとまりごとに見出しを付けて並べる。#244)
+// (項目が 15 個あるので、名称の下に、まとまりごとのタブを置く。#244)
+// 高さは、タブを切り替えても変えない。(項目のいちばん多い「枠線」のタブが収まる高さ。吹き出しと「作成」の位置が動かないように)
 const LEAF_W = 520;
-const LEAF_H = 600;
-// 画面の高さが足りないときの、いちばん小さい高さ。(項目の所はスクロールし、「作成」のボタンは、いつも下に見える)
+const LEAF_H = 460;
+// 画面の高さが足りないときの、いちばん小さい高さ。(タブの中身がスクロールし、「作成」のボタンは、いつも下に見える)
 const LEAF_MIN_H = 180;
 // 吹き出しの枠 (manipulater の Leaf の padding。上下で 10px) の分
 const LEAF_FRAME = 10;
@@ -36,6 +40,8 @@ function leafHeight (root) {
 
 // 艦橋の Overview のタブの、ドックの「要素の追加」の丸の吹き出し。(0.12.0 から。yanqirenshi/iHub#242・#244。叩き台)
 // 吹き出しの中に、ノードの登録フォームを出す。(見た目は、GitHub の丸の吹き出し ProjectItemForm に近づける)
+// 見出しと名称は、いつも上に出す。ほかの項目は、名称の下の、まとまりごとのタブに分ける。(初めは「基本」)
+// タブを切り替えても、入れた値は消えない。「作成」で誤りがあれば、誤りのある項目のタブ (並びの先のもの) に切り替える。
 // 「作成」で、POST /api/overview/nodes に、最上位のノードを 1 件足す。(id は API サーバーが振る)
 // 足せたら、フォームを初めの値に戻し、吹き出しは開いたままにする。(続けて足せるように) 足したことを、短い知らせで出す。
 // 吹き出しを閉じて開き直すと、入力は初めの値に戻る。(閉じると、この部品は消えるため)
@@ -50,6 +56,7 @@ export default function AddOverviewNode ({ root, onSave }) {
     const nodes = useCollections()['overview/nodes'];
 
     const [values, setValues] = React.useState(initialOverviewNodeForm);
+    const [tab, setTab] = React.useState(OVERVIEW_NODE_GROUPS[0].code);
     const [errors, setErrors] = React.useState({});
     const [saving, setSaving] = React.useState(false);
     // 知らせ。{ type: 'success' | 'error', message }
@@ -71,8 +78,15 @@ export default function AddOverviewNode ({ root, onSave }) {
 
         setResult(null);
         setErrors(found);
-        if (Object.keys(found).length > 0)
+        if (Object.keys(found).length > 0) {
+            // 見ているタブに誤りが無ければ、誤りのある初めのタブに切り替える。(名称の誤りは、タブに関わらず見える)
+            const here = OVERVIEW_NODE_FIELDS.some(f=> f.group===tab && found[f.key]);
+            const there = firstGroupWithError(found);
+
+            if (!here && there)
+                setTab(there);
             return;
+        }
 
         const record = buildOverviewNodeRecord(values, nodes);
 
@@ -82,6 +96,7 @@ export default function AddOverviewNode ({ root, onSave }) {
             await onSave(record);
 
             setValues(initialOverviewNodeForm());
+            setTab(OVERVIEW_NODE_GROUPS[0].code);
             setResult({ type: 'success', message: `「${record.label.text}」を足しました。` });
         } catch (error) {
             setResult({ type: 'error', message: errorMessage(error, 'ノードを追加できません。') });
@@ -101,16 +116,26 @@ export default function AddOverviewNode ({ root, onSave }) {
                sx={{ height: '100%', boxSizing: 'border-box', p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Typography variant="h6">{TITLE}</Typography>
 
-            {/* 項目の所。(高さが足りないときは、ここだけスクロールする) */}
-            <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* いつも出す項目 (名称) */}
+            <Box sx={{ pt: 1 }}>
               <FieldGrid fields={OVERVIEW_NODE_FIELDS.filter(f=> !f.group)} {...field_props}/>
+            </Box>
 
-              {OVERVIEW_NODE_GROUPS.map(g=> (
-                  <Box key={g.code}>
-                    <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>{g.label}</Typography>
-                    <FieldGrid fields={OVERVIEW_NODE_FIELDS.filter(f=> f.group===g.code)} {...field_props}/>
-                  </Box>
-              ))}
+            {/* まとまりごとのタブ。(誤りのある項目を持つタブは、名前を赤くする) */}
+            <Box sx={{ mt: -1 }}>
+              <Tabs value={tab} onChange={(_e, code)=> setTab(code)} variant="fullWidth"
+                    sx={{ minHeight: 40, borderBottom: 1, borderColor: 'divider' }}>
+                {OVERVIEW_NODE_GROUPS.map(g=> (
+                    <Tab key={g.code} value={g.code} label={g.label}
+                         sx={{ minHeight: 40, minWidth: 0, px: 1,
+                               ...(OVERVIEW_NODE_FIELDS.some(f=> f.group===g.code && errors[f.key]) && { color: 'error.main' }) }}/>
+                ))}
+              </Tabs>
+            </Box>
+
+            {/* 選んだタブの項目。(高さが足りないときは、ここだけスクロールする) */}
+            <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', pt: 1 }}>
+              <FieldGrid fields={OVERVIEW_NODE_FIELDS.filter(f=> f.group===tab)} {...field_props}/>
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
