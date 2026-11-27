@@ -10,3 +10,4 @@ export { default as Frame                  } from './frames/Frame.js';
 export { default as FrameTabs              } from './frames/FrameTabs.js';
 export { default as FrameWbsNode           } from './frames/FrameWbsNode.js';
 export { default as FrameWbsNodeTabs       } from './frames/FrameWbsNodeTabs.js';
+export { useDockOperator                  } from './frames/dockOperators.js';

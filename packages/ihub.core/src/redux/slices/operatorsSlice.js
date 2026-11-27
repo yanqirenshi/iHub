@@ -1,5 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import { addDockOperator, closeDockOperator, removeDockOperator } from '../../manegers/dockOperators.js';
+
 const border_width = 3;
 
 // ドックの初期の状態。(roots は、設定の operators.items)
@@ -31,8 +33,21 @@ const operatorsSlice = createSlice({
         operatorsChanged (state, action) {
             return action.payload;
         },
+        // タブ (やページ) の部品が、表示されている間だけ足す丸。(0.12.0 から。manegers/dockOperators.js)
+        // payload: { code, label }
+        dockOperatorAdded (state, action) {
+            return addDockOperator(state, action.payload);
+        },
+        // payload: 丸の code
+        dockOperatorRemoved (state, action) {
+            return removeDockOperator(state, action.payload);
+        },
+        // 選んでいる丸の吹き出しを閉じる。
+        dockOperatorClosed (state) {
+            return closeDockOperator(state);
+        },
     },
 });
 
-export const { operatorsChanged } = operatorsSlice.actions;
+export const { operatorsChanged, dockOperatorAdded, dockOperatorRemoved, dockOperatorClosed } = operatorsSlice.actions;
 export default operatorsSlice.reducer;

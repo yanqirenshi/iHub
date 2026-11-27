@@ -2,6 +2,7 @@ import React from 'react';
 
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
+import AddIcon from '@mui/icons-material/Add';
 
 import D3Unchi, { Rectum } from '@yanqirenshi/d3.unchi';
 import { ModelInspector } from '@yanqirenshi/colonoscope';
@@ -12,6 +13,9 @@ import { inspectClick } from '../../../../manegers/inspectClick.js';
 import { useConfig } from '../../../../config.js';
 import { OVERVIEW_COLLECTIONS, buildOverviewData } from '../../../../manegers/overview.js';
 import { errorMessage, useCollections, usePatchRecordMutation } from '../../../../redux/api/dataApi.js';
+import { useDockOperator } from '../../../assemblies/frames/dockOperators.js';
+
+import AddOverviewNode, { useAddOverviewNode } from './AddOverviewNode.js';
 
 // 初めのズーム / パン
 const INITIAL_VIEW = { k: 1.0, x: 120, y: 120 };
@@ -31,6 +35,10 @@ const isLiveEdgePatch = (change)=> change.collection==='edges' && Object.keys(ch
 // 図ごとの知識 (編集できる項目・検証・patch への変換・d3.unchi の既定値) は @yanqirenshi/model.unchi が持つ。
 // ここは view (d3.unchi) と model (model.unchi) とインスペクタ (colonoscope の ModelInspector) をつなぎ、
 // model が返す { collection, id, patch } を PATCH /overview/{collection}/{id} で保存するだけ。
+//
+// このタブを開いている間だけ、ドックの右端に「要素の追加」の丸を出す。(0.12.0 から。yanqirenshi/iHub#242)
+// 丸を押すと、吹き出しの中に、ノードの登録フォーム (AddOverviewNode.js) を出し、最上位のノードを足す。
+// 足したら、図を作り直す。(見ている位置と拡大の度合いは、変えない。足したノードが見えない所にあっても、図は動かさない)
 export default function Overview () {
     const { data, version, rebuild } = useDiagramData(OVERVIEW_COLLECTIONS, buildOverviewData);
     const collections = useCollections();
@@ -41,6 +49,16 @@ export default function Overview () {
     const [error, setError] = React.useState(null);
 
     const rectum = React.useRef(null);
+
+    // ドックの「要素の追加」の丸。吹き出しの中は、ノードの登録フォーム。
+    const addNode = useAddOverviewNode();
+
+    useDockOperator({
+        code: 'overview',
+        label: '要素の追加',
+        Icon: AddIcon,
+        leaf: ({ root })=> <AddOverviewNode root={root} onSave={onAddNode}/>,
+    });
 
     // レコードは、読み込んだデータ (保存のたびに差し替わる) から id で引く。
     // d3.unchi に渡した複製 (コールバックの core) は、保存しても変わらないため。
@@ -65,6 +83,18 @@ export default function Overview () {
             await save(change);
         } catch (e) {
             // 保存できなかったときは、作り直すのをやめる。(次のドラッグの保存で作り直さないように)
+            rebuild(false);
+            throw e;
+        }
+    };
+
+    // ノードを足す: 足したノードを図に出すため、作り直す。(見ている位置と拡大の度合いは、変えない)
+    const onAddNode = async (record)=> {
+        rebuild();
+
+        try {
+            await addNode(record);
+        } catch (e) {
             rebuild(false);
             throw e;
         }

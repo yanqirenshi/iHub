@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from "react-router-dom";
-import { operatorsChanged } from '../../../redux/slices/operatorsSlice.js';
+import { dockOperatorClosed, operatorsChanged } from '../../../redux/slices/operatorsSlice.js';
 import { menuChanged, menuOpened, menuClosed } from '../../../redux/slices/accountMenuSlice.js';
 
 import MenuBook from '@yanqirenshi/menubook';
@@ -11,6 +11,9 @@ import Manipulater from '@yanqirenshi/manipulater';
 
 import { useConfig } from '../../../config.js';
 import { dockColor } from '../../../manegers/colors.js';
+import { withoutDockIcons } from '../../../manegers/dockOperators.js';
+
+import { DockOperatorsProvider, dockLeaf, useDockOperatorRegistry, withDockIcons } from './dockOperators.js';
 
 const sx = {
     maxWidth: '100vw',
@@ -83,8 +86,19 @@ export default function Frame (props) {
     const menu_selected_item = React.useMemo(()=> selectedItemCode(menu.pages, location.pathname),
                                              [menu.pages, location.pathname]);
 
+    // タブ (やページ) の部品が、表示されている間だけ足した丸。(0.12.0 から。useDockOperator。./dockOperators.js)
+    const [dock_entries, dock_registry] = useDockOperatorRegistry();
+
     // Manipulater の useEffect が operators の変化で再実行されるため、参照を固定する。
-    const operators_with_icons = React.useMemo(()=> withIcons(operators), [withIcons, operators]);
+    // アプリの丸のアイコンは設定の withIcons が、足した丸のアイコンは withDockIcons が差し込む。
+    const operators_with_icons = React.useMemo(()=> withDockIcons(withIcons(operators), dock_entries, dock_color),
+                                               [withIcons, operators, dock_entries, dock_color]);
+
+    // 丸を押したときの吹き出し。足した丸は、足した部品が描く。アプリの丸は、設定の operators.Leafs が描く。
+    const closeLeaf = ()=> dispatch(dockOperatorClosed());
+    const leafs = (root)=> dock_entries.has(root.code)
+          ? dockLeaf(dock_entries, root, closeLeaf)
+          : <OperatorsLeafs root={root}/>;
 
     const actions = {
         menu: {
@@ -97,7 +111,7 @@ export default function Frame (props) {
             close: ()=> dispatch(menuClosed()),
         },
         operator: {
-            change: (new_operators)=> dispatch(operatorsChanged(withoutIcons(new_operators))),
+            change: (new_operators)=> dispatch(operatorsChanged(withoutIcons(withoutDockIcons(new_operators)))),
         },
     };
 
@@ -116,9 +130,11 @@ export default function Frame (props) {
                        window_size={window_size}
                        theme_color={dock_color || undefined}
                        actions={actions}
-                       leafs={root=> <OperatorsLeafs root={root}/>}/>
+                       leafs={leafs}/>
 
-          {children}
+          <DockOperatorsProvider registry={dock_registry}>
+            {children}
+          </DockOperatorsProvider>
         </Box>
     );
 }
