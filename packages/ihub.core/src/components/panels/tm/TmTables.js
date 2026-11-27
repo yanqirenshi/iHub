@@ -11,14 +11,16 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
 import { useCollections } from '../../../redux/api/dataApi.js';
-import { entityRows, masterRows, relationshipRows } from '../../../manegers/tmTables.js';
+import { entityRows, masterRows, relationshipRows, TM_TABLE_COLLECTIONS } from '../../../manegers/tmTables.js';
 
 import AddTmEntity from './AddTmEntity.js';
+import AddTmMaster from './AddTmMaster.js';
+import AddTmRelationship from './AddTmRelationship.js';
 
 // ビジネスのページの、TM のデータを表で見るタブ。(0.12.0 から)
 //   Entities (entities)・Identifiers (identifiers)・Attributes (attributes)・Relationships (relationships)
 //
-// 見るだけ。(書き換えは、TM タブのインスペクタか、data/tm/ のファイルで行う) ただし、Entities のタブは、表の上の右端の「Entity の追加」で、エンティティを足せる。(#232。AddTmEntity.js)
+// 表の上の右端のボタンでレコードを追加できる。
 // 並びは、ファイルの順。(並べ替え・絞り込みは付けない)
 // データは、API サーバーから読んだもの (useCollections)。TM タブのインスペクタで書き換えると、表も新しい値になる。
 // 行の作り方 (名前の解決・論理名と物理名の分け方) は、manegers/tmTables.js。
@@ -121,7 +123,8 @@ export function TmIdentifiers () {
     const collections = useCollections();
     const rows = React.useMemo(()=> masterRows(collections, 'identifiers'), [collections]);
 
-    return <TmTable label="識別子" columns={MASTER_COLUMNS} rows={rows} emptyMessage={empty('識別子', 'identifiers')}/>;
+    return <TmTable label="識別子" columns={MASTER_COLUMNS} rows={rows} emptyMessage={empty('識別子', 'identifiers')}
+                    toolbar={<AddTmMaster title="Identifier を追加" collection={TM_TABLE_COLLECTIONS.identifiers} label="識別子"/>}/>;
 }
 
 // Attributes のタブ
@@ -129,13 +132,16 @@ export function TmAttributes () {
     const collections = useCollections();
     const rows = React.useMemo(()=> masterRows(collections, 'attributes'), [collections]);
 
-    return <TmTable label="属性" columns={MASTER_COLUMNS} rows={rows} emptyMessage={empty('属性', 'attributes')}/>;
+    return <TmTable label="属性" columns={MASTER_COLUMNS} rows={rows} emptyMessage={empty('属性', 'attributes')}
+                    toolbar={<AddTmMaster title="Attribute を追加" collection={TM_TABLE_COLLECTIONS.attributes} label="属性"/>}/>;
 }
 
 // Relationships のタブ
 export function TmRelationships () {
     const collections = useCollections();
     const rows = React.useMemo(()=> relationshipRows(collections), [collections]);
+    const entities = collections[TM_TABLE_COLLECTIONS.entities];
 
-    return <TmTable label="リレーションシップ" columns={RELATIONSHIP_COLUMNS} rows={rows} emptyMessage={empty('リレーションシップ', 'relationships')}/>;
+    return <TmTable label="リレーションシップ" columns={RELATIONSHIP_COLUMNS} rows={rows} emptyMessage={empty('リレーションシップ', 'relationships')}
+                    toolbar={<AddTmRelationship entities={Array.isArray(entities) ? entities : []}/>}/>;
 }
