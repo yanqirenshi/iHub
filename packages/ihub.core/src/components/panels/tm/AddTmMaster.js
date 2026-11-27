@@ -10,7 +10,16 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 
 import { errorMessage, useAddRecordMutation } from '../../../redux/api/dataApi.js';
+import { buildMasterRecord } from '../../../manegers/tmAddForms.js';
 
+import { TM_DIALOG_Z_INDEX } from './tmDialog.js';
+
+// ビジネスのページの Identifiers・Attributes のタブの「Identifier の追加」「Attribute の追加」。(0.12.0 から。yanqirenshi/iHub#238)
+// ボタンを押すと、モーダルのフォームを出し、POST /api/tm/{identifiers|attributes} で、マスタを 1 件足す。(id は API サーバーが振る)
+// 保存するレコードの形は、manegers/tmAddForms.js の buildMasterRecord が作る。
+//   title      … ボタンとモーダルの題 (「Identifier の追加」など)
+//   collection … 足すコレクション (tm/identifiers か tm/attributes)
+//   label      … 誤りの文に使う名前 (識別子・属性)
 export default function AddTmMaster ({ title, collection, label }) {
     const [open, setOpen] = React.useState(false);
 
@@ -41,28 +50,15 @@ function MasterDialog ({ title, collection, label, onClose }) {
             return;
 
         const form = new FormData(e.currentTarget);
-        const logical = form.get('logical').trim();
-        const physical = form.get('physical').trim();
-        const description = form.get('description').trim();
-        const type = form.get('type').trim();
-        const length = form.get('length');
-        const scale = form.get('scale');
+        const values = Object.fromEntries(['logical', 'physical', 'type', 'length', 'scale', 'description'].map(key=> [key, form.get(key)]));
+        const logical = String(values.logical ?? '').trim();
 
         setFailure(null);
         setLogicalError(!logical);
         if (!logical)
             return;
 
-        const dataType = {
-            ...(type ? { type } : {}),
-            ...(length !== '' ? { length: Number(length) } : {}),
-            ...(scale !== '' ? { scale: Number(scale) } : {}),
-        };
-        const record = {
-            name: physical ? { logical, physical } : logical,
-            ...(description ? { description } : {}),
-            ...(Object.keys(dataType).length ? { data_type: dataType } : {}),
-        };
+        const record = buildMasterRecord(values);
 
         try {
             await addRecord({ name: collection, record }).unwrap();
@@ -73,7 +69,7 @@ function MasterDialog ({ title, collection, label, onClose }) {
     };
 
     return (
-        <Dialog open onClose={close} fullWidth maxWidth="sm" aria-labelledby={titleId}
+        <Dialog open onClose={close} fullWidth maxWidth="sm" aria-labelledby={titleId} sx={{ zIndex: TM_DIALOG_Z_INDEX }}
                 slotProps={{ paper: { component: 'form', onSubmit: submit } }}>
           <DialogTitle id={titleId}>{title}</DialogTitle>
           <DialogContent>

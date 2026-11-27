@@ -124,7 +124,7 @@ export function TmIdentifiers () {
     const rows = React.useMemo(()=> masterRows(collections, 'identifiers'), [collections]);
 
     return <TmTable label="識別子" columns={MASTER_COLUMNS} rows={rows} emptyMessage={empty('識別子', 'identifiers')}
-                    toolbar={<AddTmMaster title="Identifier を追加" collection={TM_TABLE_COLLECTIONS.identifiers} label="識別子"/>}/>;
+                    toolbar={<AddTmMaster title="Identifier の追加" collection={TM_TABLE_COLLECTIONS.identifiers} label="識別子"/>}/>;
 }
 
 // Attributes のタブ
@@ -133,7 +133,7 @@ export function TmAttributes () {
     const rows = React.useMemo(()=> masterRows(collections, 'attributes'), [collections]);
 
     return <TmTable label="属性" columns={MASTER_COLUMNS} rows={rows} emptyMessage={empty('属性', 'attributes')}
-                    toolbar={<AddTmMaster title="Attribute を追加" collection={TM_TABLE_COLLECTIONS.attributes} label="属性"/>}/>;
+                    toolbar={<AddTmMaster title="Attribute の追加" collection={TM_TABLE_COLLECTIONS.attributes} label="属性"/>}/>;
 }
 
 // Relationships のタブ

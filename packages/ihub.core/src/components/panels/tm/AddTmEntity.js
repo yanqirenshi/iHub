@@ -28,9 +28,11 @@ import { ENTITY_TYPES } from '@yanqirenshi/model.tm';
 import { errorMessage, useAddRecordMutation, useCollections } from '../../../redux/api/dataApi.js';
 import {
     ENTITY_FORM_FIELDS, ENTITY_FORM_TABS, buildEntityRecord, firstTabWithError, initialEntityForm, masterItems, pickerLists,
-    previewEntityData, selectMaster, unselectMaster, validateEntityForm,
+    isPreviewNameEmpty, previewEntityData, selectMaster, unselectMaster, validateEntityForm,
 } from '../../../manegers/tmEntityForm.js';
 import { TM_TABLE_COLLECTIONS } from '../../../manegers/tmTables.js';
+
+import { TM_DIALOG_MENU_Z_INDEX, TM_DIALOG_Z_INDEX } from './tmDialog.js';
 
 // ビジネスのページの Entities のタブの「Entity の追加」。(0.12.0 から。叩き台)
 // ボタンを押すと、モーダル (MUI の Dialog) のフォームを出し、POST /api/tm/entities で、エンティティを 1 件足す。(id は API サーバーが振る)
@@ -66,10 +68,11 @@ export default function AddTmEntity () {
 // 左右の枠の高さ。(右の枠は、中身が長いときは、枠の中でスクロールする)
 // 画面が低くて、枠と題とボタンが収まらないときは、MUI の Dialog の既定 (scroll="paper") のとおり、
 // 題と「キャンセル」「作成」は出したまま、その間 (枠) を、モーダルの中でスクロールする。
+// 高さ 1080px の画面 (1920x1080) では、スクロールが出ないように、枠の下の余白を詰めている。(PANE_BOTTOM_SPACE。#240)
 const PANE_HEIGHT = 888;
 
-// モーダルの左の余白。(サイドメニューの、選んでいる項目の札は、長い名前でも約 165px まで伸びる。表の左の余白と同じ)
-const SIDE_MENU_WIDTH = 180;
+// 枠の下の余白。(MUI の DialogContent の既定は 20px。これだと、高さ 1080px の画面で、8px のスクロールが出る)
+const PANE_BOTTOM_SPACE = 8;
 
 function EntityDialog ({ onClose }) {
     const collections = useCollections();
@@ -118,17 +121,12 @@ function EntityDialog ({ onClose }) {
     };
 
     return (
-        // サイドメニューは、モーダルの背景より手前に出るので、モーダルの左端を、サイドメニュー (選んでいる項目の札を含む) の右から始める。
-        <Dialog open onClose={close} fullWidth maxWidth="lg"
-                slotProps={{
-                    paper: {
-                        component: 'form', onSubmit: submit, noValidate: true,
-                        sx: { ml: `${SIDE_MENU_WIDTH}px`, mr: 4, width: `calc(100% - ${SIDE_MENU_WIDTH}px - 32px)` },
-                    },
-                }}>
+        // サイドメニューも、モーダルの背景の下にする (TM_DIALOG_Z_INDEX) ので、モーダルは、画面の中央に置く。(#240)
+        <Dialog open onClose={close} fullWidth maxWidth="lg" sx={{ zIndex: TM_DIALOG_Z_INDEX }}
+                slotProps={{ paper: { component: 'form', onSubmit: submit, noValidate: true } }}>
           <DialogTitle>Entity の追加</DialogTitle>
 
-          <DialogContent>
+          <DialogContent sx={{ pb: `${PANE_BOTTOM_SPACE}px` }}>
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'stretch' }}>
               {/* 左: エンティティのイメージ */}
               <Paper variant="outlined" sx={{ flex: '0 0 40%', height: PANE_HEIGHT, overflow: 'hidden' }}>
@@ -184,7 +182,9 @@ function Field ({ field, value, error, collections, query, onQuery, onChange }) 
 
     if (field.input==='entityType')
         return (
-            <TextField select {...common} value={value} onChange={e=> onChange(e.target.value)}>
+            // 選択肢 (Menu) は、モーダルより手前に出す。(#240)
+            <TextField select {...common} value={value} onChange={e=> onChange(e.target.value)}
+                       slotProps={{ select: { MenuProps: { sx: { zIndex: TM_DIALOG_MENU_Z_INDEX } } } }}>
               {ENTITY_TYPES.map(t=> <MenuItem key={t} value={t}>{t}</MenuItem>)}
             </TextField>
         );
@@ -358,8 +358,16 @@ function EntityImage ({ values, collections }) {
         return ()=> cancelAnimationFrame(frame);
     }, [rectum]);
 
+    // 論理名が空のあいだは、名前 (「(論理名)」。previewEntityData) を薄い色で出す。
+    // (d3.ter の名前の文字は、text.entity-title。同じ class の rect (見出しの当たり判定) には、かけない。#240)
+    const unnamed = isPreviewNameEmpty(values);
+
     return (
-        <Box ref={box} aria-label="エンティティのイメージ" sx={{ width: '100%', height: '100%', pointerEvents: 'none' }}>
+        <Box ref={box} aria-label="エンティティのイメージ"
+             sx={{
+                 width: '100%', height: '100%', pointerEvents: 'none',
+                 ...(unnamed ? { '& text.entity-title': { fillOpacity: 0.6, fontStyle: 'italic' } } : {}),
+             }}>
           <D3Ter key={drawn.current} id="tm-entity-preview" rectum={rectum}/>
         </Box>
     );

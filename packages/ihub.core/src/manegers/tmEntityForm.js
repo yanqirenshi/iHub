@@ -130,11 +130,24 @@ export function buildEntityRecord (values, collections) {
 // エンティティのイメージの、エンティティの id。(描くだけ。保存はしない)
 export const PREVIEW_ENTITY_ID = 'preview';
 
+// 論理名が空のあいだ、エンティティのイメージに出す名前。(d3.ter の既定の「????????」の代わり。#240)
+// 画面の部品 (AddTmEntity.js の EntityImage) は、このあいだ、名前を薄い色で出す。保存するレコードには入れない。
+export const PREVIEW_EMPTY_NAME = '(論理名)';
+
+// 論理名が空か。(空白だけも、空とみなす)
+export function isPreviewNameEmpty (values) {
+    return String(values?.logical ?? '').trim()==='';
+}
+
 // エンティティのイメージ (左の枠) に、d3.ter で描くデータ。
 // 入力から作るレコード (buildEntityRecord) 1 件と、識別子・属性のマスタ。結線は無し。位置は (0, 0)。
+// 論理名が空のあいだは、名前を PREVIEW_EMPTY_NAME にする。(物理名があれば、論理名だけを置き換える)
 // d3.ter は、渡したデータを書き換えるので、複製して返す。
 export function previewEntityData (values, collections) {
-    const record = buildEntityRecord(values, collections);
+    const built = buildEntityRecord(values, collections);
+    const record = !isPreviewNameEmpty(values)
+        ? built
+        : { ...built, name: typeof built.name==='object' ? { ...built.name, logical: PREVIEW_EMPTY_NAME } : PREVIEW_EMPTY_NAME };
     const list = (name)=> {
         const v = collections?.[name];
 
