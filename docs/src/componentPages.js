@@ -21,7 +21,7 @@ const GROUPS = [
         dir: 'panels',
         names: [
             'Loading', 'HelpEmpty',
-            'ER', 'TM', 'Wbs', 'Procedures', 'SystemDynamics',
+            'ER', 'TM', 'TmTables', 'Wbs', 'Procedures', 'SystemDynamics',
             'DesignAssemblies', 'DesignPanels', 'DesignParts', 'DesignEvents',
         ],
     },

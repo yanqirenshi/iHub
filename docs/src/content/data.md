@@ -49,6 +49,59 @@
 }
 ```
 
+### データ型と NOT NULL (`data_type`・`not_null`)
+
+0.12.0 以降は、TM と ER のデータに、データ型と Null 制約を書けます。
+どちらも、書かなくて構いません。(データの移行はありません)
+
+```json
+// tm/attributes.json (er/attributes.json も同じ形)
+{
+    "id": 20000,
+    "name": { "logical": "プロバイダ名", "physical": "name" },
+    "data_type": { "type": "varchar", "length": 64 }
+}
+
+// tm/entities.json (er/entities.json も同じ形)
+{
+    "id": 30000,
+    "name": "Firebase Auth",
+    "attributes": [
+        { "id": 401, "attribute": 20001, "not_null": true }
+    ]
+}
+```
+
+| 項目 | 書くところ | 中身 |
+|---|---|---|
+| `data_type` | 識別子・属性のマスタ (`tm/`・`er/` の `identifiers.json`・`attributes.json`) | `{ type, length, scale, description }` の組。`type` は型の名前、`length` は 1 以上の整数 (長さ)、`scale` は 0 以上の整数 (小数部の桁数)、`description` は文字列の配列 (データ型の説明。1 行 1 要素)。どれも書かなくてよい |
+| `not_null` | エンティティの属性の行 (`tm/entities.json`・`er/entities.json` の `attributes[]`) | 真偽値。`true` で NOT NULL、`false` で Null を許す |
+
+- ER の `data_type` は、文字列 (`"varchar"` など。0.11.x までの形) でも書けます。
+- TM の `data_type` は、組か `null` だけです。(文字列は、誤りになります)
+- 形の合わない値 (長さ 0・負の小数部の桁数・真偽値でない `not_null` など) は、`POST`・`PATCH`・`npx ihub-srv check data` で誤りになります。
+- 画面からは、TM・ER 図のインスペクタで書き換えられます。([図の編集](#/diagrams) の「ER 図で名前・幅・色を変える」「TM で名前・種別・結線の記号を変える」)
+- `data_type`・`not_null` は、図には描きません。
+  ビジネスのページの Identifiers・Attributes のタブの表には、データ型を `varchar(64)` のように出します。([TmTables](#/components/panels/TmTables))
+
+### TM のデータを画面から足す
+
+0.12.0 以降は、TM のエンティティ・識別子・属性・結線を、ビジネスのページの Entities・Identifiers・Attributes・Relationships のタブの「〜 の追加」から、1 件ずつ足せます。([TmTables](#/components/panels/TmTables))
+足すだけで、消すときは、JSON を直接書き換えます。
+
+### Overview の文字 (`label.font`)
+
+`overview/nodes.json` のノードの `label.font` を、一部だけ (`color` なしで) 書くと、文字が白になり、見えません。
+`label.font` を書くときは、`color` も書いてください。
+
+```json
+"label": { "text": "iHub", "font": { "size": 24, "color": "#333333" } }
+```
+
+- 0.11.x までの `ihub-srv init` で作った `data/overview/nodes.json` の「iHub」のノードには、色の無い `label.font` が残っています。
+  文字が見えないときは、`"color": "#333333"` を足してください。(0.12.0 の雛形で直しました)
+- 0.12.0 以降は、艦橋の Overview のタブのドックの「要素の追加」から、ノードを足せます。([Overview](#/components/panels/bridge/Overview))
+
 ### Schedule の予定 (`master_schedule`)
 
 艦橋 (`/`) の「Schedule」タブに出す予定は、WBS (`data/wbs/`) とは切り離して、`data/master_schedule/` のファイルに書きます。(0.7.0 以降。0.8.0 で 3 つのファイルにし、0.10.0 で `milestones.json` を足しました)
@@ -119,7 +172,7 @@
   5. `data/wbs/` に無い行き先の `wbs`・`wbs` と `url` の両方
   6. `id` の重なり
   7. マイルストーンの、`parent` も `project` も無いもの・無い先を指すもの・実在しない日付・`id` の重なり (0.10.0 以降)
-- 名前・予定の期間・マイルストーンの日付・見た目は、艦橋の Schedule タブで、矢羽根や箱や △ を右クリックして、画面から書き換えられます。(0.9.0 以降。マイルストーンは 0.10.0 以降。[図の編集](#/diagrams) の「Schedule で名前・予定・見た目を変える」。0.8.x までは、画面からは書き換えられませんでした)
+- 名前・予定の期間・マイルストーンの日付・見た目は、艦橋の Schedule タブで、矢羽根や箱や △ を Ctrl + クリック (Mac は ⌘ + クリック) して、画面から書き換えられます。(0.9.0 以降。マイルストーンは 0.10.0 以降。0.10.x までは、右クリックでした。[図の編集](#/diagrams) の「Schedule で名前・予定・見た目を変える」。0.8.x までは、画面からは書き換えられませんでした)
   レコードの追加と削除・親の付け替え・並び順・説明・行き先・`result`・`progress` は、JSON を直接書きます。
 - 図の描き方とできることは、コンポーネントの [Schedule](#/components/panels/bridge/Schedule) にあります。
 

@@ -50,6 +50,7 @@ npx --yes --package=@yanqirenshi/ihub.core --package=@yanqirenshi/ihub.srv -- ih
 | `src/components/` | 自分で作る部品を置くフォルダ (`assemblies/`・`pages/`・`panels/`・`parts/`)。中身は、それぞれの `README.md` だけです |
 | `src/manegers/` | 自分で作るデータのマネージャを置くフォルダ。中身は `README.md` だけです |
 | `src/config/` | サイドメニューの項目・色・アイコン・アプリの配色・ドックのボタン |
+| `src/manegers/` | 自分で作るデータのマネージャを置くフォルダ。中身は `README.md` だけです (0.11.0 以降) |
 | `src/operators/` | ドックの吹き出しの中身 |
 | `src/wbs/` | WBS のノードのページ。(ページが無いときの表示の 2 つが入っています) |
 | `src/setupProxy.js` | 開発サーバーから API サーバーへの中継 |

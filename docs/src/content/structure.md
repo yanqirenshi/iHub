@@ -15,6 +15,7 @@ iHub 本体 (`@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`) は、`node_mod
 | `src/components/` | 自分で作る部品 (`assemblies`・`pages`・`panels`・`parts`) |
 | `src/manegers/` | 自分で作るデータのマネージャ |
 | `src/wbs/` | WBS のノードのページ (`P{id}.js`)・ページが無いときの表示 (`NotFoundWbsNodeData.js`・`NotFoundWbsNodeComponent.js`) |
+| `src/manegers/` | 自分で作るデータのマネージャ (0.11.0 以降の雛形) |
 | `src/operators/` | ドックの吹き出しの中身 |
 | `src/index.css` | 見た目の上書き (iHub の CSS のあとに読み込みます) |
 | `src/setupProxy.js` | 開発サーバーから API サーバーへの中継 |

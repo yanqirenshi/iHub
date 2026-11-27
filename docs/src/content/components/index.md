@@ -43,6 +43,7 @@
 | [HelpEmpty](#/components/panels/HelpEmpty) | Help のタブに、まだ中身が無いことを示すパネルです。 |
 | [ER](#/components/panels/ER) | ER 図を描くパネルです。 |
 | [TM](#/components/panels/TM) | TM (T 字形 ER) の図を描くパネルです。 |
+| [TmTables](#/components/panels/TmTables) | TM のデータを表で出す 4 つのパネル (`TmEntities`・`TmIdentifiers`・`TmAttributes`・`TmRelationships`) です。表の上のボタンで、レコードを 1 件足せます。(0.12.0 以降) |
 | [Wbs](#/components/panels/Wbs) | WBS の表を出すパネルです。 |
 | [Procedures](#/components/panels/Procedures) | 機能の一覧を出すためのパネルです。 |
 | [SystemDynamics](#/components/panels/SystemDynamics) | システムダイナミクスの図を出すためのパネルです。 |
@@ -112,3 +113,12 @@
 | [Tabs](#/components/parts/Tabs) | タブの並びを描きます。 |
 | [HeadWbsPage](#/components/parts/HeadWbsPage) | WBS のノードのページの、上の見出しを描きます。 |
 | [ItemWbsNode](#/components/parts/ItemWbsNode) | WBS のノードを、「名前 (id)」の形で描きます。 |
+
+## フックと関数
+
+部品のほかに、次のものも公開しています。
+
+| 名前 | 内容 | 説明のあるところ |
+|---|---|---|
+| `useDockOperator` | タブ (やページ) の部品が表示されている間だけ、ドックの右端に丸を足すフックです。(0.12.0 以降) | [カスタマイズ](#/customize) の「タブを開いている間だけ、ドックに丸を足す」 |
+| `inspectClick`・`isInspectClick` | クリックが、インスペクタを開くクリック (Ctrl + クリック・⌘ + クリック) かを見分けます。(0.11.0 以降) | [カスタマイズ](#/customize) の「自分の図で、インスペクタを開くクリックを見分ける」 |
