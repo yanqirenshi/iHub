@@ -157,6 +157,10 @@
   - TM・ER 図のエンティティのインスペクタに、属性の数だけ「NOT NULL: 属性の名前」の欄が増える。(エンティティの項目の最後)
   - 「ノードの追加」のフォームのラベルが、「背景の透明度」から「背景の不透明度」に変わる。
 
+### 修正 (雛形のデータ: 艦橋の Overview の「iHub」の文字が白で見えない。yanqirenshi/iHub#248)
+
+- 雛形のデータ (`examples/data/overview/nodes.json`) の「iHub」のノードの `label.font` に、色 (`"color": "#333333"`) を足した。(`label.font` を色なしで書くと、d3.unchi で文字が白になり、見えなかった)
+
 ### 追加 (FrameWbsNode・FrameWbsNodeTabs: WBS の表の表示/非表示。yanqirenshi/iHub#176)
 
 - WBS のノードのページの枠 `FrameWbsNode`・`FrameWbsNodeTabs` に、props `showWbsTable` を足した。`false` のとき、ノードから下の WBS の表 (`WBSTable`) を出さない。省略したとき (既定は `true`) は、0.11.x までと同じく出す。
