@@ -95,6 +95,10 @@ tabs: {
 },
 ```
 
+既定のタブが増えたときも、アプリが `list` で足したタブは、末尾に並びます。
+足したタブの code が、新しい既定のタブと同じときは、既定のタブの位置で、アプリのタブに差し替わります。
+例: 0.12.0 で、ビジネスのページ (`PAGE_BUSINESS`) に、`entities`・`identifiers`・`attributes`・`relationships` のタブが、TM と機能一覧の間に増えました。([TmTables](#/components/panels/TmTables)) 要らないときは、`{ code: 'entities', hidden: true }` などで消します。
+
 `panels[ページの id][code]` は、既定のパネルを上書きします。
 (既定のタブのパネルも、同じ code で差し替えられます。例: `panels: { PAGE_DATA: { 'er-diagram': MyEr } }`)
 設定を渡さないときは、いままでどおりのタブとパネルです。
@@ -255,6 +259,50 @@ const ICONS = {
 この 3 つは、`src/index.js` の設定の `operators` で iHub に渡しています。
 アイコンの色には、ドックの色 (`src/operators/dockColor.js`。配色の主の色) を使います。
 GitHub のボタンの吹き出し (Issue の追加) は、ihub.core の部品 [ProjectItemForm](#/components/assemblies/ProjectItemForm) を使います。(0.5.0 以降の雛形。`Operators.js` が `<ProjectItemForm root={root}/>` を描きます)
+
+### タブを開いている間だけ、ドックに丸を足す
+
+0.12.0 以降は、タブ (やページ) の部品の中で `useDockOperator` を呼ぶと、その部品が表示されている間だけ、ドックの右端に丸を足せます。
+艦橋の Overview のタブの「要素の追加」の丸は、これで足しています。([Overview](#/components/panels/bridge/Overview))
+
+```jsx
+import AddIcon from '@mui/icons-material/Add';
+import { Leaf } from '@yanqirenshi/manipulater';
+import { useDockOperator } from '@yanqirenshi/ihub.core';
+
+// 丸を押したときの吹き出し。(root は、ドックの丸の位置と大きさ)
+function MyLeaf ({ root }) {
+    const w = 400, h = 300, branch_h = 33;
+    const x = root.position.x + (root.size.w / 2) - (w / 2);
+    const y = root.position.y - branch_h - h;
+
+    return (
+        <Leaf x={x} y={y} w={w} h={h}>
+          {/* 吹き出しの中身 */}
+        </Leaf>
+    );
+}
+
+export default function MyPanel () {
+    useDockOperator({
+        code:  'my-add',                                // 丸の名前 (ドックの丸の code は 'ihub.core:my-add' になる)
+        label: '追加',                                   // ツールチップの文
+        Icon:  AddIcon,                                 // アイコンの部品
+        leaf:  ({ root, close })=> <MyLeaf root={root}/>,  // 丸を押したときの吹き出し
+    });
+
+    return <div>(パネルの中身)</div>;
+}
+```
+
+- 部品が表示されたときに丸を足し、消えたとき (タブ・ページを離れたとき) に丸を消します。
+- 丸の数が変わると、ドックは、丸を中央にそろえて並べ直します。
+- 丸を押したときの吹き出しは、`leaf` が描きます。(設定の `operators.Leafs` には回しません)
+  `leaf` には、`root` (ドックの丸の位置と大きさ) と、`close()` (吹き出しを閉じる関数) が渡ります。
+- アイコンは、ihub.core が描きます。(設定の `operators.labels` が知らない code でも出ます)
+- 吹き出しを出したまま部品が消えたときは、選択も外します。
+- 画面の枠 (`Frame`) の中でだけ働きます。
+- 設定の `operators` (丸の一覧・`Leafs`・`labels`) の形は、変わりません。
 
 ## 見た目を変える
 
@@ -443,6 +491,29 @@ function Diagram ({ data }) {
 - 鍵は、`ihub:{app.name}:view:{code}` です。
 - `Rectum` のコンストラクタに `view`・`onViewChange` を渡す必要はありません。作ったあとに `bindView` を呼べば、位置を戻すことと、操作のたびに覚えることの両方を行います。
 - `Rectum` が `view`・`onViewChange` を持つ必要があります。(`@yanqirenshi/assh0le` 0.5.9 以降。iHub の `dependencies` に入っています。古い `package-lock.json` のアプリは、`npm install` で更新されます)
+
+## 自分の図で、インスペクタを開くクリックを見分ける
+
+iHub の 7 つの図は、Ctrl + クリック (Mac は ⌘ + クリック) でインスペクタを開きます。(0.11.0 以降。[図の編集](#/diagrams) の「要素の中身を見る」)
+アプリが足した図でも、`inspectClick`・`isInspectClick` で、同じ見分け方を使えます。
+
+```jsx
+import { inspectClick, isInspectClick } from '@yanqirenshi/ihub.core';
+
+// d3.* の click のコールバックを作る。
+//   1 つ目: Ctrl か ⌘ を押しているときに呼ぶ (インスペクタを開く)
+//   2 つ目: それ以外のクリックのときに呼ぶ (任意。無ければ、何もしない)
+const click = inspectClick(
+    (d)=> openInspector(d),
+    (d)=> navigate(d.url),
+);
+
+// MouseEvent が、インスペクタを開くクリック (Ctrl か ⌘ を押している) か
+isInspectClick(event);   // true / false
+```
+
+- `inspectClick` は、コールバックの最後の引数を、DOM の MouseEvent として見ます。(d3.* の `click` のコールバックは、どれも最後に MouseEvent を渡します)
+- 開くと決めたときは、1 つ目の関数を呼ぶ前に、`event.preventDefault()` を呼びます。(リンクを持つ要素で、ブラウザがリンクを開くのを止めるため)
 
 ## アプリの名前を出す
 

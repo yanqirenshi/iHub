@@ -31,8 +31,8 @@ import { FrameWbsNode } from '@yanqirenshi/ihub.core';
 |---|---|---|---|
 | `children` | node | - | ページの内容。見出しと、追加のフォームの間に描きます |
 | `maxWidth` | string | - | 追加のフォームと WBS の表の幅。MUI の `Container` の `maxWidth` の値 (`'md'` など)。既定は `'lg'` |
-| `showWbsTable` | boolean | - | `false` のとき、WBS の表を出しません。既定は `true` (出す) |
-| `headAlign` | string | - | 見出し (種類・名前・説明) の寄せ。`'left'` (左寄せ)・`'center'` (中央寄せ)・`'right'` (右寄せ) のどれか。既定は `'center'` |
+| `showWbsTable` | boolean | - | `false` のとき、WBS の表を出しません。既定は `true` (出す)。0.12.0 以降 |
+| `headAlign` | string | - | 見出し (種類・名前・説明) の寄せ。`'left'` (左寄せ)・`'center'` (中央寄せ)・`'right'` (右寄せ) のどれか。既定は `'center'`。0.12.0 以降 |
 
 ## 使い方の例
 
@@ -91,6 +91,7 @@ WBS の表を出さないときは、`showWbsTable={false}` を付けます。
 - `headAlign` は、見出しにだけ効きます。
   `children`・追加のフォーム・WBS の表の寄せは、変わりません。
   `'left'`・`'center'`・`'right'` 以外の値を渡したときは、省略したときと同じく、中央寄せになります。
-- 見出しは、これまで左寄せでした。
-  `headAlign` を足した版から、既定が中央寄せに変わります。
+- 見出しは、0.11.x までは左寄せでした。
+  0.12.0 から、既定が中央寄せに変わります。(`headAlign`・`showWbsTable` も、0.12.0 から渡せます)
+  雛形の `src/wbs/NotFoundWbsNodeComponent.js` (専用のページが無いノード) も、この枠を使うので、中央寄せになります。
   左寄せのままにするときは、`headAlign="left"` を付けてください。

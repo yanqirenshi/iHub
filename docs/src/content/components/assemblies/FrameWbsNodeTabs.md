@@ -39,8 +39,8 @@ import { FrameWbsNodeTabs } from '@yanqirenshi/ihub.core';
 | `maxWidth` | string | - | タブの並びと WBS の表の幅。MUI の `Container` の `maxWidth` の値 (`'md'` など)。既定は `'lg'` |
 | `centered` | boolean | - | `true` のとき、タブを中央に寄せます。既定は左寄せ。(0.5.0 以降) |
 | `tabsProps` | object | - | タブ (MUI の `Tabs`) に渡す props。([TabsSearchParam](#/components/assemblies/TabsSearchParam) の `tabsProps` と同じ) (0.5.0 以降) |
-| `showWbsTable` | boolean | - | `false` のとき、WBS の表を出しません。既定は `true` (出す) |
-| `headAlign` | string | - | 見出し (種類・名前・説明) の寄せ。`'left'` (左寄せ)・`'center'` (中央寄せ)・`'right'` (右寄せ) のどれか。既定は `'center'` |
+| `showWbsTable` | boolean | - | `false` のとき、WBS の表を出しません。既定は `true` (出す)。0.12.0 以降 |
+| `headAlign` | string | - | 見出し (種類・名前・説明) の寄せ。`'left'` (左寄せ)・`'center'` (中央寄せ)・`'right'` (右寄せ) のどれか。既定は `'center'`。0.12.0 以降 |
 
 `centered` と `tabsProps` は、そのまま [TabsSearchParam](#/components/assemblies/TabsSearchParam) に渡します。
 
@@ -133,8 +133,9 @@ WBS の表を出さないときは、`showWbsTable={false}` を付けます。
 - `headAlign` は、見出しにだけ効きます。
   タブの並びの寄せは `centered` で、`children` の寄せは `children` の側で決めてください。
   `'left'`・`'center'`・`'right'` 以外の値を渡したときは、省略したときと同じく、中央寄せになります。
-- 見出しは、これまで左寄せでした。
-  `headAlign` を足した版から、既定が中央寄せに変わります。
+- 見出しは、0.11.x までは左寄せでした。
+  0.12.0 から、既定が中央寄せに変わります。(`headAlign`・`showWbsTable` も、0.12.0 から渡せます)
+  (専用のページが無いノードを描く雛形の `src/wbs/NotFoundWbsNodeComponent.js` は、`FrameWbsNode` を使うので、そちらも中央寄せになります)
   左寄せのままにするときは、`headAlign="left"` を付けてください。
 - `maxWidth` は、タブの並びと WBS の表にだけ効きます。
   見出しの幅は `'lg'` のままです。
