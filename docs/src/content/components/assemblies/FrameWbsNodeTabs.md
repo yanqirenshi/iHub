@@ -135,7 +135,7 @@ WBS の表を出さないときは、`showWbsTable={false}` を付けます。
   `'left'`・`'center'`・`'right'` 以外の値を渡したときは、省略したときと同じく、中央寄せになります。
 - 見出しは、0.11.x までは左寄せでした。
   0.12.0 から、既定が中央寄せに変わります。(`headAlign`・`showWbsTable` も、0.12.0 から渡せます)
-  雛形の `src/wbs/NotFoundWbsNodeComponent.js` (専用のページが無いノード) も、この枠を使うので、中央寄せになります。
+  (専用のページが無いノードを描く雛形の `src/wbs/NotFoundWbsNodeComponent.js` は、`FrameWbsNode` を使うので、そちらも中央寄せになります)
   左寄せのままにするときは、`headAlign="left"` を付けてください。
 - `maxWidth` は、タブの並びと WBS の表にだけ効きます。
   見出しの幅は `'lg'` のままです。

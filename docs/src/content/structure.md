@@ -13,9 +13,8 @@ iHub 本体 (`@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`) は、`node_mod
 | `src/Router.js` | ページの URL |
 | `src/config/` | サイドメニューの項目 (`ACCOUNT_MENUS.js`)・サイドメニューの色 (`ACCOUNT_MENU_COLORS.js`)・アプリの配色 (`COLORS.js`)・アイコン (`ICONS.js`)・ドックのボタン (`OPERATOR_ITEMS.js`) |
 | `src/components/` | 自分で作る部品 (`assemblies`・`pages`・`panels`・`parts`) |
-| `src/manegers/` | 自分で作るデータのマネージャ |
+| `src/manegers/` | 自分で作るデータのマネージャ (0.11.0 以降) |
 | `src/wbs/` | WBS のノードのページ (`P{id}.js`)・ページが無いときの表示 (`NotFoundWbsNodeData.js`・`NotFoundWbsNodeComponent.js`) |
-| `src/manegers/` | 自分で作るデータのマネージャ (0.11.0 以降の雛形) |
 | `src/operators/` | ドックの吹き出しの中身 |
 | `src/index.css` | 見た目の上書き (iHub の CSS のあとに読み込みます) |
 | `src/setupProxy.js` | 開発サーバーから API サーバーへの中継 |
