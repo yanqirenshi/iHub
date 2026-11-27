@@ -165,6 +165,28 @@ test('POST で id を振ってレコードを追加する', async ()=> {
     assert.equal((await table.json()).record.id, 10);
 });
 
+test('POST /api/overview/nodes で、最上位のノードを足す。id は、子のノードも含めた最大 + 1', async ()=> {
+    // 艦橋の Overview の「ノードの追加」(ihub.core 0.12.0。#242) が送るレコード
+    const body = {
+        type: 'NODE',
+        label: { text: '新しいノード', align: 'center', valign: 'middle' },
+        size: { w: 160, h: 80 },
+        position: { x: 780, y: 0 },
+    };
+
+    const res = await request('/api/overview/nodes', { method: 'POST', body });
+
+    assert.equal(res.status, 201);
+    // いまの id は 1・11・12 (子)・2、線は 100。コレクションの最大の id (子を含む) + 1
+    assert.deepEqual((await res.json()).record, { id: 13, ...body });
+
+    const nodes = readData('overview/nodes');
+
+    assert.equal(nodes.length, 3);
+    assert.deepEqual(nodes[2], { id: 13, ...body });
+    assert.deepEqual(nodes[0].children.map(d=> d.id), [11, 12]);
+});
+
 test('POST でルールに合わないレコードは 400 にする', async ()=> {
     const res = await request('/api/wbs/wbs', { method: 'POST', body: { parent: 99999, name: 'X' } });
 

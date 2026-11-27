@@ -1,10 +1,3 @@
 // ビジネスのページの、TM の 4 つの「〜 の追加」のモーダルで、共通に使うもの。(0.12.0 から。yanqirenshi/iHub#240)
-
-// モーダルの重なりの順。
-// サイドメニュー (@yanqirenshi/menubook) は、z-index 8888887 (アカウントの吹き出しは 8888888) で、MUI の既定 (1300) のモーダルより手前に出る。
-// モーダルを開いている間は、サイドメニューも、モーダルの背景 (暗い幕) の下にして、押せないようにする。
-// (サイドメニューの側は変えない。ほかのページ・ドックの吹き出しの重なりは、そのまま)
-export const TM_DIALOG_Z_INDEX = 8888889;
-
-// モーダルの中の、MUI の Select の選択肢 (Menu。既定は 1300) の重なりの順。(モーダルより手前に出す)
-export const TM_DIALOG_MENU_Z_INDEX = TM_DIALOG_Z_INDEX + 1;
+// 値は、Overview の「ノードの追加」(#242) と共通にするため、../dialog.js に移した。
+export { DIALOG_Z_INDEX as TM_DIALOG_Z_INDEX, DIALOG_MENU_Z_INDEX as TM_DIALOG_MENU_Z_INDEX } from '../dialog.js';

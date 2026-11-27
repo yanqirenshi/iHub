@@ -436,6 +436,58 @@ if ('b'===root.code)
     return <ProjectItemForm root={root}/>;
 ```
 
+## タブだけのドックの丸
+
+タブ (やページ) の部品は、`useDockOperator` で、表示されている間だけ、ドックの右端に丸を足せます。(0.12.0 以降。艦橋の Overview タブの「要素の追加」が使っています)
+
+```jsx
+import AddIcon from '@mui/icons-material/Add';
+import { DockMenu, useDockOperator } from '@yanqirenshi/ihub.core';
+
+function MyPanel () {
+    const [open, setOpen] = React.useState(false);
+
+    useDockOperator({
+        code: 'my-panel',          // 丸の名前。(ドックの丸の code は 'ihub.core:my-panel' になる)
+        label: '要素の追加',        // ツールチップの文
+        Icon: AddIcon,             // アイコンの部品
+        leaf: ({ root, close })=> (  // 丸を押したときの吹き出し
+            <DockMenu root={root}
+                      items={[{ code: 'add', label: '〜 の追加', onClick: ()=> { close(); setOpen(true); } }]}/>
+        ),
+    });
+    ...
+}
+```
+
+- 部品が表示されたときに丸を足し、消えたとき (タブ・ページを離れたとき) に丸を消します。丸の数が変わると、ドックは、丸を画面の中央にそろえて並べ直します。
+- 吹き出しは `leaf` が描きます。(設定の `operators.Leafs` には回りません) `root` はドックの丸 (位置と大きさ)、`close()` は吹き出しを閉じる関数です。`DockMenu` は、項目を縦に並べた吹き出しで、丸の真上に出ます。(画面の端からは、はみ出しません)
+- アイコンは、ihub.core が描きます。(設定の `operators.labels.withIcons` が知らない code でも出ます)
+- 足した丸の code には `ihub.core:` が付くので、アプリの丸 (`a`・`b`・`c` など) と重なりません。
+- 吹き出しを出したまま部品が消えたときは、選択も外します。
+- 設定の `operators` (丸の一覧・`Leafs`・`labels`) の形は、変わりません。
+- `Frame` (`FrameTabs` など) の中でだけ働きます。
+
+## 艦橋の Overview タブのノードの追加
+
+艦橋 (`/`) の Overview タブ (`/?tab=overview`) を開いている間は、ドックの右端に「要素の追加」の丸 (＋) が出ます。(0.12.0 以降。Cockpit・Schedule のタブと、ほかのページでは出ません)
+丸を押すと、吹き出しに「ノードの追加」が出て、押すと、モーダルが開きます。
+
+| 項目 | 必須 | 既定 | 保存する所 |
+|---|---|---|---|
+| 名称 | ○ | | `label.text` |
+| 幅 | | 160 | `size.w` |
+| 高さ | | 80 | `size.h` |
+| 背景色 (CSS の色) | | (書かない) | `background.color` |
+| 枠線の色 (CSS の色) | | (書かない) | `border.color` |
+
+- フォームは叩き台です。項目の名前は、Overview のインスペクタに合わせています。(項目と、保存するレコードの形は、`manegers/overviewNodeForm.js`)
+- 「作成」で、`POST /api/overview/nodes` に、最上位のノードを 1 件足します。(id は API サーバーが振ります) 名前は箱の中央 (`label.align: center`・`label.valign: middle`) です。
+- 足したノードは、いまある最上位のノードの右端 (子のノードで広がった幅を含む) の最大 + 60、y の最小の所に置かれます。(ノードが無ければ `{ x: 0, y: 0 }`) 図の上で、ドラッグして動かせます。
+- 足したあとも、図の見ている位置と拡大の度合いは変えません。足したノードが見えない所にあるときは、図を動かして (ドラッグ・ホイール) 見てください。
+- 名称が空のときと、幅・高さが 0 以下のときは、誤りを出して、保存しません。保存できなかったときは、モーダルを閉じずに、誤りの文を出します。
+- 線と、子のノード (ほかのノードの中のノード) は、足せません。
+
 ## クラス図
 
 クラス (`/classes`) のページの「クラス図」タブは、`data/classes/` のデータを、[d3.classes](https://www.npmjs.com/package/@yanqirenshi/d3.classes) で描きます。(0.6.0 以降。yanqirenshi/iHub#171)
@@ -607,6 +659,7 @@ import { IHub, pages, Frame } from '@yanqirenshi/ihub.core';
 | `ItemWbsNode`・`LinkWBS`・`Tabs` など | 小さな部品 (`components/parts/index.js`) |
 | `HelpSlide` | Help のセクションで使う、1 枚のスライド (0.2.4 以降。[Help を差し替える](#help-を差し替える)) |
 | `usePageTabs`・`mergeTabs` | ページのタブ |
+| `useDockOperator`・`DockMenu` | タブ (やページ) を開いている間だけ、ドックに丸を足す (0.12.0 以降。[タブだけのドックの丸](#タブだけのドックの丸)) |
 | `manegers`・`wbs`・`useWbs`・`sogh` | データのマネージャ |
 | `useDiagramView` | 図の位置と拡大を、ブラウザに覚える (0.2.7 以降。[図の位置を覚える](#図の位置を覚える)) |
 | `inspectClick`・`isInspectClick` | インスペクタを開くクリック (Ctrl + クリック。Mac は ⌘ + クリック) の判定 (0.11.0 以降。[図のインスペクタを開く](#図のインスペクタを開く)) |
