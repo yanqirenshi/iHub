@@ -95,8 +95,9 @@ export default function TM () {
           <Diagram key={version} data={data} onMove={onMove} onInspect={setTarget}/>
 
           {/* 項目は model (fieldsOf) が決める。マスタは collection を添える。コンテンツエリアの右端に、上から下まで */}
+          {/* エンティティの「NOT NULL: 属性の名前」の欄の名前に、マスタの名前を出すため、属性のマスタの一覧も渡す。(yanqirenshi/iHub#246) */}
           <ModelInspector target={current}
-                          fields={(t)=> fieldsOf(t, target?.collection)}
+                          fields={(t)=> fieldsOf(t, target?.collection, { attributes: collections['tm/attributes'] ?? [] })}
                           title={titleOf}
                           width={320}
                           onApply={onApply}

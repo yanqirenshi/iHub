@@ -5,6 +5,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import * as modelEr from '@yanqirenshi/model.er';
+import * as modelTm from '@yanqirenshi/model.tm';
+
 import { createApp } from '../src/app.mjs';
 
 const EXAMPLE = fileURLToPath(new URL('../../ihub.core/examples/data/', import.meta.url));
@@ -443,4 +446,64 @@ test('ER の文字列の data_type に、model.er が作る patch (型の名前�
     // model.er の applyPatch は、文字列の data_type に長さを足すとき、型の名前も patch に入れる
     assert.equal((await request(url, { method: 'PATCH', body: { data_type: { length: 20, type: 'varchar' } } })).status, 200);
     assert.deepEqual(readData('er/attributes').find(d=> d.id===id).data_type, { length: 20, type: 'varchar' });
+});
+
+// エンティティのインスペクタの NOT NULL の欄 (model.tm 0.1.4・model.er 0.2.3。yanqirenshi/iHub#246) は、
+// patch に attributes の配列を丸ごと入れる。API サーバーは、配列を、要素ごとに重ねずに、丸ごと入れ替える。(JSON Merge Patch)
+for (const [name, model] of [['tm', modelTm], ['er', modelEr]]) {
+    test(`${name.toUpperCase()} の NOT NULL: model の patch (attributes の配列) で、その属性の行の not_null だけが変わる`, async ()=> {
+        const before = readData(`${name}/entities`);
+        const entity = before.find(e=> (e.attributes ?? []).length >= 2);
+        const url = `/api/${name}/entities/${entity.id}`;
+        const values = (changed)=> ({ ...model.withDefaults(entity), ...changed });
+
+        // 何も変えずに適用したときは、attributes は patch に入らない
+        assert.deepEqual(model.applyPatch(entity, values({}), 'entities').patch, {});
+
+        // 2 つ目の属性の行を NOT NULL にする
+        const { patch } = model.applyPatch(entity, values({ 'attributes.1.not_null': 'true' }), 'entities');
+
+        assert.ok(Array.isArray(patch.attributes));
+        assert.equal((await request(url, { method: 'PATCH', body: patch })).status, 200);
+
+        const after = readData(`${name}/entities`);
+        const expected = structuredClone(before);
+        const target = expected.find(e=> e.id===entity.id);
+
+        target.attributes[1] = { ...target.attributes[1], not_null: true };
+
+        // ほかの行・ほかの項目 (識別子の行・位置など)・ほかのエンティティは、変わらない
+        assert.deepEqual(after, expected);
+
+        // 空にすると、not_null のキーを消す (「制約なし」に戻る)
+        const cleared = model.applyPatch(after.find(e=> e.id===entity.id), { ...model.withDefaults(after.find(e=> e.id===entity.id)), 'attributes.1.not_null': '' }, 'entities');
+
+        assert.equal((await request(url, { method: 'PATCH', body: cleared.patch })).status, 200);
+        assert.deepEqual(readData(`${name}/entities`), before);
+    });
+}
+
+test('PATCH の配列は、要素ごとに重ねずに、丸ごと入れ替える (要素が減っても、残らない)', async ()=> {
+    const entity = readData('tm/entities').find(e=> (e.attributes ?? []).length >= 2);
+    const url = `/api/tm/entities/${entity.id}`;
+    const first = entity.attributes[0];
+
+    // 要素の項目を落とした配列を送ると、落とした項目は残らない
+    assert.equal((await request(url, { method: 'PATCH', body: { attributes: [{ id: first.id, attribute: first.attribute }] } })).status, 200);
+    assert.deepEqual(readData('tm/entities').find(e=> e.id===entity.id).attributes, [{ id: first.id, attribute: first.attribute }]);
+});
+
+test('Overview のノード: 説明とリンクを空にしたときの patch ({ description: null }・{ link: { url: null } }) で、項目が消える', async ()=> {
+    const id = readData('overview/nodes')[0].id;
+    const url = `/api/overview/nodes/${id}`;
+    const get = ()=> readData('overview/nodes').find(d=> d.id===id);
+
+    assert.equal((await request(url, { method: 'PATCH', body: { description: '説明', link: { url: 'https://example.com' } } })).status, 200);
+    assert.equal(get().description, '説明');
+    assert.deepEqual(get().link, { url: 'https://example.com' });
+
+    assert.equal((await request(url, { method: 'PATCH', body: { description: null, link: { url: null } } })).status, 200);
+    assert.equal('description' in get(), false);
+    // url を消したあとの link は、空のオブジェクトで残る (JSON Merge Patch のとおり)
+    assert.deepEqual(get().link, {});
 });

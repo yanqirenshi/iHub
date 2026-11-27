@@ -103,7 +103,7 @@
 ### 追加 (艦橋の Overview のタブ: 「ノードの追加」の項目を足す。yanqirenshi/iHub#244)
 
 - ドックの吹き出しの中の「ノードの追加」のフォームに、項目を 10 個足した。(全部で 15 個)
-  - 背景: 背景の透明度 (`background.opacity`。0〜1)
+  - 背景: 背景の不透明度 (`background.opacity`。0〜1。1 で不透明。yanqirenshi/iHub#246 で「背景の透明度」から直した)
   - 枠線: 枠線の種類 (`border.type`。実線・破線・点線)・枠線の太さ (`border.width`)・角の丸み (`border.r`。0 以上)・影 (`shadow`。「なし」のときだけ `false` を書く)
   - 文字: 文字の大きさ (`label.font.size`)・文字の色 (`label.font.color`)・文字の太さ (`label.font.weight`。標準・太字)
   - そのほか: 説明 (`description`。複数行)・リンク (`link.url`。`http://`・`https://` で始まる URL か、`/` で始まるパス)
@@ -133,7 +133,29 @@
   - Identifiers・Attributes のタブの列が 1 つ増える。(ID・論理名・物理名・**データ型**・説明)
   - データの形が増える。マスタ (`data/tm/`・`data/er/` の identifiers・attributes) の `data_type` と、エンティティの属性の行 (`attributes[]`) の `not_null` (真偽値。`true` で NOT NULL)。どちらも書かなくてよい。
   - いまのデータは、そのまま読める。(データの移行は無い) ER の文字列の `data_type` も、これまでどおり使える。
-  - `not_null` は、画面からは書き換えられない。(ファイルに書く。インスペクタの項目には出ない)
+  - `not_null` は、この節の版では、画面からは書き換えられなかった。(yanqirenshi/iHub#246 で、エンティティのインスペクタで書き換えられるようにした。下の節)
+
+### 変更 (インスペクタの項目を足した版を取り込む。Overview のノードの 8 項目・エンティティの属性の NOT NULL。yanqirenshi/iHub#246)
+
+- 依存の版を上げた。
+  - `@yanqirenshi/model.unchi`: `^0.1.2` (Foolsgolds/Assholes#269)
+  - `@yanqirenshi/model.core`: `^0.1.2` (Foolsgolds/Assholes#267)
+  - `@yanqirenshi/model.tm`: `^0.1.4` (同)
+  - `@yanqirenshi/model.er`: `^0.2.3` (同)
+- 艦橋の Overview のノードのインスペクタに、項目が 8 つ増える。(文字の大きさ・文字の色・文字の太さ・角の丸み・影・背景の不透明度・説明・リンク。model.unchi の `fieldsOf` が出すものを、そのまま出す。iHub のコードの直しは無い)
+  - 「ノードの追加」のフォーム (#244) が保存する所と、同じ項目。フォームで作ったノードを開くと、入れた値が、同じ名前の欄に出る。
+  - 影は `true` / `false`、文字の太さは `normal` / `bold` を、文字で入れる。説明とリンクは、空にして適用すると消える。(patch は `{ description: null }`・`{ link: { url: null } }`。リンクは、`link` が空の `{}` で残る。図には「link」は出ない)
+- 「ノードの追加」のフォームのラベル「背景の透明度」を、インスペクタと同じ「背景の不透明度」に直した。(`opacity` は 1 で不透明なので、「透明度」だと、値の向きが逆に読める) 保存する所と、書ける値は、変えていない。ほかの 14 個のラベルは、インスペクタと同じだった。(インスペクタの「背景の不透明度」には、「(0〜1。1 で不透明)」の添え書きが付く)
+  - テストを、15 個すべてがインスペクタにあり、ラベルが同じ (末尾の括弧の添え書きを除く) ことを確かめる形にした。(`test/overviewNodeForm.test.mjs`)
+- TM・ER 図のエンティティのインスペクタに、属性の行ごとに「NOT NULL: 属性の名前」の欄が出る。(model.tm・model.er の `fieldsOf` が出すものを、そのまま出す)
+  - 欄の名前に属性のマスタの名前を出すため、`TM.js`・`ER.js` で、`fieldsOf` の 3 つ目の引数に、属性のマスタの一覧 (`{ attributes }`) を渡すようにした。(渡さないと、属性の id が出る)
+  - 値は `true` (NOT NULL) か `false` (Null を許す)。空にして適用すると、その行の `not_null` のキーを消す。(「制約なし」)
+  - 適用すると、PATCH の patch に、`attributes` の配列が丸ごと入る。API サーバーは、配列を丸ごと入れ替える。(ihub.srv は、これまでどおり。テストを足した) その属性の行の `not_null` だけが変わり、ほかの行と項目 (識別子の行・位置など) は変わらない。
+  - いまのデータ (`not_null` を持たない ER のデータなど) は、そのまま読める。
+- **利用側から見える違い**:
+  - 艦橋の Overview のノードのインスペクタの項目が 8 つ増える。
+  - TM・ER 図のエンティティのインスペクタに、属性の数だけ「NOT NULL: 属性の名前」の欄が増える。(エンティティの項目の最後)
+  - 「ノードの追加」のフォームのラベルが、「背景の透明度」から「背景の不透明度」に変わる。
 
 ### 追加 (FrameWbsNode・FrameWbsNodeTabs: WBS の表の表示/非表示。yanqirenshi/iHub#176)
 

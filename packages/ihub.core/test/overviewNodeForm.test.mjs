@@ -20,15 +20,15 @@ const COLORS = new Set(['#fff8e1', 'orange', '#333', 'rgb(0, 0, 0)']);
 const isColor = (v)=> COLORS.has(v);
 const validate = (values)=> validateOverviewNodeForm(values, { isColor });
 
-test('OVERVIEW_NODE_FIELDS: 見出しは、Overview のインスペクタ (model.unchi の fieldsOf) にある項目なら、そのラベルと同じ', ()=> {
-    const inspector = Object.fromEntries(fieldsOf({ type: 'NODE' }).map(f=> [f.path, f.label]));
-    const shared = OVERVIEW_NODE_FIELDS.filter(f=> f.path in inspector);
+test('OVERVIEW_NODE_FIELDS: 見出しは、Overview のインスペクタ (model.unchi の fieldsOf) のラベルと同じ (末尾の括弧の添え書きは除く)', ()=> {
+    // 添え書きの例: 「背景の不透明度 (0〜1。1 で不透明)」
+    const inspector = Object.fromEntries(fieldsOf({ type: 'NODE' }).map(f=> [f.path, f.label.replace(/ \(.*\)$/, '')]));
 
-    // 名称・幅・高さ・背景色・枠線の種類・枠線の色・枠線の太さ
-    assert.equal(shared.length, 7);
-
-    for (const f of shared)
+    // model.unchi 0.1.2 から、15 個すべてが、インスペクタにある。(yanqirenshi/iHub#246)
+    for (const f of OVERVIEW_NODE_FIELDS) {
+        assert.ok(f.path in inspector, f.path);
         assert.equal(f.label, inspector[f.path], f.path);
+    }
 });
 
 test('OVERVIEW_NODE_FIELDS: 15 個。鍵と保存する所は重ならない。まとまり (タブ) は、決めたものだけ', ()=> {
@@ -84,14 +84,14 @@ test('validateOverviewNodeForm: 名称は必須。幅と高さは、0 より大�
     assert.deepEqual(validate({ ...initialOverviewNodeForm(), text: 'A', w: '', h: '' }), {});
 });
 
-test('validateOverviewNodeForm: 数の範囲 (枠線の太さ・文字の大きさは 0 より大きい、角の丸みは 0 以上、透明度は 0〜1)', ()=> {
+test('validateOverviewNodeForm: 数の範囲 (枠線の太さ・文字の大きさは 0 より大きい、角の丸みは 0 以上、不透明度は 0〜1)', ()=> {
     const base = { ...initialOverviewNodeForm(), text: 'A' };
 
     assert.deepEqual(validate({ ...base, borderWidth: '0', fontSize: '-1', radius: '-0.5', opacity: '2' }), {
         borderWidth: '枠線の太さは、0 より大きい数を入力してください。',
         fontSize: '文字の大きさは、0 より大きい数を入力してください。',
         radius: '角の丸みは、0 以上の数を入力してください。',
-        opacity: '背景の透明度は、0 から 1 までの数を入力してください。',
+        opacity: '背景の不透明度は、0 から 1 までの数を入力してください。',
     });
 
     // 境目

@@ -42,7 +42,7 @@ export const OVERVIEW_NODE_FIELDS = [
     { key: 'h',           label: '高さ',         path: 'size.h',             input: 'number',   range: { gt: 0 }, group: 'basic', initial: '80',  fallback: 80 },
 
     { key: 'background',  label: '背景色',       path: 'background.color',   input: 'text',     check: 'color', group: 'background', initial: '' },
-    { key: 'opacity',     label: '背景の透明度', path: 'background.opacity', input: 'number',   range: { ge: 0, le: 1 }, group: 'background', initial: '' },
+    { key: 'opacity',     label: '背景の不透明度', path: 'background.opacity', input: 'number',   range: { ge: 0, le: 1 }, group: 'background', initial: '' },
 
     { key: 'borderType',  label: '枠線の種類',   path: 'border.type',        input: 'select',   group: 'border', initial: '',
       options: [UNSET, { value: 'solid', label: '実線' }, { value: 'dashed', label: '破線' }, { value: 'dotted', label: '点線' }] },
