@@ -21,6 +21,14 @@
   - データの形が増える。(`data_type`・`not_null`。どちらも書かなくてよい) いまのデータは、そのまま通る。(データの移行は無い)
   - 形の合わない値 (TM の文字列の `data_type`・長さ 0・負の小数部の桁数・真偽値でない `not_null` など) は、`POST`・`PATCH`・`check` で誤りになる。
 
+### 変更 (インスペクタの項目を足した版を取り込む。yanqirenshi/iHub#246)
+
+- 依存の版を上げた。(`@yanqirenshi/model.unchi`: `^0.1.2`・`@yanqirenshi/model.tm`: `^0.1.4`・`@yanqirenshi/model.er`: `^0.2.3`) スキーマと検査は、変わらない。
+- `PATCH` は、変えていない。テストを足した。
+  - 配列は、要素ごとに重ねずに、丸ごと入れ替える。(JSON Merge Patch のとおり) TM・ER のエンティティのインスペクタの NOT NULL の欄は、`{ "attributes": [ …すべての行 ] }` の patch を送る。その属性の行の `not_null` だけが変わり、ほかの行と項目は変わらない。
+  - Overview のノードの `{ "description": null }` は説明を消し、`{ "link": { "url": null } }` はリンクの URL を消す。(`link` は、空の `{}` で残る)
+- **利用側から見える違い**: 無い。
+
 ## 0.11.0 (2026-11)
 
 - コードの変更は無い。(ihub.core 0.11.0 と、版をそろえるだけ。yanqirenshi/iHub#222)
