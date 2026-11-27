@@ -1,26 +1,63 @@
-// 艦橋の Overview のタブの「ノードの追加」のフォーム。(0.12.0 から。yanqirenshi/iHub#242。叩き台)
+// 艦橋の Overview のタブの「ノードの追加」のフォーム。(0.12.0 から。yanqirenshi/iHub#242・#244。叩き台)
 //
-// フォームの項目・初めの値・入力の確かめ・保存するレコードの作り方を、ここにまとめる。
-// 画面の部品 (components/panels/bridge/components/AddOverviewNode.js。ドックの吹き出しの中のフォーム) は、OVERVIEW_NODE_FIELDS を見て、フォームを組み立てる。
+// フォームの項目・まとまり・初めの値・入力の確かめ・保存するレコードの作り方を、ここにまとめる。
+// 画面の部品 (components/panels/bridge/components/AddOverviewNode.js。ドックの吹き出しの中のフォーム) は、
+// OVERVIEW_NODE_FIELDS と OVERVIEW_NODE_GROUPS を見て、フォームを組み立てる。
 // 項目を足す・消すときは、OVERVIEW_NODE_FIELDS だけを直す。(path の所に、値を書く)
+//
+// 入れなかった項目は、レコードに書かない。(d3.unchi の既定で描かれる)
 //
 // どれも、ただの関数。(何も読み込まない。node --test で、そのまま確かめる)
 
-// フォームの項目。(並びは、フォームの並び)
+// まとまり。(並びは、フォームの並び。まとまりの無い項目は、いつも上に出す)
+export const OVERVIEW_NODE_GROUPS = [
+    { code: 'background', label: '背景' },
+    { code: 'border',     label: '枠線' },
+    { code: 'font',       label: '文字' },
+    { code: 'other',      label: 'そのほか' },
+];
+
+// 選ぶ項目の「指定なし」。(レコードに書かない)
+const UNSET = { value: '', label: '指定なし' };
+
+// フォームの項目。(並びは、フォームの並び。まとまりの中も、この順)
 //   key      … 入力の値の鍵
-//   label    … 見出し。(Overview のインスペクタ (@yanqirenshi/model.unchi の fieldsOf) のラベルに合わせる)
+//   label    … 見出し。(Overview のインスペクタ (@yanqirenshi/model.unchi の fieldsOf) に同じ項目があれば、そのラベルに合わせる)
 //   path     … 保存するレコードの項目 ('size.w' など)
-//   input    … 'text' (文字) か 'number' (数)
+//   group    … まとまり (OVERVIEW_NODE_GROUPS の code)。無ければ、いつも上に出す
+//   input    … 'text' (1 行)・'textarea' (複数行)・'number' (数)・'select' (選ぶ)
+//   check    … 文字の確かめ。'color' (CSS の色)・'url' (リンク)
+//   range    … 数の範囲。{ gt } (より大きい)・{ ge } (以上)・{ le } (以下) を組み合わせる
+//   options  … input が 'select' のときの選択肢。[{ value, label, record? }]
+//              value はフォームの値。'' (初めの値) は、レコードに書かない。record があれば、value の代わりに、それを書く
 //   required … 必須か
 //   initial  … 初めの値
 //   fallback … 空のときに書く値。(無い項目は、空のとき、レコードに書かない)
 //   wide     … フォームの横幅いっぱいに置くか。(無い項目は、2 つずつ横に並べる)
 export const OVERVIEW_NODE_FIELDS = [
-    { key: 'text',        label: '名称',     path: 'label.text',       input: 'text',   required: true, initial: '', wide: true },
-    { key: 'w',           label: '幅',       path: 'size.w',           input: 'number', initial: '160', fallback: 160 },
-    { key: 'h',           label: '高さ',     path: 'size.h',           input: 'number', initial: '80',  fallback: 80 },
-    { key: 'background',  label: '背景色',   path: 'background.color', input: 'text',   initial: '' },
-    { key: 'border',      label: '枠線の色', path: 'border.color',     input: 'text',   initial: '' },
+    { key: 'text',        label: '名称',         path: 'label.text',         input: 'text',     required: true, initial: '', wide: true },
+    { key: 'w',           label: '幅',           path: 'size.w',             input: 'number',   range: { gt: 0 }, initial: '160', fallback: 160 },
+    { key: 'h',           label: '高さ',         path: 'size.h',             input: 'number',   range: { gt: 0 }, initial: '80',  fallback: 80 },
+
+    { key: 'background',  label: '背景色',       path: 'background.color',   input: 'text',     check: 'color', group: 'background', initial: '' },
+    { key: 'opacity',     label: '背景の透明度', path: 'background.opacity', input: 'number',   range: { ge: 0, le: 1 }, group: 'background', initial: '' },
+
+    { key: 'borderType',  label: '枠線の種類',   path: 'border.type',        input: 'select',   group: 'border', initial: '',
+      options: [UNSET, { value: 'solid', label: '実線' }, { value: 'dashed', label: '破線' }, { value: 'dotted', label: '点線' }] },
+    { key: 'border',      label: '枠線の色',     path: 'border.color',       input: 'text',     check: 'color', group: 'border', initial: '' },
+    { key: 'borderWidth', label: '枠線の太さ',   path: 'border.width',       input: 'number',   range: { gt: 0 }, group: 'border', initial: '' },
+    { key: 'radius',      label: '角の丸み',     path: 'border.r',           input: 'number',   range: { ge: 0 }, group: 'border', initial: '' },
+    // 影は、書かなければ「あり」。(d3.unchi の葉の既定) 「なし」のときだけ shadow: false を書く。
+    { key: 'shadow',      label: '影',           path: 'shadow',             input: 'select',   group: 'border', initial: '',
+      options: [{ value: '', label: 'あり (既定)' }, { value: 'none', label: 'なし', record: false }] },
+
+    { key: 'fontSize',    label: '文字の大きさ', path: 'label.font.size',    input: 'number',   range: { gt: 0 }, group: 'font', initial: '' },
+    { key: 'fontColor',   label: '文字の色',     path: 'label.font.color',   input: 'text',     check: 'color', group: 'font', initial: '' },
+    { key: 'fontWeight',  label: '文字の太さ',   path: 'label.font.weight',  input: 'select',   group: 'font', initial: '',
+      options: [UNSET, { value: 'normal', label: '標準' }, { value: 'bold', label: '太字' }] },
+
+    { key: 'description', label: '説明',         path: 'description',        input: 'textarea', group: 'other', initial: '', wide: true },
+    { key: 'link',        label: 'リンク',       path: 'link.url',           input: 'text',     check: 'url', group: 'other', initial: '', wide: true },
 ];
 
 // 名称を置く所。(参照アプリのいまのノードと同じ、箱の中央)
@@ -36,9 +73,41 @@ export function initialOverviewNodeForm () {
 
 const trimmed = (v)=> String(v ?? '').trim();
 
+// CSS の色か。(ブラウザの判定。Overview のインスペクタ (model.unchi の applyPatch) と同じ)
+// ブラウザの外 (CSS が無いとき) は、確かめない。
+export function isCssColor (value) {
+    if (typeof CSS==='undefined' || typeof CSS.supports!=='function')
+        return true;
+
+    return CSS.supports('color', value);
+}
+
+// リンクとして書けるか。(http://・https:// で始まる URL か、/ で始まるアプリの中のパス。// で始まるものは、ほかのサイトなので外す)
+export function isNodeLink (value) {
+    return /^https?:\/\/\S/i.test(value) || /^\/(?!\/)/.test(value);
+}
+
+// 数の範囲の誤りの文。
+function rangeMessage (label, range) {
+    if (range.ge!==undefined && range.le!==undefined)
+        return `${label}は、${range.ge} から ${range.le} までの数を入力してください。`;
+
+    if (range.gt!==undefined)
+        return `${label}は、${range.gt} より大きい数を入力してください。`;
+
+    return `${label}は、${range.ge} 以上の数を入力してください。`;
+}
+
+function inRange (n, range) {
+    return Number.isFinite(n)
+        && (range.gt===undefined || n > range.gt)
+        && (range.ge===undefined || n >= range.ge)
+        && (range.le===undefined || n <= range.le);
+}
+
 // 入力の確かめ。誤りのある項目の鍵 → 誤りの文。(誤りが無ければ、空のオブジェクト)
-//   数の項目は、0 より大きい数。
-export function validateOverviewNodeForm (values) {
+//   isColor … 色の判定。(既定は isCssColor。テストで差し替える)
+export function validateOverviewNodeForm (values, { isColor = isCssColor } = {}) {
     const errors = {};
 
     for (const f of OVERVIEW_NODE_FIELDS) {
@@ -50,8 +119,17 @@ export function validateOverviewNodeForm (values) {
             continue;
         }
 
-        if (f.input==='number' && !(Number.isFinite(Number(v)) && Number(v) > 0))
-            errors[f.key] = `${f.label}は、0 より大きい数を入力してください。`;
+        if (f.input==='number' && f.range && !inRange(Number(v), f.range))
+            errors[f.key] = rangeMessage(f.label, f.range);
+
+        else if (f.input==='select' && !f.options.some(o=> o.value===v))
+            errors[f.key] = `${f.label}は、選択肢から選んでください。`;
+
+        else if (f.check==='color' && !isColor(v))
+            errors[f.key] = `${f.label}は、CSS の色 (#ff8800・orange など) を入力してください。`;
+
+        else if (f.check==='url' && !isNodeLink(v))
+            errors[f.key] = `${f.label}は、http:// か https:// で始まる URL か、/ で始まるパスを入力してください。`;
     }
 
     return errors;
@@ -99,10 +177,23 @@ function put (record, path, value) {
     at[keys[keys.length - 1]] = value;
 }
 
+// フォームの値を、レコードに書く値にする。
+function recordValue (f, v) {
+    if (f.input==='number')
+        return Number(v);
+
+    if (f.input==='select') {
+        const option = f.options.find(o=> o.value===v);
+        return option && 'record' in option ? option.record : v;
+    }
+
+    return v;
+}
+
 // 保存するレコード。(id は API サーバーが振る。最上位のノードとして足す)
 //   values … フォームの値。(validateOverviewNodeForm で確かめたもの)
 //   nodes  … いまある最上位のノード。(data/overview/nodes.json。置く所を決めるのに使う)
-// 空の項目は、書かない。(fallback のある項目は、fallback を書く) 数の項目は、数にする。
+// 空の項目 (選ぶ項目の「指定なし」も) は、書かない。(fallback のある項目は、fallback を書く) 数の項目は、数にする。
 export function buildOverviewNodeRecord (values, nodes) {
     const record = { type: 'NODE', label: {} };
 
@@ -115,7 +206,7 @@ export function buildOverviewNodeRecord (values, nodes) {
             continue;
         }
 
-        put(record, f.path, f.input==='number' ? Number(v) : v);
+        put(record, f.path, recordValue(f, v));
     }
 
     record.label = { ...record.label, ...NODE_LABEL_ALIGN };
