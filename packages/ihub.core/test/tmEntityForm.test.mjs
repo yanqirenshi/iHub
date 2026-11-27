@@ -5,8 +5,9 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import {
-    ENTITY_FORM_FIELDS, ENTITY_FORM_TABS, NEW_ENTITY_GAP_X, PREVIEW_ENTITY_ID, buildEntityRecord, firstTabWithError, initialEntityForm,
-    masterItems, matchesMaster, newEntityPosition, nextRowId, pickerLists, previewEntityData, selectMaster, unselectMaster,
+    ENTITY_FORM_FIELDS, ENTITY_FORM_TABS, NEW_ENTITY_GAP_X, PREVIEW_EMPTY_NAME, PREVIEW_ENTITY_ID, buildEntityRecord, firstTabWithError,
+    initialEntityForm, isPreviewNameEmpty, masterItems, matchesMaster, newEntityPosition, nextRowId, pickerLists, previewEntityData,
+    selectMaster, unselectMaster,
     validateEntityForm,
 } from '../src/manegers/tmEntityForm.js';
 
@@ -141,7 +142,7 @@ test('previewEntityData: 入力のレコード 1 件 (位置は原点) と、マ
     // 論理名が空・マスタが無いときも、落ちない
     const empty = previewEntityData(initialEntityForm(), {});
 
-    assert.equal(empty.entities[0].name, '');
+    assert.equal(empty.entities[0].name, PREVIEW_EMPTY_NAME);   // (#240。d3.ter の「????????」の代わり)
     assert.deepEqual(empty.identifiers, []);
 });
 
@@ -217,4 +218,27 @@ test('selectMaster・unselectMaster: 選ぶと末尾に入り、外すと消え�
 
     assert.deepEqual(unselectMaster(undefined, 1), []);
     assert.deepEqual(selectMaster(undefined, 1), [1]);
+});
+
+test('previewEntityData: 論理名が空のあいだは、名前を「(論理名)」にする。保存するレコードは変えない (#240)', ()=> {
+    const collections = { 'tm/entities': [] };
+
+    assert.equal(PREVIEW_EMPTY_NAME, '(論理名)');
+    assert.equal(isPreviewNameEmpty(initialEntityForm()), true);
+    assert.equal(isPreviewNameEmpty({ logical: '   ' }), true);
+    assert.equal(isPreviewNameEmpty({ logical: '顧客' }), false);
+    assert.equal(isPreviewNameEmpty(undefined), true);
+
+    // 論理名も物理名も空: 文字列の名前
+    assert.equal(previewEntityData(initialEntityForm(), collections).entities[0].name, PREVIEW_EMPTY_NAME);
+    assert.equal(buildEntityRecord(initialEntityForm(), collections).name, '');
+
+    // 物理名だけ: 論理名だけを置き換える
+    const physical = { ...initialEntityForm(), logical: ' ', physical: 'customer' };
+
+    assert.deepEqual(previewEntityData(physical, collections).entities[0].name, { logical: PREVIEW_EMPTY_NAME, physical: 'customer' });
+    assert.deepEqual(buildEntityRecord(physical, collections).name, { logical: '', physical: 'customer' });
+
+    // 論理名があれば、そのまま
+    assert.equal(previewEntityData({ ...initialEntityForm(), logical: '顧客' }, collections).entities[0].name, '顧客');
 });

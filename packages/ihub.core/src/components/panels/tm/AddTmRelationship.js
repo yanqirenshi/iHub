@@ -12,20 +12,26 @@ import TextField from '@mui/material/TextField';
 import { CARDINALITIES, OPTIONALITIES, SUBSET_KINDS } from '@yanqirenshi/model.tm';
 
 import { errorMessage, useAddRecordMutation } from '../../../redux/api/dataApi.js';
+import { buildRelationshipRecord } from '../../../manegers/tmAddForms.js';
 import { nameText, TM_TABLE_COLLECTIONS } from '../../../manegers/tmTables.js';
 
-const TITLE = 'Relationship を追加';
+import { TM_DIALOG_Z_INDEX } from './tmDialog.js';
+
+// ビジネスのページの Relationships のタブの「Relationship の追加」。(0.12.0 から。yanqirenshi/iHub#238)
+// ボタンを押すと、モーダルのフォームを出し、POST /api/tm/relationships で、結線を 1 件足す。(id は API サーバーが振る)
+// 保存するレコードの形は、manegers/tmAddForms.js の buildRelationshipRecord が作る。
+// 接続位置 (from.position・to.position) は、2 つのエンティティの位置から、向かい合う向きに決める。(フォームに欄は無い。#240)
+const TITLE = 'Relationship の追加';
 const CARDINALITY_LABELS = { 1: '1', 3: '多' };
 const OPTIONALITY_LABELS = { 0: '任意', 1: '必須' };
 
-function relationshipEnd (form, name) {
-    const cardinality = form.get(`${name}Cardinality`);
-    const optionality = form.get(`${name}Optionality`);
-
+// 端点の入力。{ entity, cardinality, optionality }
+function endValues (form, name) {
     return {
+        // HTML の選択値は文字列なので、JSON で数値 ID と文字列 ID を区別している。(EntitySelect)
         entity: JSON.parse(form.get(name)),
-        ...(cardinality !== '' ? { cardinality: Number(cardinality) } : {}),
-        ...(optionality !== '' ? { optionality: Number(optionality) } : {}),
+        cardinality: form.get(`${name}Cardinality`),
+        optionality: form.get(`${name}Optionality`),
     };
 }
 
@@ -61,17 +67,15 @@ function RelationshipDialog ({ entities, onClose }) {
             return;
 
         const form = new FormData(e.currentTarget);
-        const type = form.get('type').trim();
-        const label = form.get('label').trim();
-        const description = form.get('description').trim();
-        const record = {
-            from: relationshipEnd(form, 'from'),
-            to: relationshipEnd(form, 'to'),
-            ...(type ? { type } : {}),
-            ...(label ? { label } : {}),
-            ...(subsetKind ? { subset: { kind: subsetKind, code: form.get('subsetCode').trim() } } : {}),
-            ...(description ? { description } : {}),
-        };
+        const record = buildRelationshipRecord({
+            from: endValues(form, 'from'),
+            to: endValues(form, 'to'),
+            type: form.get('type'),
+            label: form.get('label'),
+            subsetKind,
+            subsetCode: form.get('subsetCode'),
+            description: form.get('description'),
+        }, options);
 
         setFailure(null);
         try {
@@ -83,7 +87,7 @@ function RelationshipDialog ({ entities, onClose }) {
     };
 
     return (
-        <Dialog open onClose={close} fullWidth maxWidth="sm" aria-labelledby={titleId}
+        <Dialog open onClose={close} fullWidth maxWidth="sm" aria-labelledby={titleId} sx={{ zIndex: TM_DIALOG_Z_INDEX }}
                 slotProps={{ paper: { component: 'form', onSubmit: submit } }}>
           <DialogTitle id={titleId}>{TITLE}</DialogTitle>
           <DialogContent>
