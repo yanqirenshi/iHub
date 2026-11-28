@@ -10,6 +10,12 @@
 
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマット・API・CLI を変えるときに、minor を上げます。
 
+## 0.12.1 (2026-11)
+
+- `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv`: 艦橋の Overview の線を、破線・点線で描ける版 (d3.unchi 0.10.4・model.unchi 0.1.3) を取り込んだ。(yanqirenshi/iHub#252) 線のインスペクタに「線の種類」(`stroke.type`。`solid`・`dashed`・`dotted`) が増え、データにも書ける。空や知らない文字で適用すると、誤りを出して書かない。(空にしても、項目は消えない) いままで線の `stroke.type` に何か書いていたデータは、描かれ方が変わる。範囲が `^` なので、0.12.0 を新しく `npm install` したアプリにも入っている。iHub のコードの変更は無い。データの形・設定の形は変わらない。
+- `@yanqirenshi/ihub.core`: 雛形の `examples/app/package.template.json` の iHub の版を、`^0.12.1` にそろえた。
+- `@yanqirenshi/ihub.srv`: コードの変更は無い。`stroke.type` を書いた線の `POST`・`PATCH`・検査のテストを足した。
+
 ## 0.12.0 (2026-11)
 
 - `@yanqirenshi/ihub.core`: ビジネスのページに、TM のデータ (`data/tm/` の entities・identifiers・attributes・relationships) を表で見るタブ (Entities・Identifiers・Attributes・Relationships) を、「TM」と「機能一覧」の間に足した。(yanqirenshi/iHub#224) 並びはファイルの順。(書き換え・削除は、表からはできない)エンティティの識別子・属性、結線の接続元・接続先は、id ではなく名前で出す。Identifiers・Attributes は、名前を論理名と物理名の列に分けて出す。(yanqirenshi/iHub#230) 初めに開くタブは、これまでどおり TM。

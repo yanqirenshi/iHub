@@ -4,6 +4,24 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、設定の形・公開する部品・データのフォーマットを変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.12.1 (2026-11)
+
+### 変更 (艦橋の Overview の線を、破線・点線で描ける版を取り込む。yanqirenshi/iHub#252)
+
+- `dependencies` の `@yanqirenshi/d3.unchi` を `^0.10.4`、`@yanqirenshi/model.unchi` を `^0.1.3` に上げた。(Foolsgolds/Assholes#275) 2 つの依存の範囲は、変わっていない。
+- d3.unchi 0.10.4 は、線 (`data/overview/edges.json`) の `stroke.type` を読んで、`solid` (実線。既定)・`dashed` (破線。6px の線・4px のすき間)・`dotted` (点線。2px の線・3px のすき間) で描く。書かない・空・知らない文字は、実線。(実線の DOM は、0.10.3 と同じ) 両端の 12px は、破線・点線でも隠れる。マーカーは、線の種類によらず、実線の形で描かれる。線・すき間の長さは、データでは変えられない。
+- model.unchi 0.1.3 は、線のインスペクタ (`fieldsOf`) に「線の種類」(`stroke.type`) を足した。`Overview.js` は `fieldsOf` をそのまま渡しているので、iHub のコードの変更は無い。
+- 雛形の `examples/app/package.template.json` の `@yanqirenshi/ihub.core`・`@yanqirenshi/ihub.srv` を、`^0.12.1` にした。
+- **利用側から見える違い**:
+  - 艦橋の Overview の線を Ctrl + クリックすると、インスペクタに「線の種類 (solid / dashed / dotted)」の欄が出る。(文字で入れる欄。ノードの「枠線の種類」と同じ出方) `stroke.type` を書いていない線は、`solid` と出る。
+  - 適用すると、その線の `stroke.type` だけが書き換わる。(`{ stroke: { type: 'dashed' } }` の patch。ほかの項目と、ほかの線は変わらない) 何も変えなければ、「適用」は押せず、データは書き換わらない。
+  - **空にして適用すると、誤りになる。** (「線の種類は、solid / dashed / dotted のどれかで入力してください。」と図の上に出て、書かない。項目は消えない) 知らない文字のときも、同じ。
+  - 破線・点線から実線に戻すときは、`solid` を入れる。そのときは、`"type": "solid"` がデータに書かれる。(項目は消えない。描かれ方は、書いていないときと同じ)
+  - データにも、線の `stroke.type` を書ける。**いままで線の `stroke.type` に何か書いていたデータは、描かれ方が変わる。** (0.12.0 までは、無視されていた) 参照アプリと雛形のデータには、`stroke.type` を書いた線は無い。
+  - 長さ 24px 以下の短い線は、破線・点線を指定しても、破線にならない。(両端の 12px を隠すと、見える区間が無いため)
+  - 範囲が `^` なので、0.12.0 を新しく `npm install` したアプリにも、d3.unchi 0.10.4・model.unchi 0.1.3 が入る。(lock を持っているアプリは、0.12.1 に上げると、必ず入る)
+  - データの形・設定の形は、変わらない。(データの移行は無い)
+
 ## 0.12.0 (2026-11)
 
 ### 追加 (ビジネスのページに、TM のデータを表で見るタブを足す。yanqirenshi/iHub#224)
