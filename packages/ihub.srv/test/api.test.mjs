@@ -190,6 +190,29 @@ test('POST /api/overview/nodes で、最上位のノードを足す。id は、�
     assert.deepEqual(nodes[0].children.map(d=> d.id), [11, 12]);
 });
 
+test('Overview の線: 線の種類 (stroke.type) を、POST・PATCH で書ける。ほかの項目と、ほかの線は変わらない (ihub.core 0.12.1。#252)', async ()=> {
+    const before = readData('overview/edges');
+
+    // 破線の線を足す
+    const body = { from: { id: 1, position: 270 }, to: { id: 2, position: 90 }, stroke: { color: '#888888', type: 'dashed' } };
+    const res = await request('/api/overview/edges', { method: 'POST', body });
+
+    assert.equal(res.status, 201);
+
+    const id = (await res.json()).record.id;
+    const url = `/api/overview/edges/${id}`;
+    const get = ()=> readData('overview/edges').find(d=> d.id===id);
+
+    assert.deepEqual(get().stroke, { color: '#888888', type: 'dashed' });
+
+    // インスペクタ (model.unchi の applyPatch) が送る形 ({ stroke: { type } }) で、点線にする
+    assert.equal((await request(url, { method: 'PATCH', body: { stroke: { type: 'dotted' } } })).status, 200);
+    assert.deepEqual(get().stroke, { color: '#888888', type: 'dotted' });
+
+    // もとからある線は、変わらない
+    assert.deepEqual(readData('overview/edges').filter(d=> d.id!==id), before);
+});
+
 test('POST でルールに合わないレコードは 400 にする', async ()=> {
     const res = await request('/api/wbs/wbs', { method: 'POST', body: { parent: 99999, name: 'X' } });
 

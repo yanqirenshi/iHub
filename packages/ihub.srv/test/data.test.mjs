@@ -64,8 +64,17 @@ test('Overview のノードは、id に文字列も使え、d3.unchi の見た�
 
     data['overview/nodes'].push({ id: 'note-1', type: 'TEXT', text: ['メモ'], bullet: true, size: { w: 200 }, position: { x: 0, y: 300 } });
     data['overview/edges'].push({ id: 101, from: { id: 'note-1' }, to: { id: 2 }, to_marker: 'triangle', stroke: { color: '#888888' } });
+    // 線の種類 (d3.unchi 0.10.4 から。#252)
+    data['overview/edges'].push({ id: 102, from: { id: 1 }, to: { id: 2 }, stroke: { type: 'dashed' } });
 
     assert.deepEqual(validateData(data), []);
+
+    // 見た目の項目は検査しないので、知らない線の種類も通る。(d3.unchi は実線で描く。インスペクタからは入れられない)
+    const unknownStroke = structuredClone(data);
+
+    unknownStroke['overview/edges'][2].stroke.type = 'wavy';
+
+    assert.deepEqual(validateData(unknownStroke), []);
 
     // スキーマに合わないもの (位置が数でない・マーカーの種類が無い)
     const broken = structuredClone(data);

@@ -4,6 +4,15 @@
 版は [semver](https://semver.org/lang/ja/) で付けます。0.x の間は、API・データのフォーマット・CLI を変えるときに、minor を上げます。
 (リポジトリ全体の更新履歴は、[ルートの CHANGELOG.md](https://github.com/yanqirenshi/iHub/blob/main/CHANGELOG.md) にあります)
 
+## 0.12.1 (2026-11)
+
+- ihub.core 0.12.1 と、版をそろえる。(yanqirenshi/iHub#252)
+- `dependencies` の `@yanqirenshi/model.unchi` を `^0.1.3` に上げた。(線の種類 `stroke.type` を足した版) コードの変更は無い。
+  - `overview/edges` のスキーマは、これまでどおり、見た目の項目 (`stroke`・`label`) を確かめない。`stroke.type` を書いた線は、`POST`・`PATCH`・`ihub-srv check` を通る。知らない線の種類 (`wavy` など) も通る。(d3.unchi は、実線で描く。インスペクタからは入れられない)
+  - 整合性の検査 (model.unchi の `check`) は、id の重複と、線の端点のノードだけを見る。線の種類は見ない。
+  - テストを足した。(`stroke.type` を書いた線の `POST`・`PATCH` と、データの検査)
+- `init --app` で作る `package.json` の iHub の版は、`^0.12.1` になる。
+
 ## 0.12.0 (2026-11)
 
 - ihub.core 0.12.0 と、版をそろえる。(yanqirenshi/iHub#224)
